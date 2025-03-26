@@ -131,7 +131,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await axios.post(apiUrl, {
-      contents: [{ 
+      contents: [{
         parts: [{
           text: message // Use the message from the chat input here
         }]
