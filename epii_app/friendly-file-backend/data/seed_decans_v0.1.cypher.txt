@@ -1,0 +1,345 @@
+// --- Match Starting Node ---
+MATCH (startNode:ParashaktiComponent {id: 3})
+
+// --- Create Element Nodes ---
+MERGE (fire:Element {name: 'Fire'})
+MERGE (earth:Element {name: 'Earth'})
+MERGE (air:Element {name: 'Air'})
+MERGE (water:Element {name: 'Water'})
+MERGE (startNode)-[:HAS_ELEMENT]->(fire)
+MERGE (startNode)-[:HAS_ELEMENT]->(earth)
+MERGE (startNode)-[:HAS_ELEMENT]->(air)
+MERGE (startNode)-[:HAS_ELEMENT]->(water)
+
+// --- Create Zodiac Sign Nodes ---
+// Fire Signs
+MERGE (aries:ZodiacSign {name: 'Aries', element: 'Fire', signRuler: 'Mars'})
+MERGE (leo:ZodiacSign {name: 'Leo', element: 'Fire', signRuler: 'Sun'})
+MERGE (sagittarius:ZodiacSign {name: 'Sagittarius', element: 'Fire', signRuler: 'Jupiter'})
+MERGE (fire)-[:HAS_ZODIAC_SIGN]->(aries)
+MERGE (fire)-[:HAS_ZODIAC_SIGN]->(leo)
+MERGE (fire)-[:HAS_ZODIAC_SIGN]->(sagittarius)
+// Earth Signs
+MERGE (taurus:ZodiacSign {name: 'Taurus', element: 'Earth', signRuler: 'Venus'})
+MERGE (virgo:ZodiacSign {name: 'Virgo', element: 'Earth', signRuler: 'Mercury'})
+MERGE (capricorn:ZodiacSign {name: 'Capricorn', element: 'Earth', signRuler: 'Saturn'})
+MERGE (earth)-[:HAS_ZODIAC_SIGN]->(taurus)
+MERGE (earth)-[:HAS_ZODIAC_SIGN]->(virgo)
+MERGE (earth)-[:HAS_ZODIAC_SIGN]->(capricorn)
+// Air Signs
+MERGE (gemini:ZodiacSign {name: 'Gemini', element: 'Air', signRuler: 'Mercury'})
+MERGE (libra:ZodiacSign {name: 'Libra', element: 'Air', signRuler: 'Venus'})
+MERGE (aquarius:ZodiacSign {name: 'Aquarius', element: 'Air', signRuler: 'Saturn'})
+MERGE (air)-[:HAS_ZODIAC_SIGN]->(gemini)
+MERGE (air)-[:HAS_ZODIAC_SIGN]->(libra)
+MERGE (air)-[:HAS_ZODIAC_SIGN]->(aquarius)
+// Water Signs
+MERGE (cancer:ZodiacSign {name: 'Cancer', element: 'Water', signRuler: 'Moon'})
+MERGE (scorpio:ZodiacSign {name: 'Scorpio', element: 'Water', signRuler: 'Mars'})
+MERGE (pisces:ZodiacSign {name: 'Pisces', element: 'Water', signRuler: 'Jupiter'})
+MERGE (water)-[:HAS_ZODIAC_SIGN]->(cancer)
+MERGE (water)-[:HAS_ZODIAC_SIGN]->(scorpio)
+MERGE (water)-[:HAS_ZODIAC_SIGN]->(pisces)
+
+// --- Create Decan Nodes and Aspects (Example: Aries - Full script will include all 36) ---
+
+// Aries Decan 1
+MERGE (d_aries1:Decan {name: 'Aries Decan 1', degrees: '0-10°', zodiacSign: 'Aries', traditionalRuler: 'Mars', iconography: 'A fierce black warrior figure with red eyes, wielding an axe and clothed in white.', egyptianDeity: 'Amun-Ra', tarotCard: '2 of Wands', bodyPart: 'Skull, Brain'})
+MERGE (aries)-[:HAS_DECAN]->(d_aries1)
+MERGE (da_aries1_l:DecanAspect {type: 'Light', description: 'Natural pioneers and leaders, brimming with courage, enthusiasm, and initiative. Remarkable ability to start new projects and inspire others. Directness and honesty. Excel in competitive situations.'})
+MERGE (da_aries1_s:DecanAspect {type: 'Shadow', description: 'Excessive impulsivity and aggression. Self-centered, impatient, quick to anger. Competitive nature may turn into domination. Reckless risk-taking. May start many projects but finish few. Tactlessness.'})
+MERGE (d_aries1)-[:HAS_ASPECT]->(da_aries1_l)
+MERGE (d_aries1)-[:HAS_ASPECT]->(da_aries1_s)
+
+// Aries Decan 2
+MERGE (d_aries2:Decan {name: 'Aries Decan 2', degrees: '10-20°', zodiacSign: 'Aries', traditionalRuler: 'Sun', iconography: 'A one-legged woman in colorful garments (red or green robes) searching for jewelry and children.', egyptianDeity: 'Sekhmet', tarotCard: '3 of Wands', bodyPart: 'Eyes, Sinuses'})
+MERGE (aries)-[:HAS_DECAN]->(d_aries2)
+MERGE (da_aries2_l:DecanAspect {type: 'Light', description: 'Charismatic, confident, and creative. Natural leadership abilities and strong sense of personal dignity. Warm, generous nature. Flair for the dramatic. More stable and consistent, greater staying power.'})
+MERGE (da_aries2_s:DecanAspect {type: 'Shadow', description: 'Egotism, pride, domineering attitude. Overly concerned with image. Attention-seeking behavior and dramatic displays. Stubborn and resistant to advice. Confidence can turn into arrogance.'})
+MERGE (d_aries2)-[:HAS_ASPECT]->(da_aries2_l)
+MERGE (d_aries2)-[:HAS_ASPECT]->(da_aries2_s)
+
+// Aries Decan 3
+MERGE (d_aries3:Decan {name: 'Aries Decan 3', degrees: '20-30°', zodiacSign: 'Aries', traditionalRuler: 'Venus', iconography: 'A restless man with reddish hair, holding a golden bracelet or ring, dressed in red. Appears eager to do good but cannot carry it out fully.', egyptianDeity: 'Hathor', tarotCard: '4 of Wands', bodyPart: 'Neck, Throat'})
+MERGE (aries)-[:HAS_DECAN]->(d_aries3)
+MERGE (da_aries3_l:DecanAspect {type: 'Light', description: 'Socially adept, optimistic, philosophically minded. Broader vision, concerned with ideals. Charming and diplomatic, able to inspire. Ability to bring people together and create harmony.'})
+MERGE (da_aries3_s:DecanAspect {type: 'Shadow', description: 'Restlessness, overconfidence, tendency to promise more than can be delivered. May scatter energies. Overly idealistic and impractical. Desire to please everyone may lead to inconsistency.'})
+MERGE (d_aries3)-[:HAS_ASPECT]->(da_aries3_l)
+MERGE (d_aries3)-[:HAS_ASPECT]->(da_aries3_s)
+
+// --- Taurus Decans ---
+// Taurus Decan 1
+MERGE (d_taurus1:Decan {name: 'Taurus Decan 1', degrees: '0-10°', zodiacSign: 'Taurus', traditionalRuler: 'Mercury', iconography: 'A woman with curly hair in fiery-colored clothes, holding her child. Both wear garments glowing like embers.', egyptianDeity: 'Ptah', tarotCard: '5 of Pentacles', bodyPart: 'Throat, Vocal Cords'})
+MERGE (taurus)-[:HAS_DECAN]->(d_taurus1)
+MERGE (da_taurus1_l:DecanAspect {type: 'Light', description: 'Patient, reliable, deeply connected to the physical world. Appreciation for beauty, comfort, quality. Grounded and practical, steady determination. Loyalty and dependability. Calming, stabilizing influence.'})
+MERGE (da_taurus1_s:DecanAspect {type: 'Shadow', description: 'Stubbornness, possessiveness, materialism. Fixed in ways, resistant to change. Unhealthy attachments to possessions, people, routines. Complacency. Self-indulgence and laziness.'})
+MERGE (d_taurus1)-[:HAS_ASPECT]->(da_taurus1_l)
+MERGE (d_taurus1)-[:HAS_ASPECT]->(da_taurus1_s)
+
+// Taurus Decan 2
+MERGE (d_taurus2:Decan {name: 'Taurus Decan 2', degrees: '10-20°', zodiacSign: 'Taurus', traditionalRuler: 'Moon', iconography: 'A man with the face of a camel and hooved feet, in old garments, working the land with oxen.', egyptianDeity: 'Apis Bull', tarotCard: '6 of Pentacles', bodyPart: 'Chest, Lungs'})
+MERGE (taurus)-[:HAS_DECAN]->(d_taurus2)
+MERGE (da_taurus2_l:DecanAspect {type: 'Light', description: 'Practical, detail-oriented, analytical. Excellent organizational skills, methodical approach. Intelligence grounded in common sense. Reliable workers, take pride in doing things well. Ability to create efficient systems.'})
+MERGE (da_taurus2_s:DecanAspect {type: 'Shadow', description: 'Overthinking, worry, excessive criticism. Can become bogged down in details. Desire for perfection may lead to chronic dissatisfaction. Overly cautious. Analytical nature may create emotional distance.'})
+MERGE (d_taurus2)-[:HAS_ASPECT]->(da_taurus2_l)
+MERGE (d_taurus2)-[:HAS_ASPECT]->(da_taurus2_s)
+
+// Taurus Decan 3
+MERGE (d_taurus3:Decan {name: 'Taurus Decan 3', degrees: '20-30°', zodiacSign: 'Taurus', traditionalRuler: 'Saturn', iconography: 'A red-skinned man with an elephant’s body and very white teeth, accompanied by a horse, dog, and resting calf.', egyptianDeity: 'Horus', tarotCard: '7 of Pentacles', bodyPart: 'Upper Back'})
+MERGE (taurus)-[:HAS_DECAN]->(d_taurus3)
+MERGE (da_taurus3_l:DecanAspect {type: 'Light', description: 'Disciplined, responsible, achievement-oriented. Exceptional endurance, ability to work steadily toward long-term goals. Practical wisdom, mature outlook, natural authority. Excellent at managing resources and building lasting structures.'})
+MERGE (da_taurus3_s:DecanAspect {type: 'Shadow', description: 'Rigidity, pessimism, excessive focus on security. Overly controlled and controlling. Prone to melancholy. Concern with status can lead to workaholism. May judge harshly.'})
+MERGE (d_taurus3)-[:HAS_ASPECT]->(da_taurus3_l)
+MERGE (d_taurus3)-[:HAS_ASPECT]->(da_taurus3_s)
+
+// --- Gemini Decans ---
+// Gemini Decan 1
+MERGE (d_gemini1:Decan {name: 'Gemini Decan 1', degrees: '0-10°', zodiacSign: 'Gemini', traditionalRuler: 'Jupiter', iconography: 'A beautiful woman skilled in sewing, with two calves and two horses beside her.', egyptianDeity: 'Thoth', tarotCard: '8 of Swords', bodyPart: 'Hands, Arms'})
+MERGE (gemini)-[:HAS_DECAN]->(d_gemini1)
+MERGE (da_gemini1_l:DecanAspect {type: 'Light', description: 'Intellectually curious, communicative, versatile. Quick minds, process information rapidly. Wit and verbal agility. Adaptable and youthful, sense of wonder. Wide range of knowledge.'})
+MERGE (da_gemini1_s:DecanAspect {type: 'Shadow', description: 'Scattered energy, nervousness, superficiality. May commit to nothing. Racing thoughts, anxiety. Inconsistent and unreliable. Communication may become gossip or empty chatter.'})
+MERGE (d_gemini1)-[:HAS_ASPECT]->(da_gemini1_l)
+MERGE (d_gemini1)-[:HAS_ASPECT]->(da_gemini1_s)
+
+// Gemini Decan 2
+MERGE (d_gemini2:Decan {name: 'Gemini Decan 2', degrees: '10-20°', zodiacSign: 'Gemini', traditionalRuler: 'Mars', iconography: 'A man with a griffin’s face, wearing a turban and armored with leaden shield and iron helmet adorned by a crown. Holds bow and arrow.', egyptianDeity: 'Ma\'at', tarotCard: '9 of Swords', bodyPart: 'Lungs, Diaphragm'})
+MERGE (gemini)-[:HAS_DECAN]->(d_gemini2)
+MERGE (da_gemini2_l:DecanAspect {type: 'Light', description: 'Socially intelligent, diplomatic, charming. Ability to see multiple perspectives and mediate conflicts. Refined communication style. Excellent taste, appreciation for beauty and art.'})
+MERGE (da_gemini2_s:DecanAspect {type: 'Shadow', description: 'Indecisiveness, people-pleasing, avoidance of conflict. May struggle to form own opinions. May suppress truths. Can use charm to manipulate or avoid emotional engagement.'})
+MERGE (d_gemini2)-[:HAS_ASPECT]->(da_gemini2_l)
+MERGE (d_gemini2)-[:HAS_ASPECT]->(da_gemini2_s)
+
+// Gemini Decan 3
+MERGE (d_gemini3:Decan {name: 'Gemini Decan 3', degrees: '20-30°', zodiacSign: 'Gemini', traditionalRuler: 'Sun', iconography: 'A man armed with bow and quiver, in motion (one text shows him wearing a shield).', egyptianDeity: 'Seshat', tarotCard: '10 of Swords', bodyPart: 'Nervous System'})
+MERGE (gemini)-[:HAS_DECAN]->(d_gemini3)
+MERGE (da_gemini3_l:DecanAspect {type: 'Light', description: 'Innovative, original, intellectually brilliant. Forward-thinking perspective. Challenges conventional thinking. Humanitarian outlook. Diverse and unconventional social networks.'})
+MERGE (da_gemini3_s:DecanAspect {type: 'Shadow', description: 'Erratic behavior, rebelliousness for its own sake, emotional detachment. Unpredictable and unreliable. May reject valuable traditions. May use intellect to distance from emotions. Provocative communication.'})
+MERGE (d_gemini3)-[:HAS_ASPECT]->(da_gemini3_l)
+MERGE (d_gemini3)-[:HAS_ASPECT]->(da_gemini3_s)
+
+// --- Cancer Decans ---
+// Cancer Decan 1
+MERGE (d_cancer1:Decan {name: 'Cancer Decan 1', degrees: '0-10°', zodiacSign: 'Cancer', traditionalRuler: 'Venus', iconography: 'A man with a horse-like face and fingers, white feet, and covered in leaves.', egyptianDeity: 'Isis', tarotCard: '2 of Cups', bodyPart: 'Breasts, Stomach'})
+MERGE (cancer)-[:HAS_DECAN]->(d_cancer1)
+MERGE (da_cancer1_l:DecanAspect {type: 'Light', description: 'Deeply nurturing, intuitive, emotionally sensitive. Ability to care for others and create safe environments. Strong connection to home and family. Excellent emotional memory. Empathy.'})
+MERGE (da_cancer1_s:DecanAspect {type: 'Shadow', description: 'Moodiness, clinginess, emotional manipulation. Can become overwhelmed by feelings. Desire to nurture may become smothering. Can hold onto hurts, develop grudges. Overly defensive.'})
+MERGE (d_cancer1)-[:HAS_ASPECT]->(da_cancer1_l)
+MERGE (d_cancer1)-[:HAS_ASPECT]->(da_cancer1_s)
+
+// Cancer Decan 2
+MERGE (d_cancer2:Decan {name: 'Cancer Decan 2', degrees: '10-20°', zodiacSign: 'Cancer', traditionalRuler: 'Mercury', iconography: 'A beautiful woman singing, wearing a wreath of green basil and holding a water-lily rod.', egyptianDeity: 'Heka', tarotCard: '3 of Cups', bodyPart: 'Ribs, Pancreas'})
+MERGE (cancer)-[:HAS_DECAN]->(d_cancer2)
+MERGE (da_cancer2_l:DecanAspect {type: 'Light', description: 'Emotionally intense, psychologically perceptive, deeply transformative. Powerful intuition, sees beneath the surface. Resilient and resourceful. Access to profound wisdom and healing abilities.'})
+MERGE (da_cancer2_s:DecanAspect {type: 'Shadow', description: 'Emotional control, obsession, power struggles. Secretive and manipulative. Fear of vulnerability may create emotional walls. Can become fixated on past hurts or betrayals. Intensity may overwhelm others.'})
+MERGE (d_cancer2)-[:HAS_ASPECT]->(da_cancer2_l)
+MERGE (d_cancer2)-[:HAS_ASPECT]->(da_cancer2_s)
+
+// Cancer Decan 3
+MERGE (d_cancer3:Decan {name: 'Cancer Decan 3', degrees: '20-30°', zodiacSign: 'Cancer', traditionalRuler: 'Moon', iconography: 'A man with one foot like a turtle’s, holding a snake, and adorned with gold jewelry.', egyptianDeity: 'Tawaret', tarotCard: '4 of Cups', bodyPart: 'Liver, Gallbladder'})
+MERGE (cancer)-[:HAS_DECAN]->(d_cancer3)
+MERGE (da_cancer3_l:DecanAspect {type: 'Light', description: 'Compassionate, imaginative, spiritually attuned. Boundless empathy, desire to alleviate suffering. Rich inner life, creative inspiration, mystical experiences. Understanding of interconnectedness.'})
+MERGE (da_cancer3_s:DecanAspect {type: 'Shadow', description: 'Escapism, martyrdom, boundary confusion. May retreat into fantasy or addiction. May neglect own needs. May absorb others\' emotions, losing sense of self. Vulnerable to delusion or spiritual bypassing.'})
+MERGE (d_cancer3)-[:HAS_ASPECT]->(da_cancer3_l)
+MERGE (d_cancer3)-[:HAS_ASPECT]->(da_cancer3_s)
+
+// --- Leo Decans ---
+// Leo Decan 1
+MERGE (d_leo1:Decan {name: 'Leo Decan 1', degrees: '0-10°', zodiacSign: 'Leo', traditionalRuler: 'Saturn', iconography: 'A man in dirty clothes, alongside a wolfish cavalryman and a watchdog, all gazing north.', egyptianDeity: 'Ra-Horakhty', tarotCard: '5 of Wands', bodyPart: 'Heart, Spine'})
+MERGE (leo)-[:HAS_DECAN]->(d_leo1)
+MERGE (da_leo1_l:DecanAspect {type: 'Light', description: 'Confident, generous, naturally charismatic. Warm, radiant presence. Natural flair for leadership and performance. Creativity expressed with dramatic flair. Strong sense of dignity and integrity. Loyalty and big-heartedness.'})
+MERGE (da_leo1_s:DecanAspect {type: 'Shadow', description: 'Arrogance, domineering behavior, excessive pride. Overly concerned with image and status. Attention-seeking behavior and drama. Vulnerable to flattery. Stubborn and resistant to criticism. Generosity may expect loyalty in return.'})
+MERGE (d_leo1)-[:HAS_ASPECT]->(da_leo1_l)
+MERGE (d_leo1)-[:HAS_ASPECT]->(da_leo1_s)
+
+// Leo Decan 2
+MERGE (d_leo2:Decan {name: 'Leo Decan 2', degrees: '10-20°', zodiacSign: 'Leo', traditionalRuler: 'Jupiter', iconography: 'A man crowned with white basil, holding an arrow.', egyptianDeity: 'Sekhmet-Bast', tarotCard: '6 of Wands', bodyPart: 'Stomach, Spleen'})
+MERGE (leo)-[:HAS_DECAN]->(d_leo2)
+MERGE (da_leo2_l:DecanAspect {type: 'Light', description: 'Optimistic, expansive, philosophically minded. Broader vision, interests extend beyond personal concerns. Natural enthusiasm and faith. Inspiring leaders and teachers. Gift for seeing potential in others. Generosity extends to sharing wisdom.'})
+MERGE (da_leo2_s:DecanAspect {type: 'Shadow', description: 'Self-righteousness, exaggeration, overconfidence. Can become dogmatic. May make promises they cannot keep or take risks without preparation. Extravagant and excessive. May pontificate rather than engage.'})
+MERGE (d_leo2)-[:HAS_ASPECT]->(da_leo2_l)
+MERGE (d_leo2)-[:HAS_ASPECT]->(da_leo2_s)
+
+// Leo Decan 3
+MERGE (d_leo3:Decan {name: 'Leo Decan 3', degrees: '20-30°', zodiacSign: 'Leo', traditionalRuler: 'Mars', iconography: 'An “ugly” dark-complexioned man, with fruit and meat in his mouth and carrying a kettle.', egyptianDeity: 'Maahes', tarotCard: '7 of Wands', bodyPart: 'Lower Back, Kidneys'})
+MERGE (leo)-[:HAS_DECAN]->(d_leo3)
+MERGE (da_leo3_l:DecanAspect {type: 'Light', description: 'Dynamic, passionate, action-oriented. Combines leadership with pioneering spirit. Effective initiators. Tremendous energy and drive, courage to take risks. Magnetic charisma. Direct and honest.'})
+MERGE (da_leo3_s:DecanAspect {type: 'Shadow', description: 'Aggression, impatience, domineering attitude. Forceful and intimidating. Desire for immediate results may lead to cutting corners. Combative and argumentative. Passion may express as anger.'})
+MERGE (d_leo3)-[:HAS_ASPECT]->(da_leo3_l)
+MERGE (d_leo3)-[:HAS_ASPECT]->(da_leo3_s)
+
+// --- Virgo Decans ---
+// Virgo Decan 1
+MERGE (d_virgo1:Decan {name: 'Virgo Decan 1', degrees: '0-10°', zodiacSign: 'Virgo', traditionalRuler: 'Sun', iconography: 'A modest maiden in an old dress, holding a pomegranate.', egyptianDeity: 'Seshat', tarotCard: '8 of Pentacles', bodyPart: 'Intestines'})
+MERGE (virgo)-[:HAS_DECAN]->(d_virgo1)
+MERGE (da_virgo1_l:DecanAspect {type: 'Light', description: 'Analytical, precise, dedicated to improvement. Ability to see details, organize efficiently. Practical intelligence. Service-oriented, find fulfillment in being useful. Commitment to excellence.'})
+MERGE (da_virgo1_s:DecanAspect {type: 'Shadow', description: 'Perfectionism, criticism, anxiety. Focused on flaws. High standards may lead to chronic dissatisfaction. Overthinking, worry. Desire to help can become intrusive.'})
+MERGE (d_virgo1)-[:HAS_ASPECT]->(da_virgo1_l)
+MERGE (d_virgo1)-[:HAS_ASPECT]->(da_virgo1_s)
+
+// Virgo Decan 2
+MERGE (d_virgo2:Decan {name: 'Virgo Decan 2', degrees: '10-20°', zodiacSign: 'Virgo', traditionalRuler: 'Venus', iconography: 'A well-colored man wearing animal skins and iron clothing.', egyptianDeity: 'Nephthys', tarotCard: '9 of Pentacles', bodyPart: 'Pancreas, Appendix'})
+MERGE (virgo)-[:HAS_DECAN]->(d_virgo2)
+MERGE (da_virgo2_l:DecanAspect {type: 'Light', description: 'Disciplined, responsible, methodical. Exceptional organizational abilities, talent for creating systems. Practical wisdom grounded in experience. Patient and persistent. Sense of duty and responsibility.'})
+MERGE (da_virgo2_s:DecanAspect {type: 'Shadow', description: 'Rigidity, pessimism, excessive self-criticism. Overly controlled and controlling. Pessimistic outlook. Sense of responsibility can become a burden. May judge self harshly.'})
+MERGE (d_virgo2)-[:HAS_ASPECT]->(da_virgo2_l)
+MERGE (d_virgo2)-[:HAS_ASPECT]->(da_virgo2_s)
+
+// Virgo Decan 3
+MERGE (d_virgo3:Decan {name: 'Virgo Decan 3', degrees: '20-30°', zodiacSign: 'Virgo', traditionalRuler: 'Mercury', iconography: 'A large pale man wrapped in rope, and a woman holding a black fawn to be sacrificed by a magus.', egyptianDeity: 'Imhotep', tarotCard: '10 of Pentacles', bodyPart: 'Nervous System'})
+MERGE (virgo)-[:HAS_DECAN]->(d_virgo3)
+MERGE (da_virgo3_l:DecanAspect {type: 'Light', description: 'Practical, sensual, aesthetically refined. Combines attention to detail with appreciation for beauty. Analytical abilities applied to creating harmony. Talent for craftsmanship. Service includes creating beauty.'})
+MERGE (da_virgo3_s:DecanAspect {type: 'Shadow', description: 'Pickiness, materialism, confusing worth with perfection. Overly concerned with appearances. Desire for quality may become excessive spending. Critical of tastes. Focus on external perfection.'})
+MERGE (d_virgo3)-[:HAS_ASPECT]->(da_virgo3_l)
+MERGE (d_virgo3)-[:HAS_ASPECT]->(da_virgo3_s)
+
+// --- Libra Decans ---
+// Libra Decan 1
+MERGE (d_libra1:Decan {name: 'Libra Decan 1', degrees: '0-10°', zodiacSign: 'Libra', traditionalRuler: 'Moon', iconography: 'A man holding an arrow in one hand and an upside-down bird in the other.', egyptianDeity: 'Maat', tarotCard: '2 of Swords', bodyPart: 'Kidneys, Lower Back'})
+MERGE (libra)-[:HAS_DECAN]->(d_libra1)
+MERGE (da_libra1_l:DecanAspect {type: 'Light', description: 'Diplomatic, fair-minded, attuned to others\' needs. Gift for creating harmony and balance. Aesthetic sensibility. Excellent mediators. Social intelligence.'})
+MERGE (da_libra1_s:DecanAspect {type: 'Shadow', description: 'Indecisiveness, conflict avoidance, people-pleasing. Paralyzed by difficult choices. May suppress own needs, leading to resentment. Overly concerned with appearances and social approval.'})
+MERGE (d_libra1)-[:HAS_ASPECT]->(da_libra1_l)
+MERGE (d_libra1)-[:HAS_ASPECT]->(da_libra1_s)
+
+// Libra Decan 2
+MERGE (d_libra2:Decan {name: 'Libra Decan 2', degrees: '10-20°', zodiacSign: 'Libra', traditionalRuler: 'Saturn', iconography: 'A black man leading a wedding procession.', egyptianDeity: 'Anubis', tarotCard: '3 of Swords', bodyPart: 'Bladder, Pelvis'})
+MERGE (libra)-[:HAS_DECAN]->(d_libra2)
+MERGE (da_libra2_l:DecanAspect {type: 'Light', description: 'Intellectually progressive, socially conscious, independent-minded. Strong sense of justice extending to social issues. Vision of harmony includes equality and freedom. Innovative in relationships.'})
+MERGE (da_libra2_s:DecanAspect {type: 'Shadow', description: 'Emotional detachment, rebelliousness, ideological rigidity. Focused on abstract principles, neglecting emotional needs. Desire for freedom may manifest as inability to commit. Contrary and rebellious.'})
+MERGE (d_libra2)-[:HAS_ASPECT]->(da_libra2_l)
+MERGE (d_libra2)-[:HAS_ASPECT]->(da_libra2_s)
+
+// Libra Decan 3
+MERGE (d_libra3:Decan {name: 'Libra Decan 3', degrees: '20-30°', zodiacSign: 'Libra', traditionalRuler: 'Jupiter', iconography: 'A man riding a donkey with a predatory beast before him.', egyptianDeity: 'Shu', tarotCard: '4 of Swords', bodyPart: 'Skin, Circulation'})
+MERGE (libra)-[:HAS_DECAN]->(d_libra3)
+MERGE (da_libra3_l:DecanAspect {type: 'Light', description: 'Intellectually brilliant, communicative, socially versatile. Exceptional verbal abilities. Quick minds see connections. Adaptable in social situations. Broad perspective.'})
+MERGE (da_libra3_s:DecanAspect {type: 'Shadow', description: 'Overthinking, anxiety, superficial charm. Caught in mental loops. Chameleon-like social adaptability. May use verbal skills to avoid emotional engagement or manipulate. Intellectual approach creates distance.'})
+MERGE (d_libra3)-[:HAS_ASPECT]->(da_libra3_l)
+MERGE (d_libra3)-[:HAS_ASPECT]->(da_libra3_s)
+
+// --- Scorpio Decans ---
+// Scorpio Decan 1
+MERGE (d_scorpio1:Decan {name: 'Scorpio Decan 1', degrees: '0-10°', zodiacSign: 'Scorpio', traditionalRuler: 'Mars', iconography: 'A man holding arrows in both hands.', egyptianDeity: 'Serqet', tarotCard: '5 of Cups', bodyPart: 'Genitals, Rectum'})
+MERGE (scorpio)-[:HAS_DECAN]->(d_scorpio1)
+MERGE (da_scorpio1_l:DecanAspect {type: 'Light', description: 'Intensely passionate, psychologically perceptive, powerfully transformative. Sees beneath the surface. Emotional depth gives access to wisdom. Resourceful and resilient. Unwavering loyalty.'})
+MERGE (da_scorpio1_s:DecanAspect {type: 'Shadow', description: 'Controlling behavior, vengefulness, emotional manipulation. Obsessed with power dynamics. Intensity may overwhelm. Holds grudges. Fear of vulnerability leads to testing others. Passion becomes possessiveness.'})
+MERGE (d_scorpio1)-[:HAS_ASPECT]->(da_scorpio1_l)
+MERGE (d_scorpio1)-[:HAS_ASPECT]->(da_scorpio1_s)
+
+// Scorpio Decan 2
+MERGE (d_scorpio2:Decan {name: 'Scorpio Decan 2', degrees: '10-20°', zodiacSign: 'Scorpio', traditionalRuler: 'Sun', iconography: 'A man on a camel holding a scorpion.', egyptianDeity: 'Sobek', tarotCard: '6 of Cups', bodyPart: 'Colon, Prostate'})
+MERGE (scorpio)-[:HAS_DECAN]->(d_scorpio2)
+MERGE (da_scorpio2_l:DecanAspect {type: 'Light', description: 'Deeply intuitive, compassionate, spiritually attuned. Senses emotional currents. Empathy allows connection at soul level. Drawn to mysteries. Creative imagination, access to symbols.'})
+MERGE (da_scorpio2_s:DecanAspect {type: 'Shadow', description: 'Escapism, deception, boundary confusion. May use intuitive gifts to manipulate or escape reality. Sensitivity can be overwhelming. May absorb others\' emotions. Vulnerable to delusion.'})
+MERGE (d_scorpio2)-[:HAS_ASPECT]->(da_scorpio2_l)
+MERGE (d_scorpio2)-[:HAS_ASPECT]->(da_scorpio2_s)
+
+// Scorpio Decan 3
+MERGE (d_scorpio3:Decan {name: 'Scorpio Decan 3', degrees: '20-30°', zodiacSign: 'Scorpio', traditionalRuler: 'Venus', iconography: 'A horse and a snake appear, and elsewhere an image of a man subduing a woman.', egyptianDeity: 'Nehebkau', tarotCard: '7 of Cups', bodyPart: 'Blood, Bone Marrow'})
+MERGE (scorpio)-[:HAS_DECAN]->(d_scorpio3)
+MERGE (da_scorpio3_l:DecanAspect {type: 'Light', description: 'Emotionally deep, protective, intuitively nurturing. Combines intensity with caring nature. Forms profound emotional bonds. Accurate intuition about others\' needs. Deeply loyal.'})
+MERGE (da_scorpio3_s:DecanAspect {type: 'Shadow', description: 'Emotional manipulation, possessiveness, mood swings. May use emotional intelligence to control. Protective instincts may become smothering. Moody and unpredictable. Fear of abandonment leads to clinging.'})
+MERGE (d_scorpio3)-[:HAS_ASPECT]->(da_scorpio3_l)
+MERGE (d_scorpio3)-[:HAS_ASPECT]->(da_scorpio3_s)
+
+// --- Sagittarius Decans ---
+// Sagittarius Decan 1
+MERGE (d_sagittarius1:Decan {name: 'Sagittarius Decan 1', degrees: '0-10°', zodiacSign: 'Sagittarius', traditionalRuler: 'Mercury', iconography: 'Three human figures – one red, one white, one red.', egyptianDeity: 'Neith', tarotCard: '8 of Wands', bodyPart: 'Hips, Thighs'})
+MERGE (sagittarius)-[:HAS_DECAN]->(d_sagittarius1)
+MERGE (da_sagittarius1_l:DecanAspect {type: 'Light', description: 'Optimistic, expansive, philosophically minded. Natural enthusiasm, faith in positive outcomes. Broad perspective, sees the big picture. Truth-seekers. Adventurous spirit, open mind.'})
+MERGE (da_sagittarius1_s:DecanAspect {type: 'Shadow', description: 'Overconfidence, exaggeration, dogmatism. Convinced of own rightness. May make promises they cannot keep or take risks without preparation. Tactless and blunt. Desire for freedom may express as inability to commit.'})
+MERGE (d_sagittarius1)-[:HAS_ASPECT]->(da_sagittarius1_l)
+MERGE (d_sagittarius1)-[:HAS_ASPECT]->(da_sagittarius1_s)
+
+// Sagittarius Decan 2
+MERGE (d_sagittarius2:Decan {name: 'Sagittarius Decan 2', degrees: '10-20°', zodiacSign: 'Sagittarius', traditionalRuler: 'Moon', iconography: 'A man driving cows, with a monkey and wolf ahead of him.', egyptianDeity: 'Wepwawet', tarotCard: '9 of Wands', bodyPart: 'Liver Detox'}) // Note: Body part seems descriptive, using as is.
+MERGE (sagittarius)-[:HAS_DECAN]->(d_sagittarius2)
+MERGE (da_sagittarius2_l:DecanAspect {type: 'Light', description: 'Energetic, passionate, boldly direct. Courage to stand up for beliefs. Enthusiasm is contagious. Natural pioneers. Honesty is refreshing.'})
+MERGE (da_sagittarius2_s:DecanAspect {type: 'Shadow', description: 'Impulsiveness, argumentativeness, lack of diplomacy. Reckless in pursuit of excitement. Directness may become aggressive. Impatient with details. Restlessness makes completion difficult.'})
+MERGE (d_sagittarius2)-[:HAS_ASPECT]->(da_sagittarius2_l)
+MERGE (d_sagittarius2)-[:HAS_ASPECT]->(da_sagittarius2_s)
+
+// Sagittarius Decan 3
+MERGE (d_sagittarius3:Decan {name: 'Sagittarius Decan 3', degrees: '20-30°', zodiacSign: 'Sagittarius', traditionalRuler: 'Saturn', iconography: 'A man with a golden cap killing another man.', egyptianDeity: 'Sopdet/Sothis', tarotCard: '10 of Wands', bodyPart: 'Sacrum, Sciatic'})
+MERGE (sagittarius)-[:HAS_DECAN]->(d_sagittarius3)
+MERGE (da_sagittarius3_l:DecanAspect {type: 'Light', description: 'Charismatic, visionary, inspirational. Combines philosophical breadth with creative leadership. Effective teachers and guides. Natural confidence and enthusiasm. Gift for expressing complex ideas.'})
+MERGE (da_sagittarius3_s:DecanAspect {type: 'Shadow', description: 'Egotism, grandiosity, self-righteousness. Enamored with own vision. Confidence may become arrogance. Dramatic and attention-seeking. May make pronouncements without full understanding.'})
+MERGE (d_sagittarius3)-[:HAS_ASPECT]->(da_sagittarius3_l)
+MERGE (d_sagittarius3)-[:HAS_ASPECT]->(da_sagittarius3_s)
+
+// --- Capricorn Decans ---
+// Capricorn Decan 1
+MERGE (d_capricorn1:Decan {name: 'Capricorn Decan 1', degrees: '0-10°', zodiacSign: 'Capricorn', traditionalRuler: 'Jupiter', iconography: 'A man with a cane in one hand and a hoop in the other.', egyptianDeity: 'Ptah-Sokar', tarotCard: '2 of Pentacles', bodyPart: 'Knees, Joints'})
+MERGE (capricorn)-[:HAS_DECAN]->(d_capricorn1)
+MERGE (da_capricorn1_l:DecanAspect {type: 'Light', description: 'Disciplined, responsible, achievement-oriented. Exceptional patience and persistence. Practical wisdom grounded in experience. Natural authority and gravitas. Ambition tempered by duty.'})
+MERGE (da_capricorn1_s:DecanAspect {type: 'Shadow', description: 'Rigidity, pessimism, excessive focus on status. Overly controlled and controlling. Focus on achievement leads to workaholism. Judgmental and critical. Fear of failure prevents risks.'})
+MERGE (d_capricorn1)-[:HAS_ASPECT]->(da_capricorn1_l)
+MERGE (d_capricorn1)-[:HAS_ASPECT]->(da_capricorn1_s)
+
+// Capricorn Decan 2
+MERGE (d_capricorn2:Decan {name: 'Capricorn Decan 2', degrees: '10-20°', zodiacSign: 'Capricorn', traditionalRuler: 'Mars', iconography: 'A man with a monkey before him.', egyptianDeity: 'Khnum', tarotCard: '3 of Pentacles', bodyPart: 'Skin, Nails'})
+MERGE (capricorn)-[:HAS_DECAN]->(d_capricorn2)
+MERGE (da_capricorn2_l:DecanAspect {type: 'Light', description: 'Practical, patient, aesthetically refined. Talent for building functional and beautiful structures. Sensual appreciation for quality. Reliable and steady. Creates comfort and beauty.'})
+MERGE (da_capricorn2_s:DecanAspect {type: 'Shadow', description: 'Materialism, stubbornness, emotional repression. Overly focused on external markers of success. Inflexibility. Possessive and controlling in relationships. Difficulty expressing emotions.'})
+MERGE (d_capricorn2)-[:HAS_ASPECT]->(da_capricorn2_l)
+MERGE (d_capricorn2)-[:HAS_ASPECT]->(da_capricorn2_s)
+
+// Capricorn Decan 3
+MERGE (d_capricorn3:Decan {name: 'Capricorn Decan 3', degrees: '20-30°', zodiacSign: 'Capricorn', traditionalRuler: 'Sun', iconography: 'Man opening and closing a book (Qur’an) with a fish tail before him.', egyptianDeity: 'Hapi', tarotCard: '4 of Pentacles', bodyPart: 'Bones, Teeth'})
+MERGE (capricorn)-[:HAS_DECAN]->(d_capricorn3)
+MERGE (da_capricorn3_l:DecanAspect {type: 'Light', description: 'Analytical, strategic, detail-oriented. Combines ambition with precision. Effective at planning complex projects. Practical intelligence identifies problems. Excellent communicator of practical info.'})
+MERGE (da_capricorn3_s:DecanAspect {type: 'Shadow', description: 'Overthinking, criticism, emotional detachment. Loses touch with intuition. Attention to detail becomes nitpicking. Calculating in relationships. Communication may lack warmth.'})
+MERGE (d_capricorn3)-[:HAS_ASPECT]->(da_capricorn3_l)
+MERGE (d_capricorn3)-[:HAS_ASPECT]->(da_capricorn3_s)
+
+// --- Aquarius Decans ---
+// Aquarius Decan 1
+MERGE (d_aquarius1:Decan {name: 'Aquarius Decan 1', degrees: '0-10°', zodiacSign: 'Aquarius', traditionalRuler: 'Venus', iconography: 'A beheaded man holding a peacock.', egyptianDeity: 'Nut', tarotCard: '5 of Swords', bodyPart: 'Ankles, Calves'})
+MERGE (aquarius)-[:HAS_DECAN]->(d_aquarius1)
+MERGE (da_aquarius1_l:DecanAspect {type: 'Light', description: 'Innovative, progressive, humanitarian. Thinks outside conventional boundaries. Vision extends to welfare of humanity. Values freedom and independence. Objective and fair.'})
+MERGE (da_aquarius1_s:DecanAspect {type: 'Shadow', description: 'Rebelliousness, emotional detachment, eccentricity for its own sake. Contrary and rebellious. Intellectual approach creates emotional distance. Unpredictable and unreliable. May adopt extreme positions.'})
+MERGE (d_aquarius1)-[:HAS_ASPECT]->(da_aquarius1_l)
+MERGE (d_aquarius1)-[:HAS_ASPECT]->(da_aquarius1_s)
+
+// Aquarius Decan 2
+MERGE (d_aquarius2:Decan {name: 'Aquarius Decan 2', degrees: '10-20°', zodiacSign: 'Aquarius', traditionalRuler: 'Mercury', iconography: 'A tenacious man appearing like a mighty king.', egyptianDeity: 'Heh', tarotCard: '6 of Swords', bodyPart: 'Circulatory System'})
+MERGE (aquarius)-[:HAS_DECAN]->(d_aquarius2)
+MERGE (da_aquarius2_l:DecanAspect {type: 'Light', description: 'Intellectually brilliant, communicative, socially versatile. Exceptional verbal skills. Quick minds make connections. Natural networkers. Intellectual curiosity.'})
+MERGE (da_aquarius2_s:DecanAspect {type: 'Shadow', description: 'Mental restlessness, emotional detachment, superficial knowledge. Caught up in ideas, neglecting practical application. Chameleon-like social adaptability. Argumentative. Breadth of knowledge may lack depth.'})
+MERGE (d_aquarius2)-[:HAS_ASPECT]->(da_aquarius2_l)
+MERGE (d_aquarius2)-[:HAS_ASPECT]->(da_aquarius2_s)
+
+// Aquarius Decan 3
+MERGE (d_aquarius3:Decan {name: 'Aquarius Decan 3', degrees: '20-30°', zodiacSign: 'Aquarius', traditionalRuler: 'Moon', iconography: 'A beheaded man with an old woman in front of him.', egyptianDeity: 'Tefnut', tarotCard: '7 of Swords', bodyPart: 'Lymphatic System'})
+MERGE (aquarius)-[:HAS_DECAN]->(d_aquarius3)
+MERGE (da_aquarius3_l:DecanAspect {type: 'Light', description: 'Socially idealistic, diplomatic, aesthetically refined. Combines vision with desire for harmony. Social intelligence allows effective group work. Appreciation for beauty and harmony.'})
+MERGE (da_aquarius3_s:DecanAspect {type: 'Shadow', description: 'Emotional distance, ideological rigidity, conflict avoidance. Focused on abstract ideals, neglecting human emotions. Desire for harmony avoids necessary confrontations. Judgmental of differing values. Difficulty forming deep connections.'})
+MERGE (d_aquarius3)-[:HAS_ASPECT]->(da_aquarius3_l)
+MERGE (d_aquarius3)-[:HAS_ASPECT]->(da_aquarius3_s)
+
+// --- Pisces Decans ---
+// Pisces Decan 1
+MERGE (d_pisces1:Decan {name: 'Pisces Decan 1', degrees: '0-10°', zodiacSign: 'Pisces', traditionalRuler: 'Saturn', iconography: 'A man with two bodies pointing fingers.', egyptianDeity: 'Hatmehit', tarotCard: '8 of Cups', bodyPart: 'Feet, Toes'})
+MERGE (pisces)-[:HAS_DECAN]->(d_pisces1)
+MERGE (da_pisces1_l:DecanAspect {type: 'Light', description: 'Compassionate, intuitive, spiritually attuned. Senses emotional currents, empathizes with suffering. Rich imagination, creative inspiration, mystical experiences. Understands interconnectedness.'})
+MERGE (da_pisces1_s:DecanAspect {type: 'Shadow', description: 'Escapism, martyrdom, boundary confusion. May retreat into fantasy or addiction. May neglect own needs. May absorb others\' emotions. Vulnerable to delusion. May ignore practical realities.'})
+MERGE (d_pisces1)-[:HAS_ASPECT]->(da_pisces1_l)
+MERGE (d_pisces1)-[:HAS_ASPECT]->(da_pisces1_s)
+
+// Pisces Decan 2
+MERGE (d_pisces2:Decan {name: 'Pisces Decan 2', degrees: '10-20°', zodiacSign: 'Pisces', traditionalRuler: 'Jupiter', iconography: 'An upside-down man holding food.', egyptianDeity: 'Wadjet', tarotCard: '9 of Cups', bodyPart: 'Lymph Nodes'})
+MERGE (pisces)-[:HAS_DECAN]->(d_pisces2)
+MERGE (da_pisces2_l:DecanAspect {type: 'Light', description: 'Emotionally intuitive, nurturing, receptive. Deep emotional wisdom. Understands and responds to others\' needs. Strong intuition about family/home. Creates safe environments. Emotional memory connects to past.'})
+MERGE (da_pisces2_s:DecanAspect {type: 'Shadow', description: 'Emotional overwhelm, moodiness, boundary issues. Loses touch with own needs. Sensitivity leads to mood swings. Overly attached to past. Nurturing instincts may become smothering.'})
+MERGE (d_pisces2)-[:HAS_ASPECT]->(da_pisces2_l)
+MERGE (d_pisces2)-[:HAS_ASPECT]->(da_pisces2_s)
+
+// Pisces Decan 3
+MERGE (d_pisces3:Decan {name: 'Pisces Decan 3', degrees: '20-30°', zodiacSign: 'Pisces', traditionalRuler: 'Mars', iconography: 'An “evil man” with a woman, above whom is a donkey, and she holds a bird.', egyptianDeity: 'Mehet-Weret', tarotCard: '10 of Cups', bodyPart: 'Immune System'})
+MERGE (pisces)-[:HAS_DECAN]->(d_pisces3)
+MERGE (da_pisces3_l:DecanAspect {type: 'Light', description: 'Deeply transformative, psychically powerful, emotionally intense. Combines spiritual sensitivity with penetrating insight. Profound intuition, psychic abilities. Natural healing abilities. Connects at soul level.'})
+MERGE (da_pisces3_s:DecanAspect {type: 'Shadow', description: 'Self-destruction, manipulation, psychic vampirism. Caught in cycles of addiction or victimhood. May manipulate others energetically. Obsessed with occult power. Intensity may overwhelm. Vulnerable to archetypal forces.'})
+MERGE (d_pisces3)-[:HAS_ASPECT]->(da_pisces3_l)
+MERGE (d_pisces3)-[:HAS_ASPECT]->(da_pisces3_s)
+
+RETURN count(*) as nodes_relationships_merged; // Returns a count, mainly for confirmation

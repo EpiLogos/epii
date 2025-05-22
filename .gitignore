@@ -1,0 +1,120 @@
+# Ignore all folders except the ones we want to include
+/*
+!epii_app/
+!Cline/
+Cline/*
+!Cline/MCP/
+Cline/MCP/*
+!Cline/MCP/servers/
+!Cline/MCP/lightrag-mcp-server/
+!Cline/MCP/Bimba-Pratibimba-Memory-MCP/
+
+# Python-related files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+*.env*
+!.env.example
+
+# Build / Distribution
+dist/
+build/
+site/
+*.tgz
+*.tar.gz
+
+# Logs / Reports
+logs/
+*.log
+*.log.*
+*.logfire
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Caches
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache
+.gradio/
+.history/
+temp/
+
+# IDE / Editor Files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+
+# Node.js
+node_modules/
+bower_components/
+jspm_packages/
+web_modules/
+.npm
+.yarn/
+.pnp.*
+
+# Project-specific files
+rag_storage/
+inputs/
+examples/input/
+examples/output/
+memory-bank/
+
+# Test and development scripts
+*_test.js
+*_test.py
+*_test.mjs
+test_*.js
+test_*.py
+test_*.mjs
+
+# Cypher scripts
+*.cypher
+*.cql
+
+# Credentials
+gcp-oauth.keys.json
+.*-server-credentials.json
+*credentials*.json
+
+# MongoDB data
+**/data/db/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp

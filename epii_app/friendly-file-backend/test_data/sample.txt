@@ -1,0 +1,5 @@
+This is a sample text document for testing the ingestion pipeline.
+
+It contains some basic information about the concept of Quaternal Logic (QL) as used in the Epi-Logos project. QL is a foundational generative logic.
+
+We will see how the pipeline chunks this text and assigns Bimba coordinates based on the map defined in Notion. Hopefully, it tags this chunk with something relevant to Paramasiva or foundational logic.
