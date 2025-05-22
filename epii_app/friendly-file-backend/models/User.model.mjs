@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 /**
  * User Schema
@@ -147,6 +148,32 @@ userSchema.methods.toSafeObject = function() {
   const obj = this.toObject();
   delete obj.password;
   return obj;
+};
+
+// Pre-save hook to hash password
+userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) {
+    return next();
+  }
+  try {
+    // Generate a salt
+    const salt = await bcrypt.genSalt(10);
+    // Hash the password with the salt
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error); // Pass errors to the next middleware
+  }
+});
+
+// Method to compare candidate password with stored hashed password
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw error; // Or handle error as appropriate
+  }
 };
 
 // Create the model with specific collection name "UserIdentityData"

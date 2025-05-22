@@ -10,6 +10,10 @@
 
 import User from '../models/User.model.mjs';
 import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
+
+// TODO: Move this to environment variables
+const JWT_SECRET = 'your-super-secret-and-long-random-string';
 // Removed bcrypt dependency for simplified authentication
 
 /**
@@ -106,8 +110,8 @@ export const authenticateUser = async (req, res) => {
       });
     }
 
-    // Check password (simplified for now)
-    const isMatch = password === user.password;
+    // Check password
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -120,11 +124,18 @@ export const authenticateUser = async (req, res) => {
     user.systemUsage.loginCount += 1;
     await user.save();
 
-    // Return success with user data
+    // Generate JWT
+    const token = jwt.sign(
+      { userId: user.userId, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' } // Token expires in 1 hour
+    );
+
     res.status(200).json({
       success: true,
       message: 'Authentication successful',
-      user: user.toSafeObject()
+      token: token,
+      user: user.toSafeObject() // Still useful to return user info
     });
   } catch (error) {
     console.error('Error authenticating user:', error);

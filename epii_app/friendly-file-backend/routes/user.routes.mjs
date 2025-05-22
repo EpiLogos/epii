@@ -11,24 +11,25 @@
 
 import express from 'express';
 import userController from '../controllers/user.controller.mjs';
+import authMiddleware from '../middleware/auth.middleware.mjs';
 
 const router = express.Router();
 
-// Auth routes
+// Auth routes (no protection)
 router.post('/signup', userController.createUser);
 router.post('/signin', userController.authenticateUser);
 
-// User profile routes
-router.get('/:userId', userController.getUserProfile);
-router.put('/:userId', userController.updateUserProfile);
+// User profile routes (protected)
+router.get('/:userId', authMiddleware, userController.getUserProfile);
+router.put('/:userId', authMiddleware, userController.updateUserProfile);
 
-// User preferences routes
-router.put('/:userId/preferences', userController.updateUserPreferences);
+// User preferences routes (protected)
+router.put('/:userId/preferences', authMiddleware, userController.updateUserPreferences);
 
-// User identity routes
-router.put('/:userId/identity', userController.updateUserIdentity);
+// User identity routes (protected)
+router.put('/:userId/identity', authMiddleware, userController.updateUserIdentity);
 
-// Bio synthesis route
-router.post('/:userId/synthesize-bio', userController.synthesizeUserBio);
+// Bio synthesis route (protected)
+router.post('/:userId/synthesize-bio', authMiddleware, userController.synthesizeUserBio);
 
 export default router;
