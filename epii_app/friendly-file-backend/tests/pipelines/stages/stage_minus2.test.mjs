@@ -61,79 +61,94 @@ describe('runStageMinus2', () => {
     });
     
     mockAnalyzeChunkGroup.mockImplementation(async (chunks, srcMeta, bimbaCtx, usrCtx, assignedCoords, metalogikon, opts) => {
-        // Default mock for analyzeChunkGroup if not overridden by a specific test
+        // 2.b Mock for analyzeChunkGroup: Updated to return the new rich JSON structure
         if (opts.analyzeAsSingleUnit) {
             return {
-                analysis: `Single analysis for: ${opts.concatenatedContent.substring(0, 20)}...`,
-                extractedMappings: [{type: "batch_mapping"}],
-                identifiedVariations: [],
-                naturalElaborations: [],
-                deepElaboration: [],
-                novelContributions: [],
-                qlDynamics: [],
+                assignedCoordinates: assignedCoords, // Should be [srcMeta.targetCoordinate]
+                overallSummary: `Overall summary for batch starting with ${chunks[0].substring(0,10)}`,
+                mainThemes: ["Theme Batch"],
+                analysis: `Rich analysis for: ${opts.concatenatedContent.substring(0, 30)}...`,
+                extractedMappings: [{type: "batch_mapping", value: chunks[0].substring(0,5)}],
+                identifiedVariations: [{type: "batch_variation", text: chunks[0].substring(0,5)}],
+                naturalElaborations: [{type: "batch_elaboration", text: chunks[0].substring(0,5)}],
+                deepElaboration: [{point: "Batch deep"}],
+                novelContributions: [{contribution: "Batch novel"}],
+                qlDynamics: [{operator: "Batch QL"}],
+                extractedTags: [`tag_${chunks[0].substring(0,3)}`],
+                mefLensInsights: {},
+                subnodeMappings: {},
+                concatenatedContentLength: opts.concatenatedContent.length,
             };
         }
-        // Fallback for old path, though new tests will focus on single unit
+        // Fallback for old path (not primary focus of these tests anymore)
         return chunks.map((chunk, index) => ({
-            analysis: `Analysis for ${chunk}`,
-            chunkIndex: index,
-            extractedMappings: [],
-            identifiedVariations: [],
-            naturalElaborations: [],
-            deepElaboration: [],
-            novelContributions: [],
-            qlDynamics: [],
+            analysis: `Analysis for ${chunk}`, chunkIndex: index, extractedMappings: [], 
+            identifiedVariations: [], naturalElaborations: [], deepElaboration: [], 
+            novelContributions: [], qlDynamics: [], extractedTags: []
         }));
     });
 
 
     mockStateFromStageMinus3 = {
-      documentChunks: ["Chunk 1 processed text.", "Chunk 2 processed text.", "Chunk 3 processed text."], // documentChunks from stage -3 output
-      originalChunks: ["Original chunk 1.", "Original chunk 2.", "Original chunk 3."], // originalChunks from stage -3 output
-      sourceMetadata: {
-        targetCoordinate: '#TARGET',
-        sourceFileName: 'test.txt',
-        // other metadata...
-      },
+      documentChunks: ["Chunk 1 processed text.", "Chunk 2 processed text.", "Chunk 3 processed text."],
+      originalChunks: ["Original chunk 1.", "Original chunk 2.", "Original chunk 3."],
+      sourceMetadata: { targetCoordinate: '#TARGET', sourceFileName: 'test.txt' },
       coordinateMap: { '#TARGET': 'Test Target Node' },
-      fullBimbaMap: { nodes: [{id: 'N1', name: 'Node1'}], edges: [] }, // from stage -4
-      documentContent: "Original full document content.", // from stage -4
-      bimbaEnhancedContext: "Bimba enhanced context string", // from stage -4
-      projectContext: { projectName: "Test Project", projectDescription: "Test project description" }, // from stage -4
-      bimbaMapSummary: "Bimba map summary string", // from stage -4
+      fullBimbaMap: { nodes: [{id: 'N1', name: 'Node1'}], edges: [] },
+      documentContent: "Original full document content.",
+      bimbaEnhancedContext: "Bimba enhanced context string",
+      projectContext: { projectName: "Test Project", projectDescription: "Test project description" },
+      bimbaMapSummary: "Bimba map summary string",
       bimbaContext: [{ node: { name: 'Bimba Node', description: 'Bimba Desc' } }],
       userContext: { userName: "testUser" },
-      // ... other properties passed from stage -3
     };
   });
 
   it('should call analyzeChunkGroup with concatenated content and analyzeAsSingleUnit:true for each batch', async () => {
-    // Override default mock for this specific test to check parameters
-    mockAnalyzeChunkGroup.mockResolvedValue({
-      analysis: 'Test batch analysis',
-      extractedMappings: [], identifiedVariations: [], naturalElaborations: [],
-      deepElaboration: [], novelContributions: [], qlDynamics: [],
-    });
-
+    // Default mockAnalyzeChunkGroup is fine for checking call parameters
     await runStageMinus2(mockStateFromStageMinus3);
 
-    // Assuming batchSize is 6 as per stage_minus2.mjs, with 3 chunks, there's 1 batch.
-    expect(mockAnalyzeChunkGroup).toHaveBeenCalledTimes(1);
+    expect(mockAnalyzeChunkGroup).toHaveBeenCalledTimes(1); // For 3 chunks, batch size 6 -> 1 batch
 
     const [chunksArg, metadataArg, bimbaCtxArg, userCtxArg, assignedCoordsArg, metalogikonArg, optionsArg] = mockAnalyzeChunkGroup.mock.calls[0];
     
-    // Check the options passed to analyzeChunkGroup
     expect(optionsArg.analyzeAsSingleUnit).toBe(true);
     expect(optionsArg.concatenatedContent).toBe("Original chunk 1.\n\n---\n\nOriginal chunk 2.\n\n---\n\nOriginal chunk 3.");
-    expect(optionsArg.llmService).toBeDefined(); // epiiLLMService should be passed
+    expect(optionsArg.llmService).toBeDefined();
     expect(optionsArg.useProvidedContextWindows).toBe(true);
     expect(optionsArg.contextWindows).toBeInstanceOf(Array);
     expect(optionsArg.contextWindows.length).toBe(mockStateFromStageMinus3.originalChunks.length);
-
-    // Check other args
-    expect(chunksArg).toEqual(mockStateFromStageMinus3.originalChunks); // analyzeChunkGroup still receives original chunk texts for the batch
-    expect(assignedCoordsArg).toEqual([mockStateFromStageMinus3.sourceMetadata.targetCoordinate]); // For single unit, it's the primary target
+    expect(chunksArg).toEqual(mockStateFromStageMinus3.originalChunks);
+    expect(assignedCoordsArg).toEqual([mockStateFromStageMinus3.sourceMetadata.targetCoordinate]);
   });
+
+  // 2.a Output Validation Test
+  it('should produce stageMinus2Output with batchAnalyses (rich objects) and populated batchMappings, etc.', async () => {
+    // The default mock for analyzeChunkGroup in beforeEach will return the rich structure
+    const output = await runStageMinus2(mockStateFromStageMinus3);
+
+    expect(output.batchAnalyses).toBeInstanceOf(Array);
+    expect(output.batchAnalyses.length).toBe(1);
+    const firstBatchAnalysis = output.batchAnalyses[0];
+    expect(firstBatchAnalysis.overallSummary).toContain('Overall summary for batch');
+    expect(firstBatchAnalysis.extractedMappings).toEqual([{type: "batch_mapping", value: "Origi"}]); // From default mock
+    expect(firstBatchAnalysis.extractedTags).toEqual(["tag_Ori"]);
+
+    expect(output.hasEnhancedBatchAnalysis).toBe(true);
+
+    expect(output.batchMappings).toBeInstanceOf(Array);
+    expect(output.batchMappings.length).toBe(1);
+    expect(output.batchMappings[0]).toEqual(firstBatchAnalysis.extractedMappings);
+
+    expect(output.batchVariations).toBeInstanceOf(Array);
+    expect(output.batchVariations.length).toBe(1);
+    expect(output.batchVariations[0]).toEqual(firstBatchAnalysis.identifiedVariations);
+    
+    expect(output.batchTags).toBeInstanceOf(Array);
+    expect(output.batchTags.length).toBe(1);
+    expect(output.batchTags[0]).toEqual(firstBatchAnalysis.extractedTags);
+  });
+
 
   it('should produce stageMinus2Output with batchAnalyses from analyzeChunkGroup results', async () => {
     const batchAnalysisResultFromMock = {
@@ -144,25 +159,35 @@ describe('runStageMinus2', () => {
       deepElaboration: [{point: "Batch deep point"}],
       novelContributions: [{contribution: "Batch novel contribution"}],
       qlDynamics: [{operator: "Batch QL dynamics"}],
-    };
-    mockAnalyzeChunkGroup.mockResolvedValue(batchAnalysisResultFromMock);
+      // Adding new rich fields for the mock response
+      overallSummary: "Overall summary from mock.",
+      mainThemes: ["Mock Theme 1"],
+      extractedTags: ["MockTag1"],
+      mefLensInsights: {},
+      subnodeMappings: {},
+      concatenatedContentLength: 100,
+      assignedCoordinates: [mockStateFromStageMinus3.sourceMetadata.targetCoordinate],
+    });
 
-    const output = await runStageMinus2(mockStateFromStageMinus3);
+    await runStageMinus2(mockStateFromStageMinus3);
 
     expect(output.batchAnalyses).toBeInstanceOf(Array);
-    expect(output.batchAnalyses.length).toBe(1); // 1 batch for 3 chunks with batchSize 6
-    expect(output.batchAnalyses[0]).toEqual(batchAnalysisResultFromMock);
+    expect(output.batchAnalyses.length).toBe(1);
+    expect(output.batchAnalyses[0]).toEqual(batchAnalysisResultFromMock); // Check if the whole rich object is stored
     expect(output.hasEnhancedBatchAnalysis).toBe(true);
 
-    // Check that per-chunk arrays are handled (they might be empty or structured differently)
-    expect(output.chunkMappings).toBeInstanceOf(Array); 
-    // Further checks on chunkMappings, etc. would depend on how stage_minus2 is decided to populate them
-    // based on the single batch analysis result. The current stage_minus2.mjs code
-    // doesn't explicitly populate them from the singleBatchAnalysisResult.
-    // It initializes them as empty and they remain so.
-    expect(output.chunkMappings.length).toBe(0); // or based on new logic if any
-    expect(output.chunkVariations.length).toBe(0);
-    expect(output.chunkTags.length).toBe(0);
+    // Check population of batchMappings, batchVariations, batchTags
+    expect(output.batchMappings).toBeInstanceOf(Array);
+    expect(output.batchMappings.length).toBe(1);
+    expect(output.batchMappings[0]).toEqual(batchAnalysisResultFromMock.extractedMappings);
+    
+    expect(output.batchVariations).toBeInstanceOf(Array);
+    expect(output.batchVariations.length).toBe(1);
+    expect(output.batchVariations[0]).toEqual(batchAnalysisResultFromMock.identifiedVariations);
+    
+    expect(output.batchTags).toBeInstanceOf(Array);
+    expect(output.batchTags.length).toBe(1);
+    expect(output.batchTags[0]).toEqual(batchAnalysisResultFromMock.extractedTags);
   });
 
   it('should handle multiple batches correctly', async () => {
@@ -177,21 +202,36 @@ describe('runStageMinus2', () => {
         contextText: `Ctx for ${chunk.substring(0,10)}`, bimbaContext: { directlyRelevantNodes: [] }
     }));
 
-    const mockResults = [
-        { analysis: 'Batch 1 analysis', extractedMappings: [], identifiedVariations: [], naturalElaborations: [], deepElaboration: [], novelContributions: [], qlDynamics: [] },
-        { analysis: 'Batch 2 analysis', extractedMappings: [], identifiedVariations: [], naturalElaborations: [], deepElaboration: [], novelContributions: [], qlDynamics: [] }
-    ];
+    // 2.b Mock for analyzeChunkGroup: Ensure it returns rich objects for multiple calls
+    const richResultBatch1 = {
+        assignedCoordinates: ["#TARGET"], overallSummary: "Summary B1", mainThemes: ["TB1"], analysis: "Analysis B1",
+        extractedMappings: [{type: "map_b1"}], identifiedVariations: [{type: "var_b1"}], naturalElaborations: [],
+        deepElaboration: [], novelContributions: [], qlDynamics: [], extractedTags: ["tag_b1"],
+        mefLensInsights: {}, subnodeMappings: {}, concatenatedContentLength: 100
+    };
+    const richResultBatch2 = {
+        assignedCoordinates: ["#TARGET"], overallSummary: "Summary B2", mainThemes: ["TB2"], analysis: "Analysis B2",
+        extractedMappings: [{type: "map_b2"}], identifiedVariations: [{type: "var_b2"}], naturalElaborations: [],
+        deepElaboration: [], novelContributions: [], qlDynamics: [], extractedTags: ["tag_b2"],
+        mefLensInsights: {}, subnodeMappings: {}, concatenatedContentLength: 50
+    };
     mockAnalyzeChunkGroup
-        .mockResolvedValueOnce(mockResults[0])
-        .mockResolvedValueOnce(mockResults[1]);
+        .mockResolvedValueOnce(richResultBatch1)
+        .mockResolvedValueOnce(richResultBatch2);
 
     const output = await runStageMinus2(mockStateFromStageMinus3);
     
     // Batch size is 6. 8 chunks = 2 batches (6 in first, 2 in second)
     expect(mockAnalyzeChunkGroup).toHaveBeenCalledTimes(2);
     expect(output.batchAnalyses.length).toBe(2);
-    expect(output.batchAnalyses[0]).toEqual(mockResults[0]);
-    expect(output.batchAnalyses[1]).toEqual(mockResults[1]);
+    expect(output.batchAnalyses[0]).toEqual(richResultBatch1);
+    expect(output.batchAnalyses[1]).toEqual(richResultBatch2);
+
+    // Verify population of batchMappings etc. for multiple batches
+    expect(output.batchMappings[0]).toEqual(richResultBatch1.extractedMappings);
+    expect(output.batchMappings[1]).toEqual(richResultBatch2.extractedMappings);
+    expect(output.batchTags[0]).toEqual(richResultBatch1.extractedTags);
+    expect(output.batchTags[1]).toEqual(richResultBatch2.extractedTags);
 
     // Check concatenation for the first batch
     const firstCallOptions = mockAnalyzeChunkGroup.mock.calls[0][6];

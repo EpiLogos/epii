@@ -152,13 +152,11 @@ export async function runStageMinus2(state) {
         const numBatches = Math.ceil(documentChunks.length / batchSize);
         console.log(`Will process chunks in ${numBatches} batches of up to ${batchSize} chunks each`);
 
-        // Initialize array to store batch analysis results
-        const batchAnalyses = [];
-        // Per-chunk mappings, variations, and tags might be deprecated or changed with batch-level analysis.
-        // For now, we'll keep them but they might not be populated as before, or their meaning might shift.
-        const chunkMappings = []; // Retained for now, structure might need to change
-        const chunkVariations = []; // Retained for now, structure might need to change
-        const chunkTags = []; // Retained for now, structure might need to change
+        // Initialize arrays to store batch-level results
+        const batchAnalyses = []; // Stores the rich JSON object for each batch
+        const batchMappings = []; // Stores mappings extracted from each batchAnalysisObject
+        const batchVariations = []; // Stores variations extracted from each batchAnalysisObject
+        const batchTags = []; // Stores tags extracted from each batchAnalysisObject
 
 
         // Process chunks in batches
@@ -199,53 +197,52 @@ export async function runStageMinus2(state) {
 
             console.log(`Analyzing concatenated content of batch ${batchIndex + 1} (length: ${concatenatedBatchContent.length} chars)...`);
 
-            let singleBatchAnalysisResult;
+            let singleBatchAnalysisResult; // This will be the rich JSON object
             try {
-                // Import the analyzeChunkGroup function
-                // This function is now expected to:
-                // 1. Take concatenated content (or an array of chunks it will concatenate).
-                // 2. Return a SINGLE analysis object for the entire batch.
                 const { analyzeChunkGroup } = await import('../../utils/content/analysis.mjs');
-
-                // Call analyzeChunkGroup with the concatenated content
-                // The options object might need adjustment based on the refactored analyzeChunkGroup.
-                // We pass `batchChunkTexts` (array) and `concatenatedBatchContent` (string)
-                // The new `analyzeChunkGroup` should ideally handle this, perhaps preferring `concatenatedBatchContent`.
                 singleBatchAnalysisResult = await analyzeChunkGroup(
-                    batchChunkTexts, // Array of original chunk texts in the batch
+                    batchChunkTexts, 
                     sourceMetadata,
                     state.bimbaContext,
                     state.userContext,
-                    [batchTargetCoordinate], // Assign the batch to the main target coordinate
+                    [batchTargetCoordinate], 
                     metalogikon,
                     {
                         llmService: epiiLLMService,
-                        concatenatedContent: concatenatedBatchContent, // Explicitly pass concatenated content
-                        contextWindows: batchContextWindows, // Pass all context windows for the batch
+                        concatenatedContent: concatenatedBatchContent,
+                        contextWindows: batchContextWindows,
                         useProvidedContextWindows: true,
                         fullBimbaMap: state.fullBimbaMap,
-                        documentContent: state.documentContent, // Full document content for broader context
-                        analyzeAsSingleUnit: true // New flag indicating batch-level analysis
+                        documentContent: state.documentContent,
+                        analyzeAsSingleUnit: true 
                     },
-                    state // Pass the entire state as a fallback
+                    state 
                 );
 
-                // Store the single analysis result for the batch
+                // Store the rich JSON object for the batch
                 batchAnalyses[batchIndex] = singleBatchAnalysisResult;
 
+                // Populate batch-level mappings, variations, tags
+                batchMappings[batchIndex] = singleBatchAnalysisResult.extractedMappings || [];
+                batchVariations[batchIndex] = singleBatchAnalysisResult.identifiedVariations || [];
+                batchTags[batchIndex] = singleBatchAnalysisResult.extractedTags || []; // Assuming 'extractedTags' field
+
                 // Logging for the batch result
-                // The structure of singleBatchAnalysisResult will determine what can be logged here.
-                // Assuming it's an object with an 'analysis' text and potentially other fields.
-                if (typeof singleBatchAnalysisResult === 'object' && singleBatchAnalysisResult.analysis) {
-                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis length: ${singleBatchAnalysisResult.analysis.length}`);
-                    // If the new analyzeChunkGroup still provides mappings, variations, tags for the batch as a whole:
-                    // chunkMappings[batchIndex] = singleBatchAnalysisResult.extractedMappings || [];
-                    // chunkVariations[batchIndex] = singleBatchAnalysisResult.identifiedVariations || [];
-                    // chunkTags[batchIndex] = singleBatchAnalysisResult.tags || [];
-                } else if (typeof singleBatchAnalysisResult === 'string') {
-                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis length: ${singleBatchAnalysisResult.length}`);
+                if (singleBatchAnalysisResult && !singleBatchAnalysisResult.error) {
+                    const analysisText = singleBatchAnalysisResult.analysis || singleBatchAnalysisResult.overallSummary || "";
+                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis text length: ${analysisText.length}`);
+                    console.log(`Batch ${batchIndex + 1}: ${batchMappings[batchIndex].length} mappings, ${batchVariations[batchIndex].length} variations, ${batchTags[batchIndex].length} tags.`);
+                } else if (singleBatchAnalysisResult && singleBatchAnalysisResult.error) {
+                    console.error(`Error analyzing batch ${batchIndex + 1}: ${singleBatchAnalysisResult.error}`);
+                     // Store error information appropriately if needed for downstream
+                    batchMappings[batchIndex] = [];
+                    batchVariations[batchIndex] = [];
+                    batchTags[batchIndex] = [];
                 } else {
-                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Result type: ${typeof singleBatchAnalysisResult}`);
+                    console.warn(`Batch ${batchIndex + 1} analysis result was empty or not in expected format.`);
+                    batchMappings[batchIndex] = [];
+                    batchVariations[batchIndex] = [];
+                    batchTags[batchIndex] = [];
                 }
 
 
@@ -270,24 +267,21 @@ export async function runStageMinus2(state) {
                 }
 
                 // Store error information for the batch
-                batchAnalyses[batchIndex] = `Error analyzing batch as single unit: ${batchError.message}`;
-                // chunkMappings, chunkVariations, chunkTags would remain empty for this batch or handle error appropriately
+                const errorMsg = `Error analyzing batch as single unit: ${batchError.message}`;
+                batchAnalyses[batchIndex] = { error: errorMsg, analysis: errorMsg, overallSummary: errorMsg, mainThemes:[], extractedMappings:[], identifiedVariations:[], naturalElaborations:[], deepElaboration:[], novelContributions:[], qlDynamics:[], extractedTags:[] };
+                batchMappings[batchIndex] = [];
+                batchVariations[batchIndex] = [];
+                batchTags[batchIndex] = [];
             }
-            // Removed per-chunk result logging, batch result logged above
         }
 
         // 7. Prepare state for the next stage
-        // The output now contains batchAnalyses instead of chunkAnalyses.
-        // chunkMappings, chunkVariations, chunkTags might be re-evaluated based on batch analysis.
-        // For now, they are passed as potentially empty or differently structured.
         const stageMinus2Output = {
-            batchAnalyses, // New: array of single analysis results per batch
-            // chunkAnalyses, // Old: array of per-chunk analyses - REMOVED/REPLACED
-            chunkMappings, // Retained: structure/relevance TBD with batch analysis
-            chunkVariations, // Retained: structure/relevance TBD with batch analysis
-            chunkTags, // Retained: structure/relevance TBD with batch analysis
-            // Flag to indicate that this stage has been enhanced with deeper elaboration (now at batch level)
-            hasEnhancedBatchAnalysis: true, // Renamed for clarity
+            batchAnalyses,        // Array of rich JSON objects (one per batch)
+            batchMappings,        // Array of arrays of mappings (one inner array per batch)
+            batchVariations,      // Array of arrays of variations (one inner array per batch)
+            batchTags,            // Array of arrays of tags (one inner array per batch)
+            hasEnhancedBatchAnalysis: true,
             metalogikon,
             // Include only essential properties from previous state
             documentId: state.documentId,
@@ -341,13 +335,10 @@ export async function runStageMinus2(state) {
             langsmithTracing.endRunSuccess(stageRun, {
                 numBatchesAnalyzed,
                 totalAnalysisContentLength,
-                // numMappingsTotal, numVariationsTotal, numTagsTotal might need re-evaluation
-                // based on how they are handled with batch-level analysis.
-                // For now, we'll report based on what's available.
-                numMappingsTotal: chunkMappings.flat().length, // If populated per batch
-                numVariationsTotal: chunkVariations.flat().length, // If populated per batch
-                numTagsTotal: chunkTags.flat().length, // If populated per batch
-                hasEnhancedBatchAnalysis: true
+            numMappingsTotal: batchMappings.flat().length,
+            numVariationsTotal: batchVariations.flat().length,
+            numTagsTotal: batchTags.flat().length,
+            hasEnhancedBatchAnalysis: true // Keep this flag or adapt its meaning
             });
         } catch (tracingError) {
             console.warn(`LangSmith tracing error: ${tracingError.message}`);

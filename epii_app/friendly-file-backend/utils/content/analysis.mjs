@@ -378,37 +378,34 @@ ${contextWindows && contextWindows.length > 0 && contextWindows[0].bimbaContext 
 
             let singleUnitContextInformation = groupContext; // Start with general group context
 
-            if (contextWindows && contextWindows.length > 0 && contextWindows[0].contextText) {
-                 // For single unit, we might use the context of the first chunk or a combined context.
-                 // Here, we append the first chunk's contextText. This could be refined.
-                singleUnitContextInformation += "\n\n" + (contextWindows[0].contextText || JSON.stringify(bimbaContext, null, 2));
-                console.log(`Using provided context window from the first chunk for single unit analysis.`);
+            // 1.a Context Aggregation: Iterate through options.contextWindows
+            if (contextWindows && contextWindows.length > 0) {
+                let aggregatedContextText = "\n\n--- Aggregated Context from Batch Chunks ---\n";
+                contextWindows.forEach((cw, idx) => {
+                    // Ensure cw and cw.contextText are not null or undefined
+                    const textToAppend = cw && cw.contextText ? cw.contextText : "No specific context text for this chunk.";
+                    aggregatedContextText += `\nContext for Original Chunk ${idx + 1} (part of this batch):\n${textToAppend}\n`;
+                });
+                singleUnitContextInformation += aggregatedContextText;
+                console.log(`Using aggregated context from ${contextWindows.length} windows for single unit analysis.`);
             } else if (chunks && chunks.length > 0) {
-                // Fallback: if no context window passed, try to generate one for the first chunk of the original batch (if available)
-                // This part might be less relevant if concatenatedContent is truly standalone.
+                // Fallback: if no context window passed, try to generate one for the first chunk of the original batch
                 console.warn(`No context windows provided for single unit analysis. Attempting to generate for the first original chunk.`);
                 const firstChunkForContext = chunks[0];
-                // Ensure documentContent is available for generating context window
                 const docContentForContext = options.documentContent || state?.documentContent || "";
-
                 const tempContextWindow = await generateContextWindow(
-                    firstChunkForContext,
-                    docContentForContext,
-                    bimbaContext || "",
-                    fullBimbaMap,
-                    userContext || {},
-                    null,
-                    { forAnalysis: true }
+                    firstChunkForContext, docContentForContext, bimbaContext || "",
+                    fullBimbaMap, userContext || {}, null, { forAnalysis: true }
                 );
                 singleUnitContextInformation += "\n\n" + tempContextWindow.contextText;
             } else {
-                console.warn(`No context windows provided or original chunks available for single unit analysis context. Using general bimbaContext.`);
+                console.warn(`No context windows or original chunks available for single unit analysis context. Using general bimbaContext.`);
                 singleUnitContextInformation += "\n\n" + JSON.stringify(bimbaContext, null, 2);
             }
 
-
+            // 1.b Rich JSON Output: System prompt instructs LLM for a single rich JSON object.
             const systemPromptSingleUnit = `You are Epii, an advanced AI system for analyzing text in relation to the Bimba coordinate system.
-Your task is to analyze the provided block of text and extract mappings, variations, natural elaborations, and relational properties.
+Your task is to analyze the provided block of text and extract a comprehensive analysis including overall summary, main themes, mappings, variations, natural elaborations, QL dynamics, and other relational properties.
 
 CONTEXT INFORMATION:
 ${singleUnitContextInformation}
@@ -417,38 +414,36 @@ METALOGIKON FRAMEWORK:
 ${mefPrompt}
 
 IMPORTANT DISTINCTION:
-- Quaternal Logic (QL) is the foundational, generative framework... (rest of distinction remains same)
+- Quaternal Logic (QL) is the foundational, generative framework...
 - NEVER conflate QL operators with Bimba coordinates themselves.
 
 ANALYTICAL TASK INSTRUCTIONS: (Apply to the entire block of text)
-... (rest of instructions remain same, but applied to the whole block)
+1.  Provide an overall summary of the text block.
+2.  Identify the main themes or topics discussed.
+3.  Extract mappings, variations, natural elaborations, deep elaborations, novel contributions, and QL dynamics relevant to the entire block.
+4.  Apply the Metalogikon Framework lenses to gain deeper insights for the entire block.
 
 BIMBA-CENTRIC ANALYSIS REQUIREMENTS: (Apply to the entire block of text)
-... (rest of requirements remain same)
+...
 
 NATURAL ELABORATION ENHANCEMENT REQUIREMENTS: (Apply to the entire block of text)
-... (rest of requirements remain same)
+...
 
 TECHNICAL INSTRUCTIONS:
 1. Analyze the text block in relation to the primary target coordinate: ${sourceMetadata.targetCoordinate}
-2. Extract mappings between the text and the Bimba coordinate system
-3. Apply the Metalogikon Framework lenses to gain deeper insights
-4. Format your response as a single structured JSON object (not an array)
-5. Maintain context within the provided text block
+2. Format your response as a single, structured JSON object as specified in the user prompt.
+3. Ensure all specified fields in the JSON structure are present, using empty arrays [] if no items of a particular type are found.
 
 RELATIONAL PROPERTIES EXTRACTION GUIDE: (remains same)
 ...
 
 CRITICAL FORMAT REQUIREMENTS:
 - Your response MUST be a valid single JSON object.
-- The object MUST have all required properties: assignedCoordinates (this will be the primary target coordinate), extractedMappings, identifiedVariations, naturalElaborations.
-- The object SHOULD also include these new properties: deepElaboration, novelContributions, qlDynamics.
-- Each naturalElaboration MUST have ALL required properties (elaborationType, elaborationText, targetCoordinate, confidenceScore).
-- If you have no elaborations, use an empty array [] for naturalElaborations.
-- Do not omit any required properties or use different property names.
-- Follow the exact format shown in the user prompt for a single analysis object.
+- The object MUST contain all fields as specified in the user prompt's JSON structure example.
+- Pay close attention to nesting and data types (arrays of objects, strings, etc.).
 - Double-check your JSON before returning it.`;
 
+            // 1.b Rich JSON Output: User prompt defines the structure of the single JSON object.
             const userPromptSingleUnit = `TEXT BLOCK TO ANALYZE:
 """
 ${concatenatedContent}
@@ -457,20 +452,24 @@ Assigned primary coordinate: ${sourceMetadata.targetCoordinate}
 
 Please analyze this text block and provide your analysis in the following JSON format (a single object):
 {
-  "assignedCoordinates": ["${sourceMetadata.targetCoordinate}"], // Primary coordinate for the block
-  "extractedMappings": [ /* ... format same as before ... */ ],
-  "identifiedVariations": [ /* ... format same as before ... */ ],
-  "naturalElaborations": [ /* ... format same as before ... */ ],
-  "deepElaboration": [ /* ... format same as before ... */ ],
-  "novelContributions": [ /* ... format same as before ... */ ],
-  "qlDynamics": [ /* ... format same as before ... */ ],
-  "mefLensInsights": { /* ... */ },
-  "subnodeMappings": { /* ... */ }
+  "assignedCoordinates": ["${sourceMetadata.targetCoordinate}"],
+  "overallSummary": "string (concise summary of the entire text block)",
+  "mainThemes": ["string (list of main themes or topics)"],
+  "analysis": "string (detailed textual analysis of the block, integrating various insights)",
+  "extractedMappings": [ /* array of mapping objects, format same as before */ ],
+  "identifiedVariations": [ /* array of variation objects, format same as before */ ],
+  "naturalElaborations": [ /* array of natural elaboration objects, format same as before */ ],
+  "deepElaboration": [ /* array of deep elaboration objects, format same as before */ ],
+  "novelContributions": [ /* array of novel contribution objects, format same as before */ ],
+  "qlDynamics": [ /* array of QL dynamic objects, format same as before */ ],
+  "extractedTags": ["string (list of relevant tags or keywords for the block)"],
+  "mefLensInsights": { /* MEF lens insights object, format same as before */ },
+  "subnodeMappings": { /* subnode mappings object, format same as before */ }
 }`;
 
             const response = await llmService.generateContent(-2, systemPromptSingleUnit, userPromptSingleUnit, {
-                temperature: 0.2,
-                maxOutputTokens: 8192 // Potentially needs to be large for concatenated content
+                temperature: 0.2, // Adjusted temperature for potentially more creative/synthesizing tasks
+                maxOutputTokens: 8192 // Retain large token limit
             });
 
             // Parse response (expecting a single JSON object)
@@ -487,32 +486,65 @@ Please analyze this text block and provide your analysis in the following JSON f
                     if (startBrace !== -1 && endBrace !== -1 && endBrace > startBrace) {
                         jsonStr = response.substring(startBrace, endBrace + 1);
                     } else {
-                        jsonStr = response;
+                        jsonStr = response; // Fallback, though risky
                     }
                 }
                 jsonStr = jsonStr.trim().replace(/,(\s*[}\]])/g, '$1').replace(/([^\\])\\([^"\\\/bfnrtu])/g, '$1\\\\$2');
                 console.log("Extracted JSON string for single unit (first 200 chars):", jsonStr.substring(0, 200) + "...");
                 analysisResult = JSON.parse(jsonStr);
 
-                // Validate and normalize the single result
-                if (!analysisResult.extractedMappings) throw new Error("Single unit result missing extractedMappings.");
-                if (!analysisResult.identifiedVariations) throw new Error("Single unit result missing identifiedVariations.");
-                if (!analysisResult.naturalElaborations) throw new Error("Single unit result missing naturalElaborations.");
+                // Validate and normalize the single result based on the new rich structure
+                analysisResult.assignedCoordinates = analysisResult.assignedCoordinates || [sourceMetadata.targetCoordinate];
+                analysisResult.overallSummary = analysisResult.overallSummary || "No overall summary provided.";
+                analysisResult.mainThemes = analysisResult.mainThemes || [];
+                analysisResult.analysis = analysisResult.analysis || "No detailed analysis text provided.";
+                analysisResult.extractedMappings = analysisResult.extractedMappings || [];
+                analysisResult.identifiedVariations = analysisResult.identifiedVariations || [];
+                analysisResult.naturalElaborations = analysisResult.naturalElaborations || [];
+                analysisResult.deepElaboration = analysisResult.deepElaboration || [];
+                analysisResult.novelContributions = analysisResult.novelContributions || [];
+                analysisResult.qlDynamics = analysisResult.qlDynamics || [];
+                analysisResult.extractedTags = analysisResult.extractedTags || [];
+                analysisResult.mefLensInsights = analysisResult.mefLensInsights || {};
+                analysisResult.subnodeMappings = analysisResult.subnodeMappings || {};
+                
+                // Validate naturalElaborations structure if present
                 if (Array.isArray(analysisResult.naturalElaborations)) {
                     analysisResult.naturalElaborations.forEach((elaboration, elabIndex) => {
                         if (!elaboration.elaborationType || !elaboration.elaborationText || !elaboration.targetCoordinate || elaboration.confidenceScore === undefined) {
-                            throw new Error(`Natural elaboration ${elabIndex} in single unit result missing required properties.`);
+                            console.warn(`Natural elaboration ${elabIndex} in single unit result missing required properties. Filling with defaults.`);
+                            elaboration.elaborationType = elaboration.elaborationType || "unknown";
+                            elaboration.elaborationText = elaboration.elaborationText || "Missing text";
+                            elaboration.targetCoordinate = elaboration.targetCoordinate || sourceMetadata.targetCoordinate;
+                            elaboration.confidenceScore = elaboration.confidenceScore !== undefined ? elaboration.confidenceScore : 0.5;
                         }
                     });
                 }
-                analysisResult.concatenatedContentLength = concatenatedContent.length; // Add some metadata
+                analysisResult.concatenatedContentLength = concatenatedContent.length;
 
-                return analysisResult; // Return the single analysis object
+                return analysisResult;
 
             } catch (parseError) {
                 console.error("JSON parsing failed for single unit analysis:", parseError.message);
                 console.error("Raw LLM response for single unit:", response);
-                throw new Error(`Failed to parse LLM response for single unit analysis: ${parseError.message}`);
+                // Attempt to return a structured error object if parsing fails
+                return {
+                    error: "Failed to parse LLM response for single unit analysis",
+                    rawResponse: response.substring(0, 1000) + "...", // Include part of the raw response
+                    assignedCoordinates: [sourceMetadata.targetCoordinate],
+                    overallSummary: "Error in processing.",
+                    mainThemes: [],
+                    analysis: `Error: ${parseError.message}`,
+                    extractedMappings: [],
+                    identifiedVariations: [],
+                    naturalElaborations: [],
+                    deepElaboration: [],
+                    novelContributions: [],
+                    qlDynamics: [],
+                    extractedTags: [],
+                    mefLensInsights: {},
+                    subnodeMappings: {}
+                };
             }
 
         } else {

@@ -53,71 +53,82 @@ describe('analyzeChunkGroup', () => {
   describe('analyzeAsSingleUnit: true', () => {
     it('should analyze concatenated content as a single unit and return a single analysis object', async () => {
       const concatenatedContent = "Chunk 1 content.\n\n---\n\nChunk 2 content.";
-      const mockChunks = ["Chunk 1 content.", "Chunk 2 content."]; // Original chunks before concatenation
+      const mockChunks = ["Chunk 1 content.", "Chunk 2 content."];
       const mockContextWindows = [
-        { contextText: 'Context for Chunk 1', bimbaContext: { directlyRelevantNodes: [] } },
-        { contextText: 'Context for Chunk 2', bimbaContext: { directlyRelevantNodes: [] } },
+        { contextText: 'Context for Original Chunk 1 (part of this batch):\nDetails C1.', bimbaContext: { directlyRelevantNodes: [{name: "NodeC1"}] } },
+        { contextText: 'Context for Original Chunk 2 (part of this batch):\nDetails C2.', bimbaContext: { directlyRelevantNodes: [{name: "NodeC2"}] } },
       ];
-      const expectedSingleAnalysis = {
-        analysis: 'Single analysis for concatenated content',
-        extractedMappings: [{ mappingType: 'Test', mappingValue: 'TestVal1' }],
-        identifiedVariations: [],
-        naturalElaborations: [],
-        deepElaboration: [],
-        novelContributions: [],
-        qlDynamics: [],
-        concatenatedContentLength: concatenatedContent.length,
+      // 1.b Rich JSON Output Test: Mock LLM to return the new rich structure
+      const mockRichAnalysisResult = {
         assignedCoordinates: [mockSourceMetadata.targetCoordinate],
+        overallSummary: "Overall summary for the batch.",
+        mainThemes: ["Theme A", "Theme B"],
+        analysis: "Detailed analysis of the concatenated content.",
+        extractedMappings: [{ mappingType: 'BatchMapping', mappingValue: 'Value1' }],
+        identifiedVariations: [{ variationType: 'BatchVar', variationText: 'Text1' }],
+        naturalElaborations: [{ elaborationType: 'BatchElab', elaborationText: 'Text1', targetCoordinate: '#T1', confidenceScore: 0.9 }],
+        deepElaboration: [{ point: 'BatchDeep1', evidence: 'Evidence1', significance: 'Sig1' }],
+        novelContributions: [{ contribution: 'BatchNovel1', explanation: 'Expl1' }],
+        qlDynamics: [{ operator: 'BatchQL1', type: 'structural', explanation: 'Expl1' }],
+        extractedTags: ["Tag1", "Tag2"],
+        mefLensInsights: { "#LENS1": "Insight via lens 1 for batch" },
+        subnodeMappings: {},
+        concatenatedContentLength: concatenatedContent.length,
       };
-      mockLlmService.generateContent.mockResolvedValueOnce(JSON.stringify(expectedSingleAnalysis));
+      mockLlmService.generateContent.mockResolvedValueOnce(JSON.stringify(mockRichAnalysisResult));
 
       const options = {
         llmService: mockLlmService,
         fullBimbaMap: mockFullBimbaMap,
-        contextWindows: mockContextWindows, // stage_minus2.mjs provides these
+        contextWindows: mockContextWindows,
         useProvidedContextWindows: true,
         concatenatedContent: concatenatedContent,
         analyzeAsSingleUnit: true,
         documentContent: mockSourceMetadata.documentContent,
       };
 
-      // Note: `chunks` param to analyzeChunkGroup is still the array of original chunks
-      // for context generation if needed, even if `concatenatedContent` is primary for analysis.
       const result = await analyzeChunkGroup(
-        mockChunks, 
-        mockSourceMetadata,
-        mockBimbaContext,
-        mockUserContext,
-        [mockSourceMetadata.targetCoordinate], // For single unit, assignedCoordinates might be just the primary target
-        mockMetalogikon,
-        options,
-        mockState
+        mockChunks, mockSourceMetadata, mockBimbaContext, mockUserContext,
+        [mockSourceMetadata.targetCoordinate], mockMetalogikon, options, mockState
       );
 
-      expect(result).toEqual(expectedSingleAnalysis);
+      // 1.b Rich JSON Output Test: Verify parsing of rich JSON
+      expect(result).toEqual(mockRichAnalysisResult);
       expect(mockLlmService.generateContent).toHaveBeenCalledTimes(1);
+      
       const [callArgs] = mockLlmService.generateContent.mock.calls;
       const systemPrompt = callArgs[1];
       const userPrompt = callArgs[2];
 
+      // 1.a Context Aggregation Test: Verify prompt includes aggregated context
+      expect(systemPrompt).toContain('CONTEXT INFORMATION:');
+      expect(systemPrompt).toContain('Aggregated Context from Batch Chunks');
+      expect(systemPrompt).toContain('Context for Original Chunk 1 (part of this batch):\nDetails C1.');
+      expect(systemPrompt).toContain('Context for Original Chunk 2 (part of this batch):\nDetails C2.');
+      
       expect(systemPrompt).toContain('analyze the provided block of text');
-      expect(systemPrompt).toContain('Format your response as a single structured JSON object');
+      expect(systemPrompt).toContain('Format your response as a single, structured JSON object');
       expect(userPrompt).toContain('TEXT BLOCK TO ANALYZE:');
       expect(userPrompt).toContain(concatenatedContent);
-      expect(userPrompt).toContain('Assigned primary coordinate: #TARGET_COORD');
-      expect(userPrompt).toContain('"assignedCoordinates": ["#TARGET_COORD"]'); // Check JSON example
-      expect(userPrompt).not.toContain('CHUNK 1:');
-      expect(userPrompt).not.toContain('CHUNK 2:');
-      expect(userPrompt).not.toContain('"chunkIndex":'); // Should not ask for chunkIndex in single mode output
+      expect(userPrompt).toContain('"overallSummary": "string (concise summary of the entire text block)"'); // Check for new rich fields in prompt
+      expect(userPrompt).toContain('"mainThemes": ["string (list of main themes or topics)"]');
+      expect(userPrompt).toContain('"extractedTags": ["string (list of relevant tags or keywords for the block)"]');
     });
 
     it('should use fallback context generation if no contextWindows provided for single unit', async () => {
         const concatenatedContent = "Single chunk content for context test.";
-        const mockChunks = [concatenatedContent]; // Original chunk
-        const expectedSingleAnalysis = { analysis: 'Fallback context test' };
-        mockLlmService.generateContent.mockResolvedValueOnce(JSON.stringify(expectedSingleAnalysis));
+        const mockChunks = [concatenatedContent]; 
+        const mockRichAnalysisResult = { 
+            analysis: 'Fallback context test', 
+            // include other fields from the rich structure with default/empty values
+            assignedCoordinates: [mockSourceMetadata.targetCoordinate],
+            overallSummary: "Summary for fallback", mainThemes: [], extractedMappings: [], 
+            identifiedVariations: [], naturalElaborations: [], deepElaboration: [], 
+            novelContributions: [], qlDynamics: [], extractedTags: [], mefLensInsights: {}, subnodeMappings: {}
+        };
+        mockLlmService.generateContent.mockResolvedValueOnce(JSON.stringify(mockRichAnalysisResult));
   
-        mockGenerateContextWindow.mockResolvedValueOnce({
+        mockGenerateContextWindow.mockResolvedValueOnce({ // This is the fallback generation for chunks[0]
             contextText: `Generated context for: ${concatenatedContent.substring(0,10)}... Options: ${JSON.stringify({forAnalysis: true})}`,
             bimbaContext: { directlyRelevantNodes: [] }
         });
