@@ -33,6 +33,17 @@ ENV/
 *.env*
 !.env.example
 
+# Python virtual environments
+**/venv/
+**/venv_*/
+**/.venv/
+Cline/MCP/lightrag-mcp-server/venv_312/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Build / Distribution
 dist/
 build/
@@ -70,6 +81,9 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Deprecated Files
+epii_app/Deprecated Files/
 
 # OS specific
 .DS_Store
