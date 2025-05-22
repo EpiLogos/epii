@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "44963c713e150a55612e08bee5bd28a6": {
+      "return": "{\"high_level_keywords\": [\"Meta-symbol\", \"Epi-Logos system\", \"Symbolism\", \"Conceptual analysis\"], \"low_level_keywords\": [\"Definition\", \"Function\", \"Meaning\", \"Structure\", \"System components\", \"Relationships\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Tell me everything you can about the meta-symbol in the Epi-Logos system."
+    }
+  }
+}

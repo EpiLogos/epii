@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "73617fa176f2ad3d3d3e5a958764d03b": {
+      "return": "{\"high_level_keywords\": [\"Meta\", \"Stock Symbol\", \"Financial Information\"], \"low_level_keywords\": [\"META\", \"Stock market\", \"Stock price\", \"Trading\", \"Investment\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "meta symbol info"
+    }
+  }
+}
