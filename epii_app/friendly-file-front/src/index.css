@@ -1,0 +1,125 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 30% 5%;
+    --foreground: 180 100% 95%;
+
+    --card: 210 30% 8%;
+    --card-foreground: 180 100% 95%;
+
+    --popover: 210 30% 8%;
+    --popover-foreground: 180 100% 95%;
+
+    --primary: 180 100% 50%;
+    --primary-foreground: 210 30% 5%;
+
+    --secondary: 210 30% 15%;
+    --secondary-foreground: 180 100% 95%;
+
+    --muted: 210 30% 12%;
+    --muted-foreground: 180 15% 65%;
+
+    --accent: 335 100% 50%;
+    --accent-foreground: 180 100% 95%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 180 100% 95%;
+
+    --border: 210 30% 15%;
+    --input: 210 30% 15%;
+    --ring: 180 100% 50%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-epii-darker text-foreground antialiased overflow-x-hidden;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-light tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+}
+
+@layer utilities {
+  .neo-glow {
+    @apply border border-epii-neon/30 shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all duration-300;
+  }
+
+  .neo-glow:hover {
+    @apply shadow-[0_0_30px_rgba(0,229,255,0.5)] border-epii-neon/60;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+  }
+
+  .text-accent-glow {
+    text-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+  }
+
+  .glass {
+    @apply backdrop-blur-lg bg-epii-dark/30 border border-white/5;
+  }
+
+  .geometric-pattern {
+    background-image: linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 229, 255, 0.3);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 229, 255, 0.5);
+  }
+
+  /* Animation for status messages */
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
+}
