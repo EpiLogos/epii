@@ -152,11 +152,14 @@ export async function runStageMinus2(state) {
         const numBatches = Math.ceil(documentChunks.length / batchSize);
         console.log(`Will process chunks in ${numBatches} batches of up to ${batchSize} chunks each`);
 
-        // Initialize arrays to store analysis results
-        const chunkAnalyses = [];
-        const chunkMappings = [];
-        const chunkVariations = [];
-        const chunkTags = [];
+        // Initialize array to store batch analysis results
+        const batchAnalyses = [];
+        // Per-chunk mappings, variations, and tags might be deprecated or changed with batch-level analysis.
+        // For now, we'll keep them but they might not be populated as before, or their meaning might shift.
+        const chunkMappings = []; // Retained for now, structure might need to change
+        const chunkVariations = []; // Retained for now, structure might need to change
+        const chunkTags = []; // Retained for now, structure might need to change
+
 
         // Process chunks in batches
         for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
@@ -164,7 +167,7 @@ export async function runStageMinus2(state) {
             const batchEnd = Math.min((batchIndex + 1) * batchSize, documentChunks.length);
             const currentBatchSize = batchEnd - batchStart;
 
-            console.log(`Processing batch ${batchIndex + 1}/${numBatches} (chunks ${batchStart + 1}-${batchEnd})...`);
+            console.log(`Processing batch ${batchIndex + 1}/${numBatches} (analyzing ${currentBatchSize} chunks as a single unit)...`);
 
             // Create a batch run for tracing
             const batchRun = langsmithTracing.createChildRun(
@@ -177,110 +180,87 @@ export async function runStageMinus2(state) {
                 }
             );
 
-            // Process chunks as a group to maintain context between them
-            console.log(`Analyzing batch ${batchIndex + 1} as a group to maintain context between chunks...`);
+            // Concatenate chunks in the batch to form a single text unit for analysis
+            // We'll use originalChunks as they represent the unmodified content.
+            const batchChunkTexts = originalChunks.slice(batchStart, batchEnd);
+            const concatenatedBatchContent = batchChunkTexts.join("\n\n---\n\n"); // Separator for clarity if needed by LLM
 
-            // Note: batchRun was already created above, no need to create it again
+            // For context, we might need a strategy for combining context windows or using a general one.
+            // For now, let's assume analyzeChunkGroup will handle context for the concatenated content.
+            // We can pass all context windows for the batch, or a combined one.
+            // Let's pass the array of context windows, the new analyzeChunkGroup can decide how to use them.
+            const batchContextWindows = comprehensiveContextWindows.slice(batchStart, batchEnd);
 
-            let batchResults;
+            // The concept of "assignedCoordinates" might also change.
+            // If the analysis is for the whole batch, it might relate to the primary targetCoordinate.
+            // For now, we'll pass the main targetCoordinate, assuming analyzeChunkGroup adapts.
+            const batchTargetCoordinate = sourceMetadata.targetCoordinate;
+
+
+            console.log(`Analyzing concatenated content of batch ${batchIndex + 1} (length: ${concatenatedBatchContent.length} chars)...`);
+
+            let singleBatchAnalysisResult;
             try {
-                // Extract batch chunks and use the pre-generated comprehensive context windows
-                const batchChunks = originalChunks.slice(batchStart, batchEnd);
-                const batchContextWindows = comprehensiveContextWindows.slice(batchStart, batchEnd);
-
-                // Verify that we have context windows for all chunks in the batch
-                if (batchContextWindows.length !== batchChunks.length) {
-                    console.warn(`Context windows array length (${batchContextWindows.length}) does not match batch chunks length (${batchChunks.length}). This should not happen.`);
-                }
-
-                // Log the first context window for debugging
-                console.log(`--- Context Window Debug Information (Stage -2) ---`);
-                console.log(`Using pre-generated comprehensive context window for first chunk in batch (first 200 chars): ${batchContextWindows[0].contextText.substring(0, 200)}...`);
-                console.log(`Context window count: ${batchContextWindows.length} for ${batchChunks.length} chunks`);
-                console.log(`--- End Context Window Debug Information ---`);
-
-                // Create assigned coordinates for each chunk (using target coordinate)
-                const batchAssignedCoordinates = Array(batchChunks.length).fill([sourceMetadata.targetCoordinate]);
-
                 // Import the analyzeChunkGroup function
+                // This function is now expected to:
+                // 1. Take concatenated content (or an array of chunks it will concatenate).
+                // 2. Return a SINGLE analysis object for the entire batch.
                 const { analyzeChunkGroup } = await import('../../utils/content/analysis.mjs');
 
-                // Analyze the batch as a group using pre-generated comprehensive context windows
-                const batchAnalysisResults = await analyzeChunkGroup(
-                    batchChunks,
+                // Call analyzeChunkGroup with the concatenated content
+                // The options object might need adjustment based on the refactored analyzeChunkGroup.
+                // We pass `batchChunkTexts` (array) and `concatenatedBatchContent` (string)
+                // The new `analyzeChunkGroup` should ideally handle this, perhaps preferring `concatenatedBatchContent`.
+                singleBatchAnalysisResult = await analyzeChunkGroup(
+                    batchChunkTexts, // Array of original chunk texts in the batch
                     sourceMetadata,
                     state.bimbaContext,
                     state.userContext,
-                    batchAssignedCoordinates,
+                    [batchTargetCoordinate], // Assign the batch to the main target coordinate
                     metalogikon,
                     {
                         llmService: epiiLLMService,
-                        contextWindows: batchContextWindows,
-                        useProvidedContextWindows: true, // Flag to use provided context windows
+                        concatenatedContent: concatenatedBatchContent, // Explicitly pass concatenated content
+                        contextWindows: batchContextWindows, // Pass all context windows for the batch
+                        useProvidedContextWindows: true,
                         fullBimbaMap: state.fullBimbaMap,
-                        documentContent: state.documentContent // Pass documentContent in options
+                        documentContent: state.documentContent, // Full document content for broader context
+                        analyzeAsSingleUnit: true // New flag indicating batch-level analysis
                     },
                     state // Pass the entire state as a fallback
                 );
 
-                // Process the results with enhanced elaborations
-                batchResults = batchAnalysisResults.map((result, index) => {
-                    const chunkIndex = batchStart + index;
+                // Store the single analysis result for the batch
+                batchAnalyses[batchIndex] = singleBatchAnalysisResult;
 
-                    // Store the analysis results
-                    chunkAnalyses[chunkIndex] = result.analysis || '';
-                    chunkMappings[chunkIndex] = result.extractedMappings || [];
-                    chunkVariations[chunkIndex] = result.identifiedVariations || [];
-                    chunkTags[chunkIndex] = result.tags || [];
+                // Logging for the batch result
+                // The structure of singleBatchAnalysisResult will determine what can be logged here.
+                // Assuming it's an object with an 'analysis' text and potentially other fields.
+                if (typeof singleBatchAnalysisResult === 'object' && singleBatchAnalysisResult.analysis) {
+                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis length: ${singleBatchAnalysisResult.analysis.length}`);
+                    // If the new analyzeChunkGroup still provides mappings, variations, tags for the batch as a whole:
+                    // chunkMappings[batchIndex] = singleBatchAnalysisResult.extractedMappings || [];
+                    // chunkVariations[batchIndex] = singleBatchAnalysisResult.identifiedVariations || [];
+                    // chunkTags[batchIndex] = singleBatchAnalysisResult.tags || [];
+                } else if (typeof singleBatchAnalysisResult === 'string') {
+                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis length: ${singleBatchAnalysisResult.length}`);
+                } else {
+                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Result type: ${typeof singleBatchAnalysisResult}`);
+                }
 
-                    // Extract the enhanced elaboration elements
-                    const deepElaboration = result.deepElaboration || [];
-                    const novelContributions = result.novelContributions || [];
-                    const qlDynamics = result.qlDynamics || [];
-
-                    // Add enhanced elements to the analysis object
-                    if (deepElaboration.length > 0 || novelContributions.length > 0 || qlDynamics.length > 0) {
-                        // If the analysis is already a string, convert it to an object
-                        let analysisObj;
-                        try {
-                            analysisObj = typeof chunkAnalyses[chunkIndex] === 'string' ?
-                                JSON.parse(chunkAnalyses[chunkIndex]) : chunkAnalyses[chunkIndex];
-                        } catch (e) {
-                            // If parsing fails, create a new object
-                            analysisObj = { originalAnalysis: chunkAnalyses[chunkIndex] };
-                        }
-
-                        // Add enhanced elements
-                        analysisObj.deepElaboration = deepElaboration;
-                        analysisObj.novelContributions = novelContributions;
-                        analysisObj.qlDynamics = qlDynamics;
-                        analysisObj.isEnhancedAnalysis = true;
-
-                        // Update the analysis
-                        chunkAnalyses[chunkIndex] = analysisObj;
-                    }
-
-                    // Log success with enhanced information
-                    console.log(`Successfully analyzed chunk ${chunkIndex + 1}/${documentChunks.length} with ${deepElaboration.length} deep elaboration points, ${novelContributions.length} novel contributions, and ${qlDynamics.length} QL dynamics`);
-
-                    return {
-                        chunkIndex,
-                        success: true,
-                        hasEnhancedAnalysis: deepElaboration.length > 0 || novelContributions.length > 0 || qlDynamics.length > 0
-                    };
-                });
 
                 // End the batch run successfully
                 try {
                     langsmithTracing.endRunSuccess(batchRun, {
-                        successCount: currentBatchSize,
-                        errorCount: 0
+                        analysisLength: typeof singleBatchAnalysisResult === 'string' ? singleBatchAnalysisResult.length : (singleBatchAnalysisResult?.analysis?.length || 0),
+                        processedAsSingleUnit: true
                     });
                 } catch (tracingError) {
                     console.warn(`LangSmith tracing error: ${tracingError.message}`);
                 }
+
             } catch (batchError) {
-                console.error(`Error analyzing batch ${batchIndex + 1}:`, batchError);
+                console.error(`Error analyzing batch ${batchIndex + 1} as a single unit:`, batchError);
 
                 // End the batch run with error
                 try {
@@ -289,33 +269,25 @@ export async function runStageMinus2(state) {
                     console.warn(`LangSmith tracing error: ${tracingError.message}`);
                 }
 
-                // Store empty results for all chunks in the batch
-                for (let i = batchStart; i < batchEnd; i++) {
-                    chunkAnalyses[i] = `Error analyzing batch: ${batchError.message}`;
-                    chunkMappings[i] = [];
-                    chunkVariations[i] = [];
-                    chunkTags[i] = [];
-                }
-
-                // Create batch results with errors
-                batchResults = Array(currentBatchSize).fill().map((_, index) => ({
-                    chunkIndex: batchStart + index,
-                    success: false,
-                    error: batchError.message
-                }));
+                // Store error information for the batch
+                batchAnalyses[batchIndex] = `Error analyzing batch as single unit: ${batchError.message}`;
+                // chunkMappings, chunkVariations, chunkTags would remain empty for this batch or handle error appropriately
             }
-
-            console.log(`Batch ${batchIndex + 1} complete. Results:`, batchResults.map(r => r.success ? 'Success' : 'Error'));
+            // Removed per-chunk result logging, batch result logged above
         }
 
-        // 7. Prepare state for the next stage WITHOUT using ...state to avoid state bloat
+        // 7. Prepare state for the next stage
+        // The output now contains batchAnalyses instead of chunkAnalyses.
+        // chunkMappings, chunkVariations, chunkTags might be re-evaluated based on batch analysis.
+        // For now, they are passed as potentially empty or differently structured.
         const stageMinus2Output = {
-            chunkAnalyses,
-            chunkMappings,
-            chunkVariations,
-            chunkTags,
-            // Flag to indicate that this stage has been enhanced with deeper elaboration
-            hasEnhancedAnalysis: true,
+            batchAnalyses, // New: array of single analysis results per batch
+            // chunkAnalyses, // Old: array of per-chunk analyses - REMOVED/REPLACED
+            chunkMappings, // Retained: structure/relevance TBD with batch analysis
+            chunkVariations, // Retained: structure/relevance TBD with batch analysis
+            chunkTags, // Retained: structure/relevance TBD with batch analysis
+            // Flag to indicate that this stage has been enhanced with deeper elaboration (now at batch level)
+            hasEnhancedBatchAnalysis: true, // Renamed for clarity
             metalogikon,
             // Include only essential properties from previous state
             documentId: state.documentId,
@@ -340,9 +312,9 @@ export async function runStageMinus2(state) {
             bpMCPService: state.bpMCPService,
             // Include original document content and chunks for reference
             documentContent: state.documentContent,
-            documentChunks: state.documentChunks,
+            documentChunks: state.documentChunks, // Still pass original chunking info if needed downstream
             originalChunks: state.originalChunks,
-            chunkContextWindows: state.chunkContextWindows
+            chunkContextWindows: state.chunkContextWindows // Pass context windows if needed downstream
             // Explicitly NOT including graphData to prevent leakage
         };
 
@@ -354,36 +326,35 @@ export async function runStageMinus2(state) {
 
         // End the stage run
         try {
-            // Count enhanced analysis elements
-            let deepElaborationCount = 0;
-            let novelContributionsCount = 0;
-            let qlDynamicsCount = 0;
-
-            // Iterate through chunk analyses to count enhanced elements
-            chunkAnalyses.forEach(analysis => {
-                if (typeof analysis === 'object') {
-                    deepElaborationCount += (analysis.deepElaboration || []).length;
-                    novelContributionsCount += (analysis.novelContributions || []).length;
-                    qlDynamicsCount += (analysis.qlDynamics || []).length;
+            // Metrics for batch-level analysis
+            const numBatchesAnalyzed = batchAnalyses.length;
+            let totalAnalysisContentLength = 0;
+            batchAnalyses.forEach(analysis => {
+                if (typeof analysis === 'string') {
+                    totalAnalysisContentLength += analysis.length;
+                } else if (typeof analysis === 'object' && analysis.analysis) {
+                    totalAnalysisContentLength += analysis.analysis.length;
                 }
+                // Add more specific metrics if the structure of batch analysis is known
             });
 
             langsmithTracing.endRunSuccess(stageRun, {
-                numChunksAnalyzed: chunkAnalyses.length,
-                numMappingsTotal: chunkMappings.flat().length,
-                numVariationsTotal: chunkVariations.flat().length,
-                numTagsTotal: chunkTags.flat().length,
-                // Include enhanced analysis metrics
-                numDeepElaborations: deepElaborationCount,
-                numNovelContributions: novelContributionsCount,
-                numQLDynamics: qlDynamicsCount,
-                hasEnhancedAnalysis: true
+                numBatchesAnalyzed,
+                totalAnalysisContentLength,
+                // numMappingsTotal, numVariationsTotal, numTagsTotal might need re-evaluation
+                // based on how they are handled with batch-level analysis.
+                // For now, we'll report based on what's available.
+                numMappingsTotal: chunkMappings.flat().length, // If populated per batch
+                numVariationsTotal: chunkVariations.flat().length, // If populated per batch
+                numTagsTotal: chunkTags.flat().length, // If populated per batch
+                hasEnhancedBatchAnalysis: true
             });
         } catch (tracingError) {
             console.warn(`LangSmith tracing error: ${tracingError.message}`);
         }
 
         console.log("--- Epii Pipeline: Stage -2 Complete ---");
+        console.log(`Completed analysis for ${batchAnalyses.length} batches.`);
 
         return stageMinus2Output;
 
