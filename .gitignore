@@ -1,6 +1,7 @@
 # Ignore all folders except the ones we want to include
 /*
 !epii_app/
+!memory-bank/
 !Cline/
 Cline/*
 !Cline/MCP/
@@ -106,7 +107,7 @@ rag_storage/
 inputs/
 examples/input/
 examples/output/
-memory-bank/
+
 
 # Test and development scripts
 *_test.js
