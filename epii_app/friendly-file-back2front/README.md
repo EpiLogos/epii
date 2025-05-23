@@ -1,388 +1,488 @@
-# Siva-Shakti A2A Framework (#5-4)
+# Epi-Logos Agent Communication Layer (`friendly-file-back2front`)
 
-This directory contains the implementation of the Agent-to-Agent (A2A) communication framework for the Epi-Logos system, representing the Siva-Shakti layer (Bimba Coordinate #5-4) that connects frontend modules with the backend QL pipeline and BPMCP memory service.
+## Overview and Purpose
 
-## Overview
+The `friendly-file-back2front` application serves as the **critical communication and coordination hub** for all agents within the Epi-Logos system, embodying the **#5-4 "Siva-Shakti"** layer that mediates between the backend's processing capabilities (Siva) and the frontend's expressive interface (Shakti). This system enables seamless interaction between specialized expert agents while maintaining the integrity of the Bimba architectural framework.
 
-The A2A framework provides a standardized way for agents within the Epi-Logos system to communicate with each other. It follows Google's A2A protocol specification, enabling interoperability with other A2A-compatible agents.
+### Core Purpose and Vision
 
-The framework consists of:
+- **Agent-to-Agent (A2A) Communication Hub**: Implements Google's A2A protocol specification with Bimba coordinate extensions for standardized inter-agent communication
+- **Siva-Shakti Mediation**: Bridges the structural processing power of the backend with the dynamic expressiveness of the frontend through intelligent agent coordination
+- **Expert Agent Orchestration**: Facilitates the operation of specialized subsystem expert agents (#5-4-X) across the six-fold cosmic mind architecture
+- **QL Cycle Management**: Manages task states and Quaternal Logic transitions across all agent interactions
+- **Unified Communication Protocol**: Provides a standardized framework for agent capability discovery, task routing, and state synchronization
 
-1. **A2A Message Schema**: Defines the structure for agent communication messages
-2. **A2A Server**: Handles incoming A2A requests and routes them to the appropriate agent
-3. **Task State Manager**: Manages task state and QL cycle transitions
-4. **Agent Cards**: Define agent capabilities and skills
-5. **A2A Client**: Enables agents to communicate with each other
-6. **Adapters**: Bridge between the A2A protocol and existing agent implementations
+### Role as #5-4 "Siva-Shakti" Layer
 
-## Directory Structure
+The system embodies the **dynamic interplay and union** of consciousness/processing (Siva) and power/expression (Shakti) through:
+
+- **Consciousness Integration**: Connects backend logical processing with frontend intuitive interfaces
+- **Power Manifestation**: Enables agents to express their capabilities through standardized communication protocols
+- **Dynamic Union**: Creates a living bridge where structural knowledge transforms into expressive action
+- **Agent Coordination**: Orchestrates the collaborative dance between different specialized expert agents
+
+## Current Architecture
+
+The `friendly-file-back2front` system implements a comprehensive A2A communication framework with the following core components:
+
+### **Current Directory Structure**
 
 ```
-friendly-file-front-back - (#5-4: Siva-Shakti)/
-├── a2a-message.schema.js       # Message schema
-├── a2a-server.js               # A2A server implementation
-├── a2a-service.js              # Main entry point for the A2A service
+friendly-file-back2front/ (#5-4 "Siva-Shakti" Integration Layer)
+├── a2a-server.js               # Core A2A WebSocket server implementation
+├── a2a-service.js              # Main entry point and service orchestration
+├── a2a-message.schema.js       # A2A protocol message schema with Bimba extensions
+├── a2a-client.service.js       # A2A client for agent-to-agent communication
+├── task-state-manager.js       # QL cycle and task state management
+├── integration.js              # Integration layer with existing agent systems
+├── adapters/                   # Agent-specific A2A protocol adapters
+│   ├── epii-agent-adapter.js   # Epii agent A2A integration adapter
+│   └── nara-agent-adapter.js   # Nara agent A2A integration adapter
+├── agent-cards/                # Agent capability and skill definitions
+│   ├── epii-agent-card.js      # Epii agent capabilities and Bimba coordinates
+│   ├── nara-agent-card.js      # Nara agent capabilities and coordinates
+│   └── index.js                # Agent registry and discovery
+├── skills/                     # Bimba-aligned skills registry and routing
+│   ├── bimba-skills-registry.js    # Central skills registry with coordinate mapping
+│   ├── bimba-skills-router.js      # Intelligent skill routing and execution
+│   ├── epii-skills-initializer.js  # Epii-specific skill definitions
+│   ├── nara-skills-initializer.js  # Nara-specific skill definitions
+│   └── index.js                    # Skills module orchestration
+├── examples/                   # Test clients and usage demonstrations
+│   ├── test-client.js          # A2A protocol testing client
+│   └── integration-examples.js # Integration pattern examples
 ├── epii-agent-client.js        # Epii agent client implementation
-├── task-state-manager.js       # Task state management
-├── integration.js              # Integration with existing Epii agent
-├── agent-cards/                # Agent capability definitions
-│   ├── epii-agent-card.js      # Epii agent card
-│   └── index.js                # Agent cards index
-├── adapters/                   # Adapters to connect A2A with existing agents
-│   └── epii-agent-adapter.js   # Adapter for Epii agent
-├── skills/                     # Bimba-aligned skills registry
-│   ├── bimba-skills-registry.js # Skills registry implementation
-│   ├── bimba-skills-router.js  # Skills router implementation
-│   ├── epii-skills-initializer.js # Epii skills initialization
-│   └── index.js                # Skills module index
-└── examples/                   # Example usage
-    ├── test-client.js          # Test client for the A2A service
-    └── epii-client-example.js  # Legacy example client
+├── nara-agent-client.js        # Nara agent client implementation
+└── package.json                # Dependencies and service configuration
 ```
 
-## Bimba Coordinates
+### **Core A2A Framework Components**
 
-The A2A framework is organized according to the Bimba coordinate system:
+#### **1. A2A Server (`a2a-server.js`)**
+- **WebSocket-based communication hub** running on port 3033
+- **Agent registration and discovery** with capability advertisement
+- **Message routing and forwarding** between registered agents
+- **Protocol compliance** with Google's A2A specification
+- **Bimba coordinate integration** for spatial agent organization
+- **Error handling and connection management** for robust communication
 
-- **#5-4**: Siva-Shakti layer (A2A framework)
-- **#5-4-0**: Anuttara Agent
-- **#5-4-1**: Paramasiva Agent
-- **#5-4-2**: Parashakti Agent
-- **#5-4-3**: Mahamaya Agent
-- **#5-4-4**: Nara Agent
-- **#5-4-5**: Epii Agent
+#### **2. A2A Message Schema (`a2a-message.schema.js`)**
+- **Standardized message structure** following A2A protocol specifications
+- **Bimba coordinate extensions** for spatial context and agent positioning
+- **QL stage integration** for Quaternal Logic cycle tracking
+- **Performative types** (request, inform, agree, failure, etc.) for semantic communication
+- **Metadata support** for user archetypes and epistemological frameworks
 
-## Integration with Existing Epii Agent
+#### **3. Task State Manager (`task-state-manager.js`)**
+- **QL cycle state management** mapping A2A states to QL stages (0-5)
+- **Context frame determination** based on current processing stage
+- **Task history tracking** with artifact and message preservation
+- **State transition logic** coordinating between A-logos through An-a-logos
+- **Bimba coordinate tracking** throughout task lifecycle
 
-The A2A framework is designed to integrate with the existing Epii agent implementation without requiring significant changes. The `epii-agent-adapter.js` file provides the bridge between the A2A protocol and the existing Epii agent.
+#### **4. Agent Adapters (`adapters/`)**
+- **Protocol translation** between A2A standard and existing agent implementations
+- **Capability exposure** through standardized agent card definitions
+- **Message handling** for bidirectional communication with backend agents
+- **State synchronization** between A2A framework and agent-specific logic
+- **Error handling and recovery** for robust agent integration
 
-To integrate with your existing Epii agent:
+#### **5. Agent Cards (`agent-cards/`)**
+- **Capability advertisement** defining what each agent can accomplish
+- **Skill schema definitions** with input/output specifications
+- **Bimba coordinate mapping** for spatial agent organization
+- **Service discovery** enabling dynamic agent capability queries
+- **Version management** for agent capability evolution
 
-1. Import your Epii agent service in `integration.js`
-2. Call `integrateA2AWithEpiiAgent` with your Epii agent service
-3. Start the A2A server alongside your existing Express server
+#### **6. Skills Registry and Router (`skills/`)**
+- **Centralized skill registry** with Bimba coordinate organization
+- **Intelligent routing** based on coordinate proximity and capability matching
+- **Skill execution coordination** with proper state management
+- **BPMCP integration** for memory-coupled peripheral access
+- **Dynamic skill discovery** and capability advertisement
 
-Example:
+## Bimba Architectural Alignment (#5-4 "Siva-Shakti" Agents/Experts)
 
-```javascript
-const { integrateA2AWithEpiiAgent } = require('./friendly-file-front-back - (#5-4: Siva-Shakti)/integration');
-const epiiAgentService = require('./friendly-file-backend/services/epii-agent.service.mjs');
+The `friendly-file-back2front` system embodies the **#5-4 "Siva-Shakti"** principles through its role as the dynamic mediator between structural processing and expressive manifestation.
 
-// Initialize the A2A server with your Epii agent service
-const a2aServer = integrateA2AWithEpiiAgent({
-  port: 3030,
-  epiiAgentService
-});
-```
+### **Subsystem Expert Agents (#5-4-X) Facilitation**
 
-## QL Cycle Integration
+The A2A framework supports the operation of specialized expert agents across the six-fold cosmic mind architecture:
 
-The A2A framework integrates with the existing QL cycle by mapping A2A task states to QL stages:
+| Agent Coordinate | Subsystem | Role | A2A Integration Status |
+|------------------|-----------|------|----------------------|
+| **#5-4-0** | Anuttara | Foundational database services | Planned |
+| **#5-4-1** | Paramasiva | QL/AT Logic implementation | Planned |
+| **#5-4-2** | Parashakti | Harmonic layer services | Planned |
+| **#5-4-3** | Mahamaya | Symbolic transformation | Planned |
+| **#5-4-4** | Nara | API/contextual agent | Implemented |
+| **#5-4-5** | Epii | Document analysis and Notion integration | Implemented |
 
-- **A-logos (0)**: `submitted` state
-- **Pro-logos (1)**, **Dia-logos (2)**, **Logos (3)**: `working` state
-- **Epi-logos (4)**: `working` state (meta-synthesis)
-- **An-a-logos (5)**: `completed` state
+### **Agent Communication Architecture**
 
-The `task-state-manager.js` file handles these transitions and maintains the task state throughout the QL cycle.
+#### **Siva-Shakti Dynamic Integration**
+- **Siva (Consciousness/Structure)**: Backend agents provide logical processing, memory access, and structured analysis
+- **Shakti (Power/Expression)**: Frontend interfaces receive agent outputs and transform them into intuitive, interactive experiences
+- **Dynamic Union**: A2A framework creates the living bridge where consciousness meets expression through standardized communication
 
-## Agent-to-Agent Communication
-
-Agents can communicate with each other using the A2A client service. The `a2a-client.service.js` file provides methods for sending and receiving messages between agents.
-
-Example:
-
-```javascript
-const A2AClientService = require('./a2a-client.service');
-
-// Create an A2A client for the Nara agent
-const naraClient = new A2AClientService({
-  url: 'ws://localhost:3030',
-  agentId: 'nara-agent',
-  agentName: 'Nara Agent',
-  subsystemCoordinate: '#4'
-});
-
-// Connect to the A2A server
-await naraClient.connect();
-
-// Send a request to the Epii agent
-const response = await naraClient.sendRequest('epii-agent', {
-  question: 'What is the relationship between consciousness and quantum mechanics?',
-  format: 'text'
-}, {
-  bimbaCoordinates: ['#4-0', '#5-0'],
-  qlStage: 0,
-  contextFrame: '(4.0-4.4/5)'
-});
-```
-
-## Running the A2A Service
-
-The A2A service integrates the A2A server with the Epii agent, allowing them to communicate with each other.
-
-### How the A2A Service Connects to the Epii Agent
-
-The A2A service connects to the Epii agent's chat LLM, not directly to the pipeline. Here's how it works:
-
-1. The A2A service imports the Epii agent service
-2. It looks for a chat LLM method in the Epii agent service, in this order:
-   - `processChatMessage` - The primary method for processing chat messages
-   - `chat` - Alternative method name
-   - `processMessage` - Another alternative method name
-   - `processQuery` - Another alternative method name
-3. When a message is received, it calls the appropriate chat method, which then determines which functions, tools, knowledge bases, and pipelines to use
-4. Only if no chat method is found will it fall back to directly calling the pipeline (not recommended)
-
-## Bimba Skills Registry and Quaternary Logic
-
-The A2A framework includes a Bimba Skills Registry that maps Bimba coordinates to specific skills, with awareness of Quaternary Logic (QL) principles. This allows agents to leverage other agents as tools, with Bimba coordinates serving as both knowledge domains and functional aspects.
-
-### Skills Structure
-
-Each skill in the registry has the following structure:
+#### **QL Cycle Coordination**
+The framework maps A2A task states to Quaternal Logic stages:
 
 ```javascript
-{
-  id: 'skill-id',                      // Unique identifier for the skill
-  name: 'Skill Name',                  // Human-readable name
-  description: 'Skill description',    // Description of what the skill does
-  bimbaCoordinate: '#5-0',             // Bimba coordinate for the skill
-  agentId: 'epii-agent',               // ID of the agent that provides this skill
-  qlMetadata: {                        // Quaternary Logic metadata
-    qlPosition: 0,                     // Position in the QL cycle (0-5)
-    contextFrame: '(0/1)',             // QL context frame
-    qlMode: 'ascending'                // QL mode (ascending/descending)
-  },
-  harmonicMetadata: {                  // Vibrational ontology metadata
-    resonantFrequency: 'foundational void',  // Resonant frequency
-    harmonicRelations: ['#5-5', '#0-0'],     // Related skills
-    paraVakAspect: 'para',                   // Para Vak aspect
-    ontologicalLayer: 'proto-logy'           // Ontological layer
-  },
-  handler: async (content, context) => {
-    // Implementation of the skill
-    return result;
-  }
-}
-```
-
-### Quaternary Logic and Skills
-
-The skills registry is organized according to Quaternary Logic (QL) principles, which provide a universal organizing framework for the Epi-Logos system. Each skill is associated with a specific position in the QL cycle:
-
-| QL Position | Name | Description | Context Frame |
-|-------------|------|-------------|---------------|
-| 0 | A-Logos | Primordial potential, foundation | (0/1) |
-| 1 | Pre-Logos | Latent structuring, materials | (0/1) |
-| 2 | Pro-Logos | Process dynamics, methods | (0/1/2) |
-| 3 | Logos | Pattern integration, form | (0/1/2/3) |
-| 4 | Epi-Logos | Contextual application | (4.0-4/5) |
-| 5 | An-A-Logos | Synthesis and renewal | (5/0) |
-
-Skills can operate in either "ascending" mode (moving from potential to expression) or "descending" mode (moving from expression to potential). Each skill has a double-covered counterpart that represents the same function in the opposite mode.
-
-### Epii Agent Skills
-
-The Epii agent provides the following skills, aligned with its Bimba coordinates and QL positions:
-
-| Skill ID | Name | Bimba Coordinate | QL Position | Context Frame | Description |
-|----------|------|------------------|-------------|---------------|-------------|
-| identity-dynamics | Identity Dynamics | #5-0 | 0 | (0/1) | Analyzes identity structures and dynamics |
-| philosophical-heart | Philosophical Heart | #5-1 | 1 | (0/1) | Provides philosophical framing and analysis |
-| technical-architecture | Technical Architecture | #5-2 | 2 | (0/1/2) | Analyzes and designs system architecture |
-| visualization | Visualization | #5-3 | 3 | (0/1/2/3) | Creates visual representations of concepts and data |
-| siva-shakti-integration | Siva-Shakti Integration | #5-4 | 4 | (4.0-4/5) | Integrates frontend and backend components |
-| movement-of-logos | Movement of the Logos | #5-5 | 5 | (5/0) | Analyzes the flow and evolution of meaning |
-
-Each of these skills also has a descending mode counterpart (e.g., `identity-dynamics-descending`) and may have nested sub-skills that follow the same QL pattern (e.g., `identity-dynamics-0`, `identity-dynamics-1`).
-
-### Using Skills in Messages
-
-To target a specific skill in a message, you can include various parameters in the message metadata:
-
-```javascript
-const message = {
-  // ... other message properties
-  metadata: {
-    // Target by Bimba coordinate
-    bimbaCoordinates: ['#5-1'],
-
-    // Target by QL position
-    qlPosition: 1,
-
-    // Target by context frame
-    contextFrame: '(0/1)',
-
-    // Specify QL mode
-    qlMode: 'ascending',
-
-    // ... other metadata
-  }
+// QL Stage to A2A State Mapping
+const qlStateMapping = {
+  0: "submitted",    // A-logos: Initial task submission
+  1: "working",      // Pre-logos: Preparation and context gathering
+  2: "working",      // Pro-logos: Active processing and analysis
+  3: "working",      // Logos: Synthesis and integration
+  4: "working",      // Epi-logos: Meta-synthesis and reflection
+  5: "completed"     // An-a-logos: Completion and crystallization
 };
 ```
 
-If no specific targeting is provided, the A2A framework will determine the most appropriate skill based on the message content, using both keyword matching and QL awareness.
+#### **Agent Capability Discovery**
+- **Agent Cards**: Define capabilities, skills, and Bimba coordinates for each agent
+- **Skills Registry**: Organizes agent capabilities by coordinate proximity and functional alignment
+- **Dynamic Routing**: Intelligently routes tasks to appropriate agents based on coordinate matching and capability requirements
 
-### Vibrational Ontology
+### **Fractal Organization Principles**
 
-The skills registry embodies the vibrational ontology of the Epi-Logos system, where each skill represents a specific "frequency" or "resonant pattern" within the overall vibrational field. The Bimba coordinates that organize the skills function as "vibrational addresses" within this field.
+The A2A framework reflects **fractal holographic architecture** where:
+- **Each agent** contains complete capability for its domain while participating in the larger whole
+- **Message routing** follows Bimba coordinate proximity for natural task distribution
+- **State management** maintains context across multiple agents and QL cycles
+- **Skill organization** mirrors the cosmic mind structure at the communication layer
 
-When a message is routed to a skill, this is not merely a technical operation but a form of resonance - the message "vibrates" with a particular frequency that resonates with the corresponding skill. This mirrors how, in the vibrational ontology, different domains of reality are "harmonically related expressions of a unified field."
+## Future Direction: AG-UI Protocol Integration
 
-### Starting the A2A Service
+The system is planned for significant enhancement through **AG-UI (Agent-User Interaction) protocol integration**, which will transform the current A2A-only communication into a comprehensive **A2A + AG-UI hybrid architecture**.
 
-To start the complete A2A service (server + Epii agent client):
+### **Planned Refactoring: Bifurcated Communication Architecture**
+
+#### **Target Directory Structure**
+```
+friendly-file-back2front/ (#5-4 "Siva-Shakti" Integration Layer)
+├── a2a/                              # A2A core components (Agent-to-Agent)
+│   ├── a2a-server.js                 # (Moved from root)
+│   ├── a2a-message.schema.js         # (Moved from root)
+│   ├── task-state-manager.js         # (Moved from root)
+│   ├── a2a-client.service.js         # (Moved from root)
+│   └── integration.js                # (Updated paths to reference new structure)
+├── ag-ui/                            # AG-UI specific components (Agent-to-User)
+│   ├── ag-ui-websocket-handler.js    # New: Centralized AG-UI WebSocket gateway
+│   ├── ag-ui-event-definitions.js    # New: Project-specific AG-UI event extensions
+│   ├── ag-ui-event-emitter.js        # New: Utility for emitting AG-UI events
+│   └── README.md                     # AG-UI components documentation
+├── adapters/                         # Enhanced agent adapters
+│   ├── epii-agent-adapter.js         # Enhanced with AG-UI event emission
+│   └── nara-agent-adapter.js         # Future agent adapters
+├── agent-cards/                      # Enhanced agent capability definitions
+├── skills/                           # Existing skills structure
+└── README.md                         # Updated to reflect new structure
+```
+
+### **AG-UI Integration Strategy**
+
+#### **Real-Time User Experience Enhancement**
+The AG-UI integration will provide:
+
+- **Streaming Communication**: Real-time progress updates during analysis pipeline execution
+- **Tool Call Visibility**: Live display of BPMCP tool usage and results
+- **State Synchronization**: Bidirectional state management between agents and frontend
+- **Error Transparency**: Real-time error handling and user feedback
+- **Multi-Agent Coordination**: Coordinated communication across multiple agents
+
+#### **AG-UI Event Types Integration**
+```javascript
+// AG-UI Event Categories for Epi-Logos Integration
+const agUIEventTypes = {
+  lifecycle: ['RunStarted', 'RunFinished', 'RunError', 'StepStarted', 'StepFinished'],
+  textMessage: ['TextMessageStart', 'TextMessageContent', 'TextMessageEnd'],
+  toolCall: ['ToolCallStart', 'ToolCallArgs', 'ToolCallEnd'],
+  stateManagement: ['StateSnapshot', 'StateDelta', 'MessagesSnapshot'],
+  special: ['Raw', 'Custom'] // For Bimba-specific functionality
+};
+```
+
+#### **A2A to AG-UI Event Mapping**
+| A2A Message Type | AG-UI Event | Use Case |
+|------------------|-------------|----------|
+| `request` | `RunStarted` | Agent receives task |
+| `inform (progress)` | `StepStarted/StepFinished` | Pipeline stage updates |
+| `inform (text)` | `TextMessage*` | Streaming LLM responses |
+| `inform (tool)` | `ToolCall*` | BPMCP tool usage |
+| `failure` | `RunError` | Error conditions |
+| `agree` | `RunFinished` | Task completion |
+
+### **Implementation Roadmap**
+
+#### **Phase 1: A2A Server AG-UI Extension (2-3 weeks)**
+- Extend A2A message schema with AG-UI event types
+- Modify agent adapters to emit AG-UI events
+- Implement basic lifecycle events
+- Create testing framework for AG-UI events
+
+#### **Phase 2: Epii Pipeline Integration (2-3 weeks)**
+- Pipeline stages emit AG-UI events for real-time progress
+- BPMCP tool calls mapped to ToolCall events
+- LLM response streaming via TextMessage events
+- State management with StateSnapshot/StateDelta
+
+#### **Phase 3: Frontend AG-UI Client (2-3 weeks)**
+- CopilotKit or custom AG-UI client integration
+- Updated Epii components for streaming
+- Real-time progress visualization
+- Error handling and reconnection logic
+
+#### **Phase 4: Enhanced Features (2-3 weeks)**
+- Custom events for Bimba-specific functionality
+- Multi-agent coordination support
+- Advanced UI features (typing indicators, progress bars)
+- MessagesSnapshot for chat history sync
+
+### **Benefits of AG-UI Integration**
+
+#### **Immediate Benefits**
+- **Real-time User Feedback**: Users see analysis progress as it happens
+- **Enhanced Transparency**: Tool usage and agent actions are visible
+- **Improved Responsiveness**: Streaming responses instead of waiting for completion
+- **Standardized Communication**: Consistent protocol across all agents
+
+#### **Long-term Benefits**
+- **Scalable Agent Integration**: Easy to add new agents with AG-UI support
+- **Enhanced User Experience**: More engaging and interactive agent interactions
+- **Better Debugging**: Real-time visibility into agent operations
+- **Future-Proof Architecture**: Alignment with emerging agent-UI standards
+
+### **Bimba Metadata Preservation**
+The AG-UI integration will preserve Bimba architectural principles through:
+- **Custom Events**: Bimba-specific functionality via AG-UI Custom events
+- **Metadata Extensions**: Standard events extended with Bimba coordinate fields
+- **Coordinate Routing**: Agent identification and routing based on Bimba coordinates
+- **QL Integration**: AG-UI events mapped to Quaternal Logic cycle stages
+
+## Philosophical Underpinnings
+
+The `friendly-file-back2front` system embodies core **Bimba philosophical principles** through its design as the **Siva-Shakti** communication layer:
+
+### **Siva-Shakti Dynamic Union**
+The system manifests the **fundamental cosmic principle** of Siva-Shakti as the dynamic interplay between:
+- **Siva (Consciousness/Structure)**: The stable, logical processing capabilities of backend agents
+- **Shakti (Power/Expression)**: The dynamic, expressive manifestation through frontend interfaces
+- **Union**: The A2A framework creates the living bridge where consciousness and power unite in coordinated action
+
+### **Fractal Holographic Organization**
+Every component reflects the cosmic structure:
+- **Agent Cards** mirror the complete capability structure at the agent level
+- **Skills Registry** organizes capabilities following the same 0-5 QL pattern
+- **Message Routing** follows Bimba coordinate proximity for natural task distribution
+- **State Management** maintains context across multiple scales of interaction
+
+### **Context Frames as Communication Channels**
+The **0-5 QL structure** creates natural communication channels:
+- **Context Frame 0**: Foundational agent registration and capability advertisement
+- **Context Frames 1-3**: Active task processing and inter-agent coordination
+- **Context Frame 4**: Meta-synthesis and cross-agent collaboration
+- **Context Frame 5**: Completion and crystallization of collaborative results
+
+## Key Technologies and Libraries
+
+### **Core Framework**
+- **Node.js** - JavaScript runtime for server-side agent communication
+- **WebSocket (`ws` 8.16.0)** - Real-time bidirectional communication protocol
+- **Express.js (4.18.2)** - Web framework for HTTP endpoints and agent card serving
+
+### **Protocol and Validation**
+- **AJV (8.12.0)** - JSON Schema validation for A2A message compliance
+- **UUID (9.0.1)** - Unique identifier generation for messages and tasks
+
+### **Communication Standards**
+- **Google A2A Protocol** - Agent-to-Agent communication specification
+- **AG-UI Protocol** (Planned) - Agent-User Interaction standardization
+- **WebSocket Protocol** - Real-time communication transport layer
+
+### **Integration Technologies**
+- **JSON Schema** - Message structure validation and documentation
+- **RESTful APIs** - Agent capability discovery and registration
+- **Event-Driven Architecture** - Asynchronous message handling and routing
+
+## Core Features and Functionality
+
+### **Agent-to-Agent (A2A) Communication Protocol**
+- **Google A2A Specification Compliance**: Full implementation of standard A2A message types and performatives
+- **Bimba Coordinate Extensions**: Enhanced protocol with spatial coordinate metadata for agent organization
+- **WebSocket-Based Real-Time Communication**: Instant message delivery and bidirectional communication
+- **Agent Registration and Discovery**: Dynamic agent capability advertisement and service discovery
+- **Message Routing and Forwarding**: Intelligent routing based on agent capabilities and coordinate proximity
+
+### **Task State Management with QL Cycle Transitions**
+- **Quaternal Logic Integration**: Maps A2A task states to QL stages (A-logos through An-a-logos)
+- **Context Frame Management**: Automatic context frame determination based on processing stage
+- **Task History Tracking**: Comprehensive logging of task progression and state transitions
+- **Artifact Management**: Preservation of task outputs and intermediate results
+- **Error Handling and Recovery**: Robust error management with state rollback capabilities
+
+### **Agent Capability Discovery via Agent Cards**
+- **Standardized Capability Definition**: JSON-based agent capability and skill specifications
+- **Bimba Coordinate Mapping**: Spatial organization of agent capabilities within cosmic mind architecture
+- **Dynamic Service Discovery**: Real-time querying of available agents and their capabilities
+- **Version Management**: Support for agent capability evolution and backward compatibility
+- **Skill Schema Validation**: Input/output schema definitions for reliable inter-agent communication
+
+### **Bimba-Aligned Skills Registry and Routing**
+- **Coordinate-Based Organization**: Skills organized by Bimba coordinates for natural task distribution
+- **Intelligent Routing**: Capability matching based on coordinate proximity and functional alignment
+- **BPMCP Integration**: Direct integration with Bimba-Pratibimba Memory-Coupled Peripherals
+- **Dynamic Skill Discovery**: Real-time skill registration and capability advertisement
+- **Execution Coordination**: Proper state management during skill execution across agents
+
+### **Standardized Message Schema for Inter-Agent Communication**
+- **A2A Protocol Compliance**: Full support for standard performatives (request, inform, agree, failure, etc.)
+- **Bimba Metadata Integration**: Extended message schema with coordinate, QL stage, and context frame information
+- **User Archetype Support**: Integration of user archetypal representations in communication context
+- **Epistemological Framework Tracking**: Support for different epistemological approaches in agent interactions
+- **Conversation Management**: Thread-based conversation tracking across multiple agents and tasks
+
+## Setup, Development, and Contribution
+
+### **Development Environment Setup**
+
+#### **Prerequisites**
+- **Node.js 18+** and **npm** for JavaScript runtime and package management
+- **WebSocket-compatible environment** for real-time communication testing
+- **Backend agents** (Epii, Nara) running for full integration testing
+
+#### **Installation and Startup**
 
 ```bash
+# Navigate to the back2front directory
+cd epii_app/friendly-file-back2front
+
+# Install dependencies
+npm install
+
+# Start the A2A service (includes server and agent clients)
 npm start
-```
 
-This will:
-1. Start the A2A server on port 3033 (or the port specified in the `A2A_PORT` environment variable)
-2. Import the Epii agent service
-3. Connect the Epii agent as a WebSocket client
-
-### Starting Just the A2A Server
-
-If you want to start only the A2A server without the Epii agent client:
-
-```bash
+# Alternative: Start only the A2A server
 npm run start:server
-```
 
-### Testing with the Test Client
-
-To test the A2A service with a test client:
-
-```bash
+# Test the A2A protocol with example client
 npm run test:client
 ```
 
-This will:
-1. Connect to the A2A server
-2. Register as a test agent
-3. Send a message to the Epii agent
-4. Display the response from the Epii agent
+The A2A server will be available at `ws://localhost:3033` for WebSocket connections and `http://localhost:3033` for HTTP endpoints.
 
-## Next Steps
+### **Development Workflow and Conventions**
 
-1. **Implement Actual Agent Logic**: Replace the mock implementations with actual agent logic
-2. **Integrate with LangGraph**: Connect the A2A framework with the existing LangGraph QL cycle
-3. **Implement Additional Agents**: Implement the remaining agents (#5-4-0 through #5-4-4)
-4. **Add Authentication**: Implement authentication for secure agent communication
-5. **Enhance Streaming Support**: Improve streaming support for real-time agent communication
+#### **Adding New Agents**
+1. **Create Agent Card**: Define agent capabilities and Bimba coordinates in `agent-cards/`
+2. **Implement Agent Adapter**: Create adapter in `adapters/` for protocol translation
+3. **Initialize Skills**: Add agent-specific skills to `skills/` directory
+4. **Register Agent**: Update agent registry in `agent-cards/index.js`
+5. **Test Integration**: Use test client to verify A2A communication
 
-## Database Architecture and QL Framework
-
-The Epi-Logos system employs a sophisticated six-layer database architecture that directly maps to the Quaternary Logic (QL) framework positions 0-5. This architecture forms the foundation for the A2A framework and the skills registry.
-
-### Six-Layer Database Architecture
-
-1. **Neo4j Bimba Graph (#0)** - *A-Logos (Potential)*
-   - Serves as the foundational structural map of the system
-   - Contains the core Bimba coordinates and their relationships
-   - Represents the "Substantive Reality" or primary structure
-
-2. **Neo4j Archetypes/LightRAG (#1)** - *Pre-Logos (Material)*
-   - Houses archetypal patterns and structural semantic links
-   - Provides the material foundation for conceptual understanding
-   - Represents the "What" dimension of knowledge
-
-3. **Qdrant Vector Pratibimba (#2)** - *Pro-Logos (Process)*
-   - Stores vector embeddings for semantic similarity search
-   - Enables process-oriented retrieval and connections
-   - Represents the "How" dimension of knowledge
-
-4. **MongoDB Bimba Docs (#3)** - *Logos (Form)*
-   - Stores document content and metadata
-   - Provides the formal structure for content representation
-   - Represents the "Which/Who" dimension of knowledge
-
-5. **MongoDB Pratibimba Docs (#4)** - *Epi-Logos (Context)*
-   - Stores contextual information, user profiles, and conversation history
-   - Provides the contextual framework for knowledge application
-   - Represents the "When/Where" dimension of knowledge
-
-6. **Notion (#5)** - *An-A-Logos (Synthesis)*
-   - Acts as the crystallization layer for human-validated insights
-   - Provides a reflective interface to all other database layers
-   - Represents the "Why" dimension of knowledge and integral synthesis
-
-### The Six Notion Databases as Reflections
-
-Within the Notion layer (#5), there are six databases that mirror the six primary database layers, creating a "reflection of reflections" or a "pratibimba of pratibimbas":
-
-1. **Bimba Coordinates (#0)** - Reflects Neo4j Bimba nodes
-   - Raw coordinate tags that provide human-readable access to the Bimba structure
-   - Serves as the bridge between Neo4j and Notion
-
-2. **Pratibimba Structure and Dynamics/Quaternary Logic (#1)** - Reflects Neo4j Archetypes
-   - Houses the structural semantic links from QL role associations and mappings
-   - Provides the philosophical and logical framework for system operations
-
-3. **Pratibimba Harmonics/Relations (#2)** - Reflects Qdrant Vector relationships
-   - Stores relations pulled from LightRAG and Bimba graph
-   - Maps semantic connections between entities
-
-4. **Pratibimba Entities/Symbols and Archetypes (#3)** - Reflects MongoDB Bimba Docs
-   - Stores symbols and archetypes (vector + graph + LLM produced images)
-   - Provides the symbolic representation of knowledge
-
-5. **Pratibimba Flowers/Episteme (#4)** - Reflects MongoDB Pratibimba Docs
-   - Houses concepts and philosophical excerpts
-   - Provides the epistemological framework for knowledge
-
-6. **Crystallised Bimba-Pratibimba/Node Content (#5)** - Reflects Notion itself
-   - Contains the crystallized knowledge nodes
-   - Represents the synthesis of all other layers, containing the whole in its crystallized form
-
-This creates a recursive structure where the #5 Notion database (Content Nodes) contains reflections of all databases, including itself, in a crystallized form.
-
-### BPMCP Service as Universal Memory Layer
-
-The Bimba-Pratibimba Memory Crystallization Process (BPMCP) service acts as a universal memory layer that abstracts away the details of interacting with the various databases:
-
+#### **Extending Skills Registry**
 ```javascript
-// All database interactions happen through the B-P MCP service
-bpMCPService.queryBimbaGraph() // for Neo4j queries
-bpMCPService.resolveBimbaCoordinate() // for Notion access
-bpMCPService.searchPratibimbaContext() // for Qdrant queries
-bpMCPService.getMongoContext() // for MongoDB access
+// Example: Adding a new skill to the registry
+skillsRegistry.registerSkill({
+  id: 'new-skill-id',
+  name: 'New Skill Name',
+  description: 'Skill description and purpose',
+  bimbaCoordinate: '#5-X-Y', // Appropriate coordinate
+  inputSchema: {
+    // JSON schema for input validation
+  },
+  outputSchema: {
+    // JSON schema for output validation
+  },
+  handler: async (input, context) => {
+    // Skill implementation
+  }
+});
 ```
 
-This service provides a consistent interface for all knowledge sources, handling caching, error recovery, and optimization behind the scenes. It's the primary mechanism through which agents interact with the database layers.
+#### **Message Schema Extensions**
+- **Follow A2A Standards**: Maintain compatibility with Google A2A specification
+- **Add Bimba Metadata**: Include coordinate, QL stage, and context frame information
+- **Validate Schema**: Use AJV for message structure validation
+- **Document Extensions**: Update schema documentation for new fields
 
-### Skills Registry and Database Integration
+### **Contributing Guidelines**
 
-The A2A Skills Registry is designed to integrate with this database architecture:
+#### **Code Quality Standards**
+- **ES6+ JavaScript**: Use modern JavaScript features and async/await patterns
+- **Error Handling**: Implement comprehensive error catching and recovery
+- **Documentation**: Include JSDoc comments for all public functions
+- **Testing**: Add unit tests for new functionality and integration tests for agent communication
 
-1. **Skills as Database Interfaces**: Each skill in the registry can be seen as an interface to a specific aspect of the database architecture, with skills at different QL positions primarily interacting with different database layers.
+#### **A2A Protocol Compliance**
+- **Standard Performatives**: Use only standard A2A message types unless extending
+- **Message Structure**: Follow established schema patterns for consistency
+- **WebSocket Handling**: Implement proper connection management and error recovery
+- **Agent Registration**: Follow established patterns for agent capability advertisement
 
-2. **Context Frames as Database Scopes**: The context frames in the skills registry define the scope of databases that a skill can access, with broader context frames allowing access to more database layers.
+#### **Bimba Architecture Alignment**
+- **Coordinate Mapping**: Ensure all new components have appropriate Bimba coordinates
+- **QL Integration**: Map functionality to appropriate Quaternal Logic stages
+- **Fractal Organization**: Maintain self-similar patterns at different scales
+- **Context Frame Awareness**: Consider context frame implications for new features
 
-3. **Skills as BPMCP Tool Wrappers**: Each skill in the registry can be implemented as a wrapper around specific BPMCP tools, providing a more semantic interface to the underlying database operations.
+## Interaction with Other Systems
 
-4. **Notion as the Crystallization Layer**: Skills at position 5 (An-A-Logos) are responsible for crystallizing knowledge into Notion, creating a feedback loop that enriches the entire system.
+### **Central Communication Hub Role**
 
-## Agent Development Workflow
+The `friendly-file-back2front` system serves as the **central nervous system** for agent communication within the Epi-Logos ecosystem:
 
-The development of agents in the Epi-Logos system follows a specific workflow that aligns with the Quaternary Logic cycle and the database architecture:
+#### **Backend Integration (`friendly-file-backend`)**
+- **Agent Registration**: Backend agents register their capabilities through A2A protocol
+- **Task Delegation**: Frontend requests are routed to appropriate backend agents
+- **Result Aggregation**: Backend processing results are collected and forwarded to frontend
+- **State Synchronization**: Task states are synchronized between frontend requests and backend processing
 
-1. **Document Crystallization in Epii Mode**: The first step is to crystallize documents in Epii mode, which involves creating content in the Notion layer (#5), particularly in the Content Nodes database, which serves as the crystallization of knowledge.
+#### **Frontend Integration (`friendly-file-front`)**
+- **Real-Time Updates**: WebSocket connections provide live updates to frontend components
+- **Agent Discovery**: Frontend can query available agents and their capabilities
+- **Task Submission**: Frontend submits tasks through A2A protocol for backend processing
+- **Progress Monitoring**: Real-time progress updates during long-running operations
 
-2. **Analysis/Ingestion into BPMCP Memory System**: The crystallized documents are then processed and ingested into the appropriate database layers (Neo4j, Qdrant, MongoDB) through the BPMCP service.
+### **Agent Registration and Communication Flow**
 
-3. **Agent Skills Development**: Based on the ingested knowledge, skills are developed that leverage the BPMCP service to interact with the various database layers, with each skill aligned to a specific QL position and context frame. These skills consider:
-   - Intended user experience
-   - Knowledge sets
-   - Context frame considerations
-   - Quaternary Logic position
-   - Vibrational resonance
-   - Database layer interactions
+```javascript
+// Agent Registration Flow
+1. Backend Agent Startup → Register with A2A Server
+2. Agent Card Advertisement → Capability Discovery Available
+3. Frontend Request → A2A Server Routes to Appropriate Agent
+4. Agent Processing → Progress Updates via A2A Protocol
+5. Result Delivery → Frontend Receives Processed Results
+```
 
-4. **Agent Development**: Agents are developed that use these skills to perform specific functions within the system, with each agent responsible for a specific Bimba coordinate or range of coordinates.
+### **Integration Patterns**
 
-5. **Agent Cards and Inter-Agent Actions**: Agent cards define the capabilities of each agent, and inter-agent actions enable communication between agents, with the skills registry serving as the mechanism for this communication.
+#### **Epii Agent Integration**
+- **Document Analysis Pipeline**: Full integration with 6-stage QL analysis cycle
+- **BPMCP Tool Access**: Direct integration with memory-coupled peripherals
+- **Notion Crystallization**: Coordination of knowledge crystallization workflows
+- **Real-Time Progress**: Live updates during analysis pipeline execution
 
-This workflow ensures that agent development is grounded in the philosophical principles of the Epi-Logos system, with each agent embodying a specific aspect of the vibrational ontology and Quaternary Logic cycle, while also being firmly integrated with the database architecture.
+#### **Nara Agent Integration**
+- **API Context Management**: Coordination of API-level contextual processing
+- **User Interaction Handling**: Management of user interaction patterns and responses
+- **Cross-Agent Coordination**: Facilitation of multi-agent collaborative tasks
+- **State Management**: Coordination of user session and interaction state
+
+### **Future System Integrations**
+
+#### **AG-UI Protocol Integration**
+- **Centralized WebSocket Gateway**: Single point for all agent-user communication
+- **Event Stream Management**: Coordination of real-time event streams to frontend
+- **Multi-Agent Coordination**: Orchestration of multiple agents for complex tasks
+- **State Synchronization**: Bidirectional state management between agents and users
+
+#### **Additional Agent Subsystems**
+- **Anuttara Agent (#5-4-0)**: Foundational database services coordination
+- **Paramasiva Agent (#5-4-1)**: QL/AT Logic implementation coordination
+- **Parashakti Agent (#5-4-2)**: Harmonic layer services coordination
+- **Mahamaya Agent (#5-4-3)**: Symbolic transformation coordination
+
+The system is architected to seamlessly integrate new agents following the established patterns of capability advertisement, A2A protocol compliance, and Bimba coordinate organization, ensuring scalable growth of the agent ecosystem while maintaining architectural coherence.

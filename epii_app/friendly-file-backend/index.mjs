@@ -12,7 +12,7 @@ import corsOptions from './config/cors.config.mjs';
 import chatRoutes from './routes/chat.routes.mjs';
 import filesRoutes from './routes/files.routes.mjs';
 import agentRoutes from './routes/agent.routes.mjs';
-import ingestionRoutes from './routes/ingestion.routes.mjs'; // Import ingestion routes
+
 import notionRoutes from './routes/notion.routes.mjs'; // Import Notion routes
 import graphRoutes from './routes/graph.routes.mjs'; // Import Graph routes
 import nodeDetailsRoutes from './routes/nodeDetails.routes.mjs'; // Import Node Details routes
@@ -45,7 +45,7 @@ connectDB();
 app.use('/api/chat', chatRoutes);
 app.use('/files', filesRoutes);
 app.use('/api/agent', agentRoutes);
-app.use('/api/ingest', ingestionRoutes); // Mount ingestion routes
+
 app.use('/api', notionRoutes); // Mount Notion routes under /api
 app.use('/api/graph', graphRoutes); // Mount Graph routes under /api/graph
 app.use('/api/node-details', nodeDetailsRoutes); // Mount Node Details routes under /api/node-details

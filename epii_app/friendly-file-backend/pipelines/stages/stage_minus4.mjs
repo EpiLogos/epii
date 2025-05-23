@@ -16,7 +16,7 @@
 
 // Import required modules
 import defaultEpiiLLMService from '../../services/epii-llm.service.mjs';
-import { generateBimbaEnhancedContext, generateBimbaMapSummary } from '../../utils/content/context.mjs';
+import { generateBimbaMapSummary } from '../../utils/content/context.mjs';
 import {
     getBimbaContextFromBimbaMap,
     getProjectContextFromBimbaMap,
@@ -122,15 +122,25 @@ export async function runStageMinus4(state) {
 
         // 7. Generate Bimba-enhanced document context
         console.log(`Generating Bimba-enhanced document context...`);
-        const bimbaEnhancedContext = await generateBimbaEnhancedContext(
-            documentContent,
-            sourceFileName,
-            targetCoordinate,
-            bimbaContext || [],
-            fullBimbaMap,
-            projectContext || { projectName: "Unknown Project", projectDescription: "No project context available" },
-            llmService
-        );
+        // Create a simple context string combining available information
+        const bimbaEnhancedContext = `# Document Context for ${sourceFileName}
+
+## Target Coordinate: ${targetCoordinate}
+
+## Project Context
+Project: ${projectContext.projectName || 'Unknown Project'}
+Description: ${projectContext.projectDescription || 'No project description available'}
+
+## Bimba Context
+${bimbaContext && bimbaContext.length > 0 ?
+    bimbaContext.map(ctx => `- ${ctx.name || ctx.coordinate || 'Unknown'}: ${ctx.description || 'No description'}`).join('\n') :
+    'No specific Bimba context available'}
+
+## Document Information
+File: ${sourceFileName}
+Type: ${sourceFileName.split('.').pop().toLowerCase()}
+Content Length: ${documentContent.length} characters
+`;
         console.log(`Generated Bimba-enhanced context (${bimbaEnhancedContext.length} chars)`);
 
         // 8. Generate Bimba map summary for context window
