@@ -85,7 +85,7 @@ export const useDocumentUpload = (userId: string) => {
         content,
         lastModified: new Date(data.document.uploadDate),
         versions: [{ timestamp: new Date(data.document.uploadDate), content }],
-        bimbaCoordinate: data.document.targetCoordinate
+        bimbaCoordinate: data.document.targetCoordinate || targetCoordinate
       };
 
       // Add document to state

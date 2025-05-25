@@ -12,8 +12,7 @@ import { isValidBimbaCoordinate } from '../1_utils/epiiHelpers';
 interface DocumentControlsProps {
   onStartAnalysis: (targetCoordinate: string) => void;
   onCrystallize?: (results: AnalysisResults) => void;
-  onPreviewNotionUpdate?: () => void;
-  onSendToNotion?: () => void;
+  onCrystalliseToNotion?: () => void;
   onClose?: () => void;
   isAnalyzing?: boolean;
   isSendingToNotion?: boolean;
@@ -27,8 +26,7 @@ interface DocumentControlsProps {
 const DocumentControls: React.FC<DocumentControlsProps> = ({
   onStartAnalysis,
   onCrystallize,
-  onPreviewNotionUpdate,
-  onSendToNotion,
+  onCrystalliseToNotion,
   onClose,
   isAnalyzing = false,
   isSendingToNotion = false,
@@ -76,17 +74,10 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
     }
   };
 
-  // Handle preview Notion update
-  const handlePreviewNotionUpdate = () => {
-    if (onPreviewNotionUpdate) {
-      onPreviewNotionUpdate();
-    }
-  };
-
-  // Handle send to Notion
-  const handleSendToNotion = () => {
-    if (onSendToNotion) {
-      onSendToNotion();
+  // Handle crystallise to Notion
+  const handleCrystalliseToNotion = () => {
+    if (onCrystalliseToNotion) {
+      onCrystalliseToNotion();
     }
   };
 
@@ -102,8 +93,7 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
        analysisResults.analysisResults.notionUpdatePayload)));
 
   const showCrystallizeButton = documentType === 'bimba' && hasAnalysisResults;
-  const showNotionPreviewButton = documentType === 'pratibimba' && documentStatus !== 'sent_to_notion';
-  const showSendToNotionButton = documentType === 'pratibimba' && (documentStatus === 'ready_for_notion' || documentStatus === 'analyzed');
+  const showCrystalliseToNotionButton = documentType === 'pratibimba' && (documentStatus === 'ready_for_notion' || documentStatus === 'analyzed');
   const showNotionLink = documentType === 'pratibimba' && documentStatus === 'sent_to_notion' && notionPageUrl;
 
   return (
@@ -127,9 +117,14 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
         {/* Document coordinate indicator */}
         <div className="flex flex-col space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-300">Bimba Coordinate:</span>
-            <span className="text-sm font-medium bg-epii-dark px-2 py-1 rounded">
+            <span className="text-sm font-medium text-gray-300">
+              {documentType === 'pratibimba' ? 'Target Coordinate:' : 'Bimba Coordinate:'}
+            </span>
+            <span className={`text-sm font-medium px-2 py-1 rounded ${
+              documentType === 'pratibimba' ? 'bg-green-600 text-green-100' : 'bg-epii-dark'
+            }`}>
               {formatBimbaCoordinate(targetCoordinate)}
+              {documentType === 'pratibimba' && <span className="ml-1 text-xs">(Fixed)</span>}
             </span>
           </div>
 
@@ -220,21 +215,10 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
         {/* Crystallization document controls */}
         {documentType === 'pratibimba' && (
           <div className="space-y-4">
-            {/* Preview Notion Update button */}
-            {showNotionPreviewButton && (
+            {/* Crystallise to Notion button */}
+            {showCrystalliseToNotionButton && (
               <button
-                onClick={handlePreviewNotionUpdate}
-                className="w-full px-4 py-2 rounded-md flex items-center justify-center space-x-2 bg-blue-600 text-white hover:bg-blue-700"
-              >
-                <FileText size={18} />
-                <span>Preview Notion Update</span>
-              </button>
-            )}
-
-            {/* Send to Notion button */}
-            {showSendToNotionButton && (
-              <button
-                onClick={handleSendToNotion}
+                onClick={handleCrystalliseToNotion}
                 disabled={isSendingToNotion}
                 className={`w-full px-4 py-2 rounded-md flex items-center justify-center space-x-2 ${
                   isSendingToNotion
@@ -245,12 +229,12 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
                 {isSendingToNotion ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>Sending to Notion...</span>
+                    <span>Crystallising to Notion...</span>
                   </>
                 ) : (
                   <>
                     <ExternalLink size={18} />
-                    <span>Send to Notion</span>
+                    <span>Crystallise to Notion</span>
                   </>
                 )}
               </button>

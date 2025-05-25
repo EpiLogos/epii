@@ -167,6 +167,7 @@ const documentServiceImpl = {
    */
   updateDocument: async (documentId: string, updates: {
     content?: string;
+    textContent?: string;
     name?: string;
     targetCoordinate?: string;
     metadata?: {
@@ -213,14 +214,12 @@ const documentServiceImpl = {
           console.warn('Attempting to save empty content, using placeholder');
           const placeholderContent = ' '; // Use a space as minimum content to prevent empty content
 
-          // Set both textContent and content for backward compatibility
+          // Set textContent as the primary field
           updateObj.$set.textContent = placeholderContent;
-          updateObj.$set.content = placeholderContent;
           updateObj.$set.size = placeholderContent.length;
         } else {
-          // Set both textContent and content for backward compatibility
+          // Set textContent as the primary field
           updateObj.$set.textContent = documentContent;
-          updateObj.$set.content = documentContent;
           updateObj.$set.size = documentContent.length;
         }
 
@@ -673,6 +672,7 @@ const documentServiceImpl = {
     sourceSelection?: any;
     crystallizationIntent?: string;
     bimbaCoordinate?: string;
+    targetCoordinate?: string;
   }, documentType: 'bimba' | 'pratibimba' = 'bimba') => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
     const collection = documentType === 'pratibimba' ? 'pratibimbaDocuments' : 'Documents';
@@ -689,10 +689,9 @@ const documentServiceImpl = {
         size: documentContent?.length || 0,
         uploadDate: new Date().toISOString(),
         lastModified: new Date().toISOString(),
-        targetCoordinate: document.bimbaCoordinate || null,
+        targetCoordinate: document.bimbaCoordinate || document.targetCoordinate || null,
         userId: 'anonymous',
         textContent: documentContent, // Use textContent as the primary field
-        content: documentContent, // Also set content for backward compatibility
         analysisStatus: documentType === 'pratibimba' ? 'completed' : 'pending',
         documentType: documentType
       };
@@ -795,6 +794,7 @@ const documentServiceImpl = {
     sourceSelection: any;
     crystallizationIntent: string;
     bimbaCoordinate?: string;
+    targetCoordinate?: string;
   }) => {
     // Use the unified createDocumentWithType function with documentType='pratibimba'
     return documentServiceImpl.createDocumentWithType(document, 'pratibimba');
@@ -840,6 +840,7 @@ const documentServiceImpl = {
    */
   updatePratibimbaDocument: async (pratibimbaId: string, updates: {
     content?: string;
+    textContent?: string;
     name?: string;
     targetCoordinate?: string;
   }) => {

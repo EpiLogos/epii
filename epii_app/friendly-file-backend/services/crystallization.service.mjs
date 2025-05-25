@@ -100,8 +100,7 @@ export const createCrystallization = async ({
 
     const crystallizationData = {
       title: safeTitle,
-      textContent: safeContent, // Use textContent instead of content (required field in the schema)
-      content: safeContent,     // Also set content for backward compatibility
+      textContent: safeContent, // Use textContent as the primary field
       userId: safeUserId,
       documentType: 'pratibimba', // Use 'pratibimba' instead of 'crystallization'
       // Add required fields for the storeDocument tool
@@ -284,25 +283,52 @@ export const executeNotionProposal = async ({
     // Extract data from the payload
     const {
       targetCoordinate,
-      content,
       title,
+      properties: payloadProperties = {},
+      contentBlocks = [],
+      content, // Legacy field for backward compatibility
       analysisResults,
       relatedCoordinates = [],
       tags = []
     } = notionUpdatePayload;
 
-    if (!targetCoordinate || !content) {
-      throw new Error('Notion update payload must include targetCoordinate and content');
+    if (!targetCoordinate) {
+      throw new Error('Notion update payload must include targetCoordinate');
+    }
+
+    // Validate that we have either contentBlocks or legacy content
+    if (!contentBlocks.length && !content) {
+      throw new Error('Notion update payload must include either contentBlocks or content');
+    }
+
+    // Filter out non-existent properties that cause validation errors
+    const filteredPayloadProperties = {};
+    const INVALID_PROPERTIES = [
+      'Analysis Status',
+      'Analysis Date',
+      'Mappings Count',
+      'Variations Count',
+      'Tags'
+    ];
+
+    if (payloadProperties && typeof payloadProperties === 'object') {
+      Object.entries(payloadProperties).forEach(([key, value]) => {
+        if (!INVALID_PROPERTIES.includes(key)) {
+          filteredPayloadProperties[key] = value;
+        } else {
+          console.log(`Filtered out non-existent property: ${key}`);
+        }
+      });
     }
 
     // Prepare properties for Notion
     const properties = {
-      // Set non-relation properties directly
-      // Using exact property names from notion_workspace_map.md
-      // IMPORTANT: Send simple string values, not nested objects
-      // The MCP's formatPropertyValue function will convert these to the correct Notion API format
+      // Set default properties
       "Content Type": "Crystallization",  // Simple string value
-      "Status": "1"  // Simple string value
+      "Status": "1",  // Simple string value
+
+      // Merge in FILTERED properties from the payload
+      ...filteredPayloadProperties
     };
 
     // Log the exact properties being sent
@@ -311,10 +337,11 @@ export const executeNotionProposal = async ({
     // Note: "🗺️ Bimba Address" is redundant and already set on the page
     // The targetCoordinate is already used to find the correct Notion page
 
-    // Add tags if available
-    if (tags && tags.length > 0) {
-      properties['Tags'] = tags;
-    }
+    // REMOVED: Tags property - doesn't exist on Notion pages
+    // Tags information is included in the content blocks instead
+    // if (tags && tags.length > 0) {
+    //   properties['Tags'] = tags;
+    // }
 
     // Add analysis results as properties if available
     if (analysisResults) {
@@ -502,18 +529,37 @@ export const executeNotionProposal = async ({
         } else {
           console.log(`"Coordinate Summary" block not found, using standard crystallizeToNotion tool`);
 
-          // Create a formatted version of the content to append with a space before it
-          const formattedContent = `\n\n${content}`;
+          // Use structured contentBlocks if available, otherwise fall back to legacy content
+          let crystallizeArgs;
 
-          // Use the crystallizeToNotion tool with the found page ID
-          const result = await bpMCPService.crystallizeToNotion({
-            targetBimbaCoordinate: targetCoordinate,
-            contentToAppend: formattedContent,
-            title: title || `Content for ${targetCoordinate}`,
-            properties,
-            createIfNotExists: true,
-            contentFormat: 'markdown'
-          });
+          if (contentBlocks.length > 0) {
+            console.log(`Using structured contentBlocks (${contentBlocks.length} blocks) for crystallization`);
+
+            // Use the new structured approach with contentBlocks
+            crystallizeArgs = {
+              targetBimbaCoordinate: targetCoordinate,
+              title: title || `Content for ${targetCoordinate}`,
+              properties,
+              contentBlocks, // Pass the structured blocks directly
+              createIfNotExists: true
+            };
+          } else {
+            console.log(`Using legacy content approach for crystallization`);
+
+            // Fall back to legacy content approach
+            const formattedContent = `\n\n${content}`;
+            crystallizeArgs = {
+              targetBimbaCoordinate: targetCoordinate,
+              contentToAppend: formattedContent,
+              title: title || `Content for ${targetCoordinate}`,
+              properties,
+              createIfNotExists: true,
+              contentFormat: 'markdown'
+            };
+          }
+
+          // Use the crystallizeToNotion tool with the appropriate arguments
+          const result = await bpMCPService.crystallizeToNotion(crystallizeArgs);
 
           return result;
         }
@@ -524,14 +570,34 @@ export const executeNotionProposal = async ({
     }
 
     // If we couldn't find the page or the "Coordinate Summary" block, use the standard crystallizeToNotion tool
-    const result = await bpMCPService.crystallizeToNotion({
-      targetBimbaCoordinate: targetCoordinate,
-      contentToAppend: content,
-      title: title || `Content for ${targetCoordinate}`,
-      properties,
-      createIfNotExists: true,
-      contentFormat: 'markdown'
-    });
+    let fallbackArgs;
+
+    if (contentBlocks.length > 0) {
+      console.log(`Using structured contentBlocks (${contentBlocks.length} blocks) for fallback crystallization`);
+
+      // Use the new structured approach with contentBlocks
+      fallbackArgs = {
+        targetBimbaCoordinate: targetCoordinate,
+        title: title || `Content for ${targetCoordinate}`,
+        properties,
+        contentBlocks, // Pass the structured blocks directly
+        createIfNotExists: true
+      };
+    } else {
+      console.log(`Using legacy content approach for fallback crystallization`);
+
+      // Fall back to legacy content approach
+      fallbackArgs = {
+        targetBimbaCoordinate: targetCoordinate,
+        contentToAppend: content,
+        title: title || `Content for ${targetCoordinate}`,
+        properties,
+        createIfNotExists: true,
+        contentFormat: 'markdown'
+      };
+    }
+
+    const result = await bpMCPService.crystallizeToNotion(fallbackArgs);
 
     // Log the result
     console.log(`Notion update result for ${targetCoordinate}:`, result);

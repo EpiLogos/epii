@@ -152,11 +152,12 @@ export async function runStageMinus2(state) {
         const numBatches = Math.ceil(documentChunks.length / batchSize);
         console.log(`Will process chunks in ${numBatches} batches of up to ${batchSize} chunks each`);
 
-        // Initialize arrays to store analysis results
-        const chunkAnalyses = [];
-        const chunkMappings = [];
-        const chunkVariations = [];
-        const chunkTags = [];
+        // Initialize arrays to store batch-level results
+        const batchAnalyses = []; // Stores the rich JSON object for each batch
+        const batchMappings = []; // Stores mappings extracted from each batchAnalysisObject
+        const batchVariations = []; // Stores variations extracted from each batchAnalysisObject
+        const batchTags = []; // Stores tags extracted from each batchAnalysisObject
+
 
         // Process chunks in batches
         for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
@@ -164,7 +165,7 @@ export async function runStageMinus2(state) {
             const batchEnd = Math.min((batchIndex + 1) * batchSize, documentChunks.length);
             const currentBatchSize = batchEnd - batchStart;
 
-            console.log(`Processing batch ${batchIndex + 1}/${numBatches} (chunks ${batchStart + 1}-${batchEnd})...`);
+            console.log(`Processing batch ${batchIndex + 1}/${numBatches} (analyzing ${currentBatchSize} chunks as a single unit)...`);
 
             // Create a batch run for tracing
             const batchRun = langsmithTracing.createChildRun(
@@ -177,110 +178,86 @@ export async function runStageMinus2(state) {
                 }
             );
 
-            // Process chunks as a group to maintain context between them
-            console.log(`Analyzing batch ${batchIndex + 1} as a group to maintain context between chunks...`);
+            // Concatenate chunks in the batch to form a single text unit for analysis
+            // We'll use originalChunks as they represent the unmodified content.
+            const batchChunkTexts = originalChunks.slice(batchStart, batchEnd);
+            const concatenatedBatchContent = batchChunkTexts.join("\n\n---\n\n"); // Separator for clarity if needed by LLM
 
-            // Note: batchRun was already created above, no need to create it again
+            // For context, we might need a strategy for combining context windows or using a general one.
+            // For now, let's assume analyzeChunkGroup will handle context for the concatenated content.
+            // We can pass all context windows for the batch, or a combined one.
+            // Let's pass the array of context windows, the new analyzeChunkGroup can decide how to use them.
+            const batchContextWindows = comprehensiveContextWindows.slice(batchStart, batchEnd);
 
-            let batchResults;
+            // The concept of "assignedCoordinates" might also change.
+            // If the analysis is for the whole batch, it might relate to the primary targetCoordinate.
+            // For now, we'll pass the main targetCoordinate, assuming analyzeChunkGroup adapts.
+            const batchTargetCoordinate = sourceMetadata.targetCoordinate;
+
+
+            console.log(`Analyzing concatenated content of batch ${batchIndex + 1} (length: ${concatenatedBatchContent.length} chars)...`);
+
+            let singleBatchAnalysisResult; // This will be the rich JSON object
             try {
-                // Extract batch chunks and use the pre-generated comprehensive context windows
-                const batchChunks = originalChunks.slice(batchStart, batchEnd);
-                const batchContextWindows = comprehensiveContextWindows.slice(batchStart, batchEnd);
-
-                // Verify that we have context windows for all chunks in the batch
-                if (batchContextWindows.length !== batchChunks.length) {
-                    console.warn(`Context windows array length (${batchContextWindows.length}) does not match batch chunks length (${batchChunks.length}). This should not happen.`);
-                }
-
-                // Log the first context window for debugging
-                console.log(`--- Context Window Debug Information (Stage -2) ---`);
-                console.log(`Using pre-generated comprehensive context window for first chunk in batch (first 200 chars): ${batchContextWindows[0].contextText.substring(0, 200)}...`);
-                console.log(`Context window count: ${batchContextWindows.length} for ${batchChunks.length} chunks`);
-                console.log(`--- End Context Window Debug Information ---`);
-
-                // Create assigned coordinates for each chunk (using target coordinate)
-                const batchAssignedCoordinates = Array(batchChunks.length).fill([sourceMetadata.targetCoordinate]);
-
-                // Import the analyzeChunkGroup function
                 const { analyzeChunkGroup } = await import('../../utils/content/analysis.mjs');
-
-                // Analyze the batch as a group using pre-generated comprehensive context windows
-                const batchAnalysisResults = await analyzeChunkGroup(
-                    batchChunks,
+                singleBatchAnalysisResult = await analyzeChunkGroup(
+                    batchChunkTexts, 
                     sourceMetadata,
                     state.bimbaContext,
                     state.userContext,
-                    batchAssignedCoordinates,
+                    [batchTargetCoordinate], 
                     metalogikon,
                     {
                         llmService: epiiLLMService,
+                        concatenatedContent: concatenatedBatchContent,
                         contextWindows: batchContextWindows,
-                        useProvidedContextWindows: true, // Flag to use provided context windows
+                        useProvidedContextWindows: true,
                         fullBimbaMap: state.fullBimbaMap,
-                        documentContent: state.documentContent // Pass documentContent in options
+                        documentContent: state.documentContent,
+                        analyzeAsSingleUnit: true 
                     },
-                    state // Pass the entire state as a fallback
+                    state 
                 );
 
-                // Process the results with enhanced elaborations
-                batchResults = batchAnalysisResults.map((result, index) => {
-                    const chunkIndex = batchStart + index;
+                // Store the rich JSON object for the batch
+                batchAnalyses[batchIndex] = singleBatchAnalysisResult;
 
-                    // Store the analysis results
-                    chunkAnalyses[chunkIndex] = result.analysis || '';
-                    chunkMappings[chunkIndex] = result.extractedMappings || [];
-                    chunkVariations[chunkIndex] = result.identifiedVariations || [];
-                    chunkTags[chunkIndex] = result.tags || [];
+                // Populate batch-level mappings, variations, tags
+                batchMappings[batchIndex] = singleBatchAnalysisResult.extractedMappings || [];
+                batchVariations[batchIndex] = singleBatchAnalysisResult.identifiedVariations || [];
+                batchTags[batchIndex] = singleBatchAnalysisResult.extractedTags || []; // Assuming 'extractedTags' field
 
-                    // Extract the enhanced elaboration elements
-                    const deepElaboration = result.deepElaboration || [];
-                    const novelContributions = result.novelContributions || [];
-                    const qlDynamics = result.qlDynamics || [];
+                // Logging for the batch result
+                if (singleBatchAnalysisResult && !singleBatchAnalysisResult.error) {
+                    const analysisText = singleBatchAnalysisResult.analysis || singleBatchAnalysisResult.overallSummary || "";
+                    console.log(`Successfully analyzed batch ${batchIndex + 1}. Analysis text length: ${analysisText.length}`);
+                    console.log(`Batch ${batchIndex + 1}: ${batchMappings[batchIndex].length} mappings, ${batchVariations[batchIndex].length} variations, ${batchTags[batchIndex].length} tags.`);
+                } else if (singleBatchAnalysisResult && singleBatchAnalysisResult.error) {
+                    console.error(`Error analyzing batch ${batchIndex + 1}: ${singleBatchAnalysisResult.error}`);
+                     // Store error information appropriately if needed for downstream
+                    batchMappings[batchIndex] = [];
+                    batchVariations[batchIndex] = [];
+                    batchTags[batchIndex] = [];
+                } else {
+                    console.warn(`Batch ${batchIndex + 1} analysis result was empty or not in expected format.`);
+                    batchMappings[batchIndex] = [];
+                    batchVariations[batchIndex] = [];
+                    batchTags[batchIndex] = [];
+                }
 
-                    // Add enhanced elements to the analysis object
-                    if (deepElaboration.length > 0 || novelContributions.length > 0 || qlDynamics.length > 0) {
-                        // If the analysis is already a string, convert it to an object
-                        let analysisObj;
-                        try {
-                            analysisObj = typeof chunkAnalyses[chunkIndex] === 'string' ?
-                                JSON.parse(chunkAnalyses[chunkIndex]) : chunkAnalyses[chunkIndex];
-                        } catch (e) {
-                            // If parsing fails, create a new object
-                            analysisObj = { originalAnalysis: chunkAnalyses[chunkIndex] };
-                        }
-
-                        // Add enhanced elements
-                        analysisObj.deepElaboration = deepElaboration;
-                        analysisObj.novelContributions = novelContributions;
-                        analysisObj.qlDynamics = qlDynamics;
-                        analysisObj.isEnhancedAnalysis = true;
-
-                        // Update the analysis
-                        chunkAnalyses[chunkIndex] = analysisObj;
-                    }
-
-                    // Log success with enhanced information
-                    console.log(`Successfully analyzed chunk ${chunkIndex + 1}/${documentChunks.length} with ${deepElaboration.length} deep elaboration points, ${novelContributions.length} novel contributions, and ${qlDynamics.length} QL dynamics`);
-
-                    return {
-                        chunkIndex,
-                        success: true,
-                        hasEnhancedAnalysis: deepElaboration.length > 0 || novelContributions.length > 0 || qlDynamics.length > 0
-                    };
-                });
 
                 // End the batch run successfully
                 try {
                     langsmithTracing.endRunSuccess(batchRun, {
-                        successCount: currentBatchSize,
-                        errorCount: 0
+                        analysisLength: typeof singleBatchAnalysisResult === 'string' ? singleBatchAnalysisResult.length : (singleBatchAnalysisResult?.analysis?.length || 0),
+                        processedAsSingleUnit: true
                     });
                 } catch (tracingError) {
                     console.warn(`LangSmith tracing error: ${tracingError.message}`);
                 }
+
             } catch (batchError) {
-                console.error(`Error analyzing batch ${batchIndex + 1}:`, batchError);
+                console.error(`Error analyzing batch ${batchIndex + 1} as a single unit:`, batchError);
 
                 // End the batch run with error
                 try {
@@ -289,33 +266,22 @@ export async function runStageMinus2(state) {
                     console.warn(`LangSmith tracing error: ${tracingError.message}`);
                 }
 
-                // Store empty results for all chunks in the batch
-                for (let i = batchStart; i < batchEnd; i++) {
-                    chunkAnalyses[i] = `Error analyzing batch: ${batchError.message}`;
-                    chunkMappings[i] = [];
-                    chunkVariations[i] = [];
-                    chunkTags[i] = [];
-                }
-
-                // Create batch results with errors
-                batchResults = Array(currentBatchSize).fill().map((_, index) => ({
-                    chunkIndex: batchStart + index,
-                    success: false,
-                    error: batchError.message
-                }));
+                // Store error information for the batch
+                const errorMsg = `Error analyzing batch as single unit: ${batchError.message}`;
+                batchAnalyses[batchIndex] = { error: errorMsg, analysis: errorMsg, overallSummary: errorMsg, mainThemes:[], extractedMappings:[], identifiedVariations:[], naturalElaborations:[], deepElaboration:[], novelContributions:[], qlDynamics:[], extractedTags:[] };
+                batchMappings[batchIndex] = [];
+                batchVariations[batchIndex] = [];
+                batchTags[batchIndex] = [];
             }
-
-            console.log(`Batch ${batchIndex + 1} complete. Results:`, batchResults.map(r => r.success ? 'Success' : 'Error'));
         }
 
-        // 7. Prepare state for the next stage WITHOUT using ...state to avoid state bloat
+        // 7. Prepare state for the next stage
         const stageMinus2Output = {
-            chunkAnalyses,
-            chunkMappings,
-            chunkVariations,
-            chunkTags,
-            // Flag to indicate that this stage has been enhanced with deeper elaboration
-            hasEnhancedAnalysis: true,
+            batchAnalyses,        // Array of rich JSON objects (one per batch)
+            batchMappings,        // Array of arrays of mappings (one inner array per batch)
+            batchVariations,      // Array of arrays of variations (one inner array per batch)
+            batchTags,            // Array of arrays of tags (one inner array per batch)
+            hasEnhancedBatchAnalysis: true,
             metalogikon,
             // Include only essential properties from previous state
             documentId: state.documentId,
@@ -340,9 +306,9 @@ export async function runStageMinus2(state) {
             bpMCPService: state.bpMCPService,
             // Include original document content and chunks for reference
             documentContent: state.documentContent,
-            documentChunks: state.documentChunks,
+            documentChunks: state.documentChunks, // Still pass original chunking info if needed downstream
             originalChunks: state.originalChunks,
-            chunkContextWindows: state.chunkContextWindows
+            chunkContextWindows: state.chunkContextWindows // Pass context windows if needed downstream
             // Explicitly NOT including graphData to prevent leakage
         };
 
@@ -354,36 +320,32 @@ export async function runStageMinus2(state) {
 
         // End the stage run
         try {
-            // Count enhanced analysis elements
-            let deepElaborationCount = 0;
-            let novelContributionsCount = 0;
-            let qlDynamicsCount = 0;
-
-            // Iterate through chunk analyses to count enhanced elements
-            chunkAnalyses.forEach(analysis => {
-                if (typeof analysis === 'object') {
-                    deepElaborationCount += (analysis.deepElaboration || []).length;
-                    novelContributionsCount += (analysis.novelContributions || []).length;
-                    qlDynamicsCount += (analysis.qlDynamics || []).length;
+            // Metrics for batch-level analysis
+            const numBatchesAnalyzed = batchAnalyses.length;
+            let totalAnalysisContentLength = 0;
+            batchAnalyses.forEach(analysis => {
+                if (typeof analysis === 'string') {
+                    totalAnalysisContentLength += analysis.length;
+                } else if (typeof analysis === 'object' && analysis.analysis) {
+                    totalAnalysisContentLength += analysis.analysis.length;
                 }
+                // Add more specific metrics if the structure of batch analysis is known
             });
 
             langsmithTracing.endRunSuccess(stageRun, {
-                numChunksAnalyzed: chunkAnalyses.length,
-                numMappingsTotal: chunkMappings.flat().length,
-                numVariationsTotal: chunkVariations.flat().length,
-                numTagsTotal: chunkTags.flat().length,
-                // Include enhanced analysis metrics
-                numDeepElaborations: deepElaborationCount,
-                numNovelContributions: novelContributionsCount,
-                numQLDynamics: qlDynamicsCount,
-                hasEnhancedAnalysis: true
+                numBatchesAnalyzed,
+                totalAnalysisContentLength,
+            numMappingsTotal: batchMappings.flat().length,
+            numVariationsTotal: batchVariations.flat().length,
+            numTagsTotal: batchTags.flat().length,
+            hasEnhancedBatchAnalysis: true // Keep this flag or adapt its meaning
             });
         } catch (tracingError) {
             console.warn(`LangSmith tracing error: ${tracingError.message}`);
         }
 
         console.log("--- Epii Pipeline: Stage -2 Complete ---");
+        console.log(`Completed analysis for ${batchAnalyses.length} batches.`);
 
         return stageMinus2Output;
 

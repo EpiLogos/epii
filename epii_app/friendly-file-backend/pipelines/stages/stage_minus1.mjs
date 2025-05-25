@@ -41,31 +41,32 @@ import langsmithTracing from '../../services/langsmith-tracing.mjs';
  * @throws {Error} - If any step in the process fails
  */
 export async function runStageMinus1(state) {
-    // Validate required input state properties
-    if (!state.chunkAnalyses || !Array.isArray(state.chunkAnalyses)) {
-        throw new Error("Invalid state: chunkAnalyses must be an array");
+    // Validate required input state properties based on stage_minus2's new output
+    if (!state.batchAnalyses || !Array.isArray(state.batchAnalyses)) {
+        throw new Error("Invalid state: batchAnalyses must be an array");
     }
-    if (!state.chunkMappings || !Array.isArray(state.chunkMappings)) {
-        throw new Error("Invalid state: chunkMappings must be an array");
+    // chunkMappings, chunkVariations, chunkTags are now batchMappings, batchVariations, batchTags
+    if (!state.batchMappings || !Array.isArray(state.batchMappings)) {
+        throw new Error("Invalid state: batchMappings must be an array");
     }
-    if (!state.chunkVariations || !Array.isArray(state.chunkVariations)) {
-        throw new Error("Invalid state: chunkVariations must be an array");
+    if (!state.batchVariations || !Array.isArray(state.batchVariations)) {
+        throw new Error("Invalid state: batchVariations must be an array");
     }
-    if (!state.chunkTags || !Array.isArray(state.chunkTags)) {
-        throw new Error("Invalid state: chunkTags must be an array");
+    if (!state.batchTags || !Array.isArray(state.batchTags)) {
+        throw new Error("Invalid state: batchTags must be an array");
     }
     if (!state.sourceMetadata || !state.sourceMetadata.targetCoordinate) {
         throw new Error("Invalid state: sourceMetadata.targetCoordinate is required");
     }
-    if (!state.documentContent) {
+    if (!state.documentContent) { // documentContent is still passed for overall context
         throw new Error("Invalid state: documentContent is required");
     }
 
     const {
-        chunkAnalyses,
-        chunkMappings,
-        chunkVariations,
-        chunkTags,
+        batchAnalyses, // Changed from chunkAnalyses
+        batchMappings, // Changed from chunkMappings
+        batchVariations, // Changed from chunkVariations
+        batchTags, // Changed from chunkTags
         metalogikon,
         sourceMetadata,
         documentContent
@@ -78,14 +79,13 @@ export async function runStageMinus1(state) {
         stageRun = langsmithTracing.createStageRunTree(
             "Stage -1: Define Core Elements",
             {
-                numChunks: chunkAnalyses.length,
+                numBatches: batchAnalyses.length, // Log numBatches instead of numChunks
                 targetCoordinate: sourceMetadata.targetCoordinate,
                 sourceFileName: sourceMetadata.sourceFileName
             }
         );
     } catch (tracingError) {
         console.warn(`LangSmith tracing error: ${tracingError.message}. Continuing without tracing.`);
-        // Create a mock stageRun that won't break the pipeline
         stageRun = {
             create_child: () => ({ end: () => {}, patch: () => {} }),
             end: () => {},
@@ -94,8 +94,8 @@ export async function runStageMinus1(state) {
     }
 
     try {
-        // 1. Combine all mappings, variations, and tags
-        console.log(`Combining mappings, variations, and tags from ${chunkAnalyses.length} chunks...`);
+        // 1. Combine all mappings, variations, and tags from all batches
+        console.log(`Combining mappings, variations, and tags from ${batchAnalyses.length} batches...`);
 
         // Import the consolidation utilities
         const { consolidateMappingsEnhanced } = await import('../../utils/content/processing.mjs');
@@ -107,27 +107,27 @@ export async function runStageMinus1(state) {
         };
 
         // Consolidate mappings by coordinate to avoid duplicates
-        // Flatten the chunk mappings array and pass to consolidation function
-        if (!Array.isArray(chunkMappings.flat())) {
-            throw new Error("Invalid chunkMappings structure: cannot be flattened to an array");
+        // Flatten the batch mappings array (array of arrays) and pass to consolidation function
+        // This logic should still work if batchMappings is an array of arrays of mappings.
+        if (!Array.isArray(batchMappings.flat())) {
+            throw new Error("Invalid batchMappings structure: cannot be flattened to an array");
         }
+        const allMappings = consolidateMappingsEnhanced(batchMappings.flat(), idGenerator('map'));
 
-        const allMappings = consolidateMappingsEnhanced(chunkMappings.flat(), idGenerator('map'));
-
-        // Deduplicate variations and tags
+        // Deduplicate variations and tags from all batches
         const uniqueVariations = new Map();
-        chunkVariations.flat().forEach(variation => {
-            const key = `${variation.variationType}:${variation.variationText}`;
+        batchVariations.flat().forEach(variation => {
+            const key = `${variation.variationType}:${variation.variationText}`; // Assuming variation structure
             if (!uniqueVariations.has(key)) {
                 uniqueVariations.set(key, variation);
             }
         });
         const allVariations = Array.from(uniqueVariations.values());
 
-        // Deduplicate tags
-        const allTags = [...new Set(chunkTags.flat())];
+        // Deduplicate tags from all batches
+        const allTags = [...new Set(batchTags.flat())]; // Assuming batchTags is an array of arrays of strings/objects
 
-        console.log(`Combined and consolidated into ${allMappings.length} mappings, ${allVariations.length} variations, and ${allTags.length} tags`);
+        console.log(`Combined and consolidated into ${allMappings.length} mappings, ${allVariations.length} variations, and ${allTags.length} tags from all batches.`);
 
         // 2. Synthesize the analysis
         console.log(`Synthesizing analysis...`);
@@ -144,12 +144,12 @@ export async function runStageMinus1(state) {
         // Import the synthesizeAnalysis function
         const { synthesizeAnalysis } = await import('../../utils/content/synthesis.mjs');
 
-        // Synthesize the analysis
+        // Synthesize the analysis using batchAnalyses
         let synthesis;
         try {
-            synthesis = await synthesizeAnalysis(
+            synthesis = await synthesizeAnalysis( // This function will be updated to accept batchAnalyses
                 documentContent,
-                chunkAnalyses,
+                batchAnalyses, // Pass batchAnalyses instead of chunkAnalyses
                 allMappings,
                 allVariations,
                 allTags,
@@ -284,10 +284,10 @@ export async function runStageMinus1(state) {
                 numTags: allTags.length,
                 hasActionableSummary: Boolean(stageMinus1Output.actionableSummary),
                 actionableSummaryLength: stageMinus1Output.actionableSummary ? stageMinus1Output.actionableSummary.length : 0,
-                qlOperatorsCount: coreElementsResult.relationalProperties.qlOperators.length,
-                epistemicEssenceCount: coreElementsResult.relationalProperties.epistemicEssence.length,
-                archetypeAnchorsCount: coreElementsResult.relationalProperties.archetypeAnchors.length,
-                semanticFrameworkCount: coreElementsResult.relationalProperties.semanticFramework.length
+                qlOperatorsCount: (coreElementsResult.relationalProperties?.qlOperators || []).length,
+                epistemicEssenceCount: (coreElementsResult.relationalProperties?.epistemicEssence || []).length,
+                archetypeAnchorsCount: (coreElementsResult.relationalProperties?.archetypeAnchors || []).length,
+                semanticFrameworkCount: (coreElementsResult.relationalProperties?.semanticFramework || []).length
             });
         } catch (tracingError) {
             console.warn(`LangSmith tracing error: ${tracingError.message}`);
@@ -297,12 +297,18 @@ export async function runStageMinus1(state) {
         console.log(`Produced ${allMappings.length} consolidated mappings, ${allVariations.length} variations, and ${allTags.length} tags`);
         console.log(`Synthesis length: ${synthesis.length} characters, Core elements: ${coreElementsResult.coreElements.length}`);
 
-        // Log relational properties with more detail
+        // Log relational properties with more detail (with defensive checks)
         console.log(`Relational properties extracted:`);
-        console.log(`- QL Operators: ${coreElementsResult.relationalProperties.qlOperators.length} (${coreElementsResult.relationalProperties.qlOperators.map(op => op.name || op).join(', ')})`);
-        console.log(`- Epistemic Essence: ${coreElementsResult.relationalProperties.epistemicEssence.length} (${coreElementsResult.relationalProperties.epistemicEssence.map(ee => ee.name || ee).join(', ')})`);
-        console.log(`- Archetypal Anchors: ${coreElementsResult.relationalProperties.archetypeAnchors.length} (${coreElementsResult.relationalProperties.archetypeAnchors.map(aa => aa.name || aa).join(', ')})`);
-        console.log(`- Semantic Framework: ${coreElementsResult.relationalProperties.semanticFramework.length} (${coreElementsResult.relationalProperties.semanticFramework.map(sf => sf.name || sf).join(', ')})`);
+        const relProps = coreElementsResult.relationalProperties || {};
+        const qlOperators = relProps.qlOperators || [];
+        const epistemicEssence = relProps.epistemicEssence || [];
+        const archetypeAnchors = relProps.archetypeAnchors || [];
+        const semanticFramework = relProps.semanticFramework || [];
+
+        console.log(`- QL Operators: ${qlOperators.length} (${qlOperators.map(op => op.name || op).join(', ')})`);
+        console.log(`- Epistemic Essence: ${epistemicEssence.length} (${epistemicEssence.map(ee => ee.name || ee).join(', ')})`);
+        console.log(`- Archetypal Anchors: ${archetypeAnchors.length} (${archetypeAnchors.map(aa => aa.name || aa).join(', ')})`);
+        console.log(`- Semantic Framework: ${semanticFramework.length} (${semanticFramework.map(sf => sf.name || sf).join(', ')})`);
 
         // Log actionable summary if available
         if (stageMinus1Output.actionableSummary) {

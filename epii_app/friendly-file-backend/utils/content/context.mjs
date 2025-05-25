@@ -59,12 +59,14 @@ export function formatQLContext(qlContext) {
  * 4. Organizes nodes hierarchically for better context
  * 5. Prioritizes directly relevant nodes while maintaining the full structure
  * 6. Provides richer relationship data between nodes
+ * 7. PRIORITIZES target coordinate from project context
  *
  * @param {string} chunkContent - The content of the chunk
  * @param {object} fullBimbaMap - The full Bimba map
+ * @param {string} [targetCoordinate] - Optional target coordinate to prioritize
  * @returns {Promise<object>} - The relevant Bimba context with enhanced structure
  */
-export async function extractRelevantBimbaContext(chunkContent, fullBimbaMap) {
+export async function extractRelevantBimbaContext(chunkContent, fullBimbaMap, targetCoordinate = null) {
     try {
         // Extract potential coordinates mentioned in the chunk
         // Updated pattern to match both "-" and "." separators
@@ -84,11 +86,22 @@ export async function extractRelevantBimbaContext(chunkContent, fullBimbaMap) {
         // Store the full bimbaKnowing context
         let bimbaContext = null;
 
-        // If we have mentioned coordinates, use bimbaKnowing to get enhanced context
-        if (mentionedCoordinates.length > 0) {
-            // Use the first mentioned coordinate as the focus
-            const focusCoordinate = mentionedCoordinates[0];
+        // Determine the focus coordinate with target coordinate prioritization
+        let focusCoordinate = null;
 
+        // PRIORITIZE target coordinate if provided
+        if (targetCoordinate) {
+            focusCoordinate = targetCoordinate;
+            console.log(`Using prioritized target coordinate: ${focusCoordinate}`);
+        }
+        // Fallback to mentioned coordinates in chunk
+        else if (mentionedCoordinates.length > 0) {
+            focusCoordinate = mentionedCoordinates[0];
+            console.log(`Using first mentioned coordinate: ${focusCoordinate}`);
+        }
+
+        // If we have a focus coordinate, use bimbaKnowing to get enhanced context
+        if (focusCoordinate) {
             console.log(`Retrieving Bimba context for ${focusCoordinate} using bimbaKnowing tool`);
 
             // Call bimbaKnowing tool with comprehensive parameters including QL context
@@ -468,10 +481,12 @@ ${bimbaMapSummary && bimbaMapSummary.rootNodeDescription ? bimbaMapSummary.rootN
         // For analysis (stage -2), create a comprehensive context window
         console.log("Generating comprehensive context window for analysis (stage -2)");
 
-        // Extract relevant Bimba context for this chunk
+        // Extract relevant Bimba context for this chunk, prioritizing target coordinate
+        const targetCoordinate = projectContext && projectContext.targetCoordinate ? projectContext.targetCoordinate : null;
         const relevantBimbaContext = await extractRelevantBimbaContext(
             chunkContent,
-            fullBimbaMap
+            fullBimbaMap,
+            targetCoordinate
         );
 
         // Add a dedicated QL context section using BimbaKnowing
@@ -484,11 +499,19 @@ ${bimbaMapSummary && bimbaMapSummary.rootNodeDescription ? bimbaMapSummary.rootN
         } else {
             // If not, retrieve it directly
             try {
-                // Get the target coordinate from the project context or the first mentioned coordinate
-                const targetCoordinate =
-                    (projectContext && projectContext.targetCoordinate) ||
-                    (relevantBimbaContext.mentionedCoordinates && relevantBimbaContext.mentionedCoordinates.length > 0 ?
-                        relevantBimbaContext.mentionedCoordinates[0] : null);
+                // PRIORITIZE the target coordinate from project context first
+                let targetCoordinate = null;
+
+                // First priority: target coordinate from project context
+                if (projectContext && projectContext.targetCoordinate) {
+                    targetCoordinate = projectContext.targetCoordinate;
+                    console.log(`Using target coordinate from project context: ${targetCoordinate}`);
+                }
+                // Second priority: first mentioned coordinate in the chunk
+                else if (relevantBimbaContext.mentionedCoordinates && relevantBimbaContext.mentionedCoordinates.length > 0) {
+                    targetCoordinate = relevantBimbaContext.mentionedCoordinates[0];
+                    console.log(`Using first mentioned coordinate as fallback: ${targetCoordinate}`);
+                }
 
                 if (targetCoordinate) {
                     console.log(`Retrieving QL context for ${targetCoordinate} using bimbaKnowing tool`);

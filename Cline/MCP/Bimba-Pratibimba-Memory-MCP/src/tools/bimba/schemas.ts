@@ -29,3 +29,12 @@ export const QueryBimbaGraphSchema = z.object({
   query: z.string().describe("Cypher query to execute against the Neo4j Bimba graph."),
   params: z.record(z.any()).optional().describe("Optional parameters for the Cypher query."),
 });
+
+export const UpdateBimbaGraphSchema = z.object({
+  query: z.string().describe("Write Cypher query to execute against the Neo4j Bimba graph (CREATE, UPDATE, DELETE, MERGE operations)."),
+  params: z.record(z.any()).optional().describe("Optional parameters for the Cypher query."),
+});
+
+export const ResolveBimbaCoordinateSchema = z.object({
+  targetCoordinate: z.string().describe("The Bimba coordinate to resolve to a Notion page URL (e.g., '#5-2-1')."),
+});

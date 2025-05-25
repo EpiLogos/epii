@@ -75,9 +75,11 @@ Extract the following relational properties from the synthesis and mappings:
    - Examples: "Epistemic Topology", "Conceptual Integration", "Systemic Interdependence"
    - Generate 6-12 detailed Epistemic Essence properties with rich descriptions
 
-3. Archetypal Anchors: Symbolic representations, metaphors, or archetypes that resonate with the content
-   - These are symbolic patterns that give deeper meaning to the content
-   - Examples: "Ouroboros", "Mandala", "Hero's Journey", "Threshold Guardian"
+3. Archetypal Anchors: Underlying patterns, dynamics, or archetypal energies that can be inferred from the content
+   - These are deep structural patterns that give symbolic meaning to the content, whether explicitly mentioned or implicitly present
+   - Look for patterns like: cyclical processes, transformative journeys, integration dynamics, threshold moments, creative emergence, systemic wholeness, etc.
+   - Examples: "Cyclical Integration" (ouroboric pattern), "Threshold Navigation" (liminal dynamics), "Emergent Synthesis" (creative manifestation)
+   - INFER archetypal patterns from content themes and dynamics rather than looking for literal symbolic references
    - Generate 6-12 detailed Archetypal Anchor properties with rich descriptions
 
 4. Semantic Framework: Relationship types that define how concepts connect
@@ -166,11 +168,11 @@ Return a JSON object with the following structure:
     ],
     "archetypalAnchors": [
       {
-        "name": "string", // e.g., "Ouroboros"
-        "description": "string", // Detailed explanation (100-150 words) of this archetypal anchor
-        "evidence": "string" // Supporting evidence from the text
+        "name": "string", // e.g., "Cyclical Integration", "Threshold Navigation", "Emergent Synthesis"
+        "description": "string", // Detailed explanation (100-150 words) of this archetypal pattern inferred from the content
+        "evidence": "string" // Supporting evidence from the text that demonstrates this pattern
       }
-      // Generate 6-12 Archetypal Anchor properties
+      // Generate 6-12 Archetypal Anchor properties - INFER patterns from content dynamics, don't look for literal symbols
     ],
     "semanticFramework": [
       {
@@ -488,10 +490,10 @@ Generate a concise Epii perspective that captures the essence of this content an
  * 5. Generates a more comprehensive synthesis with actionable insights
  *
  * @param {string} documentContent - The content of the document
- * @param {Array} chunkAnalyses - The analyses of individual chunks
- * @param {Array} allMappings - All consolidated mappings
- * @param {Array} allVariations - All consolidated variations
- * @param {Array} allTags - All consolidated tags
+ * @param {Array} batchAnalyses - The analyses of batches (rich JSON objects)
+ * @param {Array} allMappings - All consolidated mappings from all batches
+ * @param {Array} allVariations - All consolidated variations from all batches
+ * @param {Array} allTags - All consolidated tags from all batches
  * @param {object} metalogikon - The Metalogikon template
  * @param {string} targetCoordinate - The target coordinate
  * @param {object} llmService - The LLM service
@@ -501,7 +503,7 @@ Generate a concise Epii perspective that captures the essence of this content an
  */
 export async function synthesizeAnalysis(
     documentContent,
-    chunkAnalyses,
+    batchAnalyses, // Changed from chunkAnalyses
     allMappings,
     allVariations,
     allTags,
@@ -515,8 +517,8 @@ export async function synthesizeAnalysis(
         throw new Error("documentContent must be a non-empty string");
     }
 
-    if (!chunkAnalyses || !Array.isArray(chunkAnalyses)) {
-        throw new Error("chunkAnalyses must be an array");
+    if (!batchAnalyses || !Array.isArray(batchAnalyses)) { // Changed validation
+        throw new Error("batchAnalyses must be an array");
     }
 
     if (!allMappings || !Array.isArray(allMappings)) {
@@ -536,7 +538,7 @@ export async function synthesizeAnalysis(
     }
 
     try {
-        console.log(`Synthesizing analysis for ${chunkAnalyses.length} chunks...`);
+        console.log(`Synthesizing analysis from ${batchAnalyses.length} batch analyses...`); // Updated log
 
         // Prepare system prompt
         const systemPrompt = `You are an expert analyst specializing in synthesizing analyses of document chunks.
@@ -560,15 +562,17 @@ Your synthesis should be comprehensive, insightful, and well-structured.
 Focus on the most significant patterns, themes, and insights that emerge from the analyses.`;
 
         // Prepare user prompt
-        const userPrompt = `Synthesize the following chunk analyses into a coherent whole:
+        const userPrompt = `Synthesize the following batch analyses into a coherent whole:
 
 TARGET COORDINATE: ${targetCoordinate}
 
 DOCUMENT CONTENT (EXCERPT):
 ${documentContent.length > 1000 ? documentContent.substring(0, 1000) + "..." : documentContent}
 
-CHUNK ANALYSES (${chunkAnalyses.length}):
-${JSON.stringify(chunkAnalyses.slice(0, 3), null, 2)}${chunkAnalyses.length > 3 ? '\n... (and more)' : ''}
+BATCH ANALYSES (${batchAnalyses.length}):
+${JSON.stringify(batchAnalyses.slice(0, 3), null, 2)}${batchAnalyses.length > 3 ? '\n... (and more)' : ''}
+// Each item in batchAnalyses is a rich JSON object representing analysis for a whole batch.
+// LLM should understand that it's synthesizing from these batch-level summaries/analyses.
 
 CONSOLIDATED MAPPINGS (${allMappings.length}):
 ${JSON.stringify(allMappings.slice(0, 5), null, 2)}${allMappings.length > 5 ? '\n... (and more)' : ''}

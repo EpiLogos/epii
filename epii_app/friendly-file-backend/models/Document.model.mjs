@@ -75,6 +75,12 @@ const documentMetadataSchema = new mongoose.Schema({
     text: String
   },
 
+  // Notion update payload (structured data for crystallization)
+  notionUpdatePayload: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
+
   // Status information
   status: {
     type: String,
@@ -131,10 +137,12 @@ const documentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // Deprecated: content field is kept for backward compatibility but should not be used
+  // DEPRECATED: content field is kept for backward compatibility only - DO NOT USE
+  // Use textContent instead. This field will be removed in future versions.
   content: {
     type: String,
-    required: false
+    required: false,
+    deprecated: true
   },
   userId: {
     type: String,
@@ -162,6 +170,12 @@ const documentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  // Top-level target coordinate for efficient querying and caching
+  targetCoordinate: {
+    type: String,
+    index: true,
+    default: null
+  },
   metadata: {
     type: documentMetadataSchema,
     default: {}
@@ -169,9 +183,10 @@ const documentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Create indexes for efficient querying
-documentSchema.index({ documentType: 1, 'metadata.targetCoordinate': 1 });
+documentSchema.index({ documentType: 1, targetCoordinate: 1 });
 documentSchema.index({ userId: 1, documentType: 1, createdAt: -1 });
 documentSchema.index({ 'metadata.originalDocumentId': 1 });
+documentSchema.index({ targetCoordinate: 1 }); // Additional index for coordinate-based queries
 
 const Document = mongoose.model('Document', documentSchema);
 

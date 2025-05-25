@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText, Save, AlertCircle, Loader, PenTool, Trash2, Sparkles,
-  FileText as FileIcon, Settings, X, ChevronUp, ChevronDown
+  Settings, X, ChevronUp, ChevronDown
 } from 'lucide-react';
 import DocumentViewer from './DocumentViewer';
 import { TextSelection, NotionUpdatePayload } from '../0_foundation/epiiTypes';
@@ -15,7 +15,11 @@ import { useDocumentAnalysis } from '../2_hooks/useEpiiDocument';
 import documentService from '../1_services/documentService';
 import DocumentControls from './DocumentControls';
 import AnalysisResultsPanel from './AnalysisResultsPanel';
-import NotionPreview from './NotionPreview';
+import CrystalliseToNotionOverlay from './CrystalliseToNotionOverlay';
+import {
+  // syncTextContentToMetadata, // DEFERRED: Sync feature temporarily disabled
+  processPayloadForNotion
+} from '../1_services/payloadSyncService';
 
 interface DocumentCanvasProps {
   userId: string;
@@ -78,10 +82,12 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
   const [documentName, setDocumentName] = useState<string>('');
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isSendingToNotion, setIsSendingToNotion] = useState<boolean>(false);
-  const [showNotionPreview, setShowNotionPreview] = useState<boolean>(false);
+  const [showCrystalliseOverlay, setShowCrystalliseOverlay] = useState<boolean>(false);
   const [showAnalysisResults, setShowAnalysisResults] = useState<boolean>(false);
   const [showDocumentControls, setShowDocumentControls] = useState<boolean>(false);
   const [notionPageUrl, setNotionPageUrl] = useState<string | undefined>(undefined);
+  // Track the current notion payload for the overlay (refreshes when metadata changes)
+  const [currentNotionPayload, setCurrentNotionPayload] = useState<NotionUpdatePayload | null>(null);
   // We keep track of the current selection in local state for immediate updates
   // but the source of truth is in the EpiiContext
   const [, setCurrentSelection] = useState<TextSelection | null>(null);
@@ -271,6 +277,16 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
     previousDocumentIdRef.current = currentDocument?.id;
   }, [currentDocument, dispatch, setTargetCoordinate]);
 
+  // Update the notion payload state when document metadata changes
+  useEffect(() => {
+    if (isPratibimba && currentDocument?.metadata?.notionUpdatePayload) {
+      setCurrentNotionPayload(currentDocument.metadata.notionUpdatePayload);
+      console.log('Updated notion payload state from document metadata');
+    } else {
+      setCurrentNotionPayload(null);
+    }
+  }, [isPratibimba, currentDocument?.metadata?.notionUpdatePayload]);
+
   // Save document when switching to another document or when content changes
   const previousDocumentIdRef = React.useRef(currentDocumentId);
   const previousContentRef = React.useRef(documentContent);
@@ -314,8 +330,12 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
     // Set a timeout to save after 2 seconds of inactivity
     contentChangeTimeoutRef.current = setTimeout(() => {
-      if (currentDocumentId) {
+      if (currentDocumentId && currentDocument) {
         console.log(`Auto-saving document ${currentDocumentId} after content change`);
+
+        // For auto-save, we don't sync textContent to metadata (only on manual save and crystallize)
+        // This keeps auto-save fast and lightweight
+        const updatedMetadata = currentDocument.metadata;
 
         // Update the document in state
         dispatch({
@@ -324,6 +344,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             id: currentDocumentId,
             textContent: documentContent, // Use textContent consistently
             name: documentName,
+            metadata: updatedMetadata,
             // Always force sync to ensure changes are saved
             forceSync: true
           }
@@ -412,7 +433,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       // Create document in MongoDB using the document service
       const result = await documentService.createDocument({
         name: initialName,
-        textContent: initialContent, // Use textContent consistently
+        content: initialContent, // documentService.createDocument expects 'content' field
         userId: userId
       });
 
@@ -542,16 +563,32 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
     }
   };
 
-  // Handle preview Notion update
-  const handlePreviewNotionUpdate = () => {
+  // Handle crystallise to Notion
+  const handleCrystalliseToNotion = async () => {
     if (!currentDocument || !currentDocumentId) return;
 
-    // Show the Notion preview
-    setShowNotionPreview(true);
+    // SYNC FEATURE DEFERRED: Auto-save before crystallization temporarily disabled
+    // For now, crystallization uses existing metadata.notionUpdatePayload as-is
+    // Users can edit content directly in Notion after crystallization
+
+    /* COMMENTED OUT - SYNC LOGIC TO BE REFINED LATER
+    if (isPratibimba) {
+      console.log('Crystallise to Notion: Triggering save and sync before opening overlay...');
+      try {
+        await handleSaveDocument();
+        console.log('Crystallise to Notion: Save and sync completed');
+      } catch (error) {
+        console.warn('Crystallise to Notion: Error during save and sync:', error);
+      }
+    }
+    */
+
+    // Show the crystallise overlay
+    setShowCrystalliseOverlay(true);
   };
 
   // Handle send to Notion
-  const handleSendToNotion = async (updatedPayload?: NotionUpdatePayload) => {
+  const handleSendToNotion = async (updatedPayload?: NotionUpdatePayload | { targetCoordinate: string; notionPageUrl?: string }) => {
     if (!currentDocument || !currentDocumentId) return;
 
     // Set loading state
@@ -559,9 +596,11 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
     try {
       // Get the document's coordinate from various possible sources
+      // Priority: targetCoordinate -> metadata.targetCoordinate -> bimbaCoordinate (deprecated) -> fallback
       let documentCoordinate =
-        currentDocument.bimbaCoordinate ||
+        currentDocument.targetCoordinate ||
         currentDocument.metadata?.targetCoordinate ||
+        currentDocument.bimbaCoordinate ||
         targetCoordinate ||
         '#5-2-1'; // Fallback default
 
@@ -573,60 +612,79 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       console.log('Using document coordinate for Notion update:', documentCoordinate);
 
       // Prepare the notionUpdatePayload
-      let notionUpdatePayload;
+      let notionUpdatePayload: NotionUpdatePayload | null = null;
+      let resolvedNotionUrl = null;
 
       if (updatedPayload) {
-        // Use the updated payload from the NotionPreview component
-        notionUpdatePayload = {
-          ...updatedPayload,
+        // Check if this is a simple coordinate resolution result from the overlay
+        if ('notionPageUrl' in updatedPayload && !('title' in updatedPayload)) {
+          // This is from the overlay with resolved URL
+          resolvedNotionUrl = (updatedPayload as { notionPageUrl?: string }).notionPageUrl;
+          documentCoordinate = updatedPayload.targetCoordinate || documentCoordinate;
+
+          // Create default payload since we only got coordinate + URL
+          // Don't set notionUpdatePayload here, let it fall through to the metadata logic
+        } else {
+          // Use the updated payload from the NotionPreview component
+          notionUpdatePayload = updatedPayload as NotionUpdatePayload;
           // Ensure the coordinate is set
-          targetCoordinate: updatedPayload.targetCoordinate || documentCoordinate
-        };
-      } else {
-        // Create a default payload
-        notionUpdatePayload = {
-          // Always include these required fields
-          targetCoordinate: documentCoordinate,
-          content: currentDocument.textContent || '# ' + currentDocument.title + '\n\nContent from document.',
-          title: currentDocument.title || 'Document for ' + documentCoordinate,
-
-          // Include these if available from the document
-          ...(currentDocument.metadata?.notionUpdatePayload || {}),
-
-          // Ensure these fields are always present
-          analysisResults: currentDocument.metadata?.analysisResults || {},
-          relatedCoordinates: currentDocument.metadata?.relatedCoordinates || [],
-
-          // Use the correct property names for Notion
-          properties: {
-            // The title property is handled separately in the backend
-            // "Node Name" will be set to the title value
-
-            // Set non-relation properties directly
-            // Content Type is a select property
-            "Content Type": {
-              select: {
-                name: currentDocument.metadata?.analysisResults?.contentType || "Crystallization"
-              }
-            },
-
-            // Status is a status property
-            "Status": {
-              status: {
-                name: "Draft"
-              }
-            }
-
-            // Relation properties will be handled by the backend by adding notes to the content:
-            // - "💠 QL Operators" (relation to Quaternal Logic DB)
-            // - "🕸️ Semantic Framework" (relation to Semantics DB)
-            // - "⚕️ Archetypal Anchors" (relation to Symbols DB)
-            // - "📚 Epistemic Essence" (relation to Concepts DB)
-          }
-        };
+          notionUpdatePayload.targetCoordinate = updatedPayload.targetCoordinate || documentCoordinate;
+        }
       }
 
-      console.log('Sending Notion update with payload:', notionUpdatePayload);
+      if (!notionUpdatePayload) {
+        // Check if this is a pratibimba document
+        if (isPratibimba) {
+          // For pratibimba documents, use metadata.notionUpdatePayload as source of truth
+          if (currentDocument.metadata?.notionUpdatePayload) {
+            console.log('Loading NotionUpdatePayload from pratibimba document metadata (structured source of truth)');
+            notionUpdatePayload = {
+              ...currentDocument.metadata.notionUpdatePayload,
+              // Ensure the coordinate matches
+              targetCoordinate: documentCoordinate
+            };
+            console.log('Successfully loaded structured NotionUpdatePayload from metadata');
+            console.log(`Payload contains ${notionUpdatePayload.contentBlocks?.length || 0} content blocks`);
+          } else {
+            // Fallback: try to parse textContent if metadata is missing
+            console.warn('No metadata.notionUpdatePayload found, attempting to parse textContent as fallback');
+            try {
+              const parsedPayload = JSON.parse(currentDocument.textContent || '{}');
+              if (parsedPayload && typeof parsedPayload === 'object' && parsedPayload.targetCoordinate) {
+                notionUpdatePayload = {
+                  ...parsedPayload,
+                  targetCoordinate: documentCoordinate
+                };
+                console.log('Successfully parsed textContent as fallback NotionUpdatePayload');
+              } else {
+                throw new Error('Parsed textContent does not look like a NotionUpdatePayload');
+              }
+            } catch (parseError) {
+              console.warn('Failed to parse pratibimba textContent as NotionUpdatePayload:', parseError);
+              notionUpdatePayload = null;
+            }
+          }
+        }
+
+        // If we still don't have a payload, this means either:
+        // 1. It's a bimba document (which shouldn't crystallize to Notion)
+        // 2. It's a pratibimba document with invalid textContent
+        if (!notionUpdatePayload) {
+          if (isPratibimba) {
+            // Pratibimba document but failed to parse - this is an error
+            throw new Error('Pratibimba document textContent could not be parsed as a valid NotionUpdatePayload. The document may be corrupted or in an invalid format.');
+          } else {
+            // Bimba document - should not crystallize to Notion
+            throw new Error('Only pratibimba documents can be crystallized to Notion. Please analyze this document first to create a pratibimba version, then crystallize that to Notion.');
+          }
+        }
+      }
+
+      // Process the payload to ensure Notion compliance (chunking large blocks)
+      const processedPayload = processPayloadForNotion(notionUpdatePayload);
+      console.log(`Processed payload: ${processedPayload.contentBlocks?.length || 0} blocks (chunked if needed)`);
+
+      console.log('Sending Notion update with processed payload:', JSON.stringify(processedPayload, null, 2));
 
       // Call the API to send to Notion
       const response = await fetch('http://localhost:3001/api/notion-update', {
@@ -635,7 +693,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          notionUpdatePayload,
+          notionUpdatePayload: processedPayload,
           sourceDocumentId: currentDocumentId
         })
       });
@@ -665,18 +723,18 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         }
       });
 
-      // Set the Notion page URL
-      setNotionPageUrl(result.url);
+      // Set the Notion page URL (use resolved URL if available, otherwise from result)
+      setNotionPageUrl(resolvedNotionUrl || result.url);
 
-      // Close the preview
-      setShowNotionPreview(false);
+      // Close the overlay
+      setShowCrystalliseOverlay(false);
 
       // Show success message
       dispatch({
         type: 'SET_STATUS_MESSAGE',
         payload: {
           type: 'success',
-          text: `Successfully sent to Notion.`
+          text: `Successfully crystallised to Notion.`
         }
       });
 
@@ -699,54 +757,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             }
           }
 
-          // Get documents from the context state - no need to reload from MongoDB
-          const { state } = useEpii();
-          const documents = state.documents;
-
-          // Filter documents by type
-          const mongoDocuments = documents.filter(doc => doc.documentType === 'bimba');
-          const mongoPratibimbaDocuments = documents.filter(doc => doc.documentType === 'pratibimba');
-
-          // Process and format documents
-          let formattedDocs = [];
-
-          // Format bimba documents
-          if (mongoDocuments && Array.isArray(mongoDocuments)) {
-            const formattedBimbaDocs = mongoDocuments.map(doc => ({
-              id: doc._id,
-              name: doc.fileName || doc.originalName || 'Untitled Document',
-              bimbaCoordinate: doc.targetCoordinate || null,
-              lastModified: new Date(doc.lastModified || doc.uploadDate),
-              isTemporary: false,
-              documentType: 'bimba',
-              pratibimbaIds: doc.pratibimbaIds || [],
-              versions: []
-            }));
-            formattedDocs = [...formattedDocs, ...formattedBimbaDocs];
-          }
-
-          // Format pratibimba documents
-          if (mongoPratibimbaDocuments && Array.isArray(mongoPratibimbaDocuments)) {
-            const formattedPratibimbaDocs = mongoPratibimbaDocuments.map(doc => ({
-              id: doc._id,
-              name: doc.fileName || doc.originalName || 'Untitled Crystallization',
-              bimbaCoordinate: doc.targetCoordinate || null,
-              lastModified: new Date(doc.lastModified || doc.uploadDate),
-              documentType: 'pratibimba',
-              bimbaId: doc.bimbaId,
-              sourceSelection: doc.sourceSelection,
-              crystallizationIntent: doc.crystallizationIntent,
-              crystallizationDate: new Date(doc.crystallizationDate),
-              versions: []
-            }));
-            formattedDocs = [...formattedDocs, ...formattedPratibimbaDocs];
-          }
-
-          // Update state with all documents
-          dispatch({
-            type: 'SET_DOCUMENTS',
-            payload: formattedDocs
-          });
+          // Document reload will be handled by the parent component
+          // We just need to invalidate the cache here
 
           console.log('Successfully reloaded documents after Notion update');
         } catch (error) {
@@ -760,7 +772,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       console.error('Error sending to Notion:', error);
       dispatch({
         type: 'SET_ERROR',
-        payload: `Failed to send to Notion: ${error instanceof Error ? error.message : 'Unknown error'}`
+        payload: `Failed to crystallise to Notion: ${error instanceof Error ? error.message : 'Unknown error'}`
       });
     } finally {
       setIsSendingToNotion(false);
@@ -784,7 +796,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         payload: {
           bimbaId: currentDocumentId,
           name: pratibimbaName,
-          content: selection.text,
+          textContent: selection.text,
+          content: selection.text, // Deprecated: kept for backward compatibility
           sourceSelection: selection,
           crystallizationIntent: 'Manual crystallization from selection',
           bimbaCoordinate: currentDocument.bimbaCoordinate
@@ -827,7 +840,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         payload: {
           bimbaId: currentDocumentId,
           name: pratibimbaName,
-          content: '', // Empty content
+          textContent: '', // Empty content
+          content: '', // Deprecated: kept for backward compatibility
           sourceSelection: { start: 0, end: 0, text: '' },
           crystallizationIntent: 'Manual empty crystallization',
           bimbaCoordinate: currentDocument.bimbaCoordinate
@@ -1007,17 +1021,18 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             // Create pratibimba document in MongoDB
             result = await documentService.createPratibimbaDocument({
               name: documentName,
-              content: documentContent,
+              textContent: documentContent,
               bimbaId: bimbaId,
               sourceSelection: currentDocument.sourceSelection || { start: 0, end: 0, text: '' },
               crystallizationIntent: currentDocument.crystallizationIntent || 'Manual crystallization',
-              bimbaCoordinate: targetCoordinate
+              bimbaCoordinate: targetCoordinate,
+              targetCoordinate: targetCoordinate
             });
           } else {
             // Create regular document in MongoDB
             result = await documentService.createDocument({
               name: documentName,
-              content: documentContent,
+              content: documentContent, // documentService.createDocument expects 'content' field
               targetCoordinate: targetCoordinate
             });
           }
@@ -1055,7 +1070,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
               sourceSelection: result.sourceSelection || { start: 0, end: 0, text: '' },
               crystallizationIntent: result.crystallizationIntent || 'Manual crystallization',
               crystallizationDate: new Date(),
-              versions: [{ timestamp: new Date(), content: documentContent }]
+              versions: [{ timestamp: new Date(), textContent: documentContent }]
             };
 
             // Add the new document to state
@@ -1080,7 +1095,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
               isTemporary: false,
               documentType: 'bimba' as const,
               pratibimbaIds: [],
-              versions: [{ timestamp: new Date(), content: documentContent }]
+              versions: [{ timestamp: new Date(), textContent: documentContent }]
             };
 
             // Add the new document to state
@@ -1126,13 +1141,30 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       } else {
         // This is an existing document, update it in MongoDB
         try {
+          // SYNC FEATURE DEFERRED: textContent to metadata sync temporarily disabled
+          // TODO: Implement robust sync between textContent and metadata.notionUpdatePayload
+          // Current approach had React re-rendering and state management complexities
+          // For now, users can edit directly in Notion after crystallization
+          const updatedMetadata = currentDocument.metadata;
+
+          /* COMMENTED OUT - SYNC LOGIC TO BE REFINED LATER
+          if (isPratibimba && documentContent) {
+            const syncResult = syncTextContentToMetadata(documentContent, currentDocument.metadata);
+            if (syncResult.success) {
+              updatedMetadata = syncResult.metadata;
+              setCurrentNotionPayload(updatedMetadata.notionUpdatePayload);
+            }
+          }
+          */
+
           // First, update the document in context state to ensure it's saved
           dispatch({
             type: 'UPDATE_DOCUMENT',
             payload: {
               id: currentDocumentId,
-              content: documentContent,
+              textContent: documentContent, // Use textContent consistently
               name: documentName,
+              metadata: updatedMetadata,
               forceSync: true // Force sync to MongoDB
             }
           });
@@ -1149,10 +1181,18 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
           // Update document in MongoDB using cleaned ID and the appropriate collection
           const collection = isPratibimba ? 'pratibimbaDocuments' : 'Documents';
+
+          // For pratibimba documents, preserve existing targetCoordinate; for bimba documents, use UI targetCoordinate
+          const coordinateToSave = isPratibimba
+            ? (currentDocument?.targetCoordinate || currentDocument?.metadata?.targetCoordinate || targetCoordinate)
+            : targetCoordinate;
+
+          console.log(`Saving document with targetCoordinate: ${coordinateToSave} (isPratibimba: ${isPratibimba})`);
+
           await documentService.updateDocument(cleanedId, {
-            content: documentContent,
+            textContent: documentContent,
             name: documentName,
-            targetCoordinate: targetCoordinate
+            targetCoordinate: coordinateToSave
           }, collection);
 
           // Update metadata in state
@@ -1161,7 +1201,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             payload: {
               id: currentDocumentId,
               name: documentName,
-              bimbaCoordinate: targetCoordinate
+              bimbaCoordinate: coordinateToSave  // ✅ Use the correctly calculated coordinate
             }
           });
 
@@ -1327,9 +1367,9 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             {isPratibimba ? 'Crystallization' : 'Document'}
           </span>
           {/* Coordinate indicator */}
-          {currentDocument?.bimbaCoordinate ? (
+          {(currentDocument?.targetCoordinate || currentDocument?.metadata?.targetCoordinate || currentDocument?.bimbaCoordinate) ? (
             <span className="ml-2 text-xs bg-epii-dark text-epii-neon px-2 py-1 rounded-md flex-shrink-0">
-              {currentDocument.bimbaCoordinate}
+              {currentDocument.targetCoordinate || currentDocument.metadata?.targetCoordinate || currentDocument.bimbaCoordinate}
             </span>
           ) : (
             <span className="ml-2 text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded-md flex-shrink-0">
@@ -1344,10 +1384,15 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
               value={targetCoordinate || ''}
               onChange={(e) => setTargetCoordinate(e.target.value)}
               placeholder="Target coordinate"
-              className="w-full sm:w-32 md:w-40 p-1 text-sm bg-epii-dark text-white rounded-md focus:outline-none focus:ring-1 focus:ring-epii-neon"
+              readOnly={isPratibimba}
+              className={`w-full sm:w-32 md:w-40 p-1 text-sm rounded-md focus:outline-none ${
+                isPratibimba
+                  ? 'bg-green-600 text-green-100 cursor-not-allowed'
+                  : 'bg-epii-dark text-white focus:ring-1 focus:ring-epii-neon'
+              }`}
             />
           </div>
-          {!currentDocument?.bimbaCoordinate && targetCoordinate && (
+          {!(currentDocument?.targetCoordinate || currentDocument?.metadata?.targetCoordinate || currentDocument?.bimbaCoordinate) && targetCoordinate && (
             <button
               className="p-1 px-2 text-xs rounded-md transition-all bg-green-700 text-white hover:bg-green-600 flex-shrink-0"
               title="Assign coordinate"
@@ -1376,13 +1421,13 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
                           await documentService.updatePratibimbaDocument(currentDocument.id, {
                             targetCoordinate: targetCoordinate,
                             name: documentName,
-                            content: documentContent
+                            textContent: documentContent
                           });
                         } else {
                           await documentService.updateDocument(currentDocument.id, {
                             targetCoordinate: targetCoordinate,
                             name: documentName,
-                            content: documentContent
+                            textContent: documentContent
                           });
                         }
 
@@ -1451,9 +1496,6 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       <div className="relative flex-grow overflow-hidden">
         {/* Main document viewer - takes full width when panels are collapsed */}
         <div className="h-full overflow-auto">
-          {/* DEBUG: Log what content is being passed to DocumentViewer */}
-          {console.log(`DocumentCanvas: Passing content to DocumentViewer, length: ${documentContent.length}`)}
-          {console.log(`DocumentCanvas: Content preview: "${documentContent.substring(0, 50)}..."`)}
           <DocumentViewer
             content={documentContent}
             filename={documentName}
@@ -1484,12 +1526,11 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             <DocumentControls
               onStartAnalysis={handleStartAnalysis}
               onCrystallize={handleCrystallizeResults}
-              onPreviewNotionUpdate={handlePreviewNotionUpdate}
-              onSendToNotion={handleSendToNotion}
+              onCrystalliseToNotion={handleCrystalliseToNotion}
               isAnalyzing={isAnalyzing}
               isSendingToNotion={isSendingToNotion}
               analysisResults={latestSession?.results || null}
-              defaultCoordinate={currentDocument?.bimbaCoordinate || targetCoordinate || '#5-2-1'}
+              defaultCoordinate={currentDocument?.targetCoordinate || currentDocument?.metadata?.targetCoordinate || currentDocument?.bimbaCoordinate || targetCoordinate || '#5-2-1'}
               documentType={isPratibimba ? 'pratibimba' : 'bimba'}
               documentStatus={currentDocument?.metadata?.status || 'draft'}
               notionPageUrl={notionPageUrl}
@@ -1557,22 +1598,16 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         </div>
       )}
 
-      {/* Notion Preview Modal */}
-      {showNotionPreview && currentDocument && (
-        <NotionPreview
-          notionUpdatePayload={currentDocument.metadata?.notionUpdatePayload || {
-            targetCoordinate: currentDocument.metadata?.targetCoordinate || '',
-            content: currentDocument.content || '',
-            title: currentDocument.title || '',
-            analysisResults: currentDocument.metadata?.analysisResults || {},
-            relatedCoordinates: currentDocument.metadata?.relatedCoordinates || [],
-            tags: []
-          }}
-          onClose={() => setShowNotionPreview(false)}
-          onSendToNotion={handleSendToNotion}
-          isSending={isSendingToNotion}
-        />
-      )}
+      {/* Crystallise to Notion Overlay */}
+      <CrystalliseToNotionOverlay
+        isOpen={showCrystalliseOverlay}
+        onClose={() => setShowCrystalliseOverlay(false)}
+        onConfirm={handleSendToNotion}
+        documentName={documentName}
+        targetCoordinate={currentDocument?.targetCoordinate || currentDocument?.metadata?.targetCoordinate || currentDocument?.bimbaCoordinate || targetCoordinate || '#5-2-1'}
+        isLoading={isSendingToNotion}
+        notionUpdatePayload={currentNotionPayload}
+      />
     </div>
   );
 };

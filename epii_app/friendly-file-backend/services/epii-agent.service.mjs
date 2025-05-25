@@ -465,13 +465,18 @@ class EpiiAgentService {
       // Notion Tools
       new DynamicStructuredTool({
         name: "resolveBimbaCoordinate",
-        description: "Find the Notion Page ID linked to a Bimba Coordinate.",
+        description: "Resolve a Bimba coordinate to its associated Notion page URL. Simple conversion: targetCoordinate -> Neo4j lookup for notionPageId -> Notion URL.",
         schema: z.object({
-          bimbaCoordinate: z.string().describe("The Bimba coordinate to resolve.")
+          targetCoordinate: z.string().describe("The Bimba coordinate to resolve to a Notion page URL (e.g., '#5-2-1').")
         }),
         func: async (args) => {
-          const result = await bpMCPService.resolveBimbaCoordinate(args.bimbaCoordinate);
-          return JSON.stringify(result);
+          try {
+            const result = await this.bpMCPService.callTool('resolveBimbaCoordinate', { targetCoordinate: args.targetCoordinate });
+            return JSON.stringify(result, null, 2);
+          } catch (error) {
+            console.error('Error calling resolveBimbaCoordinate:', error);
+            throw error;
+          }
         }
       }),
 

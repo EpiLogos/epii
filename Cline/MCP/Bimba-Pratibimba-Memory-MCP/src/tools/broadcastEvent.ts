@@ -1,14 +1,14 @@
 /**
  * Broadcast Event Tool
- * 
+ *
  * This tool broadcasts an event to all connected WebSocket clients.
  * It's used for sending real-time updates to frontend clients.
  */
 
 import { z } from "zod";
-import { ToolDefinition } from "@modelcontextprotocol/sdk/types.js";
-import { ToolDependencies } from "../types/index.js";
+import { Tool, ToolDependencies } from "../types/index.js";
 import { CustomWebSocketServerTransport } from "../transports/websocket.js";
+import { zodToJsonSchema } from "../utils/zodToJsonSchema.js";
 
 // Define the schema for the event
 const EventSchema = z.object({
@@ -19,24 +19,10 @@ const EventSchema = z.object({
 });
 
 // Define the tool
-export const broadcastEventTool: ToolDefinition = {
+export const broadcastEventTool: Tool = {
   name: "broadcastEvent",
   description: "Broadcasts an event to all connected WebSocket clients",
-  inputSchema: EventSchema,
-  examples: [
-    {
-      input: {
-        type: "document_cache_update",
-        documentId: "123456789",
-        timestamp: new Date().toISOString()
-      },
-      output: {
-        success: true,
-        message: "Event broadcasted to all connected clients",
-        clientCount: 2
-      }
-    }
-  ]
+  inputSchema: zodToJsonSchema(EventSchema)
 };
 
 // Define the handler
@@ -47,11 +33,11 @@ export const broadcastEventHandler = async (
   try {
     // Get the WebSocket transport from dependencies
     const wsTransport = dependencies.wsTransport as CustomWebSocketServerTransport;
-    
+
     if (!wsTransport || !wsTransport.wss) {
       throw new Error("WebSocket server not available");
     }
-    
+
     // Create the event message
     const eventMessage = {
       type: "event",
@@ -60,10 +46,10 @@ export const broadcastEventHandler = async (
         timestamp: args.timestamp || new Date().toISOString()
       }
     };
-    
+
     // Count of clients that received the message
     let clientCount = 0;
-    
+
     // Broadcast to all connected clients
     wsTransport.wss.clients.forEach(client => {
       if (client.readyState === client.OPEN) {
@@ -71,9 +57,9 @@ export const broadcastEventHandler = async (
         clientCount++;
       }
     });
-    
+
     console.log(`Broadcasted ${args.type} event to ${clientCount} clients`);
-    
+
     // Return success response
     return {
       success: true,

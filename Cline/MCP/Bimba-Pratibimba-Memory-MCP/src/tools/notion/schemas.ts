@@ -31,11 +31,17 @@ export const CrystallizeToNotionSchema = z.object({
     (val) => val === '#' || /^#[\w.-]+$/.test(val),
     { message: "Must be a valid Bimba coordinate starting with #" }
   ).describe("The Bimba coordinate of the target node whose Notion page should be updated."),
-  contentToAppend: z.string().describe("The text content to convert into blocks and append."),
+
+  // New structured approach with contentBlocks
+  contentBlocks: z.array(z.record(z.any())).optional().describe("Array of structured Notion block objects to append directly."),
+
+  // Legacy approach with text content
+  contentToAppend: z.string().optional().describe("The text content to convert into blocks and append (legacy)."),
+
   title: z.string().optional().describe("Title for the page if it needs to be created."),
   properties: z.record(z.any()).optional().describe("Additional properties to set on the page."),
   createIfNotExists: z.boolean().default(true).describe("Whether to create the page if it doesn't exist."),
-  contentFormat: z.enum(["markdown", "plain"]).default("markdown").describe("Format of the content to append."),
+  contentFormat: z.enum(["markdown", "plain"]).default("markdown").describe("Format of the content to append (for legacy contentToAppend)."),
   relations: z.array(
     z.object({
       database: z.string().describe("The name or ID of the related database."),
@@ -48,4 +54,7 @@ export const CrystallizeToNotionSchema = z.object({
       ).describe("The target pages for the relation.")
     })
   ).optional().describe("Relations to establish with other Notion databases.")
-});
+}).refine(
+  (data) => data.contentBlocks || data.contentToAppend,
+  { message: "Either contentBlocks or contentToAppend must be provided" }
+);
