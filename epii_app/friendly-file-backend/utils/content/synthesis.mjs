@@ -75,9 +75,11 @@ Extract the following relational properties from the synthesis and mappings:
    - Examples: "Epistemic Topology", "Conceptual Integration", "Systemic Interdependence"
    - Generate 6-12 detailed Epistemic Essence properties with rich descriptions
 
-3. Archetypal Anchors: Symbolic representations, metaphors, or archetypes that resonate with the content
-   - These are symbolic patterns that give deeper meaning to the content
-   - Examples: "Ouroboros", "Mandala", "Hero's Journey", "Threshold Guardian"
+3. Archetypal Anchors: Underlying patterns, dynamics, or archetypal energies that can be inferred from the content
+   - These are deep structural patterns that give symbolic meaning to the content, whether explicitly mentioned or implicitly present
+   - Look for patterns like: cyclical processes, transformative journeys, integration dynamics, threshold moments, creative emergence, systemic wholeness, etc.
+   - Examples: "Cyclical Integration" (ouroboric pattern), "Threshold Navigation" (liminal dynamics), "Emergent Synthesis" (creative manifestation)
+   - INFER archetypal patterns from content themes and dynamics rather than looking for literal symbolic references
    - Generate 6-12 detailed Archetypal Anchor properties with rich descriptions
 
 4. Semantic Framework: Relationship types that define how concepts connect
@@ -166,11 +168,11 @@ Return a JSON object with the following structure:
     ],
     "archetypalAnchors": [
       {
-        "name": "string", // e.g., "Ouroboros"
-        "description": "string", // Detailed explanation (100-150 words) of this archetypal anchor
-        "evidence": "string" // Supporting evidence from the text
+        "name": "string", // e.g., "Cyclical Integration", "Threshold Navigation", "Emergent Synthesis"
+        "description": "string", // Detailed explanation (100-150 words) of this archetypal pattern inferred from the content
+        "evidence": "string" // Supporting evidence from the text that demonstrates this pattern
       }
-      // Generate 6-12 Archetypal Anchor properties
+      // Generate 6-12 Archetypal Anchor properties - INFER patterns from content dynamics, don't look for literal symbols
     ],
     "semanticFramework": [
       {
@@ -567,12 +569,12 @@ TARGET COORDINATE: ${targetCoordinate}
 DOCUMENT CONTENT (EXCERPT):
 ${documentContent.length > 1000 ? documentContent.substring(0, 1000) + "..." : documentContent}
 
-BATCH ANALYSES (${batchAnalyses.length}): 
+BATCH ANALYSES (${batchAnalyses.length}):
 ${JSON.stringify(batchAnalyses.slice(0, 3), null, 2)}${batchAnalyses.length > 3 ? '\n... (and more)' : ''}
 // Each item in batchAnalyses is a rich JSON object representing analysis for a whole batch.
 // LLM should understand that it's synthesizing from these batch-level summaries/analyses.
 
-CONSOLIDATED MAPPINGS (${allMappings.length}): 
+CONSOLIDATED MAPPINGS (${allMappings.length}):
 ${JSON.stringify(allMappings.slice(0, 5), null, 2)}${allMappings.length > 5 ? '\n... (and more)' : ''}
 
 CONSOLIDATED VARIATIONS (${allVariations.length}):

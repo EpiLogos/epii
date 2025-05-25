@@ -106,6 +106,7 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
             ...doc,
             name: name !== undefined ? name : doc.name,
             bimbaCoordinate: bimbaCoordinate !== undefined ? bimbaCoordinate : doc.bimbaCoordinate,
+            targetCoordinate: bimbaCoordinate !== undefined ? bimbaCoordinate : doc.targetCoordinate, // ✅ Keep both in sync
             lastModified: new Date()
           };
         }
@@ -202,10 +203,18 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
 
             // Save to MongoDB with the appropriate collection
             const collection = isPratibimba ? 'pratibimbaDocuments' : 'Documents';
+
+            // For pratibimba documents, preserve existing targetCoordinate; for bimba documents, use bimbaCoordinate
+            const coordinateToSave = isPratibimba
+              ? (updatedDoc.targetCoordinate || updatedDoc.bimbaCoordinate)
+              : updatedDoc.bimbaCoordinate;
+
+            console.log(`EpiiContext UPDATE_DOCUMENT: Saving ${isPratibimba ? 'pratibimba' : 'bimba'} document with targetCoordinate: ${coordinateToSave}`);
+
             await documentService.updateDocument(cleanedId, {
-              content: updatedDoc.content,
+              textContent: updatedDoc.textContent || updatedDoc.content, // Use textContent consistently
               name: updatedDoc.name,
-              targetCoordinate: updatedDoc.bimbaCoordinate
+              targetCoordinate: coordinateToSave
             }, collection);
 
             console.log(`${isPratibimba ? 'Pratibimba' : 'Bimba'} document ${updatedDoc.id} force-synced to MongoDB`);
@@ -378,6 +387,7 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
           return {
             ...doc,
             bimbaCoordinate,
+            targetCoordinate: bimbaCoordinate, // ✅ Keep both in sync
             lastModified: new Date()
           };
         }
@@ -413,7 +423,7 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
               await documentService.updateDocument(cleanedId, {
                 targetCoordinate: bimbaCoordinate,
                 // Also update content to ensure it's saved correctly
-                content: updatedDoc.textContent || updatedDoc.content,
+                textContent: updatedDoc.textContent || updatedDoc.content,
                 name: updatedDoc.name
               });
 
@@ -923,7 +933,6 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
         id: `pratibimba-${Date.now()}`,
         name,
         textContent: documentContent,
-        content: documentContent, // Also set content for backward compatibility
         lastModified: new Date(),
         documentType: 'pratibimba' as const,
         bimbaId,

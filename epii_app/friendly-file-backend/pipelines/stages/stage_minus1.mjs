@@ -284,10 +284,10 @@ export async function runStageMinus1(state) {
                 numTags: allTags.length,
                 hasActionableSummary: Boolean(stageMinus1Output.actionableSummary),
                 actionableSummaryLength: stageMinus1Output.actionableSummary ? stageMinus1Output.actionableSummary.length : 0,
-                qlOperatorsCount: coreElementsResult.relationalProperties.qlOperators.length,
-                epistemicEssenceCount: coreElementsResult.relationalProperties.epistemicEssence.length,
-                archetypeAnchorsCount: coreElementsResult.relationalProperties.archetypeAnchors.length,
-                semanticFrameworkCount: coreElementsResult.relationalProperties.semanticFramework.length
+                qlOperatorsCount: (coreElementsResult.relationalProperties?.qlOperators || []).length,
+                epistemicEssenceCount: (coreElementsResult.relationalProperties?.epistemicEssence || []).length,
+                archetypeAnchorsCount: (coreElementsResult.relationalProperties?.archetypeAnchors || []).length,
+                semanticFrameworkCount: (coreElementsResult.relationalProperties?.semanticFramework || []).length
             });
         } catch (tracingError) {
             console.warn(`LangSmith tracing error: ${tracingError.message}`);
@@ -297,12 +297,18 @@ export async function runStageMinus1(state) {
         console.log(`Produced ${allMappings.length} consolidated mappings, ${allVariations.length} variations, and ${allTags.length} tags`);
         console.log(`Synthesis length: ${synthesis.length} characters, Core elements: ${coreElementsResult.coreElements.length}`);
 
-        // Log relational properties with more detail
+        // Log relational properties with more detail (with defensive checks)
         console.log(`Relational properties extracted:`);
-        console.log(`- QL Operators: ${coreElementsResult.relationalProperties.qlOperators.length} (${coreElementsResult.relationalProperties.qlOperators.map(op => op.name || op).join(', ')})`);
-        console.log(`- Epistemic Essence: ${coreElementsResult.relationalProperties.epistemicEssence.length} (${coreElementsResult.relationalProperties.epistemicEssence.map(ee => ee.name || ee).join(', ')})`);
-        console.log(`- Archetypal Anchors: ${coreElementsResult.relationalProperties.archetypeAnchors.length} (${coreElementsResult.relationalProperties.archetypeAnchors.map(aa => aa.name || aa).join(', ')})`);
-        console.log(`- Semantic Framework: ${coreElementsResult.relationalProperties.semanticFramework.length} (${coreElementsResult.relationalProperties.semanticFramework.map(sf => sf.name || sf).join(', ')})`);
+        const relProps = coreElementsResult.relationalProperties || {};
+        const qlOperators = relProps.qlOperators || [];
+        const epistemicEssence = relProps.epistemicEssence || [];
+        const archetypeAnchors = relProps.archetypeAnchors || [];
+        const semanticFramework = relProps.semanticFramework || [];
+
+        console.log(`- QL Operators: ${qlOperators.length} (${qlOperators.map(op => op.name || op).join(', ')})`);
+        console.log(`- Epistemic Essence: ${epistemicEssence.length} (${epistemicEssence.map(ee => ee.name || ee).join(', ')})`);
+        console.log(`- Archetypal Anchors: ${archetypeAnchors.length} (${archetypeAnchors.map(aa => aa.name || aa).join(', ')})`);
+        console.log(`- Semantic Framework: ${semanticFramework.length} (${semanticFramework.map(sf => sf.name || sf).join(', ')})`);
 
         // Log actionable summary if available
         if (stageMinus1Output.actionableSummary) {

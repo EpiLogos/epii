@@ -76,4 +76,27 @@ router.get('/list-tools', async (req, res) => {
   }
 });
 
+/**
+ * @route POST /api/bpmcp/resolveBimbaCoordinate
+ * @desc Resolve a Bimba coordinate to its associated Notion page URL
+ * @access Public
+ */
+router.post('/resolveBimbaCoordinate', async (req, res) => {
+  try {
+    const { targetCoordinate } = req.body;
+
+    if (!targetCoordinate) {
+      return res.status(400).json({ error: 'targetCoordinate is required' });
+    }
+
+    console.log(`Resolving Bimba coordinate: ${targetCoordinate}`);
+
+    const result = await bpmcpService.callTool('resolveBimbaCoordinate', { targetCoordinate });
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(`Error resolving Bimba coordinate:`, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

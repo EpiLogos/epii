@@ -533,25 +533,22 @@ export async function generateNotionUpdatePayload(
         // Create properties update
         const properties = {};
 
-        // Update Status property to "Analyzed"
+        // Update Status property to "Analyzed" (only if it exists on the page)
         properties["Status"] = formatStatusProperty("Analyzed");
 
-        // Update Analysis Status property
-        properties["Analysis Status"] = formatStatusProperty("Complete");
+        // REMOVED: Non-existent properties that were causing validation errors
+        // These properties don't exist on Notion pages and should be in content blocks instead:
+        // - "Analysis Status" - redundant with Status
+        // - "Analysis Date" - can be inferred from page update time
+        // - "Mappings Count" - redundant, count is in content blocks
+        // - "Variations Count" - redundant, count is in content blocks
+        // - "Tags" - will be handled separately if the property exists
 
-        // Update Analysis Date property
-        properties["Analysis Date"] = formatDateProperty(new Date().toISOString());
-
-        // Update Mappings Count property
-        properties["Mappings Count"] = formatNumberProperty(allMappings.length);
-
-        // Update Variations Count property
-        properties["Variations Count"] = formatNumberProperty(allVariations.length);
-
-        // Update Tags property
-        if (allTags && allTags.length > 0) {
-            properties["Tags"] = formatMultiSelectProperty(allTags);
-        }
+        // REMOVED: Tags property - doesn't exist on Notion pages
+        // Tags information is included in the content blocks instead
+        // if (allTags && allTags.length > 0) {
+        //     properties["Tags"] = formatMultiSelectProperty(allTags);
+        // }
 
         // Create content blocks for the analysis
         const contentBlocks = [];

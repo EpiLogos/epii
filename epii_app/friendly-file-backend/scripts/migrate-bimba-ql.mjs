@@ -10,6 +10,7 @@
  */
 
 import bpMCPService from '../services/bpMCPService.mjs';
+import { graph } from '../services/neo4j.service.mjs';
 import { BimbaNodeSchema, BimbaRelationSchema } from '../schemas/bimba.schema.mjs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -200,81 +201,116 @@ async function closeLogStream(logStream) {
 }
 
 /**
- * Get all Bimba nodes from Neo4j
- * @returns {Promise<Array>} Array of Bimba nodes
+ * Get all nodes from Neo4j (not just those with bimbaCoordinate)
+ * @returns {Promise<Array>} Array of all nodes
  */
 async function getAllBimbaNodes() {
   const query = `
     MATCH (n)
-    WHERE n.bimbaCoordinate IS NOT NULL
-    RETURN n
+    RETURN n, labels(n) as nodeLabels
+    LIMIT 1000
   `;
 
   try {
-    const result = await bpMCPService.queryBimbaGraph(query);
-
-    if (!result || !result.records) {
-      throw new Error('Failed to retrieve Bimba nodes');
+    // Use Neo4j service directly instead of BPMCP
+    if (!graph) {
+      throw new Error('Neo4j graph service is not available');
     }
 
-    // Extract nodes from the result
-    return result.records.map(record => {
-      const node = record.get('n');
+    console.log('Executing query directly with Neo4j service...');
+    const result = await graph.query(query);
+
+    console.log(`Neo4j query returned ${result.length} records`);
+
+    if (!result || result.length === 0) {
+      throw new Error('No nodes found in database');
+    }
+
+    // Process the results from Neo4j LangChain service
+    return result.map((record, index) => {
+      // The LangChain Neo4j service returns results in a different format
+      const node = record.n;
+      const labels = record.nodeLabels;
+
       return {
-        id: node.identity.toString(),
+        id: node.identity ? node.identity.toString() : index.toString(),
+        labels: labels || [],
         ...node.properties
       };
     });
   } catch (error) {
-    console.error('Error retrieving Bimba nodes:', error);
+    console.error('Error retrieving nodes:', error);
     throw error;
   }
 }
 
 /**
- * Get all Bimba relations from Neo4j
- * @returns {Promise<Array>} Array of Bimba relations
+ * Get all relations from Neo4j
+ * @returns {Promise<Array>} Array of all relations
  */
 async function getAllBimbaRelations() {
   const query = `
     MATCH (source)-[r]->(target)
-    WHERE source.bimbaCoordinate IS NOT NULL AND target.bimbaCoordinate IS NOT NULL
-    RETURN ID(r) AS id, TYPE(r) AS type, source.bimbaCoordinate AS source, target.bimbaCoordinate AS target, r
+    RETURN ID(r) AS id, TYPE(r) AS type,
+           COALESCE(source.bimbaCoordinate, ID(source)) AS source,
+           COALESCE(target.bimbaCoordinate, ID(target)) AS target,
+           r
+    LIMIT 1000
   `;
 
   try {
-    const result = await bpMCPService.queryBimbaGraph(query);
-
-    if (!result || !result.records) {
-      throw new Error('Failed to retrieve Bimba relations');
+    // Use Neo4j service directly instead of BPMCP
+    if (!graph) {
+      throw new Error('Neo4j graph service is not available');
     }
 
-    // Extract relations from the result
-    return result.records.map(record => {
-      const relation = record.get('r');
+    console.log('Executing relations query directly with Neo4j service...');
+    const result = await graph.query(query);
+
+    console.log(`Neo4j relations query returned ${result.length} records`);
+
+    if (!result || result.length === 0) {
+      console.log('No relations found in database');
+      return [];
+    }
+
+    // Process the results from Neo4j LangChain service
+    return result.map(record => {
+      const relation = record.r;
       return {
-        id: record.get('id').toString(),
-        type: record.get('type'),
-        source: record.get('source'),
-        target: record.get('target'),
+        id: record.id.toString(),
+        type: record.type,
+        source: record.source.toString(),
+        target: record.target.toString(),
         ...relation.properties
       };
     });
   } catch (error) {
-    console.error('Error retrieving Bimba relations:', error);
+    console.error('Error retrieving relations:', error);
     throw error;
   }
 }
 
 /**
- * Update a Bimba node in Neo4j
+ * Update a node in Neo4j
  * @param {Object} node - The node to update
  * @returns {Promise<void>}
  */
 async function updateBimbaNode(node) {
-  const query = `
+  // Use bimbaCoordinate if available, otherwise use node ID
+  const query = node.bimbaCoordinate ? `
     MATCH (n)
     WHERE n.bimbaCoordinate = $bimbaCoordinate
+    SET n.qlPosition = $qlPosition,
+        n.qlCategory = $qlCategory,
+        n.description = $description,
+        n.qlOperatorTypes = $qlOperatorTypes,
+        n.contextFrame = $contextFrame,
+        n.updatedAt = datetime()
+    RETURN n
+  ` : `
+    MATCH (n)
+    WHERE ID(n) = $nodeId
     SET n.qlPosition = $qlPosition,
         n.qlCategory = $qlCategory,
         n.description = $description,
@@ -285,7 +321,7 @@ async function updateBimbaNode(node) {
   `;
 
   const params = {
-    bimbaCoordinate: node.bimbaCoordinate,
+    ...(node.bimbaCoordinate ? { bimbaCoordinate: node.bimbaCoordinate } : { nodeId: parseInt(node.id) }),
     qlPosition: node.qlPosition,
     qlCategory: node.qlCategory,
     description: node.description,
@@ -294,22 +330,23 @@ async function updateBimbaNode(node) {
   };
 
   try {
-    await bpMCPService.queryBimbaGraph(query, params);
+    await graph.query(query, params);
   } catch (error) {
-    console.error(`Error updating node ${node.bimbaCoordinate}:`, error);
+    console.error(`Error updating node ${node.bimbaCoordinate || node.id}:`, error);
     throw error;
   }
 }
 
 /**
- * Update a Bimba relation in Neo4j
+ * Update a relation in Neo4j
  * @param {Object} relation - The relation to update
  * @returns {Promise<void>}
  */
 async function updateBimbaRelation(relation) {
+  // Use relation ID to update directly
   const query = `
-    MATCH (source {bimbaCoordinate: $source})-[r]->(target {bimbaCoordinate: $target})
-    WHERE TYPE(r) = $type
+    MATCH ()-[r]->()
+    WHERE ID(r) = $relationId
     SET r.qlType = $qlType,
         r.qlDynamics = $qlDynamics,
         r.qlContextFrame = $qlContextFrame,
@@ -319,9 +356,7 @@ async function updateBimbaRelation(relation) {
   `;
 
   const params = {
-    source: relation.source,
-    target: relation.target,
-    type: relation.type,
+    relationId: parseInt(relation.id),
     qlType: relation.qlType,
     qlDynamics: relation.qlDynamics,
     qlContextFrame: relation.qlContextFrame,
@@ -329,9 +364,9 @@ async function updateBimbaRelation(relation) {
   };
 
   try {
-    await bpMCPService.queryBimbaGraph(query, params);
+    await graph.query(query, params);
   } catch (error) {
-    console.error(`Error updating relation from ${relation.source} to ${relation.target}:`, error);
+    console.error(`Error updating relation ${relation.id} from ${relation.source} to ${relation.target}:`, error);
     throw error;
   }
 }
@@ -347,26 +382,27 @@ function determineQLPosition(node) {
     return parseInt(node.qlPosition);
   }
 
-  const coord = node.bimbaCoordinate || '';
+  // Try to extract from bimbaCoordinate if available
+  if (node.bimbaCoordinate) {
+    const coord = node.bimbaCoordinate;
+    const match = coord.match(/#(\d+)/);
+    if (match) {
+      const mainNumber = parseInt(match[1]);
 
-  // Extract the first number from the coordinate
-  const match = coord.match(/#(\d+)/);
-  if (match) {
-    const mainNumber = parseInt(match[1]);
-
-    // Map main subsystem numbers to QL positions
-    switch (mainNumber) {
-      case 0: return 0; // Anuttara -> QL Position 0
-      case 1: return 1; // Paramasiva -> QL Position 1
-      case 2: return 2; // Parashakti -> QL Position 2
-      case 3: return 3; // Mahamaya -> QL Position 3
-      case 4: return 4; // Nara -> QL Position 4
-      case 5: return 5; // Pratibimba -> QL Position 5
-      default: return determineQLPositionFromLabels(node);
+      // Map main subsystem numbers to QL positions
+      switch (mainNumber) {
+        case 0: return 0; // Anuttara -> QL Position 0
+        case 1: return 1; // Paramasiva -> QL Position 1
+        case 2: return 2; // Parashakti -> QL Position 2
+        case 3: return 3; // Mahamaya -> QL Position 3
+        case 4: return 4; // Nara -> QL Position 4
+        case 5: return 5; // Pratibimba -> QL Position 5
+        default: return determineQLPositionFromLabels(node);
+      }
     }
   }
 
-  // If no match, try to determine from labels or other properties
+  // If no bimbaCoordinate, try to determine from labels or other properties
   return determineQLPositionFromLabels(node);
 }
 
@@ -390,7 +426,7 @@ function determineQLPositionFromLabels(node) {
 }
 
 /**
- * Consolidate description, role, and function into a comprehensive description
+ * Consolidate description, content, concept, role, and function into a comprehensive description
  * @param {Object} node - The node to analyze
  * @returns {string} The consolidated description
  */
@@ -400,6 +436,16 @@ function consolidateDescription(node) {
   // Add existing description if available
   if (node.description) {
     parts.push(node.description);
+  }
+
+  // Add content if available and not already in description
+  if (node.content && (!node.description || !node.description.includes(node.content))) {
+    parts.push(`Content: ${node.content}`);
+  }
+
+  // Add concept if available and not already in description
+  if (node.concept && (!node.description || !node.description.includes(node.concept))) {
+    parts.push(`Concept: ${node.concept}`);
   }
 
   // Add role if available and not already in description
@@ -412,9 +458,15 @@ function consolidateDescription(node) {
     parts.push(`Function: ${node.function}`);
   }
 
-  // If no parts, provide a default description
+  // If no parts, provide a default description based on what's available
   if (parts.length === 0) {
-    return `Bimba node at coordinate ${node.bimbaCoordinate}`;
+    if (node.bimbaCoordinate) {
+      return `Bimba node at coordinate ${node.bimbaCoordinate}`;
+    } else if (node.name) {
+      return `Node: ${node.name}`;
+    } else {
+      return `Node with ID ${node.id}`;
+    }
   }
 
   return parts.join(' | ');

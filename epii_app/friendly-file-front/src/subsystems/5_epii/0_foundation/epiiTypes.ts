@@ -12,15 +12,22 @@ export interface DocumentVersion {
 // Base Document interface
 export interface Document {
   id: string;
+  _id?: string; // MongoDB ID
   name: string;
+  title?: string; // Document title
+  fileName?: string; // Original file name
+  originalName?: string; // Original name
   textContent?: string; // Optional - will be loaded on demand from MongoDB
   content?: string; // Deprecated: kept for backward compatibility
   lastModified: Date;
+  uploadDate?: Date; // Upload date
   versions?: DocumentVersion[]; // Optional - will be loaded on demand
-  bimbaCoordinate?: string;
+  targetCoordinate?: string; // Primary coordinate field
+  bimbaCoordinate?: string; // Deprecated: kept for backward compatibility
   analysisStatus?: 'pending' | 'processing' | 'completed' | 'failed';
   lastSyncTime?: number; // Timestamp of last MongoDB sync
   isTemporary?: boolean; // Flag for temporary documents not yet saved to MongoDB
+  notionPageId?: string;
 
   // Bimba-Pratibimba relationship fields
   documentType: 'bimba' | 'pratibimba'; // Original document or crystallization
@@ -33,6 +40,21 @@ export interface Document {
   sourceSelection?: TextSelection; // The text selection that was crystallized
   crystallizationIntent?: string; // Purpose/intent of this crystallization
   crystallizationDate?: Date; // When this crystallization was created
+
+  // Metadata object for additional properties
+  metadata?: {
+    status?: string;
+    targetCoordinate?: string; // Nested coordinate for analysis results
+    notionUpdatePayload?: any;
+    analysisResults?: any;
+    relatedCoordinates?: string[];
+    notionReference?: {
+      updated: boolean;
+      updateDate: Date;
+      notionPageId?: string;
+      status: string;
+    };
+  };
 }
 
 // Specialized type for Bimba (original) documents
@@ -63,10 +85,26 @@ export interface AnalysisVariation {
   variationText?: string;
 }
 
+// Notion Block interface for structured content
+export interface NotionBlock {
+  type: string;
+  [key: string]: any; // Allow for different block type properties
+}
+
 export interface NotionUpdatePayload {
   targetCoordinate: string;
-  content: string;
-  title?: string;
+  title: string;
+  properties: Record<string, any>;
+  contentBlocks: NotionBlock[];
+  contextWindow?: {
+    contextText: string;
+    bimbaContext: any;
+    qlContext: any;
+  };
+  timestamp: string;
+
+  // Legacy fields for backward compatibility
+  content?: string;
   analysisResults?: {
     semanticFramework?: string[];
     symbolicAnchors?: string[];
@@ -161,7 +199,7 @@ export interface TextSelection {
 
 // Status message type
 export interface StatusMessage {
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
   text: string;
 }
 
@@ -193,7 +231,7 @@ export type EpiiAction =
   | { type: 'SET_CURRENT_DOCUMENT', payload: string }
   | { type: 'ADD_DOCUMENT', payload: Document }
   | { type: 'SET_DOCUMENTS', payload: Document[] }
-  | { type: 'UPDATE_DOCUMENT', payload: { id: string, textContent?: string, content?: string, name?: string, analysisStatus?: string, forceSync?: boolean, documentType?: 'bimba' | 'pratibimba' } }
+  | { type: 'UPDATE_DOCUMENT', payload: { id: string, textContent?: string, content?: string, name?: string, analysisStatus?: string, forceSync?: boolean, documentType?: 'bimba' | 'pratibimba', metadata?: any } }
   | { type: 'UPDATE_DOCUMENT_METADATA', payload: { id: string, name?: string, bimbaCoordinate?: string } }
   | { type: 'APPEND_DOCUMENT_CONTENT', payload: { id: string, textContent: string, content?: string, forceSync?: boolean } }
   | { type: 'UPDATE_DOCUMENT_COORDINATE', payload: { id: string, bimbaCoordinate: string } }

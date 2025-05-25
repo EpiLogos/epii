@@ -195,11 +195,12 @@ class BPMCPService {
    * Crystallize content to a Notion page
    * @param {object} options - Crystallization options
    * @param {string} options.targetBimbaCoordinate - The Bimba coordinate of the target node
-   * @param {string} options.contentToAppend - The content to append
+   * @param {Array} [options.contentBlocks] - Structured Notion blocks to append (preferred)
+   * @param {string} [options.contentToAppend] - The content to append (legacy)
    * @param {string} [options.title] - Title for the page if it needs to be created
    * @param {object} [options.properties] - Additional properties to set on the page
    * @param {boolean} [options.createIfNotExists=true] - Whether to create the page if it doesn't exist
-   * @param {string} [options.contentFormat='markdown'] - Format of the content to append ('markdown' or 'plain')
+   * @param {string} [options.contentFormat='markdown'] - Format of the content to append ('markdown' or 'plain') - for legacy contentToAppend
    * @param {Array} [options.relations] - Relations to establish with other Notion databases
    * @returns {Promise<any>} - Crystallization results
    */
@@ -222,20 +223,30 @@ class BPMCPService {
       throw new Error('targetBimbaCoordinate is required');
     }
 
-    if (!options.contentToAppend) {
-      throw new Error('contentToAppend is required');
+    // Validate that we have either contentBlocks or contentToAppend
+    if (!options.contentBlocks && !options.contentToAppend) {
+      throw new Error('Either contentBlocks or contentToAppend is required');
     }
 
     // Set default values
     const params = {
       targetBimbaCoordinate: options.targetBimbaCoordinate,
-      contentToAppend: options.contentToAppend,
       title: options.title,
       properties: options.properties,
       createIfNotExists: options.createIfNotExists !== false, // Default to true
-      contentFormat: options.contentFormat || 'markdown',
       relations: options.relations
     };
+
+    // Add structured blocks if available
+    if (options.contentBlocks && Array.isArray(options.contentBlocks)) {
+      params.contentBlocks = options.contentBlocks;
+    }
+
+    // Add legacy content if available (and no contentBlocks)
+    if (options.contentToAppend && !options.contentBlocks) {
+      params.contentToAppend = options.contentToAppend;
+      params.contentFormat = options.contentFormat || 'markdown';
+    }
 
     return this.callTool('crystallizeToNotion', params);
   }

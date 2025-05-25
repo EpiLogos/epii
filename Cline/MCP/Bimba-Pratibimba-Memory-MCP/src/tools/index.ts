@@ -15,6 +15,8 @@ export const tools: Tool[] = [
   bimbaTools.bimbaKnowingTool,
   bimbaTools.generateBimbaEmbeddingsTool,
   bimbaTools.queryBimbaGraphTool,
+  bimbaTools.updateBimbaGraphTool,
+  bimbaTools.resolveBimbaCoordinateTool,
 
   // Pratibimba tools
   pratibimbaTools.searchPratibimbaContextTool,
@@ -51,6 +53,8 @@ export const handlers: Record<string, ToolHandler> = {
   "bimbaKnowing": bimbaTools.handleBimbaKnowing,
   "generateBimbaEmbeddings": bimbaTools.handleGenerateBimbaEmbeddings,
   "queryBimbaGraph": bimbaTools.handleQueryBimbaGraph,
+  "updateBimbaGraph": bimbaTools.handleUpdateBimbaGraph,
+  "resolveBimbaCoordinate": bimbaTools.handleResolveBimbaCoordinate,
 
   // Pratibimba handlers
   "searchPratibimbaContext": pratibimbaTools.handleSearchPratibimbaContext,

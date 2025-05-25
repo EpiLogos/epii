@@ -207,6 +207,104 @@ export const BimbaRelationSchema = {
 };
 
 /**
+ * Notion Property Integration Mappings
+ * Defines how Bimba properties map to Notion property types
+ * Supports the 5/0 synthesis pattern: Bimba (Position 5) → Notion (Position 0)
+ */
+export const NotionPropertyMappings = {
+  // QL Core Properties
+  qlPosition: {
+    notionType: 'select',
+    options: ['0', '1', '2', '3', '4', '5'],
+    description: 'QL position mapping to Notion select property'
+  },
+  qlCategory: {
+    notionType: 'select',
+    options: ['implicate', 'explicate'],
+    description: 'QL category mapping to Notion select property'
+  },
+  qlOperatorTypes: {
+    notionType: 'multi_select',
+    options: ['structural', 'processual', 'contextual'],
+    description: 'QL operator types mapping to Notion multi-select property'
+  },
+
+  // Relational Properties (from Analysis Pipeline)
+  qlOperators: {
+    notionType: 'rich_text',
+    format: 'structured_list',
+    description: 'QL operators formatted as structured rich text in Notion'
+  },
+  epistemicEssence: {
+    notionType: 'rich_text',
+    format: 'structured_list',
+    description: 'Epistemic essence formatted as structured rich text in Notion'
+  },
+  archetypalAnchors: {
+    notionType: 'rich_text',
+    format: 'structured_list',
+    description: 'Archetypal anchors formatted as structured rich text for manual page creation in Notion'
+  },
+  semanticFramework: {
+    notionType: 'rich_text',
+    format: 'structured_list',
+    description: 'Semantic framework formatted as structured rich text in Notion'
+  },
+
+  // Relationship Metadata
+  relationshipStrength: {
+    notionType: 'number',
+    format: 'percent',
+    description: 'Relationship strength as percentage in Notion'
+  },
+  relationshipConfidence: {
+    notionType: 'number',
+    format: 'percent',
+    description: 'Relationship confidence as percentage in Notion'
+  },
+  qlDynamics: {
+    notionType: 'select',
+    options: [
+      'foundational_emergence',
+      'processual_activation',
+      'formal_mediation',
+      'contextual_embedding',
+      'quintessential_synthesis',
+      'recursive_renewal'
+    ],
+    description: 'QL dynamics mapping to Notion select property'
+  },
+
+  // Temporal Properties
+  lastAnalyzed: {
+    notionType: 'date',
+    description: 'Last analysis timestamp in Notion'
+  },
+  analysisConfidence: {
+    notionType: 'number',
+    format: 'percent',
+    description: 'Analysis confidence as percentage in Notion'
+  },
+
+  // Bimba Coordinate Properties
+  bimbaCoordinate: {
+    notionType: 'title',
+    description: 'Bimba coordinate as page title in Notion'
+  },
+  parentCoordinate: {
+    notionType: 'relation',
+    targetDatabase: 'bimba_nodes',
+    description: 'Parent coordinate as relation to other Bimba nodes'
+  },
+  childCoordinates: {
+    notionType: 'relation',
+    targetDatabase: 'bimba_nodes',
+    multiple: true,
+    description: 'Child coordinates as multiple relations to other Bimba nodes'
+  }
+};
+
+/**
  * Helper function to validate a Bimba node against the schema
  * @param {Object} node - The node to validate
  * @returns {Object} - Validation result with isValid and errors properties

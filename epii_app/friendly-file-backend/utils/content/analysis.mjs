@@ -303,10 +303,6 @@ export async function analyzeChunkGroup(
         throw new Error("assignedCoordinates must be a non-empty array");
     }
 
-    if (chunks.length !== assignedCoordinates.length) {
-        throw new Error("chunks and assignedCoordinates must have the same length");
-    }
-
     // Extract options
     const {
         llmService,
@@ -507,7 +503,7 @@ Please analyze this text block and provide your analysis in the following JSON f
                 analysisResult.extractedTags = analysisResult.extractedTags || [];
                 analysisResult.mefLensInsights = analysisResult.mefLensInsights || {};
                 analysisResult.subnodeMappings = analysisResult.subnodeMappings || {};
-                
+
                 // Validate naturalElaborations structure if present
                 if (Array.isArray(analysisResult.naturalElaborations)) {
                     analysisResult.naturalElaborations.forEach((elaboration, elabIndex) => {
@@ -575,7 +571,6 @@ Please analyze this text block and provide your analysis in the following JSON f
         console.log(`--- End Context Window Debug Information ---`);
     }
 
-    try {
         // Prepare Metalogikon prompt
         let mefPrompt = "No Metalogikon framework available.";
             // This is the start of the existing logic for multi-chunk analysis
@@ -586,13 +581,13 @@ Please analyze this text block and provide your analysis in the following JSON f
 Your task is to analyze a group of related text chunks and extract mappings, variations, natural elaborations, and relational properties.
 
 CONTEXT INFORMATION:
-${contextInformation} 
+${contextInformation}
 // Note: contextInformation here is the groupContext. Individual chunk contexts are added to the userPrompt below.
 
 METALOGIKON FRAMEWORK:
 ${mefPrompt}
 
-IMPORTANT DISTINCTION: 
+IMPORTANT DISTINCTION:
 ... (rest of distinction remains same)
 
 ANALYTICAL TASK INSTRUCTIONS:

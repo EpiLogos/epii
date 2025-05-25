@@ -4,6 +4,8 @@
  * graph data, with proper validation and error handling.
  */
 
+import bpMCPService from '../services/bpMCPService.mjs';
+
 /**
  * Validates graphData structure and provides default values if needed.
  *
@@ -1109,49 +1111,44 @@ export async function assignCoordinates(chunk, sourceMetadata, coordinateMap, op
             }
         }
 
-        // If no valid mentioned coordinates, use LLM to assign coordinates
+        // If no valid mentioned coordinates, use SEMANTIC MAPPING with bimbaKnowing
         if (llmService) {
             try {
-                // Prepare the system prompt
-                const systemPrompt = `You are Epii, an advanced AI system for analyzing the Bimba coordinate system.
-Your task is to assign the most relevant Bimba coordinates to a chunk of text.`;
+                console.log(`Using semantic mapping to assign coordinates for chunk content`);
 
-                // Prepare the user prompt
-                let userPrompt = `Please analyze this text chunk and assign the most relevant Bimba coordinates to it.
+                // First, get semantic context for the target coordinate and related coordinates
+                const semanticContext = await getSemanticCoordinateContext(targetCoordinate, coordinateMap);
+
+                // Prepare the enhanced system prompt with semantic understanding
+                const systemPrompt = `You are Epii, an advanced AI system for semantic analysis of the Bimba coordinate system.
+Your task is to assign the most semantically relevant Bimba coordinates to a chunk of text based on the actual meaning and purpose of each coordinate, not just their titles.
+
+You have access to detailed semantic descriptions of each coordinate that explain what concepts, themes, and purposes they represent.`;
+
+                // Prepare the enhanced user prompt with semantic context
+                let userPrompt = `Please analyze this text chunk and assign the most semantically relevant Bimba coordinates based on the content's themes, concepts, and purposes.
 
 TEXT CHUNK:
 ${chunk.substring(0, 2000)}${chunk.length > 2000 ? '...' : ''}
 
-TARGET COORDINATE:
+TARGET COORDINATE (Primary):
 ${targetCoordinate}
 
-AVAILABLE COORDINATES:
-`;
+SEMANTIC COORDINATE CONTEXT:
+${semanticContext}
 
-                // Add available coordinates from the coordinate map
-                // Focus on the target coordinate and its immediate children
-                const relevantCoords = Object.entries(coordinateMap)
-                    .filter(([coord, _]) =>
-                        coord === targetCoordinate ||
-                        coord.startsWith(targetCoordinate + '-') ||
-                        targetCoordinate.startsWith(coord + '-') ||
-                        coord.split('-').slice(0, -1).join('-') === targetCoordinate.split('-').slice(0, -1).join('-')
-                    )
-                    .map(([coord, info]) => `${coord}: ${info.title || 'Untitled'}`);
+SEMANTIC MAPPING INSTRUCTIONS:
+1. The primary coordinate should be ${targetCoordinate} unless the content is clearly more relevant to a different coordinate.
+2. Analyze the chunk's core concepts, themes, and purposes.
+3. Match these to the semantic descriptions of the coordinates provided above.
+4. Assign additional coordinates only if they are semantically aligned with the content.
+5. Consider the hierarchical relationships between coordinates.
+6. Return your answer as a comma-separated list of coordinates, e.g., "#1-2, #1-2-3, #4-5".
+7. Do not explain your reasoning, just provide the list of coordinates.`;
 
-                userPrompt += relevantCoords.join('\n');
-
-                userPrompt += `
-
-INSTRUCTIONS:
-1. The primary coordinate should be ${targetCoordinate}, which is the target coordinate for this document.
-2. Assign additional coordinates only if they are strongly relevant to the content.
-3. Return your answer as a comma-separated list of coordinates, e.g., "#1-2, #1-2-3, #4-5".
-4. Do not explain your reasoning, just provide the list of coordinates.`;
-
-                // Call the LLM service
+                // Call the LLM service with enhanced semantic context
                 const response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
-                    temperature: 0.2,
+                    temperature: 0.1, // Lower temperature for more consistent semantic mapping
                     maxOutputTokens: 256
                 });
 
@@ -1159,7 +1156,7 @@ INSTRUCTIONS:
                 const extractedCoords = response.match(/#[0-5](-[0-5])*\b/g) || [];
 
                 if (extractedCoords.length > 0) {
-                    console.log(`LLM assigned coordinates: ${extractedCoords.join(', ')}`);
+                    console.log(`Semantic mapping assigned coordinates: ${extractedCoords.join(', ')}`);
 
                     // Filter to keep only valid coordinates that exist in the coordinateMap
                     const validExtractedCoords = extractedCoords.filter(coord =>
@@ -1172,12 +1169,12 @@ INSTRUCTIONS:
                             validExtractedCoords.push(targetCoordinate);
                         }
 
-                        console.log(`Using valid LLM-assigned coordinates: ${validExtractedCoords.join(', ')}`);
+                        console.log(`Using semantically mapped coordinates: ${validExtractedCoords.join(', ')}`);
                         return validExtractedCoords;
                     }
                 }
             } catch (llmError) {
-                console.error(`Error using LLM to assign coordinates:`, llmError);
+                console.error(`Error using semantic mapping to assign coordinates:`, llmError);
                 // Continue to fallback
             }
         }
@@ -1759,4 +1756,128 @@ export function extractRelatedCoordinatesWithStructure(mappings, targetCoordinat
 
     // Remove duplicates and return
     return [...new Set(mappingCoordinates)];
+}
+
+/**
+ * Gets semantic context for coordinates using bimbaKnowing to provide rich descriptions
+ * for semantic mapping instead of just coordinate titles.
+ *
+ * @param {string} targetCoordinate - The target coordinate to focus on
+ * @param {object} coordinateMap - Map of available coordinates
+ * @returns {Promise<string>} - Rich semantic context for coordinate mapping
+ */
+async function getSemanticCoordinateContext(targetCoordinate, coordinateMap) {
+    try {
+        console.log(`Retrieving semantic context for coordinate mapping focused on ${targetCoordinate}`);
+
+        // Get relevant coordinates (target + related)
+        const relevantCoords = Object.keys(coordinateMap).filter(coord =>
+            coord === targetCoordinate ||
+            coord.startsWith(targetCoordinate + '-') ||
+            targetCoordinate.startsWith(coord + '-') ||
+            coord.split('-').slice(0, -1).join('-') === targetCoordinate.split('-').slice(0, -1).join('-')
+        );
+
+        console.log(`Found ${relevantCoords.length} relevant coordinates for semantic context`);
+
+        // Use bimbaKnowing to get rich semantic descriptions
+        let semanticContext = `TARGET COORDINATE: ${targetCoordinate}\n\n`;
+
+        // Get semantic context for the target coordinate first
+        try {
+            const targetBimbaResult = await bpMCPService.callTool('bimbaKnowing', {
+                query: `Provide detailed semantic description of coordinate ${targetCoordinate} including its purpose, themes, concepts, and what types of content it represents`,
+                contextDepth: 2,
+                focusCoordinate: targetCoordinate,
+                includeRelations: true,
+                includeQLContext: true
+            });
+
+            if (targetBimbaResult && targetBimbaResult.content && targetBimbaResult.content.length > 0) {
+                const targetData = JSON.parse(targetBimbaResult.content[0].text);
+
+                if (targetData.results && targetData.results.length > 0) {
+                    const targetNode = targetData.results.find(node => node.coordinate === targetCoordinate);
+                    if (targetNode) {
+                        semanticContext += `${targetCoordinate}: ${targetNode.name || 'Unnamed'}\n`;
+                        semanticContext += `Description: ${targetNode.description || 'No description available'}\n`;
+                        semanticContext += `Semantic Purpose: Primary coordinate for this content\n\n`;
+                    }
+                }
+            }
+        } catch (targetError) {
+            console.warn(`Could not get semantic context for target coordinate ${targetCoordinate}:`, targetError);
+            semanticContext += `${targetCoordinate}: ${coordinateMap[targetCoordinate]?.title || 'Target coordinate'}\n`;
+            semanticContext += `Description: Primary coordinate for this content\n\n`;
+        }
+
+        // Add context for related coordinates
+        semanticContext += `RELATED COORDINATES:\n`;
+
+        for (const coord of relevantCoords.slice(0, 8)) { // Limit to 8 to avoid token overflow
+            if (coord === targetCoordinate) continue; // Already added above
+
+            try {
+                const coordBimbaResult = await bpMCPService.callTool('bimbaKnowing', {
+                    query: `Provide semantic description of coordinate ${coord} including its purpose and what content themes it represents`,
+                    contextDepth: 1,
+                    focusCoordinate: coord,
+                    includeRelations: false,
+                    includeQLContext: false
+                });
+
+                if (coordBimbaResult && coordBimbaResult.content && coordBimbaResult.content.length > 0) {
+                    const coordData = JSON.parse(coordBimbaResult.content[0].text);
+
+                    if (coordData.results && coordData.results.length > 0) {
+                        const coordNode = coordData.results.find(node => node.coordinate === coord);
+                        if (coordNode) {
+                            semanticContext += `${coord}: ${coordNode.name || 'Unnamed'}\n`;
+                            semanticContext += `Description: ${coordNode.description || 'No description available'}\n`;
+
+                            // Determine relationship to target
+                            if (coord.startsWith(targetCoordinate + '-')) {
+                                semanticContext += `Relationship: Child of target coordinate\n`;
+                            } else if (targetCoordinate.startsWith(coord + '-')) {
+                                semanticContext += `Relationship: Parent of target coordinate\n`;
+                            } else {
+                                semanticContext += `Relationship: Sibling of target coordinate\n`;
+                            }
+                            semanticContext += `\n`;
+                        }
+                    }
+                }
+            } catch (coordError) {
+                console.warn(`Could not get semantic context for coordinate ${coord}:`, coordError);
+                // Fallback to basic info from coordinate map
+                semanticContext += `${coord}: ${coordinateMap[coord]?.title || 'Related coordinate'}\n`;
+                semanticContext += `Description: Available coordinate for mapping\n\n`;
+            }
+        }
+
+        semanticContext += `\nSEMANTIC MAPPING GUIDANCE:\n`;
+        semanticContext += `- Match content themes and concepts to coordinate purposes\n`;
+        semanticContext += `- Consider hierarchical relationships between coordinates\n`;
+        semanticContext += `- Prioritize semantic relevance over superficial keyword matching\n`;
+        semanticContext += `- Use the target coordinate unless content clearly belongs elsewhere\n`;
+
+        console.log(`Generated semantic context with ${semanticContext.length} characters`);
+        return semanticContext;
+
+    } catch (error) {
+        console.error(`Error generating semantic coordinate context:`, error);
+
+        // Fallback to basic coordinate map info
+        const fallbackContext = `TARGET COORDINATE: ${targetCoordinate}\n\n`;
+        const relevantCoords = Object.entries(coordinateMap)
+            .filter(([coord, _]) =>
+                coord === targetCoordinate ||
+                coord.startsWith(targetCoordinate + '-') ||
+                targetCoordinate.startsWith(coord + '-')
+            )
+            .map(([coord, info]) => `${coord}: ${info.title || 'Untitled'}`)
+            .join('\n');
+
+        return fallbackContext + relevantCoords + '\n\nNote: Using basic coordinate information due to semantic context retrieval error.';
+    }
 }

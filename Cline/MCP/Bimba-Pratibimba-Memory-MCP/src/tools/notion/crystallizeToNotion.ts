@@ -158,11 +158,36 @@ export async function handleCrystallizeToNotion(dependencies: ToolDependencies, 
 
       console.log(`${logPrefix} Using Notion page ID: ${notionPageId}`);
 
-      // 2. Convert content to Notion blocks based on format
-      const contentToAppend = validatedArgs.contentToAppend;
-      const notionBlocks = validatedArgs.contentFormat === "markdown"
-        ? convertMarkdownToNotionBlocks(contentToAppend)
-        : convertTextToNotionBlocks(contentToAppend);
+      // 2. Prepare Notion blocks - use structured contentBlocks if available, otherwise convert content
+      let notionBlocks: any[];
+
+      if (validatedArgs.contentBlocks && validatedArgs.contentBlocks.length > 0) {
+        console.log(`${logPrefix} Using structured contentBlocks (${validatedArgs.contentBlocks.length} blocks)`);
+
+        // Use the structured blocks directly
+        notionBlocks = validatedArgs.contentBlocks;
+
+        // Validate that blocks have the required structure
+        notionBlocks = notionBlocks.filter(block => {
+          if (!block || typeof block !== 'object' || !block.type) {
+            console.warn(`${logPrefix} Skipping invalid block:`, block);
+            return false;
+          }
+          return true;
+        });
+
+        console.log(`${logPrefix} Using ${notionBlocks.length} valid structured blocks`);
+      } else if (validatedArgs.contentToAppend) {
+        console.log(`${logPrefix} Converting legacy content to blocks`);
+
+        // Fall back to legacy content conversion
+        const contentToAppend = validatedArgs.contentToAppend;
+        notionBlocks = validatedArgs.contentFormat === "markdown"
+          ? convertMarkdownToNotionBlocks(contentToAppend)
+          : convertTextToNotionBlocks(contentToAppend);
+      } else {
+        throw new McpError(ErrorCode.InvalidParams, "Either contentBlocks or contentToAppend must be provided");
+      }
 
       // 3. Append blocks to Notion page
       const response = await notionClient.blocks.children.append({
@@ -238,6 +263,14 @@ export async function handleCrystallizeToNotion(dependencies: ToolDependencies, 
       }
 
       // 6. Return results
+      // Calculate content length for logging
+      let contentLength = 0;
+      if (validatedArgs.contentBlocks && validatedArgs.contentBlocks.length > 0) {
+        contentLength = JSON.stringify(validatedArgs.contentBlocks).length;
+      } else if (validatedArgs.contentToAppend) {
+        contentLength = validatedArgs.contentToAppend.length;
+      }
+
       return {
         content: [{
           type: "text",
@@ -245,7 +278,7 @@ export async function handleCrystallizeToNotion(dependencies: ToolDependencies, 
             success: true,
             bimbaCoordinate: validatedArgs.targetBimbaCoordinate,
             notionPageId: notionPageId,
-            contentLength: contentToAppend.length,
+            contentLength: contentLength,
             blocksAppended: notionBlocks.length,
             propertiesUpdated: validatedArgs.properties ? Object.keys(validatedArgs.properties).length : 0,
             relationsEstablished: validatedArgs.relations ? validatedArgs.relations.length : 0,

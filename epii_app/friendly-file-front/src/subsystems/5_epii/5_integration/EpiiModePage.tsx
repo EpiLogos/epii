@@ -11,6 +11,7 @@ import { CheckCircle, AlertTriangle, Info, Menu, X } from "lucide-react";
 import DocumentCanvas from '../3_visualization/DocumentCanvas';
 import EpiiSidebar from '../3_visualization/EpiiSidebar';
 import EpiiChat from '../3_visualization/EpiiChat';
+import BimbaUpdateOverlay from '../3_visualization/BimbaUpdateOverlay';
 import { EpiiProvider, useEpii } from '../4_context/EpiiContext';
 import { BimbaCoordinate, Document as BimbaDocument, useBimbaCoordinates } from '../2_hooks/useBimbaCoordinates';
 
@@ -35,6 +36,7 @@ const EpiiModeContent: React.FC = () => {
   const { statusMessage } = state;
   const [selectedCoordinate, setSelectedCoordinate] = useState<BimbaCoordinate | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [bimbaUpdateOpen, setBimbaUpdateOpen] = useState<boolean>(false);
 
   // Use the Bimba coordinates hook
   const { coordinates, getRelatedCoordinates, refreshCoordinateDocuments } = useBimbaCoordinates();
@@ -74,6 +76,12 @@ const EpiiModeContent: React.FC = () => {
   const handleCoordinateSelect = (coordinate: BimbaCoordinate) => {
     console.log("Selected coordinate:", coordinate);
     setSelectedCoordinate(coordinate);
+  };
+
+  // Handle opening the Bimba update overlay
+  const handleOpenBimbaUpdate = () => {
+    setBimbaUpdateOpen(true);
+    setSidebarOpen(false); // Close sidebar when opening overlay
   };
 
   // Get related coordinates from the selected coordinate
@@ -151,6 +159,7 @@ const EpiiModeContent: React.FC = () => {
                   handleCoordinateSelect(coord);
                   setSidebarOpen(false);
                 }}
+                onOpenBimbaUpdate={handleOpenBimbaUpdate}
               />
             </div>
 
@@ -253,6 +262,12 @@ const EpiiModeContent: React.FC = () => {
             </div> {/* End Main Content Area */}
           </div> {/* End Main Flex */}
         </div> {/* End Container */}
+
+        {/* Bimba Update Overlay */}
+        <BimbaUpdateOverlay
+          isOpen={bimbaUpdateOpen}
+          onClose={() => setBimbaUpdateOpen(false)}
+        />
       </div> {/* End Page Wrapper */}
     </PageTransition>
   );

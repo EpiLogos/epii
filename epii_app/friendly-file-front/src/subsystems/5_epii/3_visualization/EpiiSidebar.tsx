@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Upload } from 'lucide-react';
+import { Search, Upload, Settings } from 'lucide-react';
 import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBimbaCoordinates';
 import { useEpii } from '../4_context/EpiiContext';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
@@ -14,11 +14,13 @@ import { standardizeDocumentContent } from '../1_services/documentCacheService';
 interface EpiiSidebarProps {
   onSelectDocument?: (document: Document) => void;
   onSelectCoordinate?: (coordinate: BimbaCoordinate) => void;
+  onOpenBimbaUpdate?: () => void;
 }
 
 const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
   onSelectDocument,
-  onSelectCoordinate
+  onSelectCoordinate,
+  onOpenBimbaUpdate
 }) => {
   const { state, dispatch } = useEpii();
   const { isLoading: isLoadingDocuments } = state;
@@ -65,6 +67,11 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
         [coordinate]: isExpanded
       };
     });
+  };
+
+  // Force refresh documents for a coordinate
+  const refreshCoordinateDocuments = (coordinate: string) => {
+    fetchDocumentsForCoordinate(coordinate);
   };
 
   // Handle file upload
@@ -131,9 +138,8 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
         }
       }
 
-      // Upload the file without requiring a coordinate initially
-      // This allows users to view the document first, then assign a coordinate
-      const uploadedDoc = await uploadDocument(file, null);
+      // Upload the file with selected coordinate if available
+      const uploadedDoc = await uploadDocument(file, selectedCoordinate);
 
       if (uploadedDoc) {
         // Read file content directly if needed
@@ -174,6 +180,16 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
             text: `Document "${file.name}" uploaded successfully. ${!selectedCoordinate ? 'You can now assign a Bimba coordinate in the document view.' : ''}`
           }
         });
+
+        // Force refresh documents for the selected coordinate if available
+        if (selectedCoordinate) {
+          // Immediate refresh
+          refreshCoordinateDocuments(selectedCoordinate);
+          // Also refresh after a delay to catch any async updates
+          setTimeout(() => {
+            refreshCoordinateDocuments(selectedCoordinate);
+          }, 2000);
+        }
       }
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -637,7 +653,18 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
     <div className="w-64 h-full flex flex-col bg-epii-dark rounded-lg overflow-hidden shadow-lg border border-gray-700">
       {/* Header */}
       <div className="p-2 border-b border-gray-700">
-        <h2 className="text-lg font-semibold text-epii-neon">Bimba Navigator</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-epii-neon">Bimba Navigator</h2>
+          {onOpenBimbaUpdate && (
+            <button
+              onClick={onOpenBimbaUpdate}
+              className="p-1.5 rounded-md bg-epii-darker hover:bg-epii-dark text-epii-neon hover:text-white transition-all duration-200 border border-epii-neon/30 hover:border-epii-neon/60"
+              title="Update Bimba Nodes"
+            >
+              <Settings size={16} />
+            </button>
+          )}
+        </div>
         <div className="mt-2 relative">
           <input
             type="text"

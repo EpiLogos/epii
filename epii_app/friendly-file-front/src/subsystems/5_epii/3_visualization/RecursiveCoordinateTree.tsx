@@ -96,7 +96,7 @@ const CoordinateItem: React.FC<CoordinateItemProps> = ({
       <div className={depth === 0 ? "mb-1" : ""}>
         <div
           className={`flex items-center ${padding} rounded-md hover:bg-epii-dark cursor-pointer ${depth > 0 ? 'ml-2' : ''}`}
-          onClick={() => handleCoordinateSelect(coordinate)}
+          onClick={() => toggleCoordinate(coordinate.coordinate)}
           title={`${coordinate.title || coordinate.coordinate} (${coordinate.coordinate})`}
         >
           <button
