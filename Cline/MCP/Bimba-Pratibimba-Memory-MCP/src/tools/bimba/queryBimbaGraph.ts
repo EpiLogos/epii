@@ -25,6 +25,23 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
     // Validate arguments
     const validatedArgs = QueryBimbaGraphSchema.parse(args);
 
+    // Determine query and params based on input
+    let cypherQuery: string;
+    let queryParams: Record<string, any> | undefined;
+
+    if (validatedArgs.specificCoordinate) {
+      cypherQuery = "MATCH (n {bimbaCoordinate: $specificCoordinate}) RETURN properties(n) AS details";
+      queryParams = { specificCoordinate: validatedArgs.specificCoordinate };
+      console.log(`${logPrefix} Executing specific coordinate query for ${validatedArgs.specificCoordinate}`);
+    } else if (validatedArgs.query) {
+      cypherQuery = validatedArgs.query;
+      queryParams = validatedArgs.params;
+      console.log(`${logPrefix} Executing general Cypher query`);
+    } else {
+      // This case should ideally be caught by Zod schema refinement, but as a fallback:
+      throw new McpError(ErrorCode.InvalidRequest, "Either query or specificCoordinate must be provided.");
+    }
+
     // Get Neo4j driver
     const { neo4jDriver } = dependencies.db;
 
@@ -32,8 +49,6 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
       console.error(`${logPrefix} Neo4j driver is not available`);
       throw new McpError(ErrorCode.InternalError, "Neo4j driver is not available");
     }
-
-    console.log(`${logPrefix} Executing Cypher query`);
 
     // Create Neo4j session with explicit configuration
     session = neo4jDriver.session({
@@ -44,72 +59,103 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
 
     try {
       // Execute query
-      const result = await session.run(validatedArgs.query, validatedArgs.params || {});
+      const result = await session.run(cypherQuery, queryParams || {});
       console.log(`${logPrefix} Query returned ${result.records.length} records`);
 
-      // Process results
-      const records = result.records.map(record => {
-        const recordObj: Record<string, any> = {};
+      if (validatedArgs.specificCoordinate) {
+        if (result.records.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: JSON.stringify({ details: null, message: "No node found with the provided specificCoordinate." }, null, 2)
+            }]
+          };
+        }
+        // For specific coordinate, return the 'details' directly
+        const details = result.records[0].get("details");
+        // Filter out embedding property from details if it exists
+        if (details && typeof details === 'object' && details !== null && 'embedding' in details) {
+          const { embedding, ...restOfDetails } = details;
+          return {
+            content: [{
+              type: "text",
+              text: JSON.stringify({ details: restOfDetails }, null, 2)
+            }]
+          };
+        }
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({ details }, null, 2)
+          }]
+        };
+      } else {
+        // Process results for general query
+        const records = result.records.map(record => {
+          const recordObj: Record<string, any> = {};
 
-        // Process each field in the record
-        for (const key of record.keys) {
-          const value = record.get(key);
-          const keyStr = String(key);
+          // Process each field in the record
+          for (const key of record.keys) {
+            const value = record.get(key);
+            const keyStr = String(key);
 
-          // Handle Neo4j node
-          if (value && typeof value === 'object' && value.labels && value.properties) {
-            const nodeProperties: Record<string, any> = {};
+            // Handle Neo4j node
+            if (value && typeof value === 'object' && value.labels && value.properties) {
+              const nodeProperties: Record<string, any> = {};
 
-            // Process node properties
-            for (const propKey in value.properties) {
-              if (propKey === 'embedding') continue; // Skip embedding property
-              nodeProperties[propKey] = value.properties[propKey];
+              // Process node properties
+              for (const propKey in value.properties) {
+                if (propKey === 'embedding') continue; // Skip embedding property
+                nodeProperties[propKey] = value.properties[propKey];
+              }
+
+              recordObj[keyStr] = {
+                labels: value.labels,
+                properties: nodeProperties
+              };
             }
+            // Handle Neo4j relationship
+            else if (value && typeof value === 'object' && value.type && value.properties) {
+              const relProperties: Record<string, any> = {};
 
-            recordObj[keyStr] = {
-              labels: value.labels,
-              properties: nodeProperties
-            };
-          }
-          // Handle Neo4j relationship
-          else if (value && typeof value === 'object' && value.type && value.properties) {
-            const relProperties: Record<string, any> = {};
+              // Process relationship properties
+              for (const propKey in value.properties) {
+                relProperties[propKey] = value.properties[propKey];
+              }
 
-            // Process relationship properties
-            for (const propKey in value.properties) {
-              relProperties[propKey] = value.properties[propKey];
+              recordObj[keyStr] = {
+                type: value.type,
+                properties: relProperties
+              };
             }
+            // Handle other values
+            else {
+              recordObj[keyStr] = value;
+            }
+          }
 
-            recordObj[keyStr] = {
-              type: value.type,
-              properties: relProperties
-            };
-          }
-          // Handle other values
-          else {
-            recordObj[keyStr] = value;
-          }
+          return recordObj;
+        });
+
+        // Extract the graph data from the records for general queries
+        // This part assumes the general query might return a 'graphData' field.
+        // If not, it will default to an empty graph.
+        let graphData = null;
+        if (records.length > 0 && records[0] && records[0].graphData) {
+          graphData = records[0].graphData;
         }
 
-        return recordObj;
-      });
-
-      // Extract the graph data from the records
-      let graphData = null;
-      if (records.length > 0 && records[0].graphData) {
-        graphData = records[0].graphData;
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify(graphData || {
+              // If general query doesn't return graphData, return processed records or a message
+              message: "Query executed. If you expected graph data, ensure your query returns it in a 'graphData' field.",
+              processedRecords: records // Return all processed records for general queries if no specific graphData format
+            }, null, 2)
+          }]
+        };
       }
-
-      // Return results
-      return {
-        content: [{
-          type: "text",
-          text: JSON.stringify(graphData || {
-            nodes: [],
-            links: []
-          }, null, 2)
-        }]
-      };
     } catch (queryError: any) {
       console.error(`${logPrefix} Error executing query:`, queryError);
       throw new McpError(ErrorCode.InternalError, `Error executing Neo4j query: ${queryError.message || 'Unknown error'}`);
