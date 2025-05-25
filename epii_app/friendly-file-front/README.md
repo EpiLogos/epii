@@ -231,7 +231,7 @@ The frontend serves as the **Pratibimba** (reflection) of the backend's **Bimba*
 
 ## Notion Integration: The Crystallization Interface
 
-The frontend provides sophisticated integration with **Notion as the dynamic crystallization medium**:
+The frontend provides sophisticated integration with **Notion as the dynamic crystallization medium**, featuring a comprehensive workflow for transforming analysis results into structured knowledge:
 
 ### **Fractal Knowledge Architecture**
 - **Real-Time Synchronization**: Live updates between analysis results and Notion pages
@@ -245,14 +245,178 @@ The frontend provides sophisticated integration with **Notion as the dynamic cry
 - **Insight Evolution**: Track how understanding develops through multiple analysis cycles
 - **Community Contribution**: Enable collaborative knowledge building and validation
 
-### **Integration Workflow**
-1. **Analysis Generation**: Frontend captures and visualizes analysis results
-2. **Crystallization Preparation**: Formats insights for Notion integration
-3. **Automated Synchronization**: Creates/updates Notion pages with structured content
-4. **Relationship Establishment**: Links new content to existing coordinate structure
-5. **Feedback Integration**: Incorporates Notion refinements back into system understanding
+### **Crystallization Workflow and Features**
 
-*For detailed Notion interface workflows and database structure, see the complete crystallization documentation in the project-level README.*
+#### **Document Canvas Integration**
+The **DocumentCanvas** component (`src/subsystems/5_epii/3_visualization/DocumentCanvas.tsx`) serves as the primary interface for document editing and crystallization preparation:
+
+- **Dual Document Support**: Handles both **Bimba** (original analysis) and **Pratibimba** (crystallized reflection) documents
+- **Target Coordinate Management**: Automatic coordinate resolution and preservation across document operations
+- **Real-Time Auto-Save**: Intelligent auto-save functionality with 2-second inactivity detection
+- **Manual Save Integration**: Comprehensive save operations with coordinate preservation and metadata synchronization
+
+#### **Crystallization Overlay System**
+The **CrystalliseToNotionOverlay** component provides a sophisticated review interface before crystallization:
+
+```typescript
+// Key features of the crystallization overlay
+interface CrystallizationFeatures {
+  documentPreview: {
+    name: string;
+    targetCoordinate: string;
+    resolvedNotionUrl: string;
+  };
+  contentValidation: {
+    structuredBlockViewer: boolean;
+    payloadPreview: boolean;
+    errorHandling: boolean;
+  };
+  coordinateResolution: {
+    bpmcpIntegration: boolean;
+    notionPageLinking: boolean;
+    errorFallbacks: boolean;
+  };
+}
+```
+
+**Core Overlay Components:**
+- **Document Information Display**: Shows document name, target coordinate, and resolved Notion page URL
+- **Structured Block Viewer**: Real-time preview of content blocks that will be sent to Notion
+- **Coordinate Resolution**: Automatic resolution of Bimba coordinates to Notion page IDs via BPMCP
+- **Error Handling**: Graceful handling of resolution failures with user feedback
+
+#### **Content Block Processing Pipeline**
+
+The crystallization system includes sophisticated content processing to ensure Notion API compliance:
+
+**1. Content Sanitization** (`src/subsystems/5_epii/1_services/payloadSyncService.ts`):
+```typescript
+// Ensures all rich_text content fields are properly stringified
+function sanitizeRichTextContent(richTextArray: any[]): any[] {
+  return richTextArray.map(rt => {
+    if (rt.text && rt.text.content !== undefined) {
+      // Convert objects to JSON strings, ensure all content is string type
+      if (typeof rt.text.content !== 'string') {
+        rt.text.content = typeof rt.text.content === 'object'
+          ? JSON.stringify(rt.text.content, null, 2)
+          : String(rt.text.content);
+      }
+    }
+    return rt;
+  });
+}
+```
+
+**2. Block Chunking for Notion Limits**:
+- **2000 Character Limit Compliance**: Automatically splits large content blocks
+- **Smart Text Splitting**: Preserves sentence and word boundaries
+- **Structure Preservation**: Maintains block types and formatting during chunking
+
+**3. Property Filtering**:
+- **Invalid Property Removal**: Filters out non-existent Notion properties
+- **Schema Compliance**: Ensures only valid page properties are updated
+- **Error Prevention**: Prevents validation errors from malformed property updates
+
+#### **Coordinate Resolution System**
+
+**BPMCP Integration** for coordinate-to-Notion mapping:
+```typescript
+// Coordinate resolution workflow
+const resolutionFlow = {
+  input: "targetCoordinate (e.g., '#1-4')",
+  process: "BPMCP → Neo4j lookup → notionPageId",
+  output: "Notion page URL for user verification",
+  errorHandling: "Graceful fallbacks with user notification"
+};
+```
+
+**Key Features:**
+- **Automatic Resolution**: Seamless lookup of Notion pages from Bimba coordinates
+- **URL Generation**: Direct links to target Notion pages for user verification
+- **Error Handling**: Comprehensive error handling for missing or invalid coordinates
+- **Validation**: Pre-crystallization verification of target page existence
+
+#### **Document State Management**
+
+**Coordinate Preservation System**:
+- **targetCoordinate Synchronization**: Maintains consistency between UI state and document metadata
+- **bimbaCoordinate Compatibility**: Handles legacy coordinate references while standardizing on targetCoordinate
+- **State Race Condition Prevention**: Sophisticated state management to prevent coordinate nullification
+- **Cache Consistency**: Ensures document coordinates remain stable across save operations
+
+**Document Type Handling**:
+```typescript
+// Dual document type support
+interface DocumentTypeHandling {
+  bimba: {
+    description: "Original analysis documents";
+    coordinateSource: "UI state or document metadata";
+    editability: "Full editing capabilities";
+  };
+  pratibimba: {
+    description: "Crystallized reflection documents";
+    coordinateSource: "Preserved from original document";
+    editability: "Content editing with coordinate preservation";
+  };
+}
+```
+
+#### **Structured Block Viewer**
+
+The **StructuredBlockViewer** component (`src/subsystems/5_epii/3_visualization/StructuredBlockViewer.tsx`) provides real-time visualization of crystallization content:
+
+**Features:**
+- **Block Type Recognition**: Displays different Notion block types with appropriate styling
+- **Content Preview**: Shows exactly what will appear in Notion after crystallization
+- **Expandable Interface**: Collapsible sections for large content structures
+- **Error State Handling**: Clear feedback when payload structure is invalid
+
+**Supported Block Types:**
+- Headings (H1, H2, H3)
+- Paragraphs with rich text
+- Bulleted and numbered lists
+- Code blocks with syntax highlighting
+- Dividers and quotes
+- To-do items with checkbox states
+
+#### **Error Handling and User Feedback**
+
+**Comprehensive Error Management**:
+- **Validation Errors**: Clear feedback for Notion API validation failures
+- **Coordinate Resolution Errors**: User-friendly messages for coordinate lookup failures
+- **Content Processing Errors**: Detailed error reporting for content sanitization issues
+- **Network Error Handling**: Graceful handling of API communication failures
+
+**User Feedback Systems**:
+- **Loading States**: Visual indicators during coordinate resolution and crystallization
+- **Success Notifications**: Confirmation of successful crystallization with Notion page links
+- **Error Recovery**: Options for users to retry failed operations or edit problematic content
+
+### **Integration Workflow**
+1. **Document Analysis**: Epii pipeline generates structured analysis results with metadata.notionUpdatePayload
+2. **Content Editing**: Users can edit textContent in DocumentCanvas for refinement
+3. **Crystallization Trigger**: "Crystallise to Notion" button opens review overlay
+4. **Content Processing**: Automatic sanitization, chunking, and property filtering
+5. **Coordinate Resolution**: BPMCP resolves target coordinate to Notion page ID
+6. **User Review**: Structured block viewer shows final content preview
+7. **Notion Update**: Validated content blocks appended to target Notion page
+8. **Confirmation**: Success notification with direct link to updated Notion page
+
+### **Technical Implementation Details**
+
+**Key Files and Components:**
+- `DocumentCanvas.tsx`: Main editing interface with crystallization integration
+- `CrystalliseToNotionOverlay.tsx`: Review and confirmation overlay
+- `StructuredBlockViewer.tsx`: Content block visualization component
+- `payloadSyncService.ts`: Content processing and sanitization utilities
+- `crystallization.service.mjs` (backend): Server-side crystallization orchestration
+
+**API Integration Points:**
+- `POST /api/notion-update`: Crystallization endpoint with structured payload
+- `BPMCP resolveBimbaCoordinate`: Coordinate-to-Notion page resolution
+- `BPMCP crystallizeToNotion`: Final Notion API integration via MCP
+
+*For detailed backend crystallization workflows and Notion database structure, see the complete crystallization documentation in the project-level README.*
 
 ## Project Info
 

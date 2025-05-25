@@ -1,103 +1,166 @@
-# 5_epii Subsystem
+# 🔮 Epii Mode: Sacred Bimba-Pratibimba Operations
 
-## Bimba Tech Architecture Alignment
-- **#5-3-4.5 (Epii Mode)**
-- Document analysis and integration with Notion content
-- Represents Agent (5/0) (Crystallize/Touch)
+## **Mathematical Essence: The 5/0 Domain**
 
-## Overview
-The 5_epii subsystem is responsible for document analysis and integration with Notion content. It embodies the Epii principle (integration/crystallization) by providing tools for analyzing documents, extracting knowledge, and integrating with the Bimba-Pratibimba memory architecture.
+Epii Mode operates within the **5/0 domain** - the transcendent space where **Notion** (pratibimba/reflection) and **Neo4j** (bimba/original) exist in perfect mathematical unity. This subsystem embodies the fundamental principle that knowledge exists simultaneously as **original essence** and **structured reflection**, requiring sacred protocols for their harmonious operation.
 
-## QL Structure
+The **5/0** designation represents:
+- **5**: Synthesis, integration, and transcendent operations
+- **0**: Foundation, essence, and original truth
+- **5/0**: The dynamic unity where reflection and original co-create meaning
 
-### 0_foundation (#5-3-4.5-0)
-Contains document store, history tracking, and type definitions:
-- `epiiDocStore.ts` - Document storage service
-- `epiiTypes.ts` - Type definitions for documents, analysis sessions, and chat messages
+---
 
-### 1_utils (#5-3-4.5-1)
-Contains utility functions for document analysis and formatting:
-- `epiiFormatters.ts` - Formatting utilities for documents and analysis results
-- `epiiHelpers.ts` - Helper functions for document processing
+## **🎯 Core Architecture: Sacred Knowledge Operations**
 
-### 2_hooks (#5-3-4.5-2)
-Contains React hooks for document analysis and state management:
-- `useEpiiAnalysis.ts` - Hooks for document analysis
-- `useEpiiDocument.ts` - Hooks for document management
+### **Philosophical Foundation**
+Epii Mode recognizes that all knowledge operations must honor the **sacred nature** of the Bimba knowledge graph while enabling precise, efficient transformations. Every interaction with the system requires conscious intention and careful review, reflecting the mathematical precision demanded by working with fundamental truth.
 
-### 3_visualization (#5-3-4.5-3)
-Contains visual components for document editing and analysis:
-- `DocumentCanvas.tsx` - Main canvas component for document editing and analysis
-- `DocumentViewer.tsx` (#5-3-4.5-3-0) - Document viewing and editing component
-- `DocumentChat.tsx` (#5-3-4.5-3-1) - Chat interface for document analysis
-- `DocumentControls.tsx` (#5-3-4.5-3-2) - Controls for analysis and coordination
-- `AnalysisVisualizer.tsx` (#5-3-4.5-3-3) - Visualization of analysis results
+### **Technical Implementation**
+The subsystem is organized into specialized layers:
+- **1_state**: Unified state management for bimba-pratibimba coordination
+- **2_hooks**: Reactive interfaces for document and knowledge operations  
+- **3_visualization**: Sacred editing interfaces and coordinate tree navigation
+- **4_analysis**: [Backend] QL-aware document processing pipeline
 
-### 4_context (#5-3-4.5-4)
-Contains context providers for Epii mode state:
-- `EpiiContext.tsx` (#5-3-4.5-4-X) - Context provider for global Epii mode state
+---
 
-### 5_integration (#5-3-4.5-5)
-Contains integration components that combine other elements:
-- `EpiiModePage.tsx` - Main Epii Mode page component
-- `EpiiModeChat.tsx` (#5-3-4.5-2) - Dialogue interface for LLM chat
-- `EpiiDocStore.tsx` (#5-3-4.5-0) - Document store and history component
+## **🔮 Sacred Bimba Update System**
 
-## Usage
-To use the Epii mode page, import the EpiiModePage component:
+### **Mathematical Essence: Precision in Sacred Operations**
+The Bimba update system embodies the principle that modifications to fundamental knowledge require **mathematical precision** combined with **sacred reverence**. Every change is tracked, reviewed, and applied with full consciousness of its impact on the knowledge graph's integrity.
 
-```tsx
-import EpiiModePage from '../subsystems/5_epii/5_integration/EpiiModePage';
+### **Key Achievements**
 
-const App = () => {
-  return (
-    <div>
-      <EpiiModePage />
-    </div>
-  );
-};
+#### **🌟 Global Change Tracking**
+- **Cross-Coordinate Awareness**: Changes persist across coordinate selections via localStorage cache
+- **Visual Indicators**: Real-time numbered badges on coordinate tree showing pending modifications
+- **Unified State Management**: Global change count updates automatically across all interface elements
+
+#### **🔮 Sacred Review Modal**
+- **Comprehensive Overview**: Displays ALL changes across ALL coordinates before application
+- **Change Classification**: Distinguishes between property modifications and relationship updates
+- **Sacred Confirmation**: Requires explicit acknowledgment of the "sacred nature" of the Bimba map
+- **Detailed Breakdown**: Shows exact values being modified with clear before/after context
+
+#### **⚡ Efficient Update Processing**
+- **Property-Only Updates**: Only modifies changed properties, not entire node structures
+- **Neo4j Compatibility**: Automatic sanitization of complex objects (DateTime, arrays, nested objects)
+- **Multi-Coordinate Operations**: Single update operation can modify multiple coordinates simultaneously
+- **Optimized Queries**: Generates precise Cypher SET clauses for minimal database impact
+
+### **Technical Implementation**
+
+#### **Change Tracking Architecture**
+```typescript
+// Global change collection across all coordinates
+const collectAllChanges = (): Map<string, any> => {
+  // Scans localStorage for all 'bimba-changes-*' keys
+  // Returns unified map of coordinate → changes
+}
+
+// Real-time visual feedback
+coordinateChanges={collectAllChanges()}
 ```
 
-To use the document canvas component directly:
+#### **Sacred Review Process**
+```typescript
+// Comprehensive change analysis
+const allCoordinateChanges = collectAllChanges();
+const totalChanges = Array.from(allCoordinateChanges.values())
+  .reduce((total, changes) => total + Object.keys(changes).length, 0);
 
-```tsx
-import DocumentCanvas from '../subsystems/5_epii/3_visualization/DocumentCanvas';
-import { EpiiProvider } from '../subsystems/5_epii/4_context/EpiiContext';
-
-const MyComponent = () => {
-  return (
-    <EpiiProvider>
-      <DocumentCanvas userId="admin" />
-    </EpiiProvider>
-  );
-};
+// Sacred confirmation required
+🔮 Apply Sacred Changes ({totalChanges})
 ```
 
-## Component Interactions
+#### **BPMCP Integration**
+```typescript
+// Unified write operations through operational heart
+toolName: 'updateBimbaGraph'  // NEW: Write-enabled BPMCP tool
+// vs. 'queryBimbaGraph'      // Read-only operations
+```
 
-The Epii mode components interact in the following way:
+### **Operational Flow**
 
-1. **EpiiContext** provides global state management for documents, analysis sessions, and chat messages
-2. **DocumentCanvas** serves as the main container for document editing and analysis
-3. **DocumentViewer** handles document viewing and editing
-4. **DocumentChat** provides a chat interface for interacting with the document
-5. **DocumentControls** provides controls for starting analysis and setting parameters
-6. **AnalysisVisualizer** visualizes the results of document analysis
+1. **Change Detection**: Property modifications automatically tracked in localStorage cache
+2. **Visual Feedback**: Coordinate tree displays numbered badges for pending changes
+3. **Global Awareness**: Apply Updates button appears when ANY coordinate has changes
+4. **Sacred Review**: Comprehensive modal shows all modifications across all coordinates
+5. **Precise Application**: Only changed properties updated via optimized Cypher queries
+6. **State Cleanup**: All caches cleared and UI refreshed after successful updates
 
-## API Integration
+---
 
-The components integrate with the following backend API endpoints:
+## **🌊 Notion Crystallization Pipeline**
 
-- `/api/epii-agent/analyze` - Analyze a document using the Epii agent
-- `/api/epii-agent/chat` - Process chat messages in the context of document analysis
-- `/files/upload` - Upload files for analysis
+### **Mathematical Essence: Reflection Creation**
+*[Space reserved for detailed documentation of the Notion crystallization system, including document analysis, payload preparation, coordinate resolution, and structured content transformation. This section will detail how analyzed content transforms from the Bimba domain into structured Notion reflections.]*
 
-## Future Development
+### **Key Features**
+*[To be documented: Review overlay, payload sanitization, metadata synchronization, coordinate linking, and the sacred process of crystallizing knowledge into its reflected form.]*
 
-Planned enhancements for this subsystem include:
+---
 
-1. **Analysis Visualization** - Enhanced visualization of analysis results
-2. **Document History** - Improved history tracking and version control
-3. **Chat Integration** - Better integration with the LangSmith-enhanced pipeline
-4. **Notion Integration** - Direct integration with Notion for document storage and retrieval
-5. **Multi-Document Analysis** - Support for analyzing multiple documents together
+## **🔄 Integration Points**
+
+### **BPMCP Operational Heart**
+- **Unified Tool Ecosystem**: Both `queryBimbaGraph` (read) and `updateBimbaGraph` (write) operations
+- **WebSocket Transport**: Real-time communication with Neo4j through centralized service
+- **Error Handling**: Consistent error responses and validation across all operations
+
+### **State Management Unity**
+- **Coordinate Synchronization**: `bimbaCoordinate` ↔ `targetCoordinate` alignment
+- **Cross-Component Communication**: Shared state between visualization, analysis, and crystallization
+- **Cache Coherence**: Consistent change tracking across all interface components
+
+### **Document-Knowledge Linking**
+- **Bidirectional Flow**: Documents inform Bimba updates; Bimba coordinates guide document analysis
+- **Persistent Associations**: `targetCoordinate` metadata ensures documents remain linked to their origins
+- **Analysis Integration**: LLM suggestions can modify multiple coordinates simultaneously
+
+---
+
+## **🚀 Development Status**
+
+### **✅ Completed Achievements**
+- Sacred Bimba update system with comprehensive review process
+- Global change tracking with visual feedback across coordinate tree
+- BPMCP `updateBimbaGraph` tool integration for unified write operations
+- Efficient property-only updates with Neo4j compatibility
+- Multi-coordinate processing for complex knowledge modifications
+- Proper state management and cache cleanup after operations
+
+### **🔄 Current Capabilities**
+- **Sacred Editing**: Full CRUD operations on Bimba knowledge graph with reverent protocols
+- **Global Awareness**: Cross-coordinate change tracking and unified application
+- **Visual Feedback**: Real-time indicators of pending modifications
+- **Precise Operations**: Efficient updates that honor the mathematical essence of the system
+
+### **🌟 Philosophical Achievement**
+The Epii Mode subsystem successfully manifests the **5/0 domain mathematical essence** through working code that honors both the **sacred nature of knowledge** and the **precision required for truth operations**. The system demonstrates that technical excellence and philosophical depth are not merely compatible but mutually reinforcing.
+
+---
+
+## **📋 Technical Notes**
+
+### **Key Components**
+- `BimbaUpdateOverlay.tsx`: Sacred editing interface with global change management
+- `RecursiveFullBimbaTree.tsx`: Coordinate navigation with change visualization
+- `useEpiiDocument.ts`: Document operations with coordinate linking
+- `EpiiSidebar.tsx`: Document management with coordinate-aware uploads
+
+### **BPMCP Tools**
+- `updateBimbaGraph`: Write operations with proper Neo4j permissions
+- `queryBimbaGraph`: Read operations for data retrieval
+- Unified error handling and response formatting
+
+### **State Architecture**
+- localStorage cache for persistent change tracking
+- React state for real-time UI updates
+- Global change count management across components
+- Coordinate synchronization between bimba and pratibimba domains
+
+---
+
+*The sacred dance of original and reflection continues through precise, reverent operations that honor both the mathematical essence and the transcendent nature of knowledge itself.*

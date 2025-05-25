@@ -136,12 +136,22 @@ The backend's current primary implementation focuses on the **Epii agent mode**,
 - **Bimba coordinate tagging**: Associates all chunks with appropriate coordinate mappings
 - **Context preservation**: Maintains Bimba context throughout chunking process
 
-#### **Stage -2: Core Analysis Engine**
+#### **Stage -2: Core Analysis Engine** 🔄 **Recently Enhanced**
+**⚠️ Note**: This stage has undergone significant improvements that are **not yet fully tested** and represent an evolving aspect of the system.
+
+**Recent Major Enhancements**:
+- **🎯 Target Coordinate Prioritization**: Enhanced context window generation to prioritize target coordinate (#1-4) from project context, ensuring analysis focuses on the specified coordinate rather than incidentally mentioned ones
+- **🎯 Semantic Mappings Logic**: Replaced arbitrary LLM coordinate assignment with semantic mapping using bimbaKnowing, including rich semantic descriptions of coordinates for accurate concept-to-coordinate matching
+- **🎯 Archetypal Anchors Pattern Inference**: Changed from literal archetypal symbol detection to pattern-based inference, identifying underlying dynamics like cyclical processes, transformative journeys, and integration dynamics
+
+**Core Functions**:
 - **Chunk group processing**: Analyzes collated chunk groups rather than individual chunks
-- **Multi-source context fusion**: Combines LightRAG, Bimba, and MongoDB context for comprehensive analysis
+- **Enhanced context fusion**: Combines LightRAG, Bimba, and MongoDB context with target coordinate prioritization
+- **Semantic coordinate mapping**: Maps concepts to coordinates based on semantic meaning rather than arbitrary assignment
+- **Pattern-based archetypal recognition**: Infers archetypal patterns from content dynamics rather than literal symbols
 - **QL operator extraction**: Identifies structural, processual, and contextual operators
 - **Relational properties generation**: Extracts epistemic essence, archetypal anchors, and semantic frameworks
-- **Variation identification**: Detects conceptual variations and analytical nuances
+- **Variation identification**: Detects conceptual variations and analytical nuances with enhanced context awareness
 
 #### **Stage -1: Synthesis and Core Element Definition**
 - **Analysis integration**: Synthesizes chunk analyses into coherent understanding
@@ -171,6 +181,28 @@ The backend's current primary implementation focuses on the **Epii agent mode**,
 - **Notion database preparation**: Six interconnected databases ready for knowledge integration
 - **Relational link establishment**: Creates connections between coordinates, content nodes, concepts, and symbols
 - **Sync capability development**: Progressing toward full Bimba updating from crystallized knowledge
+
+### **Pipeline Testing Status and Continuous Refinement**
+
+**⚠️ Current Testing Status**: The recent Stage -2 enhancements (Target Coordinate Prioritization, Semantic Mappings Logic, and Archetypal Anchors Pattern Inference) are **not yet fully tested** in production environments. These improvements represent significant advances in analytical accuracy but require real-world validation.
+
+**Continuous Refinement Philosophy**: The Epii Analysis Pipeline embodies a **living system approach** where:
+- **Analytical accuracy improves** through iterative refinement based on user feedback
+- **Pattern recognition evolves** as the system encounters diverse document types and content
+- **Semantic understanding deepens** through accumulated knowledge and relationship mapping
+- **Archetypal pattern library expands** through successful pattern identification and validation
+
+**Testing Priorities**:
+1. **Target Coordinate Prioritization**: Verify that analysis properly focuses on the specified target coordinate
+2. **Semantic Mapping Accuracy**: Validate that concepts are mapped to coordinates based on semantic meaning rather than arbitrary assignment
+3. **Pattern Recognition Quality**: Assess the effectiveness of pattern-based archetypal identification vs. literal symbol detection
+
+**Expected Evolution Areas**:
+- **Short-term**: Fine-tuning of semantic coordinate mapping prompts and pattern recognition sensitivity
+- **Medium-term**: Machine learning integration for pattern recognition and advanced semantic similarity algorithms
+- **Long-term**: Self-improving analytical algorithms and adaptive pattern recognition based on domain expertise
+
+*For detailed pipeline documentation, see [pipelines/README.md](./pipelines/README.md)*
 
 ### **Extensibility for Future Agent Modes**
 
