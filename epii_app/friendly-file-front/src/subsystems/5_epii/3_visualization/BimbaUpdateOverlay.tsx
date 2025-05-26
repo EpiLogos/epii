@@ -10,13 +10,14 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Sparkles, Save, FileText, AlertTriangle, CheckCircle } from 'lucide-react';
+import { X, Upload, Sparkles, Save, FileText, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBimbaCoordinates';
 import { useGraphData } from '../2_hooks/useGraphData';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
 import RecursiveFullBimbaTree from './RecursiveFullBimbaTree';
+import CreateNodeModal from './CreateNodeModal';
 
 interface BimbaNode {
   coordinate: string;
@@ -96,6 +97,9 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  // Create node modal state
+  const [showCreateNodeModal, setShowCreateNodeModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -424,6 +428,23 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     setSuggestionError(null);
     setUpdateError(null);
     setUpdateSuccess(false);
+  };
+
+  // Handle node creation completion
+  const handleNodeCreated = async (newCoordinate: string) => {
+    console.log('Node created:', newCoordinate);
+
+    // Refresh the graph data to include the new node
+    // The useGraphData hook should automatically refresh, but we can trigger a manual refresh if needed
+
+    // Wait a moment for the graph to update
+    setTimeout(() => {
+      // Select the newly created node
+      setSelectedCoordinate(newCoordinate);
+
+      // The useEffect for selectedCoordinate will automatically fetch the node data
+      // and open the property/relationship editor
+    }, 500);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
