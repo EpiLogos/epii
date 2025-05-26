@@ -87,7 +87,7 @@ A.  **Bimba-Pratibimba MCP Server (Node.js - Port 3030):**
     # Wait 1 second for the port to free up
     sleep 1
     # Navigate to the INTERNAL MCP server directory
-    cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/Bimba-Pratibimba-Memory-MCP && node build/index.js 
+    cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/Bimba-Pratibimba-Memory-MCP && node build/index.js
     # Start the server using its build file
     
     ```
