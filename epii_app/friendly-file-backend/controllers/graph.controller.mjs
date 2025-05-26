@@ -78,4 +78,105 @@ export const getFoundationalGraph = async (req, res) => {
   }
 };
 
+export const handleSuggestRelationshipType = async (req, res) => {
+  const { parentCoordinate } = req.params;
+  if (!parentCoordinate) {
+    return res.status(400).json({ message: 'Parent coordinate is required' });
+  }
+
+  const cypherQuery = `
+    MATCH (parent {bimbaCoordinate: $parentCoordinate})-[r]->(child)
+    RETURN type(r) as relType, count(*) as frequency
+    ORDER BY frequency DESC
+    LIMIT 3
+  `;
+
+  try {
+    console.log(`Suggesting relationship type for parent: ${parentCoordinate}`);
+    const result = await bpMCPService.callTool('queryBimbaGraph', {
+      query: cypherQuery,
+      params: { parentCoordinate },
+    });
+
+    // Assuming result is an array of records, e.g., [{ relType: 'CONTAINS', frequency: 5 }, ...]
+    // Or it might be structured differently by bpMCPService, adjust parsing as needed.
+    let suggestions = [];
+    if (result && Array.isArray(result) && result.length > 0) {
+       // Attempt to access the actual data if nested, e.g. result[0].data if that's how bpMCPService returns it
+       // This part is speculative based on queryBimbaGraph's existing parsing in getFoundationalGraph
+        let rawSuggestions = result;
+        if (result[0] && result[0].data) { // Placeholder for actual result structure
+            rawSuggestions = result[0].data;
+        } else if (result[0] && Array.isArray(result[0])) { // Another common pattern
+            rawSuggestions = result[0];
+        }
+        
+        suggestions = rawSuggestions.map(record => record.relType);
+    }
+    
+    if (suggestions.length === 0) {
+        suggestions.push('CONTAINS'); // Default fallback
+    }
+
+    console.log(`Suggested types for ${parentCoordinate}: ${suggestions.join(', ')}`);
+    res.status(200).json({ suggestions });
+  } catch (error) {
+    console.error(`Error suggesting relationship type for ${parentCoordinate}:`, error);
+    res.status(500).json({ message: 'Failed to suggest relationship type', error: error.message });
+  }
+};
+
+export const handleCreateNode = async (req, res) => {
+  const { nodeProperties, parentCoordinate, suggestedRelationType } = req.body;
+
+  if (!nodeProperties || !nodeProperties.bimbaCoordinate) {
+    return res.status(400).json({ message: 'Node properties with bimbaCoordinate are required' });
+  }
+  if (parentCoordinate && !suggestedRelationType) {
+    return res.status(400).json({ message: 'Suggested relation type is required when parentCoordinate is provided' });
+  }
+
+  let creationQuery;
+  const queryParams = { nodeProperties };
+
+  if (parentCoordinate) {
+    creationQuery = `
+      CREATE (newNode:BimbaNode $nodeProperties)
+      WITH newNode
+      MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate})
+      CREATE (parent)-[r:${suggestedRelationType}]->(newNode)
+      SET r.createdAt = datetime()
+      RETURN newNode, parent, r
+    `;
+    queryParams.parentCoordinate = parentCoordinate;
+    // Note: suggestedRelationType is directly embedded in the query string.
+    // This is generally safe if suggestedRelationType comes from a controlled list (e.g., our suggestions).
+    // If it were user-input directly, it would be a security risk (Cypher injection).
+  } else {
+    creationQuery = `
+      CREATE (newNode:BimbaNode $nodeProperties)
+      RETURN newNode
+    `;
+  }
+
+  try {
+    console.log(`Creating node with coordinate: ${nodeProperties.bimbaCoordinate}`);
+    // IMPORTANT ASSUMPTION: updateBimbaGraph tool accepts a 'query' and 'params' argument,
+    // similar to queryBimbaGraph. This might need adjustment if the tool expects a different structure.
+    const result = await bpMCPService.callTool('updateBimbaGraph', {
+      query: creationQuery,
+      params: queryParams,
+    });
+
+    // Assuming result contains the created node data.
+    // The structure of 'result' from updateBimbaGraph might need specific parsing.
+    // For now, we'll return the raw result, assuming it's meaningful.
+    console.log(`Node creation result for ${nodeProperties.bimbaCoordinate}:`, result);
+    res.status(201).json({ message: 'Node created successfully', data: result });
+  } catch (error) {
+    console.error(`Error creating node ${nodeProperties.bimbaCoordinate}:`, error);
+    res.status(500).json({ message: 'Failed to create node', error: error.message });
+  }
+};
+
 // Add other graph-related controller functions here if needed

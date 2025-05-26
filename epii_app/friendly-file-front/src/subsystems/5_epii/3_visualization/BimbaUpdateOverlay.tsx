@@ -1096,10 +1096,13 @@ Provide your response as a JSON object with the following structure:
 
         <div className="flex h-[80vh] gap-4">
           {/* Left Panel - Coordinate Tree */}
-          <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
+          {/* Added flex flex-col to allow button to be pushed to the bottom */}
+          <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto flex flex-col">
+            {/* Wrapped existing content to allow flex-grow and push button down */}
+            <div className="flex-grow">
+              <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
 
-            {isLoadingGraph && (
+              {isLoadingGraph && (
               <div className="text-gray-400 text-sm">Loading graph data...</div>
             )}
 
@@ -1121,6 +1124,19 @@ Provide your response as a JSON object with the following structure:
             {!isLoadingGraph && !graphError && !fullGraphData && (
               <div className="text-gray-400 text-sm">No graph data available</div>
             )}
+            </div> {/* End of flex-grow wrapper */}
+
+            {/* Button to open CreateNodeModal, pushed to the bottom */}
+            <div className="mt-auto pt-4"> 
+              <Button 
+                onClick={() => setShowCreateNodeModal(true)} 
+                variant="outline" 
+                className="w-full text-epii-neon border-epii-neon hover:bg-epii-neon/10 hover:text-epii-neon"
+              >
+                <Plus size={16} className="mr-2" />
+                Create New Bimba Node
+              </Button>
+            </div>
           </div>
 
           {/* Right Panel - Node Editor */}
@@ -2005,6 +2021,14 @@ Provide your response as a JSON object with the following structure:
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Render the CreateNodeModal */}
+      <CreateNodeModal
+        isOpen={showCreateNodeModal}
+        onClose={() => setShowCreateNodeModal(false)}
+        onNodeCreated={handleNodeCreated}
+        fullGraphData={fullGraphData}
+      />
     </Dialog>
   );
 };

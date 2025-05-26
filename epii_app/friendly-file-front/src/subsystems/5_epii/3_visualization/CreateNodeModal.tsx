@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { parseCoordinate as parseBimbaCoordinate, inferParentCoordinate as inferBimbaParentCoordinate, initializeQLProperties as initializeBimbaQLProperties } from '../../../utils/bimbaUtils';
+import { fetchSuggestedRelationshipTypeAPI, createNodeInGraphAPI } from '@/services/bimbaApi';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle, Plus, CheckCircle, Loader2 } from 'lucide-react';
@@ -12,12 +14,13 @@ interface CreateNodeModalProps {
   fullGraphData: any;
 }
 
-interface ParsedCoordinate {
-  fullCoordinate: string;
-  parts: number[];
-  qlPosition: number;
-  isValid: boolean;
-}
+// Interface ParsedCoordinate is no longer needed as bimbaUtils.ts parseCoordinate returns a different shape
+// interface ParsedCoordinate {
+//   fullCoordinate: string;
+//   parts: number[];
+//   qlPosition: number;
+//   isValid: boolean;
+// }
 
 const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
   isOpen,
@@ -32,46 +35,11 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Parse coordinate with support for both "-" and "." separators
-  const parseCoordinate = (input: string): ParsedCoordinate => {
-    try {
-      if (!input || input === '#') {
-        return { fullCoordinate: '', parts: [], qlPosition: 0, isValid: false };
-      }
-
-      // Handle both "-" and "." separators equally
-      const normalized = input.replace(/\./g, '-');
-      const cleanInput = normalized.startsWith('#') ? normalized.slice(1) : normalized;
-      const parts = cleanInput.split('-').map(part => {
-        const num = parseInt(part.trim());
-        if (isNaN(num)) throw new Error('Invalid number');
-        return num;
-      });
-
-      if (parts.length === 0) {
-        return { fullCoordinate: '', parts: [], qlPosition: 0, isValid: false };
-      }
-
-      return {
-        fullCoordinate: `#${parts.join('-')}`,
-        parts,
-        qlPosition: parts[parts.length - 1], // Final number for QL position
-        isValid: true
-      };
-    } catch {
-      return { fullCoordinate: input, parts: [], qlPosition: 0, isValid: false };
-    }
-  };
-
-  // Infer parent coordinate from structure
-  const inferParentCoordinate = (coord: string): string | null => {
-    const parsed = parseCoordinate(coord);
-    if (!parsed.isValid || parsed.parts.length <= 1) return null;
-    
-    // Parent is coordinate with one less level
-    const parentParts = parsed.parts.slice(0, -1);
-    return `#${parentParts.join('-')}`;
-  };
+  // Internal utility functions parseCoordinate and inferParentCoordinate are removed.
+  // We will use the imported versions from bimbaUtils.ts.
+  // Note: The imported parseCoordinate returns null for invalid inputs, 
+  // and its return type is { fullCoordinate: string; parts: number[]; qlPosition: number } | null
+  // The `isValid` field is not present, so logic will need to check for null instead.
 
   // Check if coordinate already exists
   const coordinateExists = (coord: string): boolean => {
@@ -88,51 +56,34 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
   // Suggest relationship type based on parent's existing relationships
   const suggestRelationshipType = async (parentCoord: string) => {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      // const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'; // Removed
+      // const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, { ... }); // Removed
       
-      const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          toolName: 'queryBimbaGraph',
-          args: {
-            query: `
-              MATCH (parent {bimbaCoordinate: $parentCoordinate})-[r]->(child)
-              RETURN type(r) as relType, count(*) as frequency
-              ORDER BY frequency DESC
-              LIMIT 3
-            `,
-            params: { parentCoordinate: parentCoord }
-          }
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        const relationships = result.content?.[0]?.text ? JSON.parse(result.content[0].text) : null;
-        
-        if (relationships?.records && relationships.records.length > 0) {
-          // Use most common relationship type
-          setSuggestedRelationType(relationships.records[0].relType);
-        } else {
-          // Fallback to CONTAINS for fundamental connectivity
-          setSuggestedRelationType('CONTAINS');
-        }
+      const suggestions = await fetchSuggestedRelationshipTypeAPI(parentCoord); // Placeholder
+      if (suggestions && suggestions.length > 0) {
+        setSuggestedRelationType(suggestions[0]);
+      } else {
+        setSuggestedRelationType('CONTAINS'); // Fallback
       }
     } catch (error) {
-      console.warn('Failed to suggest relationship type:', error);
-      setSuggestedRelationType('CONTAINS');
+      console.warn('Failed to suggest relationship type via API:', error);
+      setSuggestedRelationType('CONTAINS'); // Fallback
     }
   };
 
   // Auto-update parent when coordinate changes
   useEffect(() => {
     if (coordinate.length > 1) {
-      const inferred = inferParentCoordinate(coordinate);
-      setParentCoordinate(inferred);
-      
-      if (inferred && parentExists(inferred)) {
-        suggestRelationshipType(inferred);
+      const parsedCoord = parseBimbaCoordinate(coordinate); // Use imported util
+      if (parsedCoord) { // Check if parsing was successful
+        const inferred = inferBimbaParentCoordinate(coordinate); // Use imported util
+        setParentCoordinate(inferred);
+        
+        if (inferred && parentExists(inferred)) {
+          suggestRelationshipType(inferred);
+        }
+      } else {
+        setParentCoordinate(null); // If coordinate is invalid, clear parent
       }
     } else {
       setParentCoordinate(null);
@@ -157,9 +108,9 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
 
   // Validate before creation
   const validateCreation = (): string | null => {
-    const parsed = parseCoordinate(coordinate);
+    const parsed = parseBimbaCoordinate(coordinate); // Use imported util
     
-    if (!parsed.isValid) {
+    if (!parsed) { // Check for null, as imported util returns null for invalid
       return 'Invalid coordinate format. Use #1-2-3 or #1.2.3 format.';
     }
     
@@ -186,62 +137,43 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
     setError(null);
 
     try {
-      const parsed = parseCoordinate(coordinate);
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-
-      // Initialize QL-aware properties
-      const nodeProperties = {
-        bimbaCoordinate: parsed.fullCoordinate,
-        qlPosition: parsed.qlPosition,
-        name: `Node ${parsed.fullCoordinate}`,
-        title: `QL Position ${parsed.qlPosition}`,
-        description: `Quaternal Logic position ${parsed.qlPosition} node`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      // Create node with parent relationship
-      let query: string;
-      let params: any;
-
-      if (parentCoordinate) {
-        query = `
-          CREATE (newNode:BimbaNode $nodeProperties)
-          WITH newNode
-          MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate})
-          CREATE (parent)-[r:${suggestedRelationType}]->(newNode)
-          SET r.createdAt = datetime()
-          RETURN newNode, parent, r
-        `;
-        params = { nodeProperties, parentCoordinate };
-      } else {
-        // Root level node
-        query = `
-          CREATE (newNode:BimbaNode $nodeProperties)
-          RETURN newNode
-        `;
-        params = { nodeProperties };
+      const parsed = parseBimbaCoordinate(coordinate); // Use imported util
+      if (!parsed) { // Should be caught by validateCreation, but double check
+        setError("Cannot create node: Invalid coordinate.");
+        setIsCreating(false);
+        return;
       }
 
-      const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          toolName: 'updateBimbaGraph',
-          args: { query, params }
-        })
-      });
+      // const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'; // Removed
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to create node: ${errorText}`);
+      // Initialize QL-aware properties using imported utility
+      const nodeProperties = initializeBimbaQLProperties(parsed.fullCoordinate);
+      if (!nodeProperties) {
+        setError("Failed to initialize node properties. Coordinate might be invalid.");
+        setIsCreating(false);
+        return;
       }
+      
+      // Create node with parent relationship - API call replaced
+      // let query: string; // Removed
+      // let params: any; // Removed
+      // ... query building logic removed ...
+
+      // const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, { ... }); // Removed
+      
+      // Call the placeholder API function
+      await createNodeInGraphAPI(nodeProperties, parentCoordinate, suggestedRelationType); // Placeholder
+
+      // if (!response.ok) { // Removed
+      //   const errorText = await response.text(); // Removed
+      //   throw new Error(`Failed to create node: ${errorText}`); // Removed
+      // }
 
       setSuccess(true);
       
       // Auto-close and trigger navigation after brief success display
       setTimeout(() => {
-        onNodeCreated(parsed.fullCoordinate);
+        onNodeCreated(parsed.fullCoordinate); // Use fullCoordinate from parsed
         onClose();
         resetForm();
       }, 1000);
@@ -271,7 +203,9 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
     }
   };
 
-  const parsed = parseCoordinate(coordinate);
+  const parsed = parseBimbaCoordinate(coordinate); // Use imported util
+  // The validationError check below will use the result of validateCreation,
+  // which itself now uses the imported parseBimbaCoordinate.
   const validationError = coordinate.length > 1 ? validateCreation() : null;
 
   return (
@@ -297,7 +231,8 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
               className="bg-epii-darker border-gray-600 text-gray-200 focus:border-epii-neon"
               disabled={isCreating}
             />
-            {parsed.isValid && (
+            {/* Use parsed from the imported function. Check if parsed is not null before accessing properties. */}
+            {parsed && ( 
               <div className="text-xs text-gray-400 mt-1">
                 QL Position: {parsed.qlPosition}
               </div>
@@ -305,7 +240,8 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
           </div>
 
           {/* Parent Detection */}
-          {parentCoordinate && (
+          {/* Ensure parsed is not null before accessing its properties here too */}
+          {parentCoordinate && parsed && (
             <div>
               <Label className="text-sm font-medium text-gray-300 mb-2 block">
                 Detected Parent
@@ -344,7 +280,8 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={isCreating || !parsed.isValid || !!validationError}
+              // Check if parsed is not null for button disabled state
+              disabled={isCreating || !parsed || !!validationError} 
               className="bg-epii-neon text-epii-darker hover:bg-epii-neon/90"
             >
               {isCreating ? (
