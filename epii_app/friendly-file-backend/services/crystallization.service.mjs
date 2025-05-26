@@ -14,6 +14,7 @@ import mongoose from 'mongoose';
 import Document from '../models/Document.model.mjs';
 import bpMCPService from './bpMCPService.mjs';
 import fetch from 'node-fetch';
+import { NotionPropertyMappings } from '../schemas/bimba.schema.mjs';
 
 /**
  * Create a crystallized document from original content
@@ -281,323 +282,292 @@ export const executeNotionProposal = async ({
     }
 
     // Extract data from the payload
-    const {
+    let { // Use let for content as it might be modified by relation notes
       targetCoordinate,
-      title,
+      title: payloadTitle, // Renamed to avoid conflict with title property in NotionPropertyMappings
       properties: payloadProperties = {},
       contentBlocks = [],
-      content, // Legacy field for backward compatibility
+      content, // Legacy field for backward compatibility, potentially modified.
       analysisResults,
-      relatedCoordinates = [],
-      tags = []
+      relatedCoordinates = [], // Not directly used unless mapped via a property
+      // tags = [], // Not directly used unless mapped via a property
+      contentType: payloadContentType = "Crystallization", // Allow override from payload
+      status: payloadStatus = "1" // Allow override from payload
     } = notionUpdatePayload;
 
     if (!targetCoordinate) {
       throw new Error('Notion update payload must include targetCoordinate');
     }
 
-    // Validate that we have either contentBlocks or legacy content
-    if (!contentBlocks.length && !content) {
-      throw new Error('Notion update payload must include either contentBlocks or content');
+    // Ensure content is mutable and initialized if needed for relation notes
+    let mutableContent = content || ""; 
+    if (!contentBlocks.length && !mutableContent && notionUpdatePayload.analysisResults) {
+        mutableContent = ""; // Initialize if no content and analysis results might add notes
     }
 
-    // Filter out non-existent properties that cause validation errors
-    const filteredPayloadProperties = {};
-    const INVALID_PROPERTIES = [
-      'Analysis Status',
-      'Analysis Date',
-      'Mappings Count',
-      'Variations Count',
-      'Tags'
+    const INVALID_PROPERTIES = [ // Properties to explicitly filter out
+      'Analysis Status', 'Analysis Date', 'Mappings Count', 'Variations Count', 'Tags'
     ];
 
-    if (payloadProperties && typeof payloadProperties === 'object') {
-      Object.entries(payloadProperties).forEach(([key, value]) => {
-        if (!INVALID_PROPERTIES.includes(key)) {
-          filteredPayloadProperties[key] = value;
-        } else {
-          console.log(`Filtered out non-existent property: ${key}`);
-        }
-      });
-    }
+    let transformedProperties = {};
+    let relationNotesToAppend = "";
 
-    // Prepare properties for Notion
-    const properties = {
-      // Set default properties
-      "Content Type": "Crystallization",  // Simple string value
-      "Status": "1",  // Simple string value
-
-      // Merge in FILTERED properties from the payload
-      ...filteredPayloadProperties
-    };
-
-    // Log the exact properties being sent
-    console.log("Notion properties being sent:", JSON.stringify(properties, null, 2));
-
-    // Note: "🗺️ Bimba Address" is redundant and already set on the page
-    // The targetCoordinate is already used to find the correct Notion page
-
-    // REMOVED: Tags property - doesn't exist on Notion pages
-    // Tags information is included in the content blocks instead
-    // if (tags && tags.length > 0) {
-    //   properties['Tags'] = tags;
-    // }
-
-    // Add analysis results as properties if available
+    // Integrate analysisResults into payloadProperties for schema-aware processing
+    // This assumes analysisResults keys might match Bimba property names intended for Notion.
     if (analysisResults) {
-      // For relational properties, we'll add notes to the content if they don't exist
-      // This is because relation properties require UUIDs, not just text values
-      let missingRelations = [];
-
-      // Handle QL Operators (relation to Quaternal Logic DB)
-      if (analysisResults.logicOperators && analysisResults.logicOperators.length > 0) {
-        missingRelations.push({
-          property: '💠 QL Operators',
-          values: analysisResults.logicOperators
-        });
-      }
-
-      // Handle Semantic Framework (relation to Semantics DB)
-      if (analysisResults.semanticFramework && analysisResults.semanticFramework.length > 0) {
-        missingRelations.push({
-          property: '🕸️ Semantic Framework',
-          values: analysisResults.semanticFramework
-        });
-      }
-
-      // Handle Archetypal Anchors (relation to Symbols DB)
-      if (analysisResults.symbolicAnchors && analysisResults.symbolicAnchors.length > 0) {
-        missingRelations.push({
-          property: '⚕️ Archetypal Anchors',
-          values: analysisResults.symbolicAnchors
-        });
-      }
-
-      // Handle Epistemic Essence (relation to Concepts DB)
-      if (analysisResults.conceptualFramework && analysisResults.conceptualFramework.length > 0) {
-        missingRelations.push({
-          property: '📚 Epistemic Essence',
-          values: analysisResults.conceptualFramework
-        });
-      }
-
-      // If we have missing relations, append notes to the content
-      if (missingRelations.length > 0) {
-        let relationNotes = '\n\n---\n\n## Relation Properties to Set Manually\n\n';
-        relationNotes += 'The following properties need to be set manually in Notion:\n\n';
-
-        missingRelations.forEach(relation => {
-          relationNotes += `### ${relation.property}\n\n`;
-          relation.values.forEach(value => {
-            relationNotes += `- ${value}\n`;
-          });
-          relationNotes += '\n';
-        });
-
-        // Append to the content
-        content += relationNotes;
-      }
+        const analysisMappings = {
+            '💠 QL Operators': analysisResults.logicOperators,
+            '🕸️ Semantic Framework': analysisResults.semanticFramework,
+            '⚕️ Archetypal Anchors': analysisResults.symbolicAnchors,
+            '📚 Epistemic Essence': analysisResults.conceptualFramework
+            // Add other analysisResult fields here if they should become properties
+        };
+        for (const propName in analysisMappings) {
+            if (analysisMappings[propName] && analysisMappings[propName].length > 0) {
+                // Only set from analysisResults if not already present in payloadProperties
+                if (!payloadProperties.hasOwnProperty(propName)) {
+                    payloadProperties[propName] = analysisMappings[propName];
+                }
+            }
+        }
     }
 
-    // First, we need to check if the page already exists and find the "Coordinate Summary" block
+    for (const [key, rawValue] of Object.entries(payloadProperties)) {
+      if (INVALID_PROPERTIES.includes(key)) {
+        console.log(`Filtered out explicitly invalid property: ${key}`);
+        continue;
+      }
+
+      const mapping = NotionPropertyMappings[key]; // Assumes key is the Bimba Property Name
+
+      if (mapping) {
+        const { notionType, options, multiple, format } = mapping; // format is for rich_text
+        try {
+          switch (notionType) {
+            case 'title':
+              transformedProperties[key] = { title: [{ type: 'text', text: { content: String(rawValue) } }] };
+              break;
+            case 'select':
+              if (options && !options.includes(String(rawValue))) {
+                console.warn(`Value "${rawValue}" for select property "${key}" is not in defined options: ${options.join(', ')}.`);
+              }
+              transformedProperties[key] = { select: { name: String(rawValue) } };
+              break;
+            case 'multi_select':
+              if (Array.isArray(rawValue)) {
+                const validValues = rawValue.map(v => {
+                  if (options && !options.includes(String(v))) {
+                    console.warn(`Value "${v}" for multi-select property "${key}" is not in defined options: ${options.join(', ')}.`);
+                  }
+                  return { name: String(v) };
+                });
+                transformedProperties[key] = { multi_select: validValues };
+              } else {
+                console.warn(`Value for multi-select property "${key}" is not an array. Received: ${typeof rawValue}. Skipping.`);
+              }
+              break;
+            case 'number':
+              const numValue = Number(rawValue);
+              if (isNaN(numValue)) {
+                console.warn(`Value "${rawValue}" for number property "${key}" is not a valid number. Skipping.`);
+              } else {
+                transformedProperties[key] = { number: numValue };
+              }
+              break;
+            case 'date':
+              try {
+                transformedProperties[key] = { date: { start: new Date(rawValue).toISOString() } };
+              } catch (dateError) {
+                console.warn(`Value "${rawValue}" for date property "${key}" is not a valid date. Error: ${dateError.message}. Skipping.`);
+              }
+              break;
+            case 'rich_text':
+              if (format !== 'structured_list') { // Check if it's not a special structured list
+                transformedProperties[key] = { rich_text: [{ type: 'text', text: { content: String(rawValue) } }] };
+              } else {
+                // Structured lists (like QL Operators from schema if they were rich_text) are typically
+                // handled by appending to content; this path is for simple rich_text properties.
+                console.log(`Property '${key}' is a 'structured_list' rich_text. This type is usually handled in content blocks or relation notes.`);
+              }
+              break;
+            case 'relation':
+              const coordinatesToResolve = Array.isArray(rawValue) ? rawValue : (rawValue ? [String(rawValue)] : []);
+              
+              if (coordinatesToResolve.length === 0 && multiple) {
+                  transformedProperties[key] = { relation: [] };
+                  break;
+              }
+              if (coordinatesToResolve.length === 0) {
+                  if (rawValue !== null && rawValue !== undefined && String(rawValue).trim() !== "") {
+                     if (!relationNotesToAppend) relationNotesToAppend = '\n\n---\n\n## Manual Action Required for Relations\nCould not automatically set the following relations:\n';
+                     relationNotesToAppend += `- Relation property "${key}" was provided a value ("${rawValue}") but no valid coordinates to resolve.\n`;
+                  }
+                  break;
+              }
+
+              let resolvedRelationIds = [];
+              let unresolvedNotesForThisKey = [];
+
+              for (const bimbaCoordString of coordinatesToResolve) {
+                if (typeof bimbaCoordString !== 'string' || bimbaCoordString.trim() === "") {
+                    console.warn(`Invalid Bimba coordinate string for relation '${key}': "${bimbaCoordString}". Skipping.`);
+                    unresolvedNotesForThisKey.push(`- "${key}": Invalid/empty coordinate value "${bimbaCoordString}"`);
+                    continue;
+                }
+                try {
+                    const resolved = await bpMCPService.resolveBimbaCoordinate(bimbaCoordString.trim());
+                    if (resolved && resolved.notionPageId) {
+                        resolvedRelationIds.push({ id: resolved.notionPageId });
+                    } else {
+                        console.warn(`Could not resolve Bimba coordinate "${bimbaCoordString}" for relation property "${key}".`);
+                        unresolvedNotesForThisKey.push(`- "${key}": Coordinate "${bimbaCoordString}" (unresolved)`);
+                    }
+                } catch (resolveError) {
+                    console.error(`Error resolving Bimba coordinate "${bimbaCoordString}" for property "${key}": ${resolveError.message}`);
+                    unresolvedNotesForThisKey.push(`- "${key}": Coordinate "${bimbaCoordString}" (resolution error: ${resolveError.message})`);
+                }
+              }
+
+              if (resolvedRelationIds.length > 0) {
+                transformedProperties[key] = { relation: resolvedRelationIds };
+              }
+              if (unresolvedNotesForThisKey.length > 0) {
+                if (!relationNotesToAppend) relationNotesToAppend = '\n\n---\n\n## Manual Action Required for Relations\nCould not automatically set the following relations:\n';
+                relationNotesToAppend += unresolvedNotesForThisKey.join('\n') + '\n';
+              }
+              break;
+            default:
+              console.warn(`Unknown notionType "${mapping.notionType}" for property "${key}". Passing as raw value.`);
+              transformedProperties[key] = rawValue; 
+          }
+        } catch (transformError) {
+            console.error(`Error transforming property "${key}" with value "${JSON.stringify(rawValue)}": ${transformError.message}. Skipping.`);
+        }
+      } else {
+        console.warn(`Property '${key}' has no defined Notion mapping. Passing as raw value.`);
+        transformedProperties[key] = rawValue; // Pass raw value for Notion API to handle or error on.
+      }
+    }
+    
+    if (relationNotesToAppend) {
+        if (contentBlocks.length > 0) {
+            contentBlocks.push({
+                object: 'block', type: 'paragraph',
+                paragraph: { rich_text: [{ type: 'text', text: { content: relationNotesToAppend } }] }
+            });
+        } else {
+            mutableContent += relationNotesToAppend;
+        }
+    }
+
+    const propertiesForNotion = {
+      ...transformedProperties,
+      "Content Type": { select: { name: String(payloadContentType) } },
+      "Status": { status: { name: String(payloadStatus) } }
+    };
+    
+    // Determine the title for page creation.
+    // If 'bimbaCoordinate' is mapped to be the Notion title property, use its value from payloadProperties.
+    // Otherwise, use the payloadTitle or default to targetCoordinate.
+    let pageCreationTitle = payloadTitle || `Node ${targetCoordinate}`; // Default
+    if (NotionPropertyMappings.bimbaCoordinate?.notionType === 'title' && payloadProperties.bimbaCoordinate) {
+        pageCreationTitle = String(payloadProperties.bimbaCoordinate);
+    } else if (NotionPropertyMappings.name?.notionType === 'title' && payloadProperties.name) {
+        pageCreationTitle = String(payloadProperties.name);
+    }
+
+
+    console.log("Final Transformed Notion properties being sent:", JSON.stringify(propertiesForNotion, null, 2));
+    if (contentBlocks.length === 0 && !mutableContent.trim()) {
+        console.log("Warning: No contentBlocks and mutableContent is empty. Page might be created with no content.");
+    }
+
+
     let notionPageId = null;
 
     try {
       // Resolve the Bimba coordinate to a Notion page ID
       const resolveResult = await bpMCPService.resolveBimbaCoordinate(targetCoordinate);
-      console.log(`Resolved Bimba coordinate ${targetCoordinate} to Notion page ID:`, resolveResult);
+      console.log(`Resolved Bimba coordinate ${targetCoordinate} to Notion page ID:`, resolveResult ? resolveResult.notionPageId : 'null');
 
       if (resolveResult && resolveResult.notionPageId) {
         notionPageId = resolveResult.notionPageId;
+        console.log(`Existing Notion page found: ${notionPageId}. Attempting to update.`);
 
-        console.log(`Using direct Notion API to find and update the "Coordinate Summary" callout block`);
-
-        // Get all blocks from the page
-        const blocksResponse = await fetch(`https://api.notion.com/v1/blocks/${notionPageId}/children`, {
-          method: 'GET',
+        // Update the page properties directly using transformed propertiesForNotion
+        const updatePropertiesResponse = await fetch(`https://api.notion.com/v1/pages/${notionPageId}`, {
+          method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${process.env.NOTION_API_KEY}`,
-            'Notion-Version': '2022-06-28'
-          }
+            'Notion-Version': '2022-06-28',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ properties: propertiesForNotion })
         });
 
-        if (!blocksResponse.ok) {
-          throw new Error(`Failed to get blocks: ${blocksResponse.statusText}`);
-        }
-
-        const blocks = await blocksResponse.json();
-        console.log(`Retrieved ${blocks.results?.length || 0} blocks from Notion page`);
-
-        // Find the "Coordinate Summary" callout block
-        let coordinateSummaryBlock = null;
-
-        if (blocks && blocks.results) {
-          for (const block of blocks.results) {
-            if (block.type === 'callout') {
-              // Get the text content of the callout
-              const calloutText = block.callout?.rich_text?.map(rt => rt.plain_text).join('') || '';
-
-              if (calloutText.includes('Coordinate Summary')) {
-                coordinateSummaryBlock = block;
-                console.log(`Found "Coordinate Summary" callout block with ID ${block.id}`);
-                break;
-              }
-            }
-          }
-        }
-
-        if (coordinateSummaryBlock) {
-          // Append a new paragraph block as a child of the callout block
-          console.log(`Appending content to "Coordinate Summary" callout block with ID ${coordinateSummaryBlock.id}`);
-
-          // Format the content with proper spacing
-          const formattedContent = content.trim();
-
-          // Create a paragraph block to append
-          const paragraphBlock = {
-            object: 'block',
-            type: 'paragraph',
-            paragraph: {
-              rich_text: [
-                {
-                  type: 'text',
-                  text: {
-                    content: formattedContent
-                  }
-                }
-              ]
-            }
-          };
-
-          // Append the paragraph block as a child of the callout block
-          const appendResponse = await fetch(`https://api.notion.com/v1/blocks/${coordinateSummaryBlock.id}/children`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${process.env.NOTION_API_KEY}`,
-              'Notion-Version': '2022-06-28',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              children: [paragraphBlock]
-            })
-          });
-
-          if (!appendResponse.ok) {
-            throw new Error(`Failed to append block: ${appendResponse.statusText}`);
-          }
-
-          const appendResult = await appendResponse.json();
-          console.log(`Successfully appended content to "Coordinate Summary" callout block`);
-
-          // Update the page properties
-          const updatePropertiesResponse = await fetch(`https://api.notion.com/v1/pages/${notionPageId}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${process.env.NOTION_API_KEY}`,
-              'Notion-Version': '2022-06-28',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              properties: {
-                "Content Type": {
-                  select: {
-                    name: "Crystallization"
-                  }
-                },
-                "Status": {
-                  status: {
-                    name: "1"
-                  }
-                }
-              }
-            })
-          });
-
-          if (!updatePropertiesResponse.ok) {
-            throw new Error(`Failed to update properties: ${updatePropertiesResponse.statusText}`);
-          }
-
-          console.log(`Successfully updated properties for Notion page ${notionPageId}`);
-
-          // Return a success result
-          return {
-            success: true,
-            notionPageId: notionPageId,
-            url: `https://www.notion.so/${notionPageId.replace(/-/g, '')}`,
-            targetCoordinate
-          };
+        let propUpdateStatus = 'failed';
+        if (!updatePropertiesResponse.ok) {
+          const errorBody = await updatePropertiesResponse.text();
+          console.error(`Failed to update properties for page ${notionPageId}: ${updatePropertiesResponse.statusText}. Body: ${errorBody}`);
         } else {
-          console.log(`"Coordinate Summary" block not found, using standard crystallizeToNotion tool`);
-
-          // Use structured contentBlocks if available, otherwise fall back to legacy content
-          let crystallizeArgs;
-
-          if (contentBlocks.length > 0) {
-            console.log(`Using structured contentBlocks (${contentBlocks.length} blocks) for crystallization`);
-
-            // Use the new structured approach with contentBlocks
-            crystallizeArgs = {
-              targetBimbaCoordinate: targetCoordinate,
-              title: title || `Content for ${targetCoordinate}`,
-              properties,
-              contentBlocks, // Pass the structured blocks directly
-              createIfNotExists: true
-            };
-          } else {
-            console.log(`Using legacy content approach for crystallization`);
-
-            // Fall back to legacy content approach
-            const formattedContent = `\n\n${content}`;
-            crystallizeArgs = {
-              targetBimbaCoordinate: targetCoordinate,
-              contentToAppend: formattedContent,
-              title: title || `Content for ${targetCoordinate}`,
-              properties,
-              createIfNotExists: true,
-              contentFormat: 'markdown'
-            };
-          }
-
-          // Use the crystallizeToNotion tool with the appropriate arguments
-          const result = await bpMCPService.crystallizeToNotion(crystallizeArgs);
-
-          return result;
+          propUpdateStatus = 'succeeded';
+          console.log(`Successfully updated properties for Notion page ${notionPageId}`);
         }
+
+        // Append content (if any)
+        // The specific "Coordinate Summary" block logic is removed for broader applicability.
+        let contentAppended = false;
+        if (contentBlocks.length > 0) {
+           await bpMCPService.appendNotionBlock(notionPageId, contentBlocks); // Assumes this service exists and works
+           console.log(`Attempted to append contentBlocks to Notion page ${notionPageId}`);
+           contentAppended = true;
+        } else if (mutableContent && mutableContent.trim() !== "") {
+            const simpleTextBlock = [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: mutableContent.trim() } }] } }];
+            await bpMCPService.appendNotionBlock(notionPageId, simpleTextBlock); // Assumes this service exists and works
+            console.log(`Attempted to append legacy content to Notion page ${notionPageId}`);
+            contentAppended = true;
+        }
+
+        return {
+          success: propUpdateStatus === 'succeeded', // Overall success might depend on property update
+          notionPageId: notionPageId,
+          url: `https://www.notion.so/${notionPageId.replace(/-/g, '')}`,
+          targetCoordinate,
+          message: `Page ${notionPageId} update attempt. Properties update ${propUpdateStatus}. Content append ${contentAppended ? 'attempted' : 'skipped (no content)'}.`
+        };
       }
     } catch (error) {
-      console.warn(`Error finding existing Notion page: ${error.message}`);
-      // Continue with normal crystallization if there was an error
+      console.warn(`Error during existing page check/update for ${targetCoordinate}: ${error.message}. Proceeding to create new page.`);
     }
 
-    // If we couldn't find the page or the "Coordinate Summary" block, use the standard crystallizeToNotion tool
-    let fallbackArgs;
+    // If page was not found or an error occurred in updating it, create a new page.
+    console.log(`Creating new page for ${targetCoordinate} with title "${pageCreationTitle}".`);
+
+    let crystallizeArgs;
+    const currentContentToAppend = (mutableContent && mutableContent.trim() !== "") ? mutableContent : ((contentBlocks.length > 0) ? "" : "No content provided.");
 
     if (contentBlocks.length > 0) {
-      console.log(`Using structured contentBlocks (${contentBlocks.length} blocks) for fallback crystallization`);
-
-      // Use the new structured approach with contentBlocks
-      fallbackArgs = {
+      console.log(`Using structured contentBlocks (${contentBlocks.length} blocks) for new page crystallization.`);
+      crystallizeArgs = {
         targetBimbaCoordinate: targetCoordinate,
-        title: title || `Content for ${targetCoordinate}`,
-        properties,
+        title: pageCreationTitle,
+        properties: propertiesForNotion,
         contentBlocks, // Pass the structured blocks directly
         createIfNotExists: true
       };
     } else {
-      console.log(`Using legacy content approach for fallback crystallization`);
-
-      // Fall back to legacy content approach
-      fallbackArgs = {
+      console.log(`Using legacy content approach for new page crystallization. Content to append length: ${currentContentToAppend.length}`);
+      crystallizeArgs = {
         targetBimbaCoordinate: targetCoordinate,
-        contentToAppend: content,
-        title: title || `Content for ${targetCoordinate}`,
-        properties,
+        contentToAppend: currentContentToAppend,
+        title: pageCreationTitle,
+        properties: propertiesForNotion,
         createIfNotExists: true,
-        contentFormat: 'markdown'
+        contentFormat: 'markdown' 
       };
     }
-
-    const result = await bpMCPService.crystallizeToNotion(fallbackArgs);
+    
+    const result = await bpMCPService.crystallizeToNotion(crystallizeArgs);
 
     // Log the result
     console.log(`Notion update result for ${targetCoordinate}:`, result);
