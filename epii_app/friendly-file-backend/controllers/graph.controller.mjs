@@ -155,12 +155,20 @@ export const handleCreateNode = async (req, res) => {
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
       WITH newNode
-      MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate})
-      CREATE (parent)-[r:${safeRelationType}]->(newNode)
-      SET r.createdAt = datetime()
-      RETURN newNode, parent, r
+      OPTIONAL MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate}) // Parent is optional
+      // Use FOREACH hack to conditionally create relationship if parent was found
+      FOREACH (_ IN CASE WHEN parent IS NOT NULL THEN [1] ELSE [] END |
+        CREATE (parent)-[r_actual:${safeRelationType}]->(newNode)
+        SET r_actual.createdAt = datetime()
+      )
+      // Re-match to return the relationship if it was created, and the parent
+      // This ensures newNode is always returned. Parent and r will be null if not found/created.
+      OPTIONAL MATCH (parent_check:BimbaNode {bimbaCoordinate: $parentCoordinate})-[r_check:${safeRelationType}]->(newNode)
+      WHERE parent_check IS NOT NULL // Only return parent and r if parent was indeed found and relationship potentially created
+      RETURN newNode, parent_check AS parent, r_check AS r
     `;
-    queryParams.parentCoordinate = parentCoordinate;
+    // queryParams already includes nodeProperties. parentCoordinate is used in the query directly.
+    queryParams.parentCoordinate = parentCoordinate; // Still needed for the OPTIONAL MATCH and the re-match
   } else {
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
@@ -183,12 +191,28 @@ export const handleCreateNode = async (req, res) => {
 
     console.log('[handleCreateNode] Raw result from bpMCPService.callTool("updateBimbaGraph"):', JSON.stringify(result, null, 2));
     
-    // It's good practice to check if the result indicates success or contains expected data
-    // For example, if result is expected to be an array of records:
     if (result && Array.isArray(result) && result.length > 0) {
+        const record = result[0]; // Assuming the first record is most relevant
         console.log(`[handleCreateNode] Successfully processed updateBimbaGraph. Records returned: ${result.length}`);
+        if (record) {
+            console.log(`[handleCreateNode] Record details: newNode present: ${!!record.newNode}, parent present: ${!!record.parent}, relationship present: ${!!record.r}`);
+            if (parentCoordinate && (!record.parent || !record.r)) {
+                console.warn(`[handleCreateNode] WARNING: Node ${nodeProperties.bimbaCoordinate} created, but parent match or relationship creation might have failed. ParentCoordinate specified: ${parentCoordinate}. Check if parent exists and matches, or if relationship 'r' was returned as null.`);
+            } else if (parentCoordinate && record.parent && record.r) {
+                console.log(`[handleCreateNode] Successfully created node AND relationship to parent ${parentCoordinate}.`);
+            } else if (record.newNode) { // newNode should always be present
+                 console.log(`[handleCreateNode] Successfully created node ${nodeProperties.bimbaCoordinate} (no parent specified, or parent not found, or relationship not created).`);
+            } else {
+                 console.warn('[handleCreateNode] Node creation might have failed as newNode is not present in the result.');
+            }
+        } else {
+            console.warn('[handleCreateNode] updateBimbaGraph returned an array with null/undefined records.');
+        }
+    } else if (result && typeof result === 'object' && Object.keys(result).length === 0 && result.constructor === Object) {
+        // Specifically check for an empty object {} which might indicate issues if data was expected.
+        console.warn('[handleCreateNode] updateBimbaGraph returned an empty object. This might indicate the write operation did not return data or did not perform as expected (e.g., parent not found for relationship). Query was:', creationQuery);
     } else if (result) {
-        console.log('[handleCreateNode] updateBimbaGraph processed. Result (not an array or empty):', JSON.stringify(result, null, 2));
+        console.log('[handleCreateNode] updateBimbaGraph processed. Result (not an array, or not an empty object):', JSON.stringify(result, null, 2));
     } else {
         console.warn('[handleCreateNode] updateBimbaGraph call returned undefined or null result.');
     }
