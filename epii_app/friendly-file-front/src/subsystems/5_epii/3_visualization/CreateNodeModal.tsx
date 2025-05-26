@@ -30,7 +30,7 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
 }) => {
   const [coordinate, setCoordinate] = useState('#');
   const [parentCoordinate, setParentCoordinate] = useState<string | null>(null);
-  const [suggestedRelationType, setSuggestedRelationType] = useState('CONTAINS');
+  const [suggestedRelationType, setSuggestedRelationType] = useState('HAS_INTERNAL_COMPONENT');
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -61,13 +61,18 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
       
       const suggestions = await fetchSuggestedRelationshipTypeAPI(parentCoord); // Placeholder
       if (suggestions && suggestions.length > 0) {
-        setSuggestedRelationType(suggestions[0]);
+        // If API returns suggestions, use the first one.
+        // User might want more sophisticated logic here in future, e.g. if 'HAS_INTERNAL_COMPONENT' is among suggestions, prefer it.
+        // For now, just using the first one if available, otherwise defaulting.
+        setSuggestedRelationType(suggestions[0]); 
       } else {
-        setSuggestedRelationType('CONTAINS'); // Fallback
+        // If API returns no suggestions, default to HAS_INTERNAL_COMPONENT
+        setSuggestedRelationType('HAS_INTERNAL_COMPONENT'); 
       }
     } catch (error) {
       console.warn('Failed to suggest relationship type via API:', error);
-      setSuggestedRelationType('CONTAINS'); // Fallback
+      // If API call fails, default to HAS_INTERNAL_COMPONENT
+      setSuggestedRelationType('HAS_INTERNAL_COMPONENT'); 
     }
   };
 
@@ -190,7 +195,7 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
   const resetForm = () => {
     setCoordinate('#');
     setParentCoordinate(null);
-    setSuggestedRelationType('CONTAINS');
+    setSuggestedRelationType('HAS_INTERNAL_COMPONENT'); // Update reset value
     setError(null);
     setSuccess(false);
   };

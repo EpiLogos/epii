@@ -132,26 +132,35 @@ export const handleCreateNode = async (req, res) => {
   if (!nodeProperties || !nodeProperties.bimbaCoordinate) {
     return res.status(400).json({ message: 'Node properties with bimbaCoordinate are required' });
   }
+  // If parentCoordinate is provided, suggestedRelationType is also expected.
   if (parentCoordinate && !suggestedRelationType) {
     return res.status(400).json({ message: 'Suggested relation type is required when parentCoordinate is provided' });
   }
 
   let creationQuery;
-  const queryParams = { nodeProperties };
+  const queryParams = { nodeProperties }; 
 
   if (parentCoordinate) {
+    // Ensure suggestedRelationType is a string and does not contain problematic characters
+    // For now, we assume it's a safe, system-defined value like 'HAS_INTERNAL_COMPONENT'
+    // If it could be arbitrary, further sanitization or different query construction would be needed.
+    const safeRelationType = String(suggestedRelationType).replace(/[^a-zA-Z0-9_]/g, '');
+    if (!safeRelationType) {
+        // Fallback or error if relation type becomes empty after sanitization
+        console.error('Error: Invalid or empty suggestedRelationType after sanitization.');
+        return res.status(400).json({ message: 'Invalid suggested relation type.' });
+    }
+
+
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
       WITH newNode
       MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate})
-      CREATE (parent)-[r:${suggestedRelationType}]->(newNode)
+      CREATE (parent)-[r:${safeRelationType}]->(newNode)
       SET r.createdAt = datetime()
       RETURN newNode, parent, r
     `;
     queryParams.parentCoordinate = parentCoordinate;
-    // Note: suggestedRelationType is directly embedded in the query string.
-    // This is generally safe if suggestedRelationType comes from a controlled list (e.g., our suggestions).
-    // If it were user-input directly, it would be a security risk (Cypher injection).
   } else {
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
@@ -159,22 +168,36 @@ export const handleCreateNode = async (req, res) => {
     `;
   }
 
+  console.log('[handleCreateNode] Attempting to create node.');
+  console.log('[handleCreateNode] Received nodeProperties:', JSON.stringify(nodeProperties, null, 2));
+  console.log('[handleCreateNode] Received parentCoordinate:', parentCoordinate);
+  console.log('[handleCreateNode] Received suggestedRelationType:', suggestedRelationType);
+  console.log('[handleCreateNode] Constructed Cypher Query:', creationQuery);
+  console.log('[handleCreateNode] Query Parameters:', JSON.stringify(queryParams, null, 2));
+
   try {
-    console.log(`Creating node with coordinate: ${nodeProperties.bimbaCoordinate}`);
-    // IMPORTANT ASSUMPTION: updateBimbaGraph tool accepts a 'query' and 'params' argument,
-    // similar to queryBimbaGraph. This might need adjustment if the tool expects a different structure.
     const result = await bpMCPService.callTool('updateBimbaGraph', {
       query: creationQuery,
       params: queryParams,
     });
 
-    // Assuming result contains the created node data.
-    // The structure of 'result' from updateBimbaGraph might need specific parsing.
-    // For now, we'll return the raw result, assuming it's meaningful.
-    console.log(`Node creation result for ${nodeProperties.bimbaCoordinate}:`, result);
-    res.status(201).json({ message: 'Node created successfully', data: result });
+    console.log('[handleCreateNode] Raw result from bpMCPService.callTool("updateBimbaGraph"):', JSON.stringify(result, null, 2));
+    
+    // It's good practice to check if the result indicates success or contains expected data
+    // For example, if result is expected to be an array of records:
+    if (result && Array.isArray(result) && result.length > 0) {
+        console.log(`[handleCreateNode] Successfully processed updateBimbaGraph. Records returned: ${result.length}`);
+    } else if (result) {
+        console.log('[handleCreateNode] updateBimbaGraph processed. Result (not an array or empty):', JSON.stringify(result, null, 2));
+    } else {
+        console.warn('[handleCreateNode] updateBimbaGraph call returned undefined or null result.');
+    }
+
+    res.status(201).json({ message: 'Node created successfully (or creation process initiated)', data: result });
   } catch (error) {
-    console.error(`Error creating node ${nodeProperties.bimbaCoordinate}:`, error);
+    console.error(`[handleCreateNode] Error creating node ${nodeProperties.bimbaCoordinate}:`, error.message);
+    // Log the full error object if it might contain more details like a stack trace
+    console.error('[handleCreateNode] Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     res.status(500).json({ message: 'Failed to create node', error: error.message });
   }
 };

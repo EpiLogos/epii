@@ -13,6 +13,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Upload, Sparkles, Save, FileText, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // Added Input import
 import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBimbaCoordinates';
 import { useGraphData } from '../2_hooks/useGraphData';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
@@ -1295,19 +1296,40 @@ Provide your response as a JSON object with the following structure:
                                 </div>
                                 <div>
                                   <label className="text-xs font-medium text-gray-300 mb-1 block">
-                                    Target Node
+                                    Target Node {rel.action === 'create' ? '(Coordinate)' : ''}
                                   </label>
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-gray-400 text-xs">
-                                      {rel.direction === 'outgoing' ? '→' : '←'}
-                                    </span>
-                                    <span className="text-gray-300 text-xs flex-1">
-                                      {rel.relatedNode.coordinate}
-                                    </span>
-                                    {rel.relatedNode.title && (
-                                      <span className="text-gray-400 text-xs">({rel.relatedNode.title})</span>
-                                    )}
-                                  </div>
+                                  {rel.action === 'create' ? (
+                                    <Input
+                                      type="text"
+                                      value={rel.targetCoordinate || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editedRelationships];
+                                        updated[index] = { 
+                                            ...updated[index], 
+                                            targetCoordinate: e.target.value,
+                                            relatedNode: { 
+                                                ...(updated[index].relatedNode || { title: '', labels: [] }), 
+                                                coordinate: e.target.value 
+                                            }
+                                        };
+                                        setEditedRelationships(updated);
+                                      }}
+                                      placeholder="Enter target coordinate (e.g., #X-Y-Z)"
+                                      className="w-full p-1 bg-epii-dark border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
+                                    />
+                                  ) : (
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-gray-400 text-xs">
+                                        {rel.direction === 'outgoing' ? '→' : '←'}
+                                      </span>
+                                      <span className="text-gray-300 text-xs flex-1">
+                                        {rel.relatedNode.coordinate}
+                                      </span>
+                                      {rel.relatedNode.title && (
+                                        <span className="text-gray-400 text-xs">({rel.relatedNode.title})</span>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
