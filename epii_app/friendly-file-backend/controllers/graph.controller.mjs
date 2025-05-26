@@ -151,7 +151,9 @@ export const handleCreateNode = async (req, res) => {
         return res.status(400).json({ message: 'Invalid suggested relation type.' });
     }
 
-
+    // TODO: Revisit this query and its return structure pending BPMCP refinements for updateBimbaGraph 
+    // to better handle atomic node and relationship creation confirmation.
+    // Current attempt simplifies RETURN to see if tool provides basic created node data.
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
       WITH newNode
@@ -161,11 +163,11 @@ export const handleCreateNode = async (req, res) => {
         CREATE (parent)-[r_actual:${safeRelationType}]->(newNode)
         SET r_actual.createdAt = datetime()
       )
-      WITH newNode, parent // ADDED THIS LINE: Carry newNode and parent into the next scope
-      // Re-match for the relationship using the 'parent' variable (which may be null)
-      // and newNode. If parent is null, this OPTIONAL MATCH won't find anything for r_check.
-      OPTIONAL MATCH (parent)-[r_check:${safeRelationType}]->(newNode)
-      RETURN newNode, parent, r_check AS r
+      WITH newNode, parent // Critical WITH clause
+      // The OPTIONAL MATCH for r_check is removed for this test, as we are simplifying the RETURN.
+      // If parent was found and FOREACH ran, the relationship should be created.
+      // We are now testing if updateBimbaGraph returns at least newNode.
+      RETURN newNode
     `;
     // queryParams already includes nodeProperties. parentCoordinate is used in the query directly.
     queryParams.parentCoordinate = parentCoordinate; // Still needed for the OPTIONAL MATCH and the re-match

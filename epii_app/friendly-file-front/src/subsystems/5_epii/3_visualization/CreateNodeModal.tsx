@@ -55,24 +55,29 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
 
   // Suggest relationship type based on parent's existing relationships
   const suggestRelationshipType = async (parentCoord: string) => {
+    // Set HAS_INTERNAL_COMPONENT as the immediate suggestion for display.
+    // The API call can run in the background if we want to log its suggestions
+    // or potentially use them for a more advanced suggestion feature later.
+    setSuggestedRelationType('HAS_INTERNAL_COMPONENT');
+    console.log(`[CreateNodeModal] Defaulting displayed suggested relation to HAS_INTERNAL_COMPONENT for parent: ${parentCoord}`);
+
     try {
-      // const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'; // Removed
-      // const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, { ... }); // Removed
-      
-      const suggestions = await fetchSuggestedRelationshipTypeAPI(parentCoord); // Placeholder
-      if (suggestions && suggestions.length > 0) {
-        // If API returns suggestions, use the first one.
-        // User might want more sophisticated logic here in future, e.g. if 'HAS_INTERNAL_COMPONENT' is among suggestions, prefer it.
-        // For now, just using the first one if available, otherwise defaulting.
-        setSuggestedRelationType(suggestions[0]); 
+      // We still call the API to see what it suggests, which could be logged
+      // or used for a more advanced UI in the future (e.g., a dropdown of choices).
+      const suggestionsFromAPI = await fetchSuggestedRelationshipTypeAPI(parentCoord); 
+      if (suggestionsFromAPI && suggestionsFromAPI.length > 0) {
+        console.log(`[CreateNodeModal] API suggested relations for ${parentCoord}: ${suggestionsFromAPI.join(', ')}.`);
+        // Example: If 'HAS_INTERNAL_COMPONENT' is explicitly suggested by API, we ensure it's set.
+        // Or if another specific rule applies. For now, we've already set our preferred default.
+        // If we wanted to use API's first suggestion:
+        // setSuggestedRelationType(suggestionsFromAPI[0]); 
+        // But based on current requirement, we stick to HAS_INTERNAL_COMPONENT for display.
       } else {
-        // If API returns no suggestions, default to HAS_INTERNAL_COMPONENT
-        setSuggestedRelationType('HAS_INTERNAL_COMPONENT'); 
+        console.log(`[CreateNodeModal] API returned no specific suggestions for ${parentCoord}.`);
       }
     } catch (error) {
-      console.warn('Failed to suggest relationship type via API:', error);
-      // If API call fails, default to HAS_INTERNAL_COMPONENT
-      setSuggestedRelationType('HAS_INTERNAL_COMPONENT'); 
+      console.warn(`[CreateNodeModal] Failed to fetch alternative relationship suggestions via API for ${parentCoord}:`, error);
+      // No need to set state here again as it's already HAS_INTERNAL_COMPONENT
     }
   };
 

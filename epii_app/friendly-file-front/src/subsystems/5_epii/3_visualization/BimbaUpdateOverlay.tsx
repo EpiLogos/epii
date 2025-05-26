@@ -1210,7 +1210,7 @@ Provide your response as a JSON object with the following structure:
                               </div>
                               <input
                                 type="text"
-                                value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                value={value === null || value === undefined ? '' : (typeof value === 'object' ? JSON.stringify(value) : String(value))}
                                 onChange={(e) => {
                                   let newValue: any = e.target.value;
                                   // Try to parse as JSON if it looks like an object/array
@@ -1284,7 +1284,7 @@ Provide your response as a JSON object with the following structure:
                                   </label>
                                   <input
                                     type="text"
-                                    value={rel.type}
+                                    value={rel.type || ''}
                                     onChange={(e) => {
                                       const updated = [...editedRelationships];
                                       updated[index] = { ...updated[index], type: e.target.value };
@@ -1374,7 +1374,8 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
-                                          <option value="">Select QL Type</option>
+                                          {/* Ensured default empty option */}
+                                          <option value="">Select QL Type</option> 
                                           <option value="0_POTENTIAL_RELATION">0_POTENTIAL_RELATION</option>
                                           <option value="1_MATERIAL_RELATION">1_MATERIAL_RELATION</option>
                                           <option value="2_PROCESSUAL_RELATION">2_PROCESSUAL_RELATION</option>
@@ -1397,6 +1398,7 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
+                                          {/* Ensured default empty option */}
                                           <option value="">Select QL Dynamics</option>
                                           <option value="foundational_emergence">foundational_emergence</option>
                                           <option value="processual_activation">processual_activation</option>
@@ -1424,6 +1426,7 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
+                                          {/* Ensured default empty option */}
                                           <option value="">Select Context Frame</option>
                                           <option value="0000">0000 - Transcendental</option>
                                           <option value="0/1">0/1 - Foundation & Definition</option>
@@ -1458,7 +1461,7 @@ Provide your response as a JSON object with the following structure:
                                     <div>
                                       <label className="text-xs text-gray-300 block mb-1">Description</label>
                                       <textarea
-                                        value={rel.properties.description || ''}
+                                        value={(rel.properties.description === null || rel.properties.description === undefined) ? '' : rel.properties.description}
                                         onChange={(e) => {
                                           const updated = [...editedRelationships];
                                           updated[index] = {
