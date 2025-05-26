@@ -166,8 +166,17 @@ const CreateNodeModal: React.FC<CreateNodeModalProps> = ({
 
       // const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, { ... }); // Removed
       
-      // Call the placeholder API function
-      await createNodeInGraphAPI(nodeProperties, parentCoordinate, suggestedRelationType); // Placeholder
+      let finalRelationType = suggestedRelationType; // Use current state by default
+
+      // --- BEGIN NEW SAFEGUARD ---
+      if (parentCoordinate) {
+        finalRelationType = 'HAS_INTERNAL_COMPONENT';
+        console.log('[CreateNodeModal] Safeguard: Ensuring relation type is HAS_INTERNAL_COMPONENT for parented node creation.');
+      }
+      // --- END NEW SAFEGUARD ---
+
+      // Call the placeholder API function, passing finalRelationType
+      await createNodeInGraphAPI(nodeProperties, parentCoordinate, finalRelationType);
 
       // if (!response.ok) { // Removed
       //   const errorText = await response.text(); // Removed

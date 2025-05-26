@@ -155,17 +155,17 @@ export const handleCreateNode = async (req, res) => {
     creationQuery = `
       CREATE (newNode:BimbaNode $nodeProperties)
       WITH newNode
-      OPTIONAL MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate}) // Parent is optional
-      // Use FOREACH hack to conditionally create relationship if parent was found
+      OPTIONAL MATCH (parent:BimbaNode {bimbaCoordinate: $parentCoordinate})
+      WITH newNode, parent // Carry parent over (it's null if not found by OPTIONAL MATCH)
       FOREACH (_ IN CASE WHEN parent IS NOT NULL THEN [1] ELSE [] END |
         CREATE (parent)-[r_actual:${safeRelationType}]->(newNode)
         SET r_actual.createdAt = datetime()
       )
-      // Re-match to return the relationship if it was created, and the parent
-      // This ensures newNode is always returned. Parent and r will be null if not found/created.
-      OPTIONAL MATCH (parent_check:BimbaNode {bimbaCoordinate: $parentCoordinate})-[r_check:${safeRelationType}]->(newNode)
-      WHERE parent_check IS NOT NULL // Only return parent and r if parent was indeed found and relationship potentially created
-      RETURN newNode, parent_check AS parent, r_check AS r
+      WITH newNode, parent // ADDED THIS LINE: Carry newNode and parent into the next scope
+      // Re-match for the relationship using the 'parent' variable (which may be null)
+      // and newNode. If parent is null, this OPTIONAL MATCH won't find anything for r_check.
+      OPTIONAL MATCH (parent)-[r_check:${safeRelationType}]->(newNode)
+      RETURN newNode, parent, r_check AS r
     `;
     // queryParams already includes nodeProperties. parentCoordinate is used in the query directly.
     queryParams.parentCoordinate = parentCoordinate; // Still needed for the OPTIONAL MATCH and the re-match
