@@ -3,7 +3,107 @@
 
 ### Workflow Diagram (Epi-Logos Aligned)
 
-## To be developed after full plan implementation 
+```mermaid
+flowchart TD
+    %% Phase 0: Conceptual Alignment & Ideation
+    subgraph P0["Phase 0: Conceptual Alignment & Ideation (Epi-Logos Conceptual Analyst)"]
+        P0_MemExplore["Explore memory-bank for philosophical underpinnings & system context"]
+        P0_Brainstorm["Brainstorm potential features resonating with Epi-Logos tenets"]
+        P0_CAB["Produce Conceptual Alignment Brief (CAB)"]
+
+        P0_MemExplore --> P0_Brainstorm
+        P0_Brainstorm --> P0_CAB
+    end
+
+    %% Phase 1: Feature Definition
+    subgraph P1["Phase 1: Feature Definition (Epi-Logos Feature Definer)"]
+        P1_DeepDive["Deep dive into memory-bank for specific feature contexts (Bimba coords, subsystem functions)"]
+        P1_Define["Define feature scope, objectives, initial Acceptance Criteria"]
+        P1_EFDD["Create Epi-Logos Feature Definition Document (EFDD)"]
+
+        P1_DeepDive --> P1_Define
+        P1_Define --> P1_EFDD
+    end
+
+    %% Phase 2: Architectural Contextualization & Planning
+    subgraph P2["Phase 2: Architectural Contextualization & Planning (Epi-Logos Contextual Architect)"]
+        P2_MapBimba["Map feature to Bimba coordinate system within memory-bank"]
+        P2_Integrate["Identify impacted subsystems & integration points"]
+        P2_Checklists["Generate context-specific checklists from memory-bank patterns"]
+        P2_Package["Produce Feature Context & Bimba-Alignment Package (FCBAP)"]
+
+        P2_MapBimba --> P2_Integrate
+        P2_Integrate --> P2_Checklists
+        P2_Checklists --> P2_Package
+    end
+
+    %% Phase 3: Story Breakdown & Prompt Engineering
+    subgraph P3["Phase 3: Story Breakdown & Prompt Engineering (Epi-Logos Prompt Weaver)"]
+        P3_Verify["Verify EFDD & FCBAP"]
+        P3_Decompose["Decompose feature into manageable development 'stories'"]
+        P3_DraftPrompts["Draft detailed prompts for External AI Builder (embedding/referencing memory-bank info)"]
+        P3_PromptPkgs["Output: Draft Prompt Packages"]
+
+        P3_Verify --> P3_Decompose
+        P3_Decompose --> P3_DraftPrompts
+        P3_DraftPrompts --> P3_PromptPkgs
+    end
+
+    %% Phase 4: Prompt Finalization & Handover
+    subgraph P4["Phase 4: Prompt Finalization & Handover (Epi-Logos Prompt Weaver / Process Steward)"]
+        P4_Approve["Approve user stories (prompt sets)"]
+        P4_Finalize["Finalize prompt packages (ensure memory context links)"]
+        P4_Deploy["'Deploy' prompts to External AI Builder environment"]
+
+        P4_Approve --> P4_Finalize
+        P4_Finalize --> P4_Deploy
+    end
+
+    %% Phase 5: External Build, Feedback Integration & Iteration
+    subgraph P5["Phase 5: External Build, Feedback & Iteration (AI Builder / Epi-Logos Feedback Loop Manager)"]
+        P5_Build["External AI Builder implements prompts"]
+        P5_Receive["Receive outputs, logs, or feedback from AI Builder"]
+        P5_StoreFeedback["Store feedback in memory-bank (e.g., Developments/{DevName}/feedback)"]
+        P5_Analyze["Analyze feedback to inform iterations on prompts, EFDD, or philosophy"]
+        P5_UpdateMemory["Update memory-bank with learnings & refined artifacts"]
+        P5_Iterate["Iterate (back to P0, P1, P3 as needed)"]
+
+        P5_Build --> P5_Receive
+        P5_Receive --> P5_StoreFeedback
+        P5_StoreFeedback --> P5_Analyze
+        P5_Analyze --> P5_UpdateMemory
+        P5_Analyze --> P5_Iterate
+    end
+
+    %% Connections between phases
+    P0_CAB --> P1_DeepDive
+    UserInput[/"User Direct Input & Philosophical Guidance"/]:::userInput --> P0_MemExplore
+    UserInput --> P1_Define
+    P1_EFDD --> P2_MapBimba
+    P2_Package --> P3_Verify
+    P3_PromptPkgs --> P4_Approve
+    P4_Deploy --> P5_Build
+    
+    P5_Iterate -.-> P0
+    P5_Iterate -.-> P1
+    P5_Iterate -.-> P3
+
+    %% Completion condition
+    P5_UpdateMemory -- "All features complete & aligned" --> DONE["Project Increment Complete"]
+
+    %% Styling (can reuse or adapt from original)
+    classDef phase fill:#1a73e8,stroke:#0d47a1,stroke-width:2px,color:white,font-size:12px,font-weight:bold
+    classDef process fill:#e0f7fa,stroke:#00796b,stroke-width:1px,color:black,font-size:11px
+    classDef artifact fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px,color:black,font-size:11px
+    classDef iteration fill:#fff9c4,stroke:#fbc02d,stroke-width:1px,color:black,font-size:11px
+    classDef userInput fill:#fce4ec,stroke:#c2185b,stroke-width:1px,color:black,font-size:11px
+
+
+    class P0,P1,P2,P3,P4,P5 phase
+    class P0_MemExplore,P0_Brainstorm,P1_DeepDive,P1_Define,P2_MapBimba,P2_Integrate,P2_Checklists,P3_Verify,P3_Decompose,P3_DraftPrompts,P4_Approve,P4_Finalize,P4_Deploy,P5_Build,P5_Receive,P5_StoreFeedback,P5_Analyze,P5_UpdateMemory process
+    class P0_CAB,P1_EFDD,P2_Package,P3_PromptPkgs artifact
+    class P5_Iterate iteration
+```
 
 ### Original BMAD WORKFLOW for reference 
 
@@ -734,7 +834,7 @@ This is a significant architectural adjustment to the Orchestrator. What are you
 
 
           
-Alright, let's start with the <mcfile name="architecture-tmpl.md" path="/Users/admin/Documents/Epi-Logos_Seed_Files/bmad-agent/templates/architecture-tmpl.md"></mcfile>. Based on our previous discussions, the goal is to make this template align with the Epi-Logos project, particularly by referencing the `bmad-epilogos-memory` and incorporating the Siva (backend), Shakti (frontend), and Siva-Shakti (integration) distinctions.
+Alright, let's start with the <mcfile name="architecture-tmpl.md" path="/Users/admin/Documents/Epi-Logos_Seed_Files/bmad-agent/templates/architecture-tmpl.md"></mcfile>. Based on our previous discussions, the goal is to make this template align with the Epi-Logos project, particularly by referencing the `bmad-epilogos-memory` and incorporating the Siva (backend), Shakti (frontend), and Siva-Sakti (integration) distinctions.
 
 Here are my initial suggestions for augmentation. We can refine these collaboratively.
 
@@ -1543,7 +1643,7 @@ Here's a breakdown of each checklist, the likely changes, and the need for detai
 - architect-checklist.md
   
   - Global Changes : Integrate philosophical alignment in requirements, update documentation paths to bmad-epilogos-memory .
-  - Specific Review Needed? : Yes, high priority. This checklist is crucial for ensuring the technical architecture aligns not only with functional/non-functional requirements but also potentially with core Epi-Logos principles (e.g., how Siva, Shakti, Siva-Shakti concepts might influence architectural decisions for a specific development context).
+  - Specific Review Needed? : Yes, high priority. This checklist is crucial for ensuring the technical architecture aligns not only with functional/non-functional requirements but also potentially with core Epi-Logos principles (e.g., how Siva, Shakti, Siva-Sakti concepts might influence architectural decisions for a specific development context).
 - change-checklist.md
   
   - Global Changes : Ensure artifact paths in the "Artifact Conflict & Impact Analysis" section point to the correct contextual locations within bmad-epilogos-memory/{Development Name}/ .
@@ -1898,3 +1998,5 @@ This checklist is designed to ensure that the frontend architecture document for
 ```
  ------------------
 
+
+[end of bmad-agent/workflow-diagram (epi-logos aligned).md]

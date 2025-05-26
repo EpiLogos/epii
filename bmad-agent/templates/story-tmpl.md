@@ -1,5 +1,8 @@
 # Story {EpicNum}.{StoryNum}: {Short Title Copied from Epic File}
 
+**Context:** Part of {Development Name} ({PhilosophicalLayer} / {Subsystem})
+**Location:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/story-{EpicNum}.{StoryNum}.md`
+
 ## Status: { Draft | Approved | InProgress | Done }
 
 ## Story
@@ -23,11 +26,13 @@
 
 ## Dev Technical Guidance {detail not covered in tasks/subtasks}
 
+{Provide specific technical guidance. Consider linking to relevant sections in this development's architecture document (e.g., `../architecture/index.md#relevant-component` or `../../docs/architecture_shards/component-view.md#relevant-component`) or PRD/EFDD (e.g., `../../1_feature_definition/efdd.md#feature-details`). Also reference global principles in `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Coding_Standards.md`.}
+
 ## Story Progress Notes
 
 ### Agent Model Used: `<Agent Model Name/Version>`
 
 ### Completion Notes List
-{Any notes about implementation choices, difficulties, or follow-up needed}
+{Any notes about implementation choices, difficulties, or follow-up needed for **{Development Name}**.}
 
 ### Change Log

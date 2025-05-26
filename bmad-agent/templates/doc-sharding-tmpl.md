@@ -1,102 +1,93 @@
-# Document Sharding Plan Template
+# Document Sharding Plan for {Development Name}
 
-This plan directs the agent on how to break down large source documents into smaller, granular files during its Librarian Phase. The agent will refer to this plan to identify source documents, the specific sections to extract, and the target filenames for the sharded content.
+This plan directs the agent on how to break down large source documents into smaller, granular files during its Librarian Phase for the **{Development Name}** initiative, operating within the **{PhilosophicalLayer} / {Subsystem}** context. The agent will refer to this plan to identify source documents (primarily the PRD and Architecture document for **{DevelopmentName}**), the specific sections to extract, and the target filenames for the sharded content within the `BMAD EPI-LOGOS MEMORY`.
 
----
-
-## 1. Source Document: PRD (Project Requirements Document)
-
-- **Note to Agent:** Confirm the exact filename of the PRD with the user (e.g., `PRD.md`, `ProjectRequirements.md`, `prdx.y.z.md`).
-
-### 1.1. Epic Granulation
-
-- **Instruction:** For each Epic identified within the PRD:
-- **Source Section(s) to Copy:** The complete text for the Epic, including its main description, goals, and all associated user stories or detailed requirements under that Epic. Ensure to capture content starting from a heading like "**Epic X:**" up to the next such heading or end of the "Epic Overview" section.
-- **Target File Pattern:** `docs/epic-<id>.md`
-  - _Agent Note: `<id>` should correspond to the Epic number._
+**Target Base Path for Sharded Documents:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/`
 
 ---
 
-## 2. Source Document: Main Architecture Document
+## 1. Source Document: PRD for {Development Name}
 
-- **Note to Agent:** Confirm the exact filename with the user (e.g., `architecture.md`, `SystemArchitecture.md`).
+- **Note to Agent:** The primary PRD for this development is located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/prd.md`. Confirm this is the source.
 
-### 2.1. Core Architecture Granules
+### 1.1. Epic Granulation (from {Development Name} PRD)
 
-- **Source Section(s) to Copy:** Section(s) detailing "API Reference", "API Endpoints", or "Service Interfaces".
-- **Target File:** `docs/api-reference.md`
-
-- **Source Section(s) to Copy:** Section(s) detailing "Data Models", "Database Schema", "Entity Definitions".
-- **Target File:** `docs/data-models.md`
-
-- **Source Section(s) to Copy:** Section(s) titled "Environment Variables Documentation", "Configuration Settings", "Deployment Parameters", or relevant subsections within "Infrastructure and Deployment Overview" if a dedicated section is not found.
-- **Target File:** `docs/environment-vars.md`
-
-  - _Agent Note: Prioritize a dedicated 'Environment Variables' section or linked 'environment-vars.md' source if available. If not, extract relevant configuration details from 'Infrastructure and Deployment Overview'. This shard is for specific variable definitions and usage._
-
-- **Source Section(s) to Copy:** Section(s) detailing "Project Structure".
-- **Target File:** `docs/project-structure.md`
-
-  - _Agent Note: If the project involves multiple repositories (not a monorepo), ensure this file clearly describes the structure of each relevant repository or links to sub-files if necessary._
-
-- **Source Section(s) to Copy:** Section(s) detailing "Technology Stack", "Key Technologies", "Libraries and Frameworks", or "Definitive Tech Stack Selections".
-- **Target File:** `docs/tech-stack.md`
-
-- **Source Section(s) to Copy:** Sections detailing "Coding Standards", "Development Guidelines", "Best Practices", "Testing Strategy", "Testing Decisions", "QA Processes", "Overall Testing Strategy", "Error Handling Strategy", and "Security Best Practices".
-- **Target File:** `docs/operational-guidelines.md`
-
-  - _Agent Note: This file consolidates several key operational aspects. Ensure that the content from each source section ("Coding Standards", "Testing Strategy", "Error Handling Strategy", "Security Best Practices") is clearly delineated under its own H3 (###) or H4 (####) heading within this document._
-
-- **Source Section(s) to Copy:** Section(s) titled "Component View" (including sub-sections like "Architectural / Design Patterns Adopted").
-- **Target File:** `docs/component-view.md`
-
-- **Source Section(s) to Copy:** Section(s) titled "Core Workflow / Sequence Diagrams" (including all sub-diagrams).
-- **Target File:** `docs/sequence-diagrams.md`
-
-- **Source Section(s) to Copy:** Section(s) titled "Infrastructure and Deployment Overview".
-- **Target File:** `docs/infra-deployment.md`
-
-  - _Agent Note: This is for the broader overview, distinct from the specific `docs/environment-vars.md`._
-
-- **Source Section(s) to Copy:** Section(s) titled "Key Reference Documents".
-- **Target File:** `docs/key-references.md`
+- **Instruction:** For each Epic identified within the **{Development Name}** PRD:
+- **Source Section(s) to Copy:** The complete text for the Epic, including its main description, goals, and all associated user stories or detailed requirements under that Epic. Ensure to capture content starting from a heading like "**Epic X:**" up to the next such heading or end of the "Epic Overview" section within the **{Development Name}** PRD.
+- **Target File Pattern:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/epic-<id>.md`
+  - _Agent Note: `<id>` should correspond to the Epic number or a sanitized version of the Epic title from the **{Development Name}** PRD._
 
 ---
 
-## 3. Source Document(s): Front-End Specific Documentation
+## 2. Source Document: Architecture Document for {Development Name}
 
-- **Note to Agent:** Confirm filenames with the user (e.g., `front-end-architecture.md`, `front-end-spec.md`, `ui-guidelines.md`). Multiple FE documents might exist.
+- **Note to Agent:** The primary Architecture document for this development is located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md` (or a similarly named main architecture file within that directory, like `architecture.md`). Confirm this is the source.
 
-### 3.1. Front-End Granules
+### 2.1. Core Architecture Granules (from {Development Name} Architecture)
 
-- **Source Section(s) to Copy:** Section(s) detailing "Front-End Project Structure" or "Detailed Frontend Directory Structure".
-- **Target File:** `docs/front-end-project-structure.md`
+- **Source Section(s) to Copy:** Section(s) detailing "API Reference", "API Endpoints", or "Service Interfaces" relevant to **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/api-reference.md`
 
-- **Source Section(s) to Copy:** Section(s) detailing "UI Style Guide", "Brand Guidelines", "Visual Design Specifications", or "Styling Approach".
-- **Target File:** `docs/front-end-style-guide.md`
+- **Source Section(s) to Copy:** Section(s) detailing "Data Models", "Database Schema", "Entity Definitions" relevant to **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/data-models.md`
 
-  - _Agent Note: This section might be a sub-section or refer to other documents (e.g., `ui-ux-spec.txt`). Extract the core styling philosophy and approach defined within the frontend architecture document itself._
+- **Source Section(s) to Copy:** Section(s) titled "Environment Variables Documentation", "Configuration Settings", "Deployment Parameters" specific to **{Development Name}**, or relevant subsections within "Infrastructure and Deployment Overview" if a dedicated section is not found in the **{Development Name}** architecture doc.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/environment-vars.md`
 
-- **Source Section(s) to Copy:** Section(s) detailing "Component Library", "Reusable UI Components Guide", "Atomic Design Elements", or "Component Breakdown & Implementation Details".
-- **Target File:** `docs/front-end-component-guide.md`
+- **Source Section(s) to Copy:** Section(s) detailing "Project Structure" as it pertains to the implementation of **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/project-structure.md`
 
-- **Source Section(s) to Copy:** Section(s) detailing "Front-End Coding Standards" (specifically for UI development, e.g., JavaScript/TypeScript style, CSS naming conventions, accessibility best practices for FE).
-- **Target File:** `docs/front-end-coding-standards.md`
+- **Source Section(s) to Copy:** Section(s) detailing "Technology Stack", "Key Technologies", "Libraries and Frameworks", or "Definitive Tech Stack Selections" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/tech-stack.md`
 
-  - _Agent Note: A dedicated top-level section for this might not exist. If not found, this shard might be empty or require cross-referencing with the main architecture's coding standards. Extract any front-end-specific coding conventions mentioned._
+- **Source Section(s) to Copy:** Sections detailing "Coding Standards", "Development Guidelines", "Best Practices", "Testing Strategy", "Testing Decisions", "QA Processes", "Overall Testing Strategy", "Error Handling Strategy", and "Security Best Practices" specifically for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/operational-guidelines.md`
+  - _Agent Note: Consolidate aspects relevant to **{Development Name}**. Ensure clear delineation._
 
-- **Source Section(s) to Copy:** Section(s) titled "State Management In-Depth".
-- **Target File:** `docs/front-end-state-management.md`
+- **Source Section(s) to Copy:** Section(s) titled "Component View" (including sub-sections like "Architectural / Design Patterns Adopted") for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/component-view.md`
 
-- **Source Section(s) to Copy:** Section(s) titled "API Interaction Layer".
-- **Target File:** `docs/front-end-api-interaction.md`
+- **Source Section(s) to Copy:** Section(s) titled "Core Workflow / Sequence Diagrams" (including all sub-diagrams) relevant to **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/sequence-diagrams.md`
 
-- **Source Section(s) to Copy:** Section(s) titled "Routing Strategy".
-- **Target File:** `docs/front-end-routing-strategy.md`
+- **Source Section(s) to Copy:** Section(s) titled "Infrastructure and Deployment Overview" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/infra-deployment.md`
 
-- **Source Section(s) to Copy:** Section(s) titled "Frontend Testing Strategy".
-- **Target File:** `docs/front-end-testing-strategy.md`
+- **Source Section(s) to Copy:** Section(s) titled "Key Reference Documents" from the **{Development Name}** architecture doc.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/key-references.md`
 
 ---
 
-CRITICAL: **Index Management:** After creating the files, update `docs/index.md` as needed to reference and describe each doc - do not mention granules or where it was sharded from, just doc purpose - as the index also contains other doc references potentially.
+## 3. Source Document(s): Front-End Specific Documentation for {Development Name} (if applicable)
+
+- **Note to Agent:** If **{Development Name}** has a significant front-end component (Shakti aspect), its specific architecture/specification documents will be located within `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/` (e.g., `front-end-architecture.md`) or a `frontend/` subdirectory therein. Confirm filenames.
+
+### 3.1. Front-End Granules (from {Development Name} FE Docs)
+
+- **Source Section(s) to Copy:** Section(s) detailing "Front-End Project Structure" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/project-structure.md`
+
+- **Source Section(s) to Copy:** Section(s) detailing "UI Style Guide", "Visual Design Specifications" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/style-guide.md`
+
+- **Source Section(s) to Copy:** Section(s) detailing "Component Library", "Reusable UI Components Guide" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/component-guide.md`
+
+- **Source Section(s) to Copy:** Section(s) detailing "Front-End Coding Standards" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/coding-standards.md`
+
+- **Source Section(s) to Copy:** Section(s) titled "State Management In-Depth" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/state-management.md`
+
+- **Source Section(s) to Copy:** Section(s) titled "API Interaction Layer" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/api-interaction.md`
+
+- **Source Section(s) to Copy:** Section(s) titled "Routing Strategy" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/routing-strategy.md`
+
+- **Source Section(s) to Copy:** Section(s) titled "Frontend Testing Strategy" for **{Development Name}**.
+- **Target File:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/frontend_shards/testing-strategy.md`
+
+---
+
+CRITICAL: **Index Management for {Development Name}:** After creating the files, update the main index/readme for this development, typically `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/README.md` or `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/index.md`, to reference and describe each new sharded document. Focus on the document's purpose within the **{Development Name}** context.

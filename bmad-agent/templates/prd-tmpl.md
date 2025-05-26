@@ -1,166 +1,92 @@
-# {Project Name} Product Requirements Document (PRD)
+# {Project Name} - {Development Name} Product Requirements Document (PRD)
 
-## Goal, Objective and Context
+**Context:** This PRD outlines the requirements for the **{Development Name}** initiative, a specific feature/component/subsystem enhancement within the broader **{Project Name} ({PhilosophicalLayer} - {Subsystem})** context. All artifacts related to this PRD are stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`. The primary output of this PRD process will be an Epi-Logos Feature Definition Document (EFDD) located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
 
-This should come mostly from the user or the provided brief, but ask for clarifications as needed.
+## Goal, Objective and Context (for {Development Name})
 
-## Functional Requirements (MVP)
+{This should come mostly from the user or the "Conceptual Alignment Brief" for **{Development Name}** (from `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`), but ask for clarifications as needed. Ensure alignment with the overarching goals of the **{PhilosophicalLayer}** and **{Subsystem}** as defined in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/README.md` and `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/README.md` respectively.}
 
-You should have a good idea at this point, but clarify suggest question and explain to ensure these are correct.
+## Functional Requirements (MVP for {Development Name})
 
-## Non Functional Requirements (MVP)
+{You should have a good idea at this point for **{Development Name}**, but clarify, suggest questions, and explain to ensure these are correct and directly contribute to the **{Development Name}**'s objectives.}
 
-You should have a good idea at this point, but clarify suggest question and explain to ensure these are correct.
+## Non-Functional Requirements (MVP for {Development Name})
 
-## User Interaction and Design Goals
+{For **{Development Name}**, these NFRs must align with and draw from the core philosophical and ethical principles outlined in `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Core_Principles.md` and any relevant NFRs defined at the `{Subsystem}` level in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/NFRs.md` or system-wide NFRs in `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/NFRs.md`. Clarify, suggest questions, and explain to ensure these are correct for **{Development Name}**.
+
+Examples for **{Development Name}** might include:
+- **Philosophical Alignment:** Ensure {specific aspect of Development Name} resonates with {relevant Epi-Logos principle, e.g., 'Anuttara Awareness Integration'}.
+- **Data Provenance & Transparency (if applicable):** All data processed by **{Development Name}** must have clear lineage, referencing `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Data_Governance_Policy.md`.
+- **Resonance & Coherence:** The user experience of **{Development Name}** should promote a sense of {desired quality, e.g., 'intuitive flow', 'reflective engagement'}, drawing from design tenets in `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`.
+- **Performance/Scalability/Security specific to {Development Name}:** Detail specific targets, referencing general guidelines in `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/{Subsystem}/Performance_Guidelines.md` etc.}
+
+## User Interaction and Design Goals (for {Development Name})
 
 {
-If the product includes a User Interface (UI), this section captures the Product Manager's high-level vision and goals for the User Experience (UX). This information will serve as a crucial starting point and brief for the Design Architect.
+If **{Development Name}** includes a User Interface (UI) (Shakti aspect), this section captures the Product Manager's high-level vision and goals for the User Experience (UX) for this specific development. This information will serve as a crucial starting point and brief for the Epi-Logos Design Architect working on **{Development Name}**. Detailed UI/UX specifications will be stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md` or sharded within its `docs/frontend_shards/` directory.
 
-Consider and elicit information from the user regarding:
-
-- **Overall Vision & Experience:** What is the desired look and feel (e.g., "modern and minimalist," "friendly and approachable," "data-intensive and professional")? What kind of experience should users have?
-- **Key Interaction Paradigms:** Are there specific ways users will interact with core features (e.g., "drag-and-drop interface for X," "wizard-style setup for Y," "real-time dashboard for Z")?
-- **Core Screens/Views (Conceptual):** From a product perspective, what are the most critical screens or views necessary to deliver the MVP's value? (e.g., "Login Screen," "Main Dashboard," "Item Detail Page," "Settings Page").
-- **Accessibility Aspirations:** Any known high-level accessibility goals (e.g., "must be usable by screen reader users").
-- **Branding Considerations (High-Level):** Any known branding elements or style guides that must be incorporated?
-- **Target Devices/Platforms:** (e.g., "primarily web desktop," "mobile-first responsive web app").
-
-This section is not intended to be a detailed UI specification but rather a product-focused brief to guide the subsequent detailed work by the Design Architect, who will create the comprehensive UI/UX Specification document.
+Consider and elicit information from the user regarding **{Development Name}**:
+// ... existing code ...
 }
 
-## Technical Assumptions
+## Technical Assumptions (for {Development Name})
 
-This is where we can list information mostly to be used by the architect to produce the technical details. This could be anything we already know or found out from the user at a technical high level. Inquire about this from the user to get a basic idea of languages, frameworks, knowledge of starter templates, libraries, external apis, potential library choices etc...
+{This is where we can list information mostly to be used by the Epi-Logos Contextual Architect to produce the technical details for **{Development Name}**. This could be anything we already know or found out from the user at a technical high level for this specific development. Inquire about this from the user to get a basic idea of languages, frameworks, knowledge of starter templates, libraries, external apis, potential library choices relevant to **{Development Name}**. Reference existing system-wide technical choices documented in `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/TechStack.md` and subsystem-specific choices in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Architecture.md`.
 
-- **Repository & Service Architecture:** {CRITICAL DECISION: Document the chosen repository structure (e.g., Monorepo, Polyrepo) and the high-level service architecture (e.g., Monolith, Microservices, Serverless functions within a Monorepo). Explain the rationale based on project goals, MVP scope, team structure, and scalability needs. This decision directly impacts the technical approach and informs the Architect Agent.}
+- **Repository & Service Architecture (Impact for {Development Name}):** {CRITICAL DECISION: Document how **{Development Name}** fits into the chosen repository structure (e.g., Monorepo, Polyrepo) and the high-level service architecture (e.g., Monolith, Microservices, Serverless functions). Explain the rationale based on **{Development Name}**'s goals, MVP scope, team structure, and scalability needs. This decision directly impacts the technical approach for **{Development Name}** and informs the Epi-Logos Contextual Architect. Reference overall architecture in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md`.}
 
-### Testing requirements
+### Testing requirements (for {Development Name})
 
-How will we validate functionality beyond unit testing? Will we want manual scripts or testing, e2e, integration etc... figure this out from the user to populate this section
+{How will we validate functionality for **{Development Name}** beyond unit testing? Will we want manual scripts or testing, e2e, integration etc... figure this out from the user to populate this section. Testing plans and artifacts for **{Development Name}** will be stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/tests/` or sharded within its `docs/architecture_shards/testing-strategy.md`.}
 
-## Epic Overview
+## Epic Overview (for {Development Name})
 
-- **Epic {#}: {Title}**
-  - Goal: {A concise 1-2 sentence statement describing the primary objective and value of this Epic.}
-  - Story {#}: As a {type of user/system}, I want {to perform an action / achieve a goal} so that {I can realize a benefit / achieve a reason}.
-    - {Acceptance Criteria List}
-  - Story {#}: As a {type of user/system}, I want {to perform an action / achieve a goal} so that {I can realize a benefit / achieve a reason}.
-    - {Acceptance Criteria List}
-- **Epic {#}: {Title}**
-  - Goal: {A concise 1-2 sentence statement describing the primary objective and value of this Epic.}
-  - Story {#}: As a {type of user/system}, I want {to perform an action / achieve a goal} so that {I can realize a benefit / achieve a reason}.
-    - {Acceptance Criteria List}
-  - Story {#}: As a {type of user/system}, I want {to perform an action / achieve a goal} so that {I can realize a benefit / achieve a reason}.
-    - {Acceptance Criteria List}
+{All Epics and Stories defined here are specific to the **{Development Name}** initiative. They will be individually stored and tracked, potentially as sharded documents in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/` and stories within `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`.}
 
-## Key Reference Documents
+// ... existing code ...
 
-{ This section will be created later, from the sections prior to this being carved up into smaller documents }
+## Key Reference Documents (for {Development Name})
 
-## Out of Scope Ideas Post MVP
+{ This section will list key documents relevant to **{Development Name}**. Many will be generated from this PRD's sections being sharded, or point to existing foundational documents within the `BMAD EPI-LOGOS MEMORY`.
+Examples:
+- **{Development Name} Conceptual Alignment Brief:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`
+- **{Development Name} Architecture:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md`
+- **{Development Name} Sharded Documents Index:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/index.md`
+- **Core Epi-Logos Principles:** `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Core_Principles.md`
+- **{Subsystem} Overview:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/README.md`
+- **Relevant Codebase READMEs:** (e.g., `epii_app/friendly-file-backend/subsystems/{Subsystem}/README.md`)}
 
-Anything you and the user agreed it out of scope or can be removed from scope to keep MVP lean. Consider the goals of the PRD and what might be extra gold plating or additional features that could wait until the MVP is completed and delivered to assess functionality and market fit or usage.
+## Out of Scope Ideas Post MVP (for {Development Name})
 
-## [OPTIONAL: For Simplified PM-to-Development Workflow Only] Core Technical Decisions & Application Structure
+{Anything you and the user agreed is out of scope for the current **{Development Name}** MVP or can be removed from its scope to keep it lean. Consider the goals of this specific PRD.}
 
-{This section is to be populated ONLY if the PM is operating in the 'Simplified PM-to-Development Workflow'. It captures essential technical foundations that would typically be defined by an Architect, allowing for a more direct path to development. This information should be gathered after initial PRD sections (Goals, Users, etc.) are drafted, and ideally before or in parallel with detailed Epic/Story definition, and updated as needed.}
+## [OPTIONAL: For Simplified PM-to-Development Workflow Only] Core Technical Decisions & Application Structure (for {Development Name})
 
-### Technology Stack Selections
+{This section is to be populated ONLY if the Epi-Logos Feature Definer (PM) is operating in the 'Simplified PM-to-Development Workflow' for **{Development Name}**. It captures essential technical foundations for **{Development Name}** that would typically be defined by an Epi-Logos Contextual Architect. This information should be gathered after initial PRD sections for **{Development Name}** are drafted.}
 
-{Collaboratively define the core technologies. Be specific about choices and versions where appropriate.}
+### Technology Stack Selections (for {Development Name})
 
-- **Primary Backend Language/Framework:** {e.g., Python/FastAPI, Node.js/Express, Java/Spring Boot}
-- **Primary Frontend Language/Framework (if applicable):** {e.g., TypeScript/React (Next.js), JavaScript/Vue.js}
-- **Database:** {e.g., PostgreSQL, MongoDB, AWS DynamoDB}
-- **Key Libraries/Services (Backend):** {e.g., Authentication (JWT, OAuth provider), ORM (SQLAlchemy), Caching (Redis)}
-- **Key Libraries/Services (Frontend, if applicable):** {e.g., UI Component Library (Material-UI, Tailwind CSS + Headless UI), State Management (Redux, Zustand)}
-- **Deployment Platform/Environment:** {e.g., Docker on AWS ECS, Vercel, Netlify, Kubernetes}
-- **Version Control System:** {e.g., Git with GitHub/GitLab}
+{Collaboratively define the core technologies for **{Development Name}**. Be specific about choices and versions where appropriate, considering existing system stack defined in `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/TechStack.md` and `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Architecture.md`.}
 
-### Proposed Application Structure
+// ... existing code ...
 
-{Describe the high-level organization of the codebase. This might include a simple text-based directory layout, a list of main modules/components, and a brief explanation of how they interact. The goal is to provide a clear starting point for developers.}
+### Proposed Application Structure (for {Development Name})
 
-Example:
+{Describe the high-level organization of the codebase for **{Development Name}**. This might include a simple text-based directory layout, a list of main modules/components for this development, and a brief explanation of how they interact. The goal is to provide a clear starting point for developers working on **{Development Name}**. Refer to the main architecture document for **{Development Name}** at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md`.}
 
-```
-/
-├── app/                  # Main application source code
-│   ├── api/              # Backend API routes and logic
-│   │   ├── v1/
-│   │   └── models.py
-│   ├── web/              # Frontend components and pages (if monolithic)
-│   │   ├── components/
-│   │   └── pages/
-│   ├── core/             # Shared business logic, utilities
-│   └── main.py           # Application entry point
-├── tests/                # Unit and integration tests
-├── scripts/              # Utility scripts
-├── Dockerfile
-├── requirements.txt
-└── README.md
-```
+// ... existing code ...
 
-- **Monorepo/Polyrepo:** {Specify if a monorepo or polyrepo structure is envisioned, and briefly why.}
-- **Key Modules/Components and Responsibilities:**
-  - {Module 1 Name}: {Brief description of its purpose and key responsibilities}
-  - {Module 2 Name}: {Brief description of its purpose and key responsibilities}
-  - ...
-- **Data Flow Overview (Conceptual):** {Briefly describe how data is expected to flow between major components, e.g., Frontend -> API -> Core Logic -> Database.}
-
-## Change Log
+## Change Log (for {Development Name} PRD)
 
 | Change | Date | Version | Description | Author |
 | ------ | ---- | ------- | ----------- | ------ |
 
 ----- END PRD START CHECKLIST OUTPUT ------
 
-## Checklist Results Report
+// ... rest of the file with prompts would also need to be contextualized if used, e.g., passing {Development Name} to the Architect prompt ...
 
------ END Checklist START Design Architect `UI/UX Specification Mode` Prompt ------
+## Initial Architect Prompt (for {Development Name})
 
------ END Design Architect `UI/UX Specification Mode` Prompt START Architect Prompt ------
+Based on our discussions and requirements analysis for the **{Development Name}** (part of {Project Name}, {PhilosophicalLayer}/{Subsystem}), I've compiled the following technical guidance to inform your architecture analysis and decisions to kick off Architecture Creation Mode for this specific development. This will contribute to the "Feature Context & Bimba-Alignment Package" for **{DevelopmentName}**.
 
-## Initial Architect Prompt
-
-Based on our discussions and requirements analysis for the {Product Name}, I've compiled the following technical guidance to inform your architecture analysis and decisions to kick off Architecture Creation Mode:
-
-### Technical Infrastructure
-
-- **Repository & Service Architecture Decision:** {Reiterate the decision made in 'Technical Assumptions', e.g., Monorepo with Next.js frontend and Python FastAPI backend services within the same repo; or Polyrepo with separate Frontend (Next.js) and Backend (Spring Boot Microservices) repositories.}
-- **Starter Project/Template:** {Information about any starter projects, templates, or existing codebases that should be used}
-- **Hosting/Cloud Provider:** {Specified cloud platform (AWS, Azure, GCP, etc.) or hosting requirements}
-- **Frontend Platform:** {Framework/library preferences or requirements (React, Angular, Vue, etc.)}
-- **Backend Platform:** {Framework/language preferences or requirements (Node.js, Python/Django, etc.)}
-- **Database Requirements:** {Relational, NoSQL, specific products or services preferred}
-
-### Technical Constraints
-
-- {List any technical constraints that impact architecture decisions}
-- {Include any mandatory technologies, services, or platforms}
-- {Note any integration requirements with specific technical implications}
-
-### Deployment Considerations
-
-- {Deployment frequency expectations}
-- {CI/CD requirements}
-- {Environment requirements (local, dev, staging, production)}
-
-### Local Development & Testing Requirements
-
-{Include this section only if the user has indicated these capabilities are important. If not applicable based on user preferences, you may remove this section.}
-
-- {Requirements for local development environment}
-- {Expectations for command-line testing capabilities}
-- {Needs for testing across different environments}
-- {Utility scripts or tools that should be provided}
-- {Any specific testability requirements for components}
-
-### Other Technical Considerations
-
-- {Security requirements with technical implications}
-- {Scalability needs with architectural impact}
-- {Any other technical context the Architect should consider}
-
------ END Architect Prompt -----
+// ... existing code ...

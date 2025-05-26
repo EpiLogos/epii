@@ -1,51 +1,52 @@
-# Project Brief: {Project Name}
+# Conceptual Alignment Brief: {Development Name} ({PhilosophicalLayer})
 
-## Introduction / Problem Statement
+**Context:** This brief outlines the initial conceptual alignment for the **{Development Name}** initiative, operating within the **{PhilosophicalLayer}** and targeting the **{Subsystem}**. It serves as the starting point for the Epi-Logos Feature Definer. All artifacts related to this brief are stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/`.
 
-{Describe the core idea, the problem being solved, or the opportunity being addressed. Why is this project needed?}
+## Introduction / Problem Statement (from an Epi-Logos Perspective)
 
-## Vision & Goals
+{Describe the core idea, the problem being solved, or the opportunity being addressed for this specific **{DevelopmentName}**. Why is this development needed in the context of Epi-Logos? Consider linking to relevant sections in `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/` or the parent {Project Name} brief if this is a sub-development. This section should reflect insights from the "Conceptual Alignment & Ideation Phase" and/or the "Memory-bank Exploration Directive Phase".}
 
-- **Vision:** {Describe the high-level desired future state or impact of this project.}
-- **Primary Goals:** {List 2-5 specific, measurable, achievable, relevant, time-bound (SMART) goals for the Minimum Viable Product (MVP).}
+## Vision & Goals (for this Development, aligned with Epi-Logos)
+
+- **Vision:** {Describe the high-level desired future state or impact of this specific **{DevelopmentName}**, and how it contributes to the overall Epi-Logos vision and the specific goals of its **{Subsystem}**.}
+- **Primary Goals (Conceptual):** {List 2-5 specific conceptual goals for **{DevelopmentName}** that align with Epi-Logos principles.}
   - Goal 1: ...
   - Goal 2: ...
-- **Success Metrics (Initial Ideas):** {How will we measure if the project/MVP is successful? List potential KPIs.}
+- **Success Metrics (Qualitative & Philosophical):** {How will we measure if **{DevelopmentName}** is successful from an Epi-Logos perspective? List potential qualitative indicators or philosophical alignments.}
 
-## Target Audience / Users
+## Target Audience / Users (as Participants in Epi-Logos)
 
-{Describe the primary users of this product/system. Who are they? What are their key characteristics or needs relevant to this project?}
+{Describe the primary users of this system/feature within **{DevelopmentName}**. Who are they in the context of Epi-Logos (e.g., seekers, explorers, contributors to the memory-bank)? What are their key characteristics or needs relevant to this **{DevelopmentName}** and its role within the **{Subsystem}**?}
 
-## Key Features / Scope (High-Level Ideas for MVP)
+## Key Features / Scope (High-Level Conceptual Ideas for {Development Name})
 
-{List the core functionalities or features envisioned for the MVP. Keep this high-level; details will go in the PRD/Epics.}
+{List the core functionalities or features envisioned for **{DevelopmentName}** from a conceptual, Epi-Logos aligned perspective. Keep this high-level; details will be fleshed out by the Epi-Logos Feature Definer in the EFDD. These ideas should stem from the "Conceptual Alignment Insights".}
 
-- Feature Idea 1: ...
-- Feature Idea 2: ...
-- Feature Idea N: ...
+- Conceptual Idea 1: ...
+- Conceptual Idea 2: ...
+- Conceptual Idea N: ...
 
-## Post MVP Features / Scope and Ideas
+## Post MVP Conceptual Ideas (for {Development Name})
 
-{List the core functionalities or features envisioned as potential for POST MVP. Keep this high-level; details will go in the PRD/Epics/Architecture.}
+{List potential future concepts or expansions for **{DevelopmentName}** that align with the Epi-Logos trajectory for its **{Subsystem}**.}
 
-- Feature Idea 1: ...
-- Feature Idea 2: ...
-- Feature Idea N: ...
+- Future Concept 1: ...
+- Future Concept N: ...
 
-## Known Technical Constraints or Preferences
+## Known Technical Constraints or Preferences (from an Epi-Logos Viewpoint)
 
-- **Constraints:** {List any known limitations and technical mandates or preferences - e.g., budget, timeline, specific technology mandates, required integrations, compliance needs.}
-- **Initial Architectural Preferences (if any):** {Capture any early thoughts or strong preferences regarding repository structure (e.g., monorepo, polyrepo) and overall service architecture (e.g., monolith, microservices, serverless components). This is not a final decision point but for initial awareness.}
-- **Risks:** {Identify potential risks - e.g., technical challenges, resource availability, market acceptance, dependencies.}
-- **User Preferences:** {Any specific requests from the user that are not a high level feature that could direct technology or library choices, or anything else that came up in the brainstorming or drafting of the PRD that is not included in prior document sections}
+- **Constraints:** {List any known limitations, technical mandates, or preferences for **{DevelopmentName}** that are guided by Epi-Logos principles (e.g., use of specific technologies that align with Sacred Technology Ethos, integration requirements with existing Bimba-coordinated `{Subsystem}` components).}
+- **Initial Architectural Preferences (if any, Epi-Logos Aligned):** {Capture any early thoughts regarding repository structure or service architecture for **{DevelopmentName}** that would best support Epi-Logos principles. This is not a final decision point.}
+- **Adherence to Epi-Logos Principles:** All development for **{DevelopmentName}** must adhere to established Epi-Logos architectural principles (e.g., `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/System_Design_Principles.md`) and the Model Context Protocol (MCP) where applicable.
+- **Risks (Philosophical & Technical):** {Identify potential risks for **{DevelopmentName}** – e.g., challenges in aligning with specific philosophical tenets, technical hurdles in implementing Epi-Logos resonant features, dependencies on other `{Subsystem}` developments.}
 
-## Relevant Research (Optional)
+## Relevant Research / Memory Exploration Insights (for {Development Name})
 
-{Link to or summarize findings from any initial research conducted (e.g., `deep-research-report-BA.md`).}
+{Link to or summarize findings from the "Conceptual Alignment & Ideation Phase" (`conceptual_alignment_insights.md`) and/or the "Memory-bank Exploration Directive Phase" (`memory_bank_exploration_directive.md`) conducted for **{DevelopmentName}**. These are expected to be in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/`.}
 
-## PM Prompt
+## Handoff Prompt to Epi-Logos Feature Definer
 
-This Project Brief provides the full context for {Project Name}. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section 1 at a time, asking for any necessary clarification or suggesting improvements as your mode 1 programming allows.
+This Conceptual Alignment Brief provides the full context for the **{Development Name}** development run, under the **{PhilosophicalLayer}** philosophical layer and targeting the **{Subsystem}**. Please start in 'Feature Definition Mode', review this brief thoroughly to work with the user to create the "Epi-Logos Feature Definition Document (EFDD)" section by section, one at a time. Ask for any necessary clarification or suggest improvements aligned with your persona. The EFDD will be stored as `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
 
 <example_handoff_prompt>
-This Project Brief provides the full context for Mealmate. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section 1 at a time, asking for any necessary clarification or suggesting improvements as your mode 1 programming allows.</example_handoff_prompt>
+This Conceptual Alignment Brief provides the full context for the 'User-Auth-Module' development. Please start in 'Feature Definition Mode', review the brief thoroughly to work with the user to create the EFDD section by section, one at a time, asking for any necessary clarification or suggesting improvements as your persona programming allows. The EFDD will be stored at `BMAD EPI-LOGOS MEMORY/Nara/AuthSubsystem/Developments/UserAuthModule/1_feature_definition/efdd.md`.</example_handoff_prompt>

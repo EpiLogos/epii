@@ -1,239 +1,242 @@
-# Product Manager (PM) Requirements Checklist
+# Epi-Logos Feature Definer (PM) Requirements Checklist for {Development Name}
 
-This checklist serves as a comprehensive framework to ensure the Product Requirements Document (PRD) and Epic definitions are complete, well-structured, and appropriately scoped for MVP development. The PM should systematically work through each item during the product definition process.
+This checklist serves as a comprehensive framework for the Epi-Logos Feature Definer to ensure the Epi-Logos Feature Definition Document (EFDD) and Epic definitions for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) are complete, well-structured, philosophically aligned, and appropriately scoped for MVP development. The EFDD will be located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
 
-## 1. PROBLEM DEFINITION & CONTEXT
+## 1. PROBLEM DEFINITION & EPI-LOGOS CONTEXT (for {Development Name})
 
-### 1.1 Problem Statement
-- [ ] Clear articulation of the problem being solved
-- [ ] Identification of who experiences the problem
-- [ ] Explanation of why solving this problem matters
-- [ ] Quantification of problem impact (if possible)
-- [ ] Differentiation from existing solutions
+### 1.1 Problem Statement & Philosophical Alignment
+- [ ] Clear articulation of the problem being solved or opportunity being explored by **{Development Name}**.
+- [ ] Identification of who experiences the problem (user as seeker/participant in Epi-Logos).
+- [ ] Explanation of why solving this problem matters for **{Development Name}** within the Epi-Logos context.
+- [ ] Alignment with core Epi-Logos principles (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Core_Principles.md`).
+- [ ] Connection to the "Conceptual Alignment Brief" for **{Development Name}** (ref: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`).
 
-### 1.2 Business Goals & Success Metrics
-- [ ] Specific, measurable business objectives defined
-- [ ] Clear success metrics and KPIs established
-- [ ] Metrics are tied to user and business value
-- [ ] Baseline measurements identified (if applicable)
-- [ ] Timeframe for achieving goals specified
+### 1.2 Epi-Logos Goals & Success Metrics (for {Development Name})
+- [ ] Specific, measurable (qualitatively or quantitatively) objectives for **{Development Name}** defined.
+- [ ] Clear success metrics and KPIs (Key Philosophical Indicators) established for **{Development Name}**.
+- [ ] Metrics are tied to user value (as seeker/participant) and Epi-Logos vision for the **{Subsystem}**.
+- [ ] Baseline measurements identified (if applicable from `BMAD EPI-LOGOS MEMORY`).
+- [ ] Timeframe for achieving goals for **{Development Name}** specified.
 
-### 1.3 User Research & Insights
-- [ ] Target user personas clearly defined
-- [ ] User needs and pain points documented
-- [ ] User research findings summarized (if available)
-- [ ] Competitive analysis included
-- [ ] Market context provided
+### 1.3 User Research & Memory Insights (for {Development Name})
+- [ ] Target user personas (as seekers/participants) for **{Development Name}** clearly defined, referencing `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/User_Archetypes.md`.
+- [ ] User needs and pain points (in their journey within Epi-Logos) documented for **{Development Name}**.
+- [ ] Insights from `BMAD EPI-LOGOS MEMORY` (relevant `{Subsystem}` data, Bimba coordinates) summarized.
+- [ ] Competitive analysis (if relevant for **{Development Name}**) included.
+- [ ] Market context (if relevant for **{Development Name}**) provided.
 
-## 2. MVP SCOPE DEFINITION
+## 2. MVP SCOPE DEFINITION (for {Development Name})
 
-### 2.1 Core Functionality
-- [ ] Essential features clearly distinguished from nice-to-haves
-- [ ] Features directly address defined problem statement
-- [ ] Each Epic ties back to specific user needs
-- [ ] Features and Stories are described from user perspective
-- [ ] Minimum requirements for success defined
+### 2.1 Core Functionality (Aligned with Epi-Logos)
+- [ ] Essential features for **{Development Name}** clearly distinguished from nice-to-haves.
+- [ ] Features directly address defined problem statement for **{Development Name}** and align with Epi-Logos intent.
+- [ ] Each Epic within **{Development Name}** ties back to specific user (seeker) needs and philosophical goals.
+- [ ] Features and Stories for **{Development Name}** are described from user (seeker) perspective.
+- [ ] Minimum requirements for success (functional and philosophical) for **{Development Name}** defined.
 
-### 2.2 Scope Boundaries
-- [ ] Clear articulation of what is OUT of scope
-- [ ] Future enhancements section included
-- [ ] Rationale for scope decisions documented
-- [ ] MVP minimizes functionality while maximizing learning
-- [ ] Scope has been reviewed and refined multiple times
+### 2.2 Scope Boundaries (for {Development Name})
+- [ ] Clear articulation of what is OUT of scope for **{Development Name}**.
+- [ ] Future enhancements section for **{Development Name}** included.
+- [ ] Rationale for scope decisions (for **{Development Name}**) documented, considering Epi-Logos priorities.
+- [ ] MVP for **{Development Name}** minimizes functionality while maximizing learning and philosophical expression.
+- [ ] Scope for **{Development Name}** has been reviewed and refined multiple times.
 
-### 2.3 MVP Validation Approach
-- [ ] Method for testing MVP success defined
-- [ ] Initial user feedback mechanisms planned
-- [ ] Criteria for moving beyond MVP specified
-- [ ] Learning goals for MVP articulated
-- [ ] Timeline expectations set
+### 2.3 MVP Validation Approach (for {Development Name})
+- [ ] Method for testing MVP success for **{Development Name}** (qualitative & philosophical) defined.
+- [ ] Initial user (seeker) feedback mechanisms for **{Development Name}** planned.
+- [ ] Criteria for moving beyond MVP for **{Development Name}** specified.
+- [ ] Learning goals for MVP (for **{Development Name}**) articulated, including insights for `BMAD EPI-LOGOS MEMORY`.
+- [ ] Timeline expectations for **{Development Name}** set.
 
-## 3. USER EXPERIENCE REQUIREMENTS
+## 3. USER EXPERIENCE REQUIREMENTS (Shakti Aspect of {Development Name})
 
-### 3.1 User Journeys & Flows
-- [ ] Primary user flows documented
-- [ ] Entry and exit points for each flow identified
-- [ ] Decision points and branches mapped
-- [ ] Critical path highlighted
-- [ ] Edge cases considered
+### 3.1 User Journeys & Flows (within {Development Name})
+- [ ] Primary user flows for **{Development Name}** documented, reflecting seeker/participant interaction.
+- [ ] Entry and exit points for each flow in **{Development Name}** identified.
+- [ ] Decision points and branches mapped for **{Development Name}**.
+- [ ] Critical path for **{Development Name}** highlighted.
+- [ ] Edge cases for **{Development Name}** considered.
 
-### 3.2 Usability Requirements
-- [ ] Accessibility considerations documented
-- [ ] Platform/device compatibility specified
-- [ ] Performance expectations from user perspective defined
-- [ ] Error handling and recovery approaches outlined
-- [ ] User feedback mechanisms identified
+### 3.2 Usability Requirements (Aligned with Epi-Logos Design Philosophy)
+- [ ] Accessibility considerations for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Accessibility_Guidelines.md`).
+- [ ] Platform/device compatibility for **{Development Name}** specified.
+- [ ] Performance expectations from user perspective for **{Development Name}** defined.
+- [ ] Error handling and recovery approaches for **{Development Name}** outlined (promoting reflective engagement).
+- [ ] User feedback mechanisms for **{Development Name}** identified.
 
-### 3.3 UI Requirements
-- [ ] Information architecture outlined
-- [ ] Critical UI components identified
-- [ ] Visual design guidelines referenced (if applicable)
-- [ ] Content requirements specified
-- [ ] High-level navigation structure defined
+### 3.3 UI Requirements (Shakti Aspect of {Development Name})
+- [ ] Information architecture for **{Development Name}** outlined.
+- [ ] Critical UI components for **{Development Name}** identified.
+- [ ] Visual design guidelines referenced (e.g., `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`, `.../Brand_Guidelines.md`).
+- [ ] Content requirements for **{Development Name}** specified (tone, language aligned with Epi-Logos).
+- [ ] High-level navigation structure for **{Development Name}** defined.
 
-## 4. FUNCTIONAL REQUIREMENTS
+## 4. FUNCTIONAL REQUIREMENTS (for {Development Name})
 
 ### 4.1 Feature Completeness
-- [ ] All required features for MVP documented
-- [ ] Features have clear, user-focused descriptions
-- [ ] Feature priority/criticality indicated
-- [ ] Requirements are testable and verifiable
-- [ ] Dependencies between features identified
+- [ ] All required features for MVP of **{Development Name}** documented in the EFDD.
+- [ ] Features have clear, user-focused descriptions, reflecting Epi-Logos intent.
+- [ ] Feature priority/criticality for **{Development Name}** indicated.
+- [ ] Requirements for **{Development Name}** are testable and verifiable.
+- [ ] Dependencies between features of **{Development Name}** identified.
 
 ### 4.2 Requirements Quality
-- [ ] Requirements are specific and unambiguous
-- [ ] Requirements focus on WHAT not HOW
-- [ ] Requirements use consistent terminology
-- [ ] Complex requirements broken into simpler parts
-- [ ] Technical jargon minimized or explained
+- [ ] Requirements for **{Development Name}** are specific and unambiguous.
+- [ ] Requirements focus on WHAT not HOW.
+- [ ] Requirements for **{Development Name}** use consistent Epi-Logos terminology.
+- [ ] Complex requirements for **{Development Name}** broken into simpler parts.
+- [ ] Technical jargon minimized or explained.
 
-### 4.3 User Stories & Acceptance Criteria
-- [ ] Stories follow consistent format
-- [ ] Acceptance criteria are testable
-- [ ] Stories are sized appropriately (not too large)
-- [ ] Stories are independent where possible
-- [ ] Stories include necessary context
-- [ ] Local testability requirements (e.g., via CLI) defined in ACs for relevant backend/data stories
+### 4.3 User Stories & Acceptance Criteria (for {Development Name})
+- [ ] Stories for **{Development Name}** follow consistent format (As a [seeker/participant]...).
+- [ ] Acceptance criteria for **{Development Name}** are testable and reflect philosophical goals.
+- [ ] Stories for **{Development Name}** are sized appropriately.
+- [ ] Stories for **{Development Name}** are independent where possible.
+- [ ] Stories for **{Development Name}** include necessary context (Bimba coordinates, `{Subsystem}` references).
+- [ ] Local testability requirements for **{Development Name}** defined in ACs.
 
-## 5. NON-FUNCTIONAL REQUIREMENTS
+## 5. NON-FUNCTIONAL REQUIREMENTS (for {Development Name}, aligned with Epi-Logos NFRs)
+(Reference `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/NFRs.md` and specific `{Subsystem}` NFRs)
 
 ### 5.1 Performance Requirements
-- [ ] Response time expectations defined
-- [ ] Throughput/capacity requirements specified
-- [ ] Scalability needs documented
-- [ ] Resource utilization constraints identified
-- [ ] Load handling expectations set
+- [ ] Response time expectations for **{Development Name}** defined.
+- [ ] Throughput/capacity requirements for **{Development Name}** specified.
+- [ ] Scalability needs for **{Development Name}** documented.
+- [ ] Resource utilization constraints for **{Development Name}** identified.
+- [ ] Load handling expectations for **{Development Name}** set.
 
 ### 5.2 Security & Compliance
-- [ ] Data protection requirements specified
-- [ ] Authentication/authorization needs defined
-- [ ] Compliance requirements documented
-- [ ] Security testing requirements outlined
-- [ ] Privacy considerations addressed
+- [ ] Data protection requirements for **{Development Name}** specified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Data_Governance_Policy.md`).
+- [ ] Authentication/authorization needs for **{Development Name}** defined (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Security_Guidelines.md`).
+- [ ] Compliance requirements for **{Development Name}** documented.
+- [ ] Security testing requirements for **{Development Name}** outlined.
+- [ ] Privacy considerations for **{Development Name}** addressed, aligning with Sacred Technology Ethos.
 
 ### 5.3 Reliability & Resilience
-- [ ] Availability requirements defined
-- [ ] Backup and recovery needs documented
-- [ ] Fault tolerance expectations set
-- [ ] Error handling requirements specified
-- [ ] Maintenance and support considerations included
+- [ ] Availability requirements for **{Development Name}** defined.
+- [ ] Backup and recovery needs for **{Development Name}** documented.
+- [ ] Fault tolerance expectations for **{Development Name}** set.
+- [ ] Error handling requirements for **{Development Name}** specified.
+- [ ] Maintenance and support considerations for **{Development Name}** included.
 
 ### 5.4 Technical Constraints
-- [ ] Platform/technology constraints documented
-- [ ] Integration requirements outlined
-- [ ] Third-party service dependencies identified
-- [ ] Infrastructure requirements specified
-- [ ] Development environment needs identified
+- [ ] Platform/technology constraints for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/TechStack.md`).
+- [ ] Integration requirements for **{Development Name}** outlined (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Integration_Patterns.md`).
+- [ ] Third-party service dependencies for **{Development Name}** identified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/ThirdPartyIntegrations.md`).
+- [ ] Infrastructure requirements for **{Development Name}** specified.
+- [ ] Development environment needs for **{Development Name}** identified.
 
-## 6. EPIC & STORY STRUCTURE
+## 6. EPIC & STORY STRUCTURE (for {Development Name})
+(Stories to be stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`)
+(Epics sharded to `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/`)
 
 ### 6.1 Epic Definition
-- [ ] Epics represent cohesive units of functionality
-- [ ] Epics focus on user/business value delivery
-- [ ] Epic goals clearly articulated
-- [ ] Epics are sized appropriately for incremental delivery
-- [ ] Epic sequence and dependencies identified
+- [ ] Epics for **{Development Name}** represent cohesive units of functionality.
+- [ ] Epics focus on user (seeker) value delivery and philosophical expression.
+- [ ] Epic goals for **{Development Name}** clearly articulated.
+- [ ] Epics sized appropriately for incremental delivery.
+- [ ] Epic sequence and dependencies for **{Development Name}** identified.
 
 ### 6.2 Story Breakdown
-- [ ] Stories are broken down to appropriate size
-- [ ] Stories have clear, independent value
-- [ ] Stories include appropriate acceptance criteria
-- [ ] Story dependencies and sequence documented
-- [ ] Stories aligned with epic goals
+- [ ] Stories for **{Development Name}** are broken down to appropriate size.
+- [ ] Stories have clear, independent value.
+- [ ] Stories include appropriate acceptance criteria reflecting Epi-Logos values.
+- [ ] Story dependencies and sequence for **{Development Name}** documented.
+- [ ] Stories aligned with epic goals for **{Development Name}**.
 
-### 6.3 First Epic Completeness
-- [ ] First epic includes all necessary setup steps
-- [ ] Project scaffolding and initialization addressed
-- [ ] Core infrastructure setup included
-- [ ] Development environment setup addressed
-- [ ] Local testability established early
+### 6.3 First Epic Completeness (for {Development Name})
+- [ ] First epic for **{Development Name}** includes all necessary setup steps.
+- [ ] Project scaffolding and initialization for **{Development Name}** addressed.
+- [ ] Core infrastructure setup for **{Development Name}** included.
+- [ ] Development environment setup for **{Development Name}** addressed.
+- [ ] Local testability for **{Development Name}** established early.
 
-## 7. TECHNICAL GUIDANCE
+## 7. TECHNICAL GUIDANCE (Initial thoughts for Epi-Logos Contextual Architect for {Development Name})
 
 ### 7.1 Architecture Guidance
-- [ ] Initial architecture direction provided
-- [ ] Technical constraints clearly communicated
-- [ ] Integration points identified
-- [ ] Performance considerations highlighted
-- [ ] Security requirements articulated
-- [ ] Known areas of high complexity or technical risk flagged for architectural deep-dive
+- [ ] Initial architecture direction for **{Development Name}** provided (e.g., alignment with Siva/Shakti/Siva-Sakti).
+- [ ] Technical constraints for **{Development Name}** clearly communicated.
+- [ ] Integration points for **{Development Name}** (Bimba coordinates, other `{Subsystem}` components) identified.
+- [ ] Performance considerations for **{Development Name}** highlighted.
+- [ ] Security requirements for **{Development Name}** articulated.
+- [ ] Known areas of high complexity or technical risk for **{Development Name}** flagged.
 
 ### 7.2 Technical Decision Framework
-- [ ] Decision criteria for technical choices provided
-- [ ] Trade-offs articulated for key decisions
-- [ ] Rationale for selecting primary approach over considered alternatives documented (for key design/feature choices)
-- [ ] Non-negotiable technical requirements highlighted
-- [ ] Areas requiring technical investigation identified
-- [ ] Guidance on technical debt approach provided
+- [ ] Decision criteria for technical choices for **{Development Name}** provided (including philosophical alignment).
+- [ ] Trade-offs articulated for key decisions for **{Development Name}**.
+- [ ] Rationale for selecting primary approach over considered alternatives for **{Development Name}** documented.
+- [ ] Non-negotiable technical requirements for **{Development Name}** highlighted.
+- [ ] Areas requiring technical investigation for **{Development Name}** identified.
+- [ ] Guidance on technical debt approach for **{Development Name}** provided.
 
 ### 7.3 Implementation Considerations
-- [ ] Development approach guidance provided
-- [ ] Testing requirements articulated
-- [ ] Deployment expectations set
-- [ ] Monitoring needs identified
-- [ ] Documentation requirements specified
+- [ ] Development approach guidance for **{Development Name}** provided (e.g., for external AI builder).
+- [ ] Testing requirements for **{Development Name}** articulated.
+- [ ] Deployment expectations for **{Development Name}** set.
+- [ ] Monitoring needs for **{Development Name}** identified.
+- [ ] Documentation requirements for **{Development Name}** (e.g., for `BMAD EPI-LOGOS MEMORY`) specified.
 
-## 8. CROSS-FUNCTIONAL REQUIREMENTS
+## 8. CROSS-FUNCTIONAL REQUIREMENTS (for {Development Name})
 
-### 8.1 Data Requirements
-- [ ] Data entities and relationships identified
-- [ ] Data storage requirements specified
-- [ ] Data quality requirements defined
-- [ ] Data retention policies identified
-- [ ] Data migration needs addressed (if applicable)
-- [ ] Schema changes planned iteratively, tied to stories requiring them
+### 8.1 Data Requirements (Siva Aspect)
+- [ ] Data entities and relationships for **{Development Name}** identified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/DataModels.md`).
+- [ ] Data storage requirements for **{Development Name}** specified.
+- [ ] Data quality requirements for **{Development Name}** defined.
+- [ ] Data retention policies for **{Development Name}** identified.
+- [ ] Data migration needs for **{Development Name}** addressed.
+- [ ] Schema changes for **{Development Name}** planned iteratively.
 
-### 8.2 Integration Requirements
-- [ ] External system integrations identified
-- [ ] API requirements documented
-- [ ] Authentication for integrations specified
-- [ ] Data exchange formats defined
-- [ ] Integration testing requirements outlined
+### 8.2 Integration Requirements (Siva-Sakti Aspect)
+- [ ] External system integrations for **{Development Name}** identified.
+- [ ] API requirements for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/api-specs.md`).
+- [ ] Authentication for integrations for **{Development Name}** specified.
+- [ ] Data exchange formats for **{Development Name}** defined (MCP considerations).
+- [ ] Integration testing requirements for **{Development Name}** outlined.
 
 ### 8.3 Operational Requirements
-- [ ] Deployment frequency expectations set
-- [ ] Environment requirements defined
-- [ ] Monitoring and alerting needs identified
-- [ ] Support requirements documented
-- [ ] Performance monitoring approach specified
+- [ ] Deployment frequency expectations for **{Development Name}** set.
+- [ ] Environment requirements for **{Development Name}** defined.
+- [ ] Monitoring and alerting needs for **{Development Name}** identified.
+- [ ] Support requirements for **{Development Name}** documented.
+- [ ] Performance monitoring approach for **{Development Name}** specified.
 
-## 9. CLARITY & COMMUNICATION
+## 9. CLARITY & COMMUNICATION (for {Development Name})
 
-### 9.1 Documentation Quality
-- [ ] Documents use clear, consistent language
-- [ ] Documents are well-structured and organized
-- [ ] Technical terms are defined where necessary
-- [ ] Diagrams/visuals included where helpful
-- [ ] Documentation is versioned appropriately
+### 9.1 Documentation Quality (EFDD and supporting artifacts for {Development Name})
+- [ ] Documents use clear, consistent Epi-Logos language.
+- [ ] Documents are well-structured and organized in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`.
+- [ ] Technical terms are defined where necessary.
+- [ ] Diagrams/visuals included where helpful.
+- [ ] Documentation is versioned appropriately.
 
 ### 9.2 Stakeholder Alignment
-- [ ] Key stakeholders identified
-- [ ] Stakeholder input incorporated
-- [ ] Potential areas of disagreement addressed
-- [ ] Communication plan for updates established
-- [ ] Approval process defined
+- [ ] Key stakeholders (including user as Epi-Logos Guide) identified for **{Development Name}**.
+- [ ] Stakeholder input incorporated into EFDD for **{Development Name}**.
+- [ ] Potential areas of disagreement regarding **{Development Name}** addressed.
+- [ ] Communication plan for updates on **{Development Name}** established.
+- [ ] Approval process for EFDD for **{Development Name}** defined.
 
-## PRD & EPIC VALIDATION SUMMARY
+## EFDD & EPIC VALIDATION SUMMARY (for {Development Name})
 
 ### Category Statuses
 | Category | Status | Critical Issues |
 |----------|--------|----------------|
-| 1. Problem Definition & Context | PASS/FAIL/PARTIAL | |
+| 1. Problem Definition & Epi-Logos Context | PASS/FAIL/PARTIAL | |
 | 2. MVP Scope Definition | PASS/FAIL/PARTIAL | |
-| 3. User Experience Requirements | PASS/FAIL/PARTIAL | |
+| 3. User Experience Requirements (Shakti) | PASS/FAIL/PARTIAL | |
 | 4. Functional Requirements | PASS/FAIL/PARTIAL | |
-| 5. Non-Functional Requirements | PASS/FAIL/PARTIAL | |
+| 5. Non-Functional Requirements (Epi-Logos Aligned) | PASS/FAIL/PARTIAL | |
 | 6. Epic & Story Structure | PASS/FAIL/PARTIAL | |
-| 7. Technical Guidance | PASS/FAIL/PARTIAL | |
+| 7. Technical Guidance (for Epi-Logos Contextual Architect) | PASS/FAIL/PARTIAL | |
 | 8. Cross-Functional Requirements | PASS/FAIL/PARTIAL | |
 | 9. Clarity & Communication | PASS/FAIL/PARTIAL | |
 
 ### Critical Deficiencies
-- List all critical issues that must be addressed before handoff to Architect
+- List all critical issues that must be addressed before handoff to Epi-Logos Contextual Architect.
 
 ### Recommendations
-- Provide specific recommendations for addressing each deficiency
+- Provide specific recommendations for addressing each deficiency.
 
 ### Final Decision
-- **READY FOR ARCHITECT**: The PRD and epics are comprehensive, properly structured, and ready for architectural design.
-- **NEEDS REFINEMENT**: The requirements documentation requires additional work to address the identified deficiencies. 
+- **READY FOR ARCHITECTURAL CONTEXTUALIZATION**: The EFDD and epics for **{Development Name}** are comprehensive, philosophically aligned, properly structured, and ready for architectural design by the Epi-Logos Contextual Architect.
+- **NEEDS REFINEMENT**: The EFDD for **{Development Name}** requires additional work to address the identified deficiencies.

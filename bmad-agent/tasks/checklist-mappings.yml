@@ -1,47 +1,95 @@
 architect-checklist:
-  checklist_file: docs/checklists/architect-checklist.md
+  # Path to the checklist definition itself, relative to (agent-root)
+  checklist_file: checklists/architect-checklist.md
   required_docs:
-    - architecture.md
+    # Document types the checklist refers to.
+    # These are keys that checklist items might use to specify a required document.
+    - Architecture Document
+  optional_docs:
+    - Design Document
   default_locations:
-    - docs/architecture.md
+    # Default relative filenames within a {DevelopmentName} context.
+    # The system will prepend BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/
+    Architecture Document: architecture/index.md # Or architecture.md if preferred for the main arch doc
+    Design Document: design/ui-ux-spec.md # Or architecture/front-end-spec.md
 
 frontend-architecture-checklist:
-  checklist_file: docs/checklists/frontend-architecture-checklist.md
+  checklist_file: checklists/frontend-architecture-checklist.md
   required_docs:
-    - frontend-architecture.md
+    - Frontend Architecture Document
+    - Main Architecture Document
+    - UI/UX Specification
   default_locations:
-    - docs/frontend-architecture.md
-    - docs/fe-architecture.md
+    Frontend Architecture Document: architecture/front-end-architecture.md
+    Main Architecture Document: architecture/index.md # Or architecture.md
+    UI/UX Specification: design/ui-ux-spec.md
 
+# Corresponds to Epi-Logos Feature Definer
 pm-checklist:
-  checklist_file: docs/checklists/pm-checklist.md
+  checklist_file: checklists/pm-checklist.txt # Assuming this was the intended name from previous step
   required_docs:
-    - prd.md
-  default_locations:
-    - docs/prd.md
-
-po-master-checklist:
-  checklist_file: docs/checklists/po-master-checklist.md
-  required_docs:
-    - prd.md
-    - architecture.md
+    - Epi-Logos Feature Definition Document (EFDD)
+    - Conceptual Alignment Brief
   optional_docs:
-    - frontend-architecture.md
+    - Market Research Document # Retaining for now, though less emphasis in Epi-Logos
+    - Competitive Analysis # Retaining for now
   default_locations:
-    - docs/prd.md
-    - docs/frontend-architecture.md
-    - docs/architecture.md
+    Epi-Logos Feature Definition Document (EFDD): 1_feature_definition/efdd.md
+    Conceptual Alignment Brief: 0_conceptual_alignment/conceptual_alignment_brief.md
+    Market Research Document: research/market_research.md # Example path if kept
+    Competitive Analysis: research/competitive_analysis.md # Example path if kept
 
+# Corresponds to Epi-Logos Process Steward
+po-master-checklist:
+  checklist_file: checklists/po-master-checklist.md
+  required_docs:
+    - Epi-Logos Feature Definition Document (EFDD)
+    - Feature Context & Bimba-Alignment Package # This is the output of the Epi-Logos Contextual Architect
+    # Individual stories/prompt packages will be numerous, so this checklist likely verifies their collective readiness.
+    - AI Builder Prompt Packages Summary # A summary or manifest of prompt packages
+  optional_docs:
+    - Development Plan
+    - Stakeholder Communication Plan
+  default_locations:
+    Epi-Logos Feature Definition Document (EFDD): 1_feature_definition/efdd.md
+    Feature Context & Bimba-Alignment Package: architecture/index.md # Or a specific filename for this package
+    AI Builder Prompt Packages Summary: 3_prompt_engineering/prompt_packages_summary.md # Or points to a directory
+    Development Plan: plan.md
+    Stakeholder Communication Plan: communications/stakeholder_plan.md
+
+# Corresponds to Epi-Logos Story Steward for creating prompts/stories
 story-draft-checklist:
-  checklist_file: docs/checklists/story-draft-checklist.md
+  checklist_file: checklists/story-draft-checklist.md
   required_docs:
-    - story.md
+    # The "story" is now a "prompt package"
+    - AI Builder Prompt Package Description
+    - Acceptance Criteria
+  optional_docs:
+    - UI Mockups/Wireframes (link or file)
+    - Technical Notes
   default_locations:
-    - docs/stories/*.md
+    # {StoryID} will be the identifier for the prompt package
+    AI Builder Prompt Package Description: Stories/{StoryID}/prompt_description.md
+    Acceptance Criteria: Stories/{StoryID}/acceptance_criteria.md
+    UI Mockups/Wireframes (link or file): Stories/{StoryID}/mockups/ # Or a specific file
+    Technical Notes: Stories/{StoryID}/technical_notes.md
 
+# Corresponds to Epi-Logos Aligned Dev Agent / External AI Builder for DoD
 story-dod-checklist:
-  checklist_file: docs/checklists/story-dod-checklist.md
+  checklist_file: checklists/story-dod-checklist.md
   required_docs:
-    - story.md
+    - Verified Acceptance Criteria
+    - Code Review Checklist (if applicable by an internal review step)
+    - Test Cases Passed # Or link to test results
+    # The "story" file itself, which contains the prompt package & progress notes
+    - AI Builder Prompt Package Story File
+  optional_docs:
+    - Demo Recording (link)
+    - User Feedback / External Builder Feedback
   default_locations:
-    - docs/stories/*.md
+    AI Builder Prompt Package Story File: Stories/{StoryID}/story-{StoryID}.md # Assuming story file name format
+    Verified Acceptance Criteria: Stories/{StoryID}/acceptance_criteria_verified.md
+    Code Review Checklist (if applicable): Stories/{StoryID}/code_review_checklist.md
+    Test Cases Passed: Stories/{StoryID}/test_cases_passed.md
+    Demo Recording (link): Stories/{StoryID}/demo_recording.url
+    User Feedback / External Builder Feedback: Stories/{StoryID}/feedback.md
