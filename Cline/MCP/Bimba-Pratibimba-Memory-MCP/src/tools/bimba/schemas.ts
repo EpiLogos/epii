@@ -52,13 +52,9 @@ export const QueryBimbaGraphSchema = z.object({
 export const UpdateBimbaGraphSchema = z.object({
   query: z.string().describe("Write Cypher query to execute against the Neo4j Bimba graph (CREATE, UPDATE, DELETE, MERGE operations)."),
   params: z.record(z.any()).optional().describe("Optional parameters for the Cypher query."),
-})
-.refine(data => data.query || data.specificCoordinate, {
-  message: "Either query or specificCoordinate must be provided.",
-  path: ["query"], // you can specify a path to highlight the error, e.g., on the query field
 });
-// Removed: .refine(data => !(data.query && data.specificCoordinate), ...)
-// The handler will prioritize specificCoordinate if both are provided.
+// Removed the .refine call that was causing the error, as 'specificCoordinate'
+// is not a field of UpdateBimbaGraphSchema. The 'query' field is already mandatory.
 
 export const ResolveBimbaCoordinateSchema = z.object({
   targetCoordinate: z.string().describe("The Bimba coordinate to resolve to a Notion page URL (e.g., '#5-2-1')."),

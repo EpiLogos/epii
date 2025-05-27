@@ -191,7 +191,8 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
         console.error(`${logPrefix} Error executing general Neo4j query:`, queryError);
         // Ensure the error is an McpError or wrapped as one if necessary by handleError
         if (queryError instanceof McpError) throw queryError;
-        throw new McpError(ErrorCode.ThirdPartyServiceError, `Error executing general Neo4j query: ${queryError.message || 'Unknown error'}`);
+        // Replaced ThirdPartyServiceError with InternalError as ThirdPartyServiceError is not in the SDK's ErrorCode enum
+        throw new McpError(ErrorCode.InternalError, `Error executing general Neo4j query: ${queryError.message || 'Unknown error'}`);
       }
     } else {
       // This case should ideally be caught by Zod schema refinement.
