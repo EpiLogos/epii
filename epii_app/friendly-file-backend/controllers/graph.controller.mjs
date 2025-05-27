@@ -20,7 +20,7 @@ const getGraphQuery = (depth = 1) => `
   RETURN { nodes: nodesData, links: linksData } AS graphData
 `;
 
-export const getFoundationalGraph = async (req, res) => {
+const getFoundationalGraph = async (req, res) => {
   console.log("Attempting to fetch foundational graph data...");
   try {
     // The WebSocket connection state is managed internally by bpWebSocketClient.mjs
@@ -78,7 +78,7 @@ export const getFoundationalGraph = async (req, res) => {
   }
 };
 
-export const createNode = async (req, res) => {
+const createNode = async (req, res) => {
   try {
     const {
       bimbaCoordinate,
@@ -162,7 +162,7 @@ export const createNode = async (req, res) => {
   }
 };
 
-export const getRelationshipSuggestions = async (req, res) => {
+const getRelationshipSuggestions = async (req, res) => {
   try {
     const { parentCoordinate } = req.query;
 
