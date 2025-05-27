@@ -162,9 +162,6 @@ export const createNode = async (req, res) => {
   }
 };
 
-// Updated export to include both functions
-export { getFoundationalGraph, createNode };
-
 export const getRelationshipSuggestions = async (req, res) => {
   try {
     const { parentCoordinate } = req.query;
