@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query'; // Import useQueryClient
 import { X, Upload, Sparkles, Save, FileText, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBi
 import { useGraphData } from '../2_hooks/useGraphData';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
 import RecursiveFullBimbaTree from './RecursiveFullBimbaTree';
-import CreateNodeModal from './CreateNodeModal';
+import CreateNodeModal from '../../../components/meta/CreateNodeModal'; // Corrected import path
 
 interface BimbaNode {
   coordinate: string;
@@ -102,6 +103,7 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   const [showCreateNodeModal, setShowCreateNodeModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient(); // Instantiate queryClient
 
   // Get coordinates for the tree
   const { coordinates, isLoading: isLoadingCoordinates, error: coordinatesError } = useBimbaCoordinates();
@@ -446,6 +448,33 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       // and open the property/relationship editor
     }, 500);
   };
+
+  // Modal Handlers for CreateNodeModal
+  const handleModalClose = () => setShowCreateNodeModal(false);
+
+  const handleModalSubmit = async (dataFromModal: any) => {
+    // dataFromModal contains the response from the backend API call made within CreateNodeModal's internal handleSubmit
+    console.log('Node creation successful in BimbaUpdateOverlay, data:', dataFromModal);
+
+    // The CreateNodeModal itself is responsible for the primary query invalidation of 'fullGraph'.
+    // Here, we invalidate queries specific to BimbaUpdateOverlay.
+    await queryClient.invalidateQueries({ queryKey: ['bimbaCoordinates'] });
+    // Optionally, invalidate 'fullGraph' again if there are concerns about timing or component-specific instances of useGraphData
+    // await queryClient.invalidateQueries({ queryKey: ['fullGraph'] });
+
+
+    setShowCreateNodeModal(false); // Close the modal
+
+    // Auto-select the new node using its bimbaCoordinate from the response data
+    if (dataFromModal?.data?.bimbaCoordinate && dataFromModal?.data?.id) {
+      handleNodeSelect({ bimbaCoordinate: dataFromModal.data.bimbaCoordinate, id: dataFromModal.data.id });
+    } else if (dataFromModal?.data?.bimbaCoordinate) { 
+        // Fallback if ID is somehow missing but coordinate is there
+        // Create a temporary ID structure if handleNodeSelect requires an ID
+        handleNodeSelect({ bimbaCoordinate: dataFromModal.data.bimbaCoordinate, id: `coord-${dataFromModal.data.bimbaCoordinate}` }); 
+    }
+  };
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1097,7 +1126,13 @@ Provide your response as a JSON object with the following structure:
         <div className="flex h-[80vh] gap-4">
           {/* Left Panel - Coordinate Tree */}
           <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
+            <div className="flex justify-between items-center mb-4">
+                 <h3 className="text-lg font-semibold text-epii-neon">Select Coordinate</h3>
+                 <Button onClick={() => setShowCreateNodeModal(true)} size="sm" className="bg-epii-neon text-epii-darker hover:bg-epii-neon/90 flex items-center">
+                     <Plus size={16} className="mr-1" />
+                     New Node
+                 </Button>
+            </div>
 
             {isLoadingGraph && (
               <div className="text-gray-400 text-sm">Loading graph data...</div>
@@ -2004,6 +2039,15 @@ Provide your response as a JSON object with the following structure:
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* Create Node Modal - Render the shared component */}
+      {showCreateNodeModal && (
+        <CreateNodeModal
+          isOpen={showCreateNodeModal}
+          onClose={handleModalClose}
+          onSubmit={handleModalSubmit} 
+        />
       )}
     </Dialog>
   );

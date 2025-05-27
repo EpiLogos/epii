@@ -367,6 +367,104 @@ class BPMCPService {
   }
 
   /**
+   * Creates a new node in the BimbaGraph and links it to a parent node.
+   *
+   * @param {object} data - The data for creating the new node.
+   * @param {string} data.bimbaCoordinate - The Bimba coordinate for the new node (e.g., "#1-2-3").
+   * @param {string} data.parentCoordinate - The Bimba coordinate of the parent node (e.g., "#1-2").
+   * @param {string} data.relationshipType - The type of relationship to create (e.g., "HAS_INTERNAL_COMPONENT").
+   * @param {string} data.nodeName - The name or label for the new node.
+   * @param {number | null} [data.qlPosition=null] - The qlPosition for the node, if applicable.
+   * @param {object} [data.additionalProperties={}] - Optional additional properties to set on the new node.
+   * @returns {Promise<object>} The result from the graph query, typically including the created node and relationship.
+   */
+  async createNodeInBimbaGraph({
+    bimbaCoordinate,
+    parentCoordinate,
+    relationshipType,
+    nodeName,
+    qlPosition = null,
+    additionalProperties = {},
+  }) {
+    // Validate essential parameters
+    if (!bimbaCoordinate || !parentCoordinate || !relationshipType || !nodeName) {
+      const errorMsg = 'Missing required parameters for createNodeInBimbaGraph. Ensure bimbaCoordinate, parentCoordinate, relationshipType, and nodeName are provided.';
+      console.error(errorMsg, { bimbaCoordinate, parentCoordinate, relationshipType, nodeName });
+      throw new Error(errorMsg);
+    }
+    
+    // Sanitize/validate relationshipType to prevent Cypher injection if it's not from a known safe list.
+    // For this implementation, we assume it's from a controlled vocabulary.
+    // A more robust solution might involve an allowlist check:
+    // const ALLOWED_REL_TYPES = ["HAS_INTERNAL_COMPONENT", "HAS_ASSOCIATED_KNOWLEDGE_CHUNK"];
+    // if (!ALLOWED_REL_TYPES.includes(relationshipType)) {
+    //   throw new Error(`Invalid relationshipType: ${relationshipType}`);
+    // }
+
+    const nodeProperties = {
+      bimbaCoordinate,
+      name: nodeName,
+      // qlPosition explicitly included. If null, it will be set as null in Neo4j.
+      // If undefined from additionalProperties, it won't be included unless explicitly set here.
+      qlPosition: qlPosition, 
+      createdBy: 'EPII_UI_NODE_CREATION_SYSTEM', // Audit field
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(), // Also set updatedAt on creation
+      ...additionalProperties, // Spread additional properties; ensure qlPosition here overrides if also in additionalProperties
+    };
+    
+    // Ensure qlPosition from arguments takes precedence if also in additionalProperties
+    if (qlPosition !== null && qlPosition !== undefined) {
+        nodeProperties.qlPosition = qlPosition;
+    } else if (additionalProperties && additionalProperties.qlPosition !== undefined) {
+        nodeProperties.qlPosition = additionalProperties.qlPosition;
+    } else {
+        // If qlPosition is not provided either as a direct arg or in additionalProperties,
+        // ensure it's explicitly null in nodeProperties if your schema expects it.
+        // Otherwise, you can omit it if properties can be sparse.
+        // For this case, if not provided, it remains as initially set (null by default arg).
+        // If it was undefined in additionalProperties, it's fine for it not to be in nodeProperties
+        // unless explicitly set by the qlPosition argument.
+        // The default qlPosition = null handles the case where it's not in additionalProperties.
+    }
+
+
+    // Construct the Cypher query
+    // The relationshipType is directly embedded. Ensure it's a safe value.
+    const query = `
+      MATCH (p:BimbaNode {bimbaCoordinate: $parentCoordinate})
+      CREATE (n:BimbaNode)
+      SET n = $nodeProperties
+      CREATE (p)-[rel:${relationshipType}]->(n)
+      RETURN n AS createdNode, id(n) AS nodeId, p.bimbaCoordinate AS parentBimbaCoordinate, type(rel) AS relationshipTypeCreated
+    `;
+
+    const params = {
+      parentCoordinate,
+      nodeProperties,
+      // relationshipType is not passed as a query parameter here because it's part of the query string.
+    };
+
+    this.log(`Executing Cypher for node creation: ${query} with params: ${JSON.stringify(params)}`, 'info', { query, params });
+
+    try {
+      const result = await this.queryBimbaGraph(query, params);
+      this.log('Node creation successful', 'info', { result });
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+        // This might happen if the MATCH for the parent failed.
+        console.warn('Node creation query executed but returned no result. This might indicate the parent node was not found.', { parentCoordinate });
+        // Depending on desired behavior, you might throw an error here
+        // throw new Error(`Parent node with coordinate ${parentCoordinate} not found.`);
+      }
+      return result;
+    } catch (error) {
+      this.log(`Error during node creation: ${error.message}`, 'error', { error, query, params });
+      // Re-throw the error or return a structured error object
+      throw error; 
+    }
+  }
+
+  /**
    * Store document in MongoDB
    * @param {object} document - Document data
    * @returns {Promise<any>} - Stored document
@@ -675,6 +773,62 @@ class BPMCPService {
 
       // No fallback - propagate the error with clear message
       throw new Error(`Failed to start analysis pipeline: ${error.message}`);
+    }
+  }
+
+  /**
+   * Retrieves a list of common outgoing relationship types from a given parent node,
+   * ordered by frequency. This can be used to suggest relevant relationship types
+   * when creating new nodes.
+   *
+   * @param {string} parentCoordinate - The Bimba coordinate of the parent node.
+   * @returns {Promise<string[]>} A promise that resolves to an array of relationship type strings,
+   *                                e.g., ['HAS_INTERNAL_COMPONENT', 'CONTAINS', 'RELATES_TO'].
+   * @throws {Error} If parentCoordinate is not provided or if there's an error querying the graph.
+   */
+  async getHarmoniousRelationships(parentCoordinate) {
+    if (!parentCoordinate) {
+      const errorMsg = 'parentCoordinate is required for getHarmoniousRelationships.';
+      // Assuming this.log is not available, use console.error
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    const query = `
+      MATCH (p:BimbaNode {bimbaCoordinate: $parentCoordinate})-[r]->()
+      WITH type(r) AS relationshipType, count(type(r)) AS frequency
+      ORDER BY frequency DESC
+      LIMIT 10 
+      RETURN relationshipType
+    `;
+    // The query is modified to return only relationshipType directly for simplicity,
+    // as the frequency is only used for ordering.
+
+    const params = { parentCoordinate };
+
+    // Assuming this.log is not available, use console.info for logging query
+    console.info(`Executing Cypher for harmonious relationships: ${query} with params: ${JSON.stringify(params)}`, { query, params });
+
+    try {
+      const result = await this.queryBimbaGraph(query, params);
+      // queryBimbaGraph returns an array of Neo4j record objects.
+      // Each record, due to the query, should have a single field 'relationshipType'.
+      if (result && Array.isArray(result)) {
+        return result.map(record => {
+          if (typeof record.get === 'function') { // Standard Neo4j record
+            return record.get('relationshipType');
+          } else if (record.relationshipType) { // Simplified record
+            return record.relationshipType;
+          }
+          console.warn('Unexpected record structure in getHarmoniousRelationships:', record);
+          return null;
+        }).filter(rt => rt !== null); // Filter out any nulls from unexpected structures
+      }
+      return []; // Return empty array if no results or unexpected format
+    } catch (error) {
+      // Assuming this.log is not available, use console.error
+      console.error(`Error fetching harmonious relationships for ${parentCoordinate}: ${error.message}`, { error, query, params });
+      throw error; // Re-throw the error to be handled by the caller
     }
   }
 }
