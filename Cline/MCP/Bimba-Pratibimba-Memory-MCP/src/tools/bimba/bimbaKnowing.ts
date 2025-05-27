@@ -229,18 +229,46 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           });
         }
       }
-      // MODE 2: AGENT AWARENESS QUERY - Pull the agent's immediate 6 subnodes
+      // MODE 2: AGENT AWARENESS QUERY - Pull the agent's immediate 6 subnodes, with QL filtering
       else if (isAgentAwarenessQuery) {
         console.log(`${logPrefix} Using AGENT AWARENESS MODE for agent identity query`);
 
-        const agentQuery = `
+        let agentQuery = `
           // Get the agent node
           MATCH (agent)
           WHERE agent.bimbaCoordinate = $agentCoordinate
+        `;
+        
+        const agentQueryParams: Record<string, any> = { agentCoordinate: validatedArgs.agentCoordinate };
+        const subnodeWhereClauses: string[] = ["subnode.bimbaCoordinate STARTS WITH $agentCoordinate + '-'"];
 
-          // Get its immediate 6 subnodes
+        // Apply QL filters to subnodes
+        if (validatedArgs.qlPosition !== undefined) {
+          subnodeWhereClauses.push(Array.isArray(validatedArgs.qlPosition) ? "subnode.qlPosition IN $qlPosition" : "subnode.qlPosition = $qlPosition");
+          agentQueryParams.qlPosition = validatedArgs.qlPosition;
+        }
+        if (validatedArgs.strengthRange) {
+          subnodeWhereClauses.push("subnode.strength >= $minStrength AND subnode.strength <= $maxStrength");
+          agentQueryParams.minStrength = validatedArgs.strengthRange[0];
+          agentQueryParams.maxStrength = validatedArgs.strengthRange[1];
+        }
+        if (validatedArgs.confidenceThreshold) { // Assuming subnodes might have a confidence property
+          subnodeWhereClauses.push("subnode.confidence >= $confidenceThreshold");
+          agentQueryParams.confidenceThreshold = validatedArgs.confidenceThreshold;
+        }
+        if (validatedArgs.qlDynamics) {
+          subnodeWhereClauses.push(Array.isArray(validatedArgs.qlDynamics) ? "subnode.qlDynamics IN $qlDynamics" : "subnode.qlDynamics = $qlDynamics");
+          agentQueryParams.qlDynamics = validatedArgs.qlDynamics;
+        }
+        if (validatedArgs.qlContextFrame) {
+          subnodeWhereClauses.push(Array.isArray(validatedArgs.qlContextFrame) ? "subnode.qlContextFrame IN $qlContextFrame" : "subnode.qlContextFrame = $qlContextFrame");
+          agentQueryParams.qlContextFrame = validatedArgs.qlContextFrame;
+        }
+        
+        agentQuery += `
+          // Get its immediate subnodes, potentially filtered by QL properties
           OPTIONAL MATCH (agent)-[r]->(subnode)
-          WHERE subnode.bimbaCoordinate STARTS WITH $agentCoordinate + '-'
+          WHERE ${subnodeWhereClauses.join(" AND ")}
 
           RETURN agent,
                  collect(DISTINCT {
@@ -249,9 +277,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
                  }) as subnodes
         `;
 
-        const agentResult = await session.run(agentQuery, {
-          agentCoordinate: validatedArgs.agentCoordinate
-        });
+        const agentResult = await session.run(agentQuery, agentQueryParams);
 
         if (agentResult.records.length > 0) {
           const record = agentResult.records[0];
@@ -359,15 +385,71 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           // First, perform vector similarity search
           CALL db.index.vector.queryNodes('bimba_embedding_index', $k, $embedding)
           YIELD node, score
-          WHERE node.embedding IS NOT NULL
         `;
 
-        // Add focus coordinate filter if provided
+        const whereClauses: string[] = ["node.embedding IS NOT NULL"];
+        const params: Record<string, any> = {
+          embedding: queryVector,
+          k: neo4j.int(Math.floor(validatedArgs.limit * 5)), // Increased k for better filtering
+          initialLimit: neo4j.int(Math.floor(validatedArgs.limit * 3)),
+          innerLimit: neo4j.int(10), // Limit for contextual expansion
+          limit: neo4j.int(validatedArgs.limit),
+        };
+
+        // B. Subsystem Contextualization from focusCoordinate
         if (validatedArgs.focusCoordinate) {
-          vectorSearchQuery += `
-            AND (node.bimbaCoordinate STARTS WITH $focusCoordinate
-                 OR node.bimbaCoordinate = $focusCoordinate)
-          `;
+          const focusParts = validatedArgs.focusCoordinate.split('-');
+          const subsystemPrefix = focusParts[0]; // e.g., #2 from #2-1-0-0 or #2 from #2
+          whereClauses.push(`(node.bimbaCoordinate STARTS WITH $subsystemPrefix)`);
+          params.subsystemPrefix = subsystemPrefix;
+          // If full focusCoordinate is more specific than just the subsystem, add that too
+          if (validatedArgs.focusCoordinate !== subsystemPrefix) {
+            whereClauses.push(`(node.bimbaCoordinate STARTS WITH $focusCoordinate OR node.bimbaCoordinate = $focusCoordinate)`);
+            params.focusCoordinate = validatedArgs.focusCoordinate;
+          }
+        }
+        
+        // A. QL Property Integration
+        if (validatedArgs.qlPosition !== undefined) {
+          if (Array.isArray(validatedArgs.qlPosition)) {
+            whereClauses.push("node.qlPosition IN $qlPosition");
+          } else {
+            whereClauses.push("node.qlPosition = $qlPosition");
+          }
+          params.qlPosition = validatedArgs.qlPosition;
+        }
+        if (validatedArgs.strengthRange) {
+          whereClauses.push("node.strength >= $minStrength AND node.strength <= $maxStrength");
+          params.minStrength = validatedArgs.strengthRange[0];
+          params.maxStrength = validatedArgs.strengthRange[1];
+        }
+        if (validatedArgs.confidenceThreshold) {
+          // This applies to the vector search score OR an explicit confidence property on the node
+          whereClauses.push("(score >= $confidenceThreshold OR node.confidence >= $confidenceThreshold)");
+          params.confidenceThreshold = validatedArgs.confidenceThreshold;
+        }
+        // For qlDynamics and qlContextFrame, they might be on nodes or relationships.
+        // For now, applying to nodes. If they are on relationships, this query needs adjustment
+        // or a separate relationship-focused query. The QL doc implies they can be on nodes.
+        if (validatedArgs.qlDynamics) {
+          if (Array.isArray(validatedArgs.qlDynamics)) {
+            whereClauses.push("node.qlDynamics IN $qlDynamics");
+          } else {
+            whereClauses.push("node.qlDynamics = $qlDynamics");
+          }
+          params.qlDynamics = validatedArgs.qlDynamics;
+        }
+        if (validatedArgs.qlContextFrame) {
+          if (Array.isArray(validatedArgs.qlContextFrame)) {
+            whereClauses.push("node.qlContextFrame IN $qlContextFrame");
+          } else {
+            whereClauses.push("node.qlContextFrame = $qlContextFrame");
+          }
+          params.qlContextFrame = validatedArgs.qlContextFrame;
+        }
+
+        if (whereClauses.length > 0) {
+          vectorSearchQuery += `\nWHERE ${whereClauses.join(" AND ")}\n`;
         }
 
         // Add contextual graph traversal based on context depth
@@ -379,9 +461,11 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
 
             // Expand to include related nodes based on context depth
             CALL {
-              WITH node
+              WITH node // This is the 'node' from the main vector search
               MATCH path = (node)-[*1..${validatedArgs.contextDepth}]-(related)
-              WHERE related.bimbaCoordinate IS NOT NULL
+              // Apply subsystemPrefix to related nodes if focusCoordinate was given
+              WHERE related.bimbaCoordinate IS NOT NULL 
+                ${validatedArgs.focusCoordinate ? "AND related.bimbaCoordinate STARTS WITH $subsystemPrefix" : ""}
               RETURN related,
                     size([x IN nodes(path) WHERE x.bimbaCoordinate IS NOT NULL]) AS pathLength
               LIMIT $innerLimit
@@ -403,16 +487,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
         }
 
         // Execute vector search
-        const vectorSearchParams = {
-          embedding: queryVector,
-          k: neo4j.int(Math.floor(validatedArgs.limit * 3)),
-          initialLimit: neo4j.int(Math.floor(validatedArgs.limit * 2)),
-          innerLimit: neo4j.int(10),
-          limit: neo4j.int(validatedArgs.limit),
-          focusCoordinate: validatedArgs.focusCoordinate
-        };
-
-        const vectorSearchResult = await session.run(vectorSearchQuery, vectorSearchParams);
+        const vectorSearchResult = await session.run(vectorSearchQuery, params);
 
         // Process vector search results
         vectorSearchResult.records.forEach(record => {
@@ -486,61 +561,83 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
         });
       }
 
-      // 5. If includeRelations is true, fetch actual graph relationships for top results
-      if (validatedArgs.includeRelations && results.length > 0) {
-        // Get the IDs of the top nodes (use at most 3 nodes)
-        const topCount = Math.min(3, results.length);
-        const topNodeIds = results.slice(0, topCount)
-          .map(result => result.id);
+      // C. Parent, Sibling, and Child Awareness
+      // This will be done after processing the main results.
+      // We will add 'parents', 'children', 'siblings' properties to each result item.
+      // Limit detailed fetching to top N results for performance.
+      const topNResultsForRelationalFetching = 3; // Configurable: fetch details for top 3 results
+      const processedResults = []; 
 
-        // Fetch actual relationships
-        const relationshipsQuery = `
-          MATCH (n)-[r]-(m)
-          WHERE id(n) IN $nodeIds AND m.bimbaCoordinate IS NOT NULL
-          RETURN id(n) AS sourceId, type(r) AS relType, id(m) AS targetId,
-                 m.name AS targetName, m.bimbaCoordinate AS targetCoordinate,
-                 labels(m) AS targetLabels
-          LIMIT 50
-        `;
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        const nodeId = result.id; 
+        const nodeCoordinate = result.properties.bimbaCoordinate; 
 
-        const relationshipsResult = await session.run(relationshipsQuery, {
-          nodeIds: topNodeIds,
-          limit: neo4j.int(50) // Explicitly convert the LIMIT parameter to a Neo4j integer
-        });
+        if (!nodeId || !nodeCoordinate) {
+          processedResults.push(result); // Push result as is if no ID/coordinate
+          continue;
+        }
+        
+        const relationalData: { parents: any[], children: any[], siblings: any[] } = {
+          parents: [],
+          children: [],
+          siblings: [],
+        };
 
-        // Process relationships and add them to the results
-        const relationshipsByNodeId: Record<string, any[]> = {};
+        // Only fetch detailed relations for top N results OR 
+        // if it's the agent's direct node or one of its direct subnodes in agent awareness mode
+        const shouldFetchRelations = validatedArgs.includeRelations && 
+                                     (i < topNResultsForRelationalFetching || 
+                                      (isAgentAwarenessQuery && (result.relevanceType === "direct" || result.relevanceType === "branch")));
 
-        relationshipsResult.records.forEach(record => {
-          const sourceId = record.get('sourceId').toString();
-          const relType = record.get('relType');
-          const targetId = record.get('targetId').toString();
-          const targetName = record.get('targetName');
-          const targetCoordinate = record.get('targetCoordinate');
-          const targetLabels = record.get('targetLabels');
+        if (shouldFetchRelations) {
+          // Fetch Parents
+          const parentQuery = `
+            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(current)
+            WHERE id(current) = $nodeId
+            RETURN parent.name AS name, parent.bimbaCoordinate AS coordinate, labels(parent) as labels, id(parent) as id
+            LIMIT 5`;
+          const parentResult = await session.run(parentQuery, { nodeId: neo4j.int(nodeId) });
+          relationalData.parents = parentResult.records.map(r => ({ 
+            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
+          }));
 
-          if (!relationshipsByNodeId[sourceId]) {
-            relationshipsByNodeId[sourceId] = [];
-          }
-
-          relationshipsByNodeId[sourceId].push({
-            type: relType,
-            targetId: targetId,
-            targetName: targetName,
-            targetCoordinate: targetCoordinate,
-            targetLabels: targetLabels
-          });
-        });
-
-        // Add relationships to results
-        results.forEach(result => {
-          if (relationshipsByNodeId[result.id]) {
-            result.graphRelationships = relationshipsByNodeId[result.id];
-          }
-        });
+          // Fetch Children
+          const childrenQuery = `
+            MATCH (current)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(child)
+            WHERE id(current) = $nodeId
+            RETURN child.name AS name, child.bimbaCoordinate AS coordinate, labels(child) as labels, id(child) as id
+            LIMIT 10`;
+          const childrenResult = await session.run(childrenQuery, { nodeId: neo4j.int(nodeId) });
+          relationalData.children = childrenResult.records.map(r => ({ 
+            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
+          }));
+          
+          // Fetch Siblings
+          const siblingQuery = `
+            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(current)
+            WHERE id(current) = $nodeId
+            WITH parent
+            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(sibling)
+            WHERE id(sibling) <> $nodeId AND sibling.bimbaCoordinate IS NOT NULL 
+            RETURN sibling.name AS name, sibling.bimbaCoordinate AS coordinate, labels(sibling) as labels, id(sibling) as id
+            LIMIT 10`;
+          const siblingResult = await session.run(siblingQuery, { nodeId: neo4j.int(nodeId) });
+          relationalData.siblings = siblingResult.records.map(r => ({ 
+            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
+          })).filter((s, index, self) => index === self.findIndex(t => t.id === s.id)); // Deduplicate siblings
+        }
+        
+        processedResults.push({ ...result, ...relationalData });
       }
+      results = processedResults; 
 
       // 6. Ensure complete branch structure for holistic response
+      // The existing logic for 'graphRelationships' might be redundant now with specific parent/child/sibling fetching.
+      // I'll comment it out for now as it fetches generic relationships.
+      // if (validatedArgs.includeRelations && results.length > 0) { ... }
+      
+      // The branch structure completion (placeholder nodes) can remain as is.
       // If we have a focus on a specific branch (especially for agent queries), ensure all 6 subnodes are represented
       if (validatedArgs.agentCoordinate && validatedArgs.agentCoordinate.startsWith('#')) {
         const branchCoord = validatedArgs.agentCoordinate;
@@ -587,47 +684,71 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
         contextDepth: validatedArgs.contextDepth,
         focusCoordinate: validatedArgs.focusCoordinate,
         agentCoordinate: validatedArgs.agentCoordinate,
+        qlFilters: { // Add QL filters used to the output
+          qlPosition: validatedArgs.qlPosition,
+          strengthRange: validatedArgs.strengthRange,
+          confidenceThreshold: validatedArgs.confidenceThreshold,
+          qlDynamics: validatedArgs.qlDynamics,
+          qlContextFrame: validatedArgs.qlContextFrame,
+        },
         vectorSearchUsed: "db.index.vector.queryNodes",
         branchAwarenessEnabled: validatedArgs.agentCoordinate ? true : false,
-        branchDistribution: branchCounts,
-        branchHierarchy: branchHierarchy,
+        branchDistribution: branchCounts, // This will be populated based on the final 'results'
+        branchHierarchy: branchHierarchy, // This will be populated based on the final 'results'
         hexagonalStructure: {
           note: "The Bimba system follows a 6-fold hexagonal structure with each parent node having 6 subnodes",
-          mainBranches: Object.keys(branchCounts).length,
+          mainBranches: Object.keys(branchCounts).length, // This needs to be calculated after results are finalized
           totalResults: results.length
         },
         // Organize results by branch for a more holistic view
-        organizedByBranch: {} as Record<string, any[]>,
+        organizedByBranch: {} as Record<string, any[]>, // This will be populated based on the final 'results'
         // Keep the flat results for backward compatibility
-        results: results
+        results: results // This 'results' now contains parent/child/sibling data
       };
 
-      // Organize results by branch
+      // Re-calculate branchCounts and branchHierarchy based on the potentially filtered 'results'
+      // and also populate organizedByBranch
+      branchCounts = {}; // Reset
+      branchHierarchy = {}; // Reset
+      organizedResults.organizedByBranch = {}; // Reset
+
       results.forEach(result => {
+        // Populate branchCounts and branchHierarchy
         if (result.properties && result.properties.bimbaCoordinate) {
           const coord = result.properties.bimbaCoordinate;
-          const parts = coord.split('-');
+          const mainBranch = coord.split('-')[0];
+          branchCounts[mainBranch] = (branchCounts[mainBranch] || 0) + 1;
+          if (!branchHierarchy[mainBranch]) {
+            branchHierarchy[mainBranch] = [];
+          }
+          if (coord.includes('-') && !branchHierarchy[mainBranch].includes(coord)) {
+            branchHierarchy[mainBranch].push(coord);
+          }
 
-          // Handle root node
+          // Populate organizedByBranch
+          const parts = coord.split('-');
           if (coord === '#') {
             if (!organizedResults.organizedByBranch['root']) {
               organizedResults.organizedByBranch['root'] = [];
             }
             organizedResults.organizedByBranch['root'].push(result);
-            return;
+          } else {
+            const displayMainBranch = parts[0].startsWith('#') ? parts[0] : `#${parts[0]}`;
+            if (!organizedResults.organizedByBranch[displayMainBranch]) {
+              organizedResults.organizedByBranch[displayMainBranch] = [];
+            }
+            organizedResults.organizedByBranch[displayMainBranch].push(result);
           }
-
-          // Handle main branches and subnodes
-          const mainBranch = parts[0].startsWith('#') ? parts[0] : `#${parts[0]}`;
-
-          if (!organizedResults.organizedByBranch[mainBranch]) {
-            organizedResults.organizedByBranch[mainBranch] = [];
-          }
-
-          organizedResults.organizedByBranch[mainBranch].push(result);
         }
       });
-
+      
+      // Update counts in hexagonalStructure
+      organizedResults.hexagonalStructure.mainBranches = Object.keys(branchCounts).length;
+      organizedResults.hexagonalStructure.totalResults = results.length;
+      
+      // Update branchDistribution and branchHierarchy in the final object
+      organizedResults.branchDistribution = branchCounts;
+      organizedResults.branchHierarchy = branchHierarchy;
       return {
         content: [{
           type: "text",
