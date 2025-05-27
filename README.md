@@ -130,6 +130,28 @@ Each subsystem contains its own complete mod6 internal structure (0-5 components
 
 **Epistemological Integration**: Integral thinking, meta-philosophy, recursive systems theory, artificial intelligence, Heideggarian Technoscientific underpinnings, self-referential logic, phenomenology of consciousness, technological embodiment of wisdom traditions, Meta-Techne (self-refining tools).
 
+### BMAD EPI-LOGOS MEMORY: Organizing Project Philosophy and System Design
+
+The `bmad-agent/data/BMAD EPI-LOGOS MEMORY/` serves as the central, living repository for all project-related knowledge, structured according to the Epi-Logos philosophical framework and its Bimba coordinate system. This ensures that all development artifacts, documentation, and conceptual underpinnings are coherently organized and readily accessible.
+
+It is **ABUNDANTLY CLEAR** that general project-level information, which in conventional projects might reside in general `/data` or `/docs` directories, is meticulously mapped within this memory system:
+
+*   **Epi-Logos Project Philosophy & Guiding Principles:**
+    *   This foundational knowledge, encompassing the core vision, philosophical tenets, ethical guidelines, and overarching project goals, is primarily anchored within the **`#5 Epii (Epi-Logos)`** subsystem, specifically under:
+        *   **`#5-0 Transcendent Identity`**: Core identity, values, and mission of the Epi-Logos project.
+        *   **`#5-1 Ontological Specificity`**: Detailed philosophical frameworks, conceptual models, and epistemological stances.
+        *   **`#5-5 Integral Meta-Perspective`**: Overarching synthesis, project evolution, and meta-reflections on the project itself.
+    *   These areas will be built out with clear reference points and documents that define the "why" and "what" of the Epi-Logos initiative.
+
+*   **Epi-Logos System Design & Technical Documentation:**
+    *   Information pertaining to the technological implementation, including the *intended* software architecture, codebase structure, technical specifications, API documentation, and operational guidelines, is also housed within the **`#5 Epii (Epi-Logos)`** subsystem, under:
+        *   **`#5-2 Collective Processing (Siva-)`**: Backend architecture, data processing pipelines, core algorithms, and infrastructure details.
+        *   **`#5-3 Personal Mediation (-Shakti)`**: Frontend architecture, UI/UX design principles, user interaction flows, and API specifications for user-facing components.
+        *   **`#5-4 Unified Self (Siva-Shakti)`**: Agent logic, inter-agent communication protocols, integration points, and the overall system's functional cohesion.
+    *   The directory structure within these Bimba coordinates in the `BMAD EPI-LOGOS MEMORY/` will reflect the **INTENDED structure of the actual codebase**. This design choice is deliberate: the memory system acts as a blueprint, guiding the ongoing development and refactoring of the software to ensure it progressively aligns with the philosophical and architectural vision of Epi-Logos.
+
+This structured approach ensures that the `BMAD EPI-LOGOS MEMORY` is not just a passive repository but an active guide, shaping how the codebase is structured and how development proceeds, fostering a deep alignment between the project's philosophical foundations and its technical execution. Over time, these philosophy and system file structures will be populated with detailed documents, providing quick and contextually relevant reference points for both human developers and AI agents/personas.
+
 ### Vibrational-Harmonic Ontology
 
 The system is grounded in a **vibrational-harmonic understanding of reality**, where:

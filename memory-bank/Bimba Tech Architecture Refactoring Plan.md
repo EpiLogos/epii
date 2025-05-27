@@ -25,7 +25,7 @@ friendly-file-back2front/
 Frontend (friendly-file-front)
 
 friendly-file-front/
-└── [already aligned with Bimba structure]
+└── [Partially aligned with Bimba structure. Refactoring is ongoing, with the Meta3D (#5-3-4.1) and EpiiMode (#5-3-4.5) pages being the most complete in their alignment. Further refinement and alignment are needed across other modules.]
 
 **Target Structure Template:**
 
