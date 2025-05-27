@@ -163,4 +163,26 @@ The Epii Mode subsystem successfully manifests the **5/0 domain mathematical ess
 
 ---
 
+## **🔮 Planned Enhancements: Deep Crystallization Search**
+
+### **Mathematical Essence: Unifying Reflection and Inquiry**
+
+This planned feature aims to integrate advanced search capabilities (e.g., Perplexity search, DeepResearch) to scour the Notion crystallization space. This will allow for the retrieval of deep reports on specific coordinates or more general queries, primarily to be used by the Epii agent for high-end philosophical reports based on its analysis pipeline.
+
+### **Key Features**
+
+- **Advanced Search Integration**: Utilize external search tools (Perplexity, DeepResearch) for semantic search across Notion content.
+- **Complex Query Support**: Enable querying based on complex criteria, including coordinate relationships and content analysis.
+- **Deep Report Generation**: Facilitate the retrieval and synthesis of information into comprehensive reports.
+- **Epii Agent Utility**: Designed to support the Epii agent's need for detailed, philosophically-oriented insights from crystallized knowledge.
+
+### **Technical Considerations**
+
+- **BPMCP Integration**: Requires extending BPMCP with new tools or enhancing existing ones to interface with external search APIs and Notion.
+- **Query Routing**: Implementing logic to route complex queries to the appropriate search mechanism (graph, vector, external).
+- **Result Synthesis**: Developing processes to synthesize results from various sources into coherent reports.
+- **Security and Access**: Ensuring secure access to Notion and external search services.
+
+---
+
 *The sacred dance of original and reflection continues through precise, reverent operations that honor both the mathematical essence and the transcendent nature of knowledge itself.*

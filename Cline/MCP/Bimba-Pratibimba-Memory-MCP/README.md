@@ -18,11 +18,11 @@ BPMCP provides **18+ specialized tools** organized into six operational categori
 ### **🔮 Bimba Tools (Neo4j Graph Operations)**
 Core knowledge graph operations for the foundational Bimba structure:
 
-#### **`queryBimbaGraph`** - Graph Queries
-- **Purpose**: Query the Neo4j knowledge graph with flexible Cypher support
+#### **`queryBimbaGraph`** - Graph Queries (Enhanced)
+- **Purpose**: Query the Neo4j knowledge graph with flexible Cypher support, now with enhanced capabilities for deeper and more accurate structural retrieval.
 - **Access Mode**: `READ` - Safe exploration and data retrieval
-- **Features**: Complex graph traversals, relationship analysis, coordinate resolution
-- **Returns**: Structured graph data with nodes, relationships, and metadata
+- **Features**: Complex graph traversals, relationship analysis, coordinate resolution, and improved structural accuracy.
+- **Returns**: Structured graph data with nodes, relationships, and metadata, enabling direct integration into agent-driven development processes (Meta-Techne loop).
 
 #### **`updateBimbaGraph`** - Graph Modifications ⭐
 - **Purpose**: Write operations for knowledge graph updates
@@ -30,11 +30,11 @@ Core knowledge graph operations for the foundational Bimba structure:
 - **Features**: Property updates, relationship creation/deletion, multi-coordinate operations
 - **Safeguards**: Automatic value sanitization, error handling, rollback support
 
-#### **`bimbaKnowing`** - Semantic Search
-- **Purpose**: Vector-powered semantic search across the knowledge graph
-- **Technology**: Embedding similarity with graph structure awareness
-- **Features**: Context-aware search, coordinate-based filtering, relevance scoring
-- **Integration**: Supports LLM-guided knowledge discovery and exploration
+#### **`bimbaKnowing`** - Semantic Search (Enhanced)
+- **Purpose**: Vector-powered semantic search across the knowledge graph, now with enhanced capabilities for deeper and more accurate semantic retrieval.
+- **Technology**: Embedding similarity with graph structure awareness and advanced semantic matching.
+- **Features**: Context-aware search, coordinate-based filtering, improved relevance scoring, and more reliable semantic retrieval.
+- **Integration**: Supports LLM-guided knowledge discovery and exploration, enabling direct integration into agent-driven development processes (Meta-Techne loop).
 
 #### **`generateBimbaEmbeddings`** - Vector Management
 - **Purpose**: Generate and manage vector embeddings for graph nodes
