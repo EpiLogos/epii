@@ -141,12 +141,22 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
       fetchSize: 1000
     });
 
-    try {
-      // Execute query
-      const result = await session.run(cypherQuery, queryParams || {});
-      console.log(`${logPrefix} Query returned ${result.records.length} records`);
+    if (targetCoordinate) {
+      // Use the new logic for single node + relations
+      // The fetchSingleNodeWithRelations function will use the session internally.
+      // The session will be closed in the main finally block.
+      return await fetchSingleNodeWithRelations(targetCoordinate, session, logPrefix);
+    } else if (validatedArgs.query) {
+      // Fallback to existing general query logic
+      console.log(`${logPrefix} Executing general Cypher query: ${validatedArgs.query}`);
+      const cypherQuery = validatedArgs.query;
+      const queryParams = validatedArgs.params;
+      
+      // This specific try...catch is for errors during the general query execution
+      try {
+        const result = await session.run(cypherQuery, queryParams || {});
+        console.log(`${logPrefix} Query returned ${result.records.length} records`);
 
-        // Process results for general query (existing logic)
         const records = result.records.map(record => {
           const recordObj: Record<string, any> = {};
           for (const key of record.keys) {
@@ -177,45 +187,32 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
             }, null, 2),
           }],
         };
-      } catch (queryError: any) {
-        console.error(`${logPrefix} Error executing query:`, queryError);
-        throw new McpError(ErrorCode.InternalError, `Error executing Neo4j query: ${queryError.message || 'Unknown error'}`);
+      } catch (queryError: any) { // Catches errors from session.run for general queries
+        console.error(`${logPrefix} Error executing general Neo4j query:`, queryError);
+        // Ensure the error is an McpError or wrapped as one if necessary by handleError
+        if (queryError instanceof McpError) throw queryError;
+        throw new McpError(ErrorCode.ThirdPartyServiceError, `Error executing general Neo4j query: ${queryError.message || 'Unknown error'}`);
       }
     } else {
-      // This case should be caught by Zod schema refinement (at least one of query/specificCoordinate must be provided)
-      // but as a defensive measure:
-      throw new McpError(ErrorCode.InvalidRequest, "A query or specificCoordinate must be provided.");
+      // This case should ideally be caught by Zod schema refinement.
+      // If it's reached, it means validatedArgs.query and validatedArgs.specificCoordinate are both null.
+      // The Zod refine for QueryBimbaGraphSchema should prevent this.
+      // Throwing an error here is a safeguard.
+      throw new McpError(ErrorCode.InvalidRequest, "A query or specificCoordinate must be provided; this state should not be reached if validation is correct.");
     }
 
-  } catch (error: any) {
+  } catch (error: any) { // Outer catch for errors like arg parsing, session creation, or errors bubbled up
     console.error(`${logPrefix} Tool execution error:`, error);
-      throw new McpError(ErrorCode.InternalError, `Error executing Neo4j query: ${queryError.message || 'Unknown error'}`);
-    } finally {
-      if (session) {
-        await session.close();
-      }
-    }
-  } catch (error: any) {
-    console.error(`${logPrefix} Tool execution error:`, error);
-
-    // Make sure session is closed even if there's an error
+    // Pass the original error to handleError if it's already an McpError or needs specific formatting
+    throw handleError(error, "queryBimbaGraph"); 
+  } finally { // Outer finally to ensure session is always closed if created
     if (session) {
       try {
         await session.close();
+        console.log(`${logPrefix} Neo4j session closed.`);
       } catch (closeError) {
-        console.error(`${logPrefix} Error closing Neo4j session after error:`, closeError);
+        console.error(`${logPrefix} Error closing Neo4j session:`, closeError);
       }
     }
-
-    // Use handleError, ensuring it's imported or defined
-    throw handleError(error, "queryBimbaGraph"); 
-  } finally { // Ensure session is closed if opened in the main try block and not passed to helper
-    if (session && !targetCoordinate && validatedArgs.query) { // Only close if not passed to helper
-       // Actually, the helper should not close the session, the main function should.
-       // The session is created before the if (targetCoordinate) block.
-       // So, it should always be closed in the main finally block.
-    }
-    // The session is now consistently closed in the outer try...catch...finally block
-    // The existing finally block handles this correctly.
   }
 }
