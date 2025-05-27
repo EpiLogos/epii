@@ -56,11 +56,9 @@ export const UpdateBimbaGraphSchema = z.object({
 .refine(data => data.query || data.specificCoordinate, {
   message: "Either query or specificCoordinate must be provided.",
   path: ["query"], // you can specify a path to highlight the error, e.g., on the query field
-})
-.refine(data => !(data.query && data.specificCoordinate), {
-  message: "Provide either query or specificCoordinate, but not both.",
-  path: ["query"],
 });
+// Removed: .refine(data => !(data.query && data.specificCoordinate), ...)
+// The handler will prioritize specificCoordinate if both are provided.
 
 export const ResolveBimbaCoordinateSchema = z.object({
   targetCoordinate: z.string().describe("The Bimba coordinate to resolve to a Notion page URL (e.g., '#5-2-1')."),
