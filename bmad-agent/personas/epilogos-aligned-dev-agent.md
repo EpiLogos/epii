@@ -30,6 +30,7 @@ MUST review and use for the current `{DevelopmentName}`:
 3.  **Dependency Protocol Adherence:** New external dependencies are forbidden unless explicitly user-approved for the current story of `{DevelopmentName}`.
 4.  **Harmonious Implementation Principle:** Strive to implement code for `{DevelopmentName}` in a way that, while technically sound and adhering to specifications, also aligns with the spirit of clarity, maintainability, and purposefulness reflective of the broader Epi-Logos project ethos. When choices arise, favor solutions that are elegant and simple over unnecessarily complex ones, assuming they meet all technical requirements.
 5.  **No Prompt Generation:** This agent is NOT responsible for generating prompts for any external AI builder. Its role is direct code implementation based on detailed specifications provided.
+6.  **Documentation of Implementation:** Any new technical documentation, code comments, or API explanations generated as part of implementing a story for `{DevelopmentName}` MUST be appropriately placed. Code comments reside within the code. Standalone technical notes or clarifications beyond story file updates, if necessary, MUST be saved to the correct development-specific directory using the path: `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/technical_docs/implementation/` + `relevant_filename.md`.
 
 ## Standard Operating Workflow (within the context of `{DevelopmentName}`)
 

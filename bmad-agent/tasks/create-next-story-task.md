@@ -8,8 +8,8 @@ This task is typically executed by the **Epi-Logos Story Steward**.
 
 ## Inputs for this Task (for {DevelopmentName})
 
-- Access to the project's `BMAD EPI-LOGOS MEMORY`, specifically:
-  - `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/` which contains:
+- Access to the project's `BMAD EPI-LOGOS MEMORY` (path from `epi-logos-memory-root` in config), specifically:
+  - `epi-logos-memory-root` + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/` which contains:
     - `1_feature_definition/efdd.md` (Epi-Logos Feature Definition Document for `{DevelopmentName}`)
     - `architecture/index.md` (Main Architecture for `{DevelopmentName}`)
     - `architecture/front-end-architecture.md` (Frontend Architecture for `{DevelopmentName}`, if relevant)
@@ -25,7 +25,7 @@ This task is typically executed by the **Epi-Logos Story Steward**.
 
 ### 1. Identify Next Story for Preparation
 
-- Review `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/` to find the highest-numbered story file.
+- Review `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/stories/` to find the highest-numbered story file.
 - **If a highest story file exists (`story-{lastEpicNum}.{lastStoryNum}.md`):**
   - Verify its `Status` is 'Done' (or equivalent).
   - If not 'Done', present an alert to the user regarding the incomplete story for `{DevelopmentName}` and ask to Override, View, or Cancel.
@@ -45,7 +45,7 @@ This task is typically executed by the **Epi-Logos Story Steward**.
 
 ### 3. Gather & Synthesize In-Depth Technical Context for AI Builder (for Story `{StoryID}` of {DevelopmentName})
 
-- <critical_rule>Systematically use the sharded documents within `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/` as your primary guide to discover ALL detailed documentation relevant to Story `{StoryID}`'s implementation needs.</critical_rule>
+- <critical_rule>Systematically use the sharded documents within `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/` as your primary guide to discover ALL detailed documentation relevant to Story `{StoryID}`'s implementation needs.</critical_rule>
 - Thoroughly review the EFDD (`.../1_feature_definition/efdd.md`), Main Architecture (`.../architecture/index.md`), and Frontend Architecture (`.../architecture/front-end-architecture.md` if relevant for Story `{StoryID}`).
 - Guided by the sharded documents index (`.../docs/index.md`) and the story's needs, locate, analyze, and synthesize specific, relevant information from sources such as:
   - Sharded Data Models (`.../docs/architecture_shards/data-models.md`).
@@ -64,7 +64,7 @@ This task is typically executed by the **Epi-Logos Story Steward**.
 
 ### 5. Populate Story Template (for Story `{StoryID}` of {DevelopmentName})
 
-- Create a new story file: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/story-{StoryID}.md` (e.g., `story-1.1.md`).
+- Create a new story file: `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/stories/story-{StoryID}.md` (e.g., `story-1.1.md`).
 - Use the (Epi-Logos aligned) `story-tmpl.md` to structure the file.
 - Fill in:
   - Story `{EpicNum}.{StoryNum}: {Short Title Copied from Epic File}` (ensure `{StoryID}` matches `{EpicNum}.{StoryNum}`).
@@ -86,11 +86,11 @@ This task is typically executed by the **Epi-Logos Story Steward**.
 ### 6. Validate Story Draft (Prompt Package)
 
 - Use the (Epi-Logos aligned) `story-draft-checklist.md` to validate the story file for Story `{StoryID}`.
-- Ensure all sections of the checklist are addressed, paying particular attention to clarity for the AI Builder, contextual richness from `BMAD EPI-LOGOS MEMORY`, and philosophical alignment for `{DevelopmentName}`.
+- Ensure all sections of the checklist are addressed, paying particular attention to clarity for the AI Builder, contextual richness from `BMAD EPI-LOGOS MEMORY` (via `epi-logos-memory-root`), and philosophical alignment for `{DevelopmentName}`.
 - Present the completed checklist and the draft story file to the user (or Epi-Logos Process Steward) for approval.
 - Incorporate any feedback to finalize the story/prompt package for Story `{StoryID}`.
 
 ### 7. Finalize Story
 
-- Once approved, update the `Status: Approved` in the story file `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/story-{StoryID}.md`.
+- Once approved, update the `Status: Approved` in the story file located at `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/stories/story-{StoryID}.md`.
 - The story/prompt package is now ready for handoff to the Epi-Logos Aligned Dev Agent or an external AI builder.

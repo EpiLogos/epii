@@ -1,6 +1,6 @@
 # Epi-Logos Feature Definer (PM) Requirements Checklist for {Development Name}
 
-This checklist serves as a comprehensive framework for the Epi-Logos Feature Definer to ensure the Epi-Logos Feature Definition Document (EFDD) and Epic definitions for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) are complete, well-structured, philosophically aligned, and appropriately scoped for MVP development. The EFDD will be located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
+This checklist serves as a comprehensive framework for the Epi-Logos Feature Definer to ensure the Epi-Logos Feature Definition Document (EFDD) and Epic definitions for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) are complete, well-structured, philosophically aligned, and appropriately scoped for MVP development. The EFDD will be located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
 
 ## 1. PROBLEM DEFINITION & EPI-LOGOS CONTEXT (for {Development Name})
 
@@ -8,8 +8,8 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Clear articulation of the problem being solved or opportunity being explored by **{Development Name}**.
 - [ ] Identification of who experiences the problem (user as seeker/participant in Epi-Logos).
 - [ ] Explanation of why solving this problem matters for **{Development Name}** within the Epi-Logos context.
-- [ ] Alignment with core Epi-Logos principles (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Core_Principles.md`).
-- [ ] Connection to the "Conceptual Alignment Brief" for **{Development Name}** (ref: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`).
+- [ ] Alignment with core Epi-Logos principles (ref: `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Core_Principles.md`).
+- [ ] Connection to the "Conceptual Alignment Brief" for **{Development Name}** (ref: `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`).
 
 ### 1.2 Epi-Logos Goals & Success Metrics (for {Development Name})
 - [ ] Specific, measurable (qualitatively or quantitatively) objectives for **{Development Name}** defined.
@@ -19,7 +19,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Timeframe for achieving goals for **{Development Name}** specified.
 
 ### 1.3 User Research & Memory Insights (for {Development Name})
-- [ ] Target user personas (as seekers/participants) for **{Development Name}** clearly defined, referencing `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/User_Archetypes.md`.
+- [ ] Target user personas (as seekers/participants) for **{Development Name}** clearly defined, referencing `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/User_Archetypes.md`.
 - [ ] User needs and pain points (in their journey within Epi-Logos) documented for **{Development Name}**.
 - [ ] Insights from `BMAD EPI-LOGOS MEMORY` (relevant `{Subsystem}` data, Bimba coordinates) summarized.
 - [ ] Competitive analysis (if relevant for **{Development Name}**) included.
@@ -58,7 +58,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Edge cases for **{Development Name}** considered.
 
 ### 3.2 Usability Requirements (Aligned with Epi-Logos Design Philosophy)
-- [ ] Accessibility considerations for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Accessibility_Guidelines.md`).
+- [ ] Accessibility considerations for **{Development Name}** documented (ref: `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Accessibility_Guidelines.md`).
 - [ ] Platform/device compatibility for **{Development Name}** specified.
 - [ ] Performance expectations from user perspective for **{Development Name}** defined.
 - [ ] Error handling and recovery approaches for **{Development Name}** outlined (promoting reflective engagement).
@@ -67,7 +67,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 ### 3.3 UI Requirements (Shakti Aspect of {Development Name})
 - [ ] Information architecture for **{Development Name}** outlined.
 - [ ] Critical UI components for **{Development Name}** identified.
-- [ ] Visual design guidelines referenced (e.g., `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`, `.../Brand_Guidelines.md`).
+- [ ] Visual design guidelines referenced (e.g., `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Design_Philosophy.md`, `.../Brand_Guidelines.md`).
 - [ ] Content requirements for **{Development Name}** specified (tone, language aligned with Epi-Logos).
 - [ ] High-level navigation structure for **{Development Name}** defined.
 
@@ -96,7 +96,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Local testability requirements for **{Development Name}** defined in ACs.
 
 ## 5. NON-FUNCTIONAL REQUIREMENTS (for {Development Name}, aligned with Epi-Logos NFRs)
-(Reference `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/NFRs.md` and specific `{Subsystem}` NFRs)
+(Reference `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/NFRs.md` and specific `{Subsystem}` NFRs)
 
 ### 5.1 Performance Requirements
 - [ ] Response time expectations for **{Development Name}** defined.
@@ -106,8 +106,8 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Load handling expectations for **{Development Name}** set.
 
 ### 5.2 Security & Compliance
-- [ ] Data protection requirements for **{Development Name}** specified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Data_Governance_Policy.md`).
-- [ ] Authentication/authorization needs for **{Development Name}** defined (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Security_Guidelines.md`).
+- [ ] Data protection requirements for **{Development Name}** specified (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Data_Governance_Policy.md`).
+- [ ] Authentication/authorization needs for **{Development Name}** defined (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Security_Guidelines.md`).
 - [ ] Compliance requirements for **{Development Name}** documented.
 - [ ] Security testing requirements for **{Development Name}** outlined.
 - [ ] Privacy considerations for **{Development Name}** addressed, aligning with Sacred Technology Ethos.
@@ -120,15 +120,15 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 - [ ] Maintenance and support considerations for **{Development Name}** included.
 
 ### 5.4 Technical Constraints
-- [ ] Platform/technology constraints for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/TechStack.md`).
-- [ ] Integration requirements for **{Development Name}** outlined (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Integration_Patterns.md`).
-- [ ] Third-party service dependencies for **{Development Name}** identified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/ThirdPartyIntegrations.md`).
+- [ ] Platform/technology constraints for **{Development Name}** documented (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/TechStack.md`).
+- [ ] Integration requirements for **{Development Name}** outlined (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Integration_Patterns.md`).
+- [ ] Third-party service dependencies for **{Development Name}** identified (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/ThirdPartyIntegrations.md`).
 - [ ] Infrastructure requirements for **{Development Name}** specified.
 - [ ] Development environment needs for **{Development Name}** identified.
 
 ## 6. EPIC & STORY STRUCTURE (for {Development Name})
-(Stories to be stored in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`)
-(Epics sharded to `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/`)
+(Stories to be stored in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`)
+(Epics sharded to `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/`)
 
 ### 6.1 Epic Definition
 - [ ] Epics for **{Development Name}** represent cohesive units of functionality.
@@ -179,7 +179,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 ## 8. CROSS-FUNCTIONAL REQUIREMENTS (for {Development Name})
 
 ### 8.1 Data Requirements (Siva Aspect)
-- [ ] Data entities and relationships for **{Development Name}** identified (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/DataModels.md`).
+- [ ] Data entities and relationships for **{Development Name}** identified (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/DataModels.md`).
 - [ ] Data storage requirements for **{Development Name}** specified.
 - [ ] Data quality requirements for **{Development Name}** defined.
 - [ ] Data retention policies for **{Development Name}** identified.
@@ -188,7 +188,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 
 ### 8.2 Integration Requirements (Siva-Sakti Aspect)
 - [ ] External system integrations for **{Development Name}** identified.
-- [ ] API requirements for **{Development Name}** documented (ref: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/api-specs.md`).
+- [ ] API requirements for **{Development Name}** documented (ref: `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/api-specs.md`).
 - [ ] Authentication for integrations for **{Development Name}** specified.
 - [ ] Data exchange formats for **{Development Name}** defined (MCP considerations).
 - [ ] Integration testing requirements for **{Development Name}** outlined.
@@ -204,7 +204,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Feature Def
 
 ### 9.1 Documentation Quality (EFDD and supporting artifacts for {Development Name})
 - [ ] Documents use clear, consistent Epi-Logos language.
-- [ ] Documents are well-structured and organized in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`.
+- [ ] Documents are well-structured and organized in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`.
 - [ ] Technical terms are defined where necessary.
 - [ ] Diagrams/visuals included where helpful.
 - [ ] Documentation is versioned appropriately.

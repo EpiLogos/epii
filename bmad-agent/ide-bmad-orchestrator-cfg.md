@@ -2,13 +2,13 @@
 
 ## Data Resolution:
 
-- `personas:` `bmad-agent/personas/`
-- `tasks:` `bmad-agent/tasks/`
-- `templates:` `bmad-agent/templates/`
-- `checklists:` `bmad-agent/checklists/`
-- `epi-logos-memory-root:` `BMAD EPI-LOGOS MEMORY/` # Root for all development-specific data
-- `philosophical-layer-root:` `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/`
-- `system-technology-root:` `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/`
+- `personas:` `bmad-agent/personas/` # Base path for persona definition files
+- `tasks:` `bmad-agent/tasks/` # Base path for task definition files
+- `templates:` `bmad-agent/templates/` # Base path for generic templates used by tasks
+- `checklists:` `bmad-agent/checklists/` # Base path for checklist files used by tasks
+- `epi-logos-memory-root:` `BMAD EPI-LOGOS MEMORY/` # CRITICAL: Root for ALL development-specific data. Output paths for artifacts like briefs, EFDDs, stories, etc., are constructed as: `epi-logos-memory-root` + `{currentSubsystem}` + `/Developments/` + `{currentDevelopmentName}` + `/docs/` (or other relevant subdirectories like `/code/`, `/assets/` as per task needs).
+- `philosophical-layer-root:` `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/` # READ-ONLY: For accessing documents ABOUT the Epi-Logos Project philosophy for conceptual alignment and assessment.
+- `system-technology-root:` `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/` # READ-ONLY: For accessing documents ABOUT the Epi-Logos System technology stack and architectural guidelines.
 
 ## Epi-Logos Personas:
 

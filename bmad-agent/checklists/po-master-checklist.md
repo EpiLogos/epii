@@ -1,18 +1,18 @@
 # Epi-Logos Process Steward (PO) Validation Checklist for {Development Name}
 
-This checklist serves as a comprehensive framework for the Epi-Logos Process Steward to validate the complete MVP plan for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) before development execution by an external AI builder. The Process Steward should systematically work through each item, documenting compliance status and noting any deficiencies. All artifacts are expected to be within `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`.
+This checklist serves as a comprehensive framework for the Epi-Logos Process Steward to validate the complete MVP plan for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) before development execution by an external AI builder. The Process Steward should systematically work through each item, documenting compliance status and noting any deficiencies. All artifacts are expected to be within `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/`.
 
 ## 1. PROJECT SETUP & INITIALIZATION (for {Development Name})
 
 ### 1.1 Project Scaffolding (as defined for {Development Name})
-- [ ] Epic 1 (in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/epic-1.md`) includes explicit steps for **{Development Name}** creation/initialization.
-- [ ] If using a starter template for **{Development Name}**, steps for cloning/setup are included and align with `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Starter_Templates/`.
+- [ ] Epic 1 (in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/epics/epic-1.md`) includes explicit steps for **{Development Name}** creation/initialization.
+- [ ] If using a starter template for **{Development Name}**, steps for cloning/setup are included and align with `{epi-logos-memory-root}/Epi-Logos System (Technology)/Starter_Templates/`.
 - [ ] If building **{Development Name}** from scratch, all necessary scaffolding steps are defined.
-- [ ] Initial README for **{Development Name}** (in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/README.md`) or documentation setup is included.
+- [ ] Initial README for **{Development Name}** (in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/README.md`) or documentation setup is included.
 - [ ] Repository setup and initial commit processes for **{Development Name}** are defined (if applicable).
 
 ### 1.2 Development Environment (for {Development Name})
-- [ ] Local development environment setup for **{Development Name}** is clearly defined in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/dev-environment.md`.
+- [ ] Local development environment setup for **{Development Name}** is clearly defined in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/dev-environment.md`.
 - [ ] Required tools and versions for **{Development Name}** are specified (ref: `.../docs/architecture_shards/tech-stack.md`).
 - [ ] Steps for installing dependencies for **{Development Name}** are included.
 - [ ] Configuration files (dotenv, config files, etc.) for **{Development Name}** are addressed (ref: `.../docs/architecture_shards/environment-vars.md`).
@@ -40,14 +40,14 @@ This checklist serves as a comprehensive framework for the Epi-Logos Process Ste
 - [ ] Middleware and common utilities for **{Development Name}** are created before use.
 
 ### 2.3 Deployment Pipeline (for {Development Name})
-- [ ] CI/CD pipeline for **{Development Name}** is established before any deployment actions (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Deployment_Strategy.md`).
+- [ ] CI/CD pipeline for **{Development Name}** is established before any deployment actions (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Deployment_Strategy.md`).
 - [ ] Infrastructure as Code (IaC) for **{Development Name}** is set up before use (ref: `.../docs/architecture_shards/infra-deployment.md`).
 - [ ] Environment configurations (dev, staging, prod) for **{Development Name}** are defined early.
 - [ ] Deployment strategies for **{Development Name}** are defined before implementation.
 - [ ] Rollback procedures or considerations for **{Development Name}** are addressed.
 
 ### 2.4 Testing Infrastructure (for {Development Name})
-- [ ] Testing frameworks for **{Development Name}** are installed before writing tests (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Testing_Strategy.md`).
+- [ ] Testing frameworks for **{Development Name}** are installed before writing tests (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Testing_Strategy.md`).
 - [ ] Test environment setup for **{Development Name}** precedes test implementation.
 - [ ] Mock services or data for **{Development Name}** are defined before testing.
 - [ ] Test utilities or helpers for **{Development Name}** are created before use.
@@ -57,7 +57,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Process Ste
 ### 3.1 Third-Party Services
 - [ ] Account creation steps for required services for **{Development Name}** are identified.
 - [ ] API key acquisition processes for **{Development Name}** are defined.
-- [ ] Steps for securely storing credentials for **{Development Name}** are included (ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Security_Guidelines.md`).
+- [ ] Steps for securely storing credentials for **{Development Name}** are included (ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Security_Guidelines.md`).
 - [ ] Fallback or offline development options for **{Development Name}** are considered.
 
 ### 3.2 External APIs
@@ -122,7 +122,7 @@ This checklist serves as a comprehensive framework for the Epi-Logos Process Ste
 
 ### 6.3 Technical Requirements Satisfaction
 - [ ] All technical constraints from the EFDD for **{Development Name}** are addressed.
-- [ ] Non-functional requirements for **{Development Name}** are incorporated (ref: EFDD NFR section and `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/NFRs.md`).
+- [ ] Non-functional requirements for **{Development Name}** are incorporated (ref: EFDD NFR section and `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/NFRs.md`).
 - [ ] Architecture decisions for **{Development Name}** align with specified constraints (ref: `.../architecture/index.md`).
 - [ ] Performance considerations for **{Development Name}** are appropriately addressed.
 

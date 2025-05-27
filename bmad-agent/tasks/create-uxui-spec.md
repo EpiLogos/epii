@@ -2,15 +2,15 @@
 
 ## Purpose
 
-To collaboratively work with the user to define and document the User Interface (UI) and User Experience (UX) specifications for a specific **{Development Name}** within its **{PhilosophicalLayer} / {Subsystem}**. This involves understanding user needs (as seekers/participants in Epi-Logos), defining information architecture, outlining user flows, and ensuring a solid foundation for visual design and frontend development that resonates with Epi-Logos principles. The output will populate a new document, typically `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md`, following the (Epi-Logos aligned) `front-end-spec-tmpl.md` template.
+To collaboratively work with the user to define and document the User Interface (UI) and User Experience (UX) specifications for a specific **{Development Name}** within its **{PhilosophicalLayer} / {Subsystem}**. This involves understanding user needs (as seekers/participants in Epi-Logos), defining information architecture, outlining user flows, and ensuring a solid foundation for visual design and frontend development that resonates with Epi-Logos principles. The output will populate a new document, typically stored at `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/design/ui-ux-spec.md`, following the (Epi-Logos aligned) `front-end-spec-tmpl.md` template.
 
 This task is typically executed by the **Epi-Logos Design Architect**.
 
 ## Inputs (for {Development Name})
 
-- **Epi-Logos Feature Definition Document (EFDD):** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
-- **Conceptual Alignment Brief for {Development Name}:** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`.
-- **Frontend Architecture for {Development Name} (if available, may be developed in parallel or iteratively):** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/front-end-architecture.md`.
+- **Epi-Logos Feature Definition Document (EFDD):** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/efdd.md`.
+- **Conceptual Alignment Brief for {Development Name}:** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/conceptual_alignment_brief.md`.
+- **Frontend Architecture for {Development Name} (if available, may be developed in parallel or iteratively):** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/architecture/front-end-architecture.md`.
 - User feedback or research relevant to **{Development Name}**.
 - Relevant Epi-Logos Memory Context:
     - `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`
@@ -54,7 +54,7 @@ This task is typically executed by the **Epi-Logos Design Architect**.
 ### 6. Define Component Library / Design System Approach (for `front-end-spec-tmpl.md` of {DevelopmentName})
 
 - Discuss if the global `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Interface)/Design_System.md` will be used, or if **{DevelopmentName}** requires specific new components.
-- New components for **{DevelopmentName}** should be documented in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/components/`.
+- New components for **{DevelopmentName}** should be documented in `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/design/components/`.
 
 ### 7. Establish Branding & Style Guide Basics (for `front-end-spec-tmpl.md` of {DevelopmentName})
 
@@ -76,7 +76,7 @@ This task is typically executed by the **Epi-Logos Design Architect**.
 - **a. Draft Section:** Incrementally populate one logical section of the UI/UX Spec for **{DevelopmentName}**.
 - **b. Present & Incorporate Initial Feedback:** Present the drafted section for **{DevelopmentName}** to the user.
 - **c. [Offer Advanced Self-Refinement & Elicitation Options](#offer-advanced-self-refinement--elicitation-options)** (adapted for UI/UX spec of **{DevelopmentName}**).
-- Ensure the final document is saved to `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md`.
+- Ensure the final document is saved to `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/design/ui-ux-spec.md`.
 
 ## Offer Advanced Self-Refinement & Elicitation Options
 (As defined in other task files, adapted for the context of creating the UI/UX Specification for **{DevelopmentName}**.)

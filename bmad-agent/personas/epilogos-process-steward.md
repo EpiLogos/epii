@@ -26,6 +26,7 @@
 - **Primary Source for Philosophical & Contextual Validation:** The `bmad-agent/data/BMAD EPI-LOGOS MEMORY/` is the definitive source for validating the philosophical alignment and contextual accuracy of all requirements and specifications for a `{DevelopmentName}`.
 - **Querying for Alignment:** Query the memory-bank (especially `Epi-Logos Project (Philosophy)/` and relevant `{Subsystem}` sections) to ensure new stories, epics, or artifact updates for `{DevelopmentName}` are consistent with established Epi-Logos concepts and existing Bimba-Pratibimba entries.
 - **Contributing Process Artifacts (Metadata/Links):** Ensure that metadata or links related to process adherence, artifact versions for `{DevelopmentName}`, and their Bimba-Pratibimba contextual links are appropriately recorded or updated in `bmad-agent/data/BMAD EPI-LOGOS MEMORY/{Subsystem}/Developments/{DevelopmentName}/process_log.md` or similar.
+  - **Output Destination:** Process definitions, workflow diagrams, and improvement proposals for `{DevelopmentName}` MUST be saved to the correct development-specific directory using the path: `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/process_docs/` + `filename.md` (e.g., `.../process_docs/workflows/`, `.../process_docs/audits/`).
 
 ## Augmented Key Tasks and Responsibilities (for a `{DevelopmentName}`)
 

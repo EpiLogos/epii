@@ -5,7 +5,7 @@
 - Transform the "Conceptual Alignment Brief" for a `{DevelopmentName}` into a comprehensive "Epi-Logos Feature Definition Document (EFDD)" conforming to the `prd-tmpl.md` (which should be understood as an EFDD template).
 - Define clear MVP scope for `{DevelopmentName}` focused on essential functionality and philosophical alignment with its target `{Subsystem}` and the broader Epi-Logos.
 - Provide foundation for the Epi-Logos Contextual Architect and eventually for generating prompt packages for an external AI builder.
-- Ensure all outputs are stored correctly within `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/`.
+- Ensure all outputs are stored correctly. The primary EFDD MUST be saved to `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/efdd.md`. Supporting documents like checklists follow a similar path in a relevant subfolder (e.g., `/docs/features/checklists/`).
 
 Remember as you (Epi-Logos Feature Definer) follow the upcoming instructions:
 
@@ -29,7 +29,7 @@ Remember as you (Epi-Logos Feature Definer) follow the upcoming instructions:
 
 ### 3. Review Inputs Provided for {DevelopmentName}
 
-- Review the "Conceptual Alignment Brief" for `{DevelopmentName}` (from `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/0_conceptual_alignment/conceptual_alignment_brief.md`).
+- Review the "Conceptual Alignment Brief" for `{DevelopmentName}` (from `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/conceptual_alignment_brief.md`).
 - Consult relevant sections of `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/` and `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/` (especially for the target `{Subsystem}`).
 - Incorporate any user input and ideas specific to `{DevelopmentName}`.
 
@@ -84,12 +84,12 @@ vi. [Offer Advanced Self-Refinement & Elicitation Options](#offer-advanced-self-
 - Document completion status for each item.
 - Present the user with a summary of each section of the checklist.
 - Address deficiencies with user for input or suggested updates.
-- Output the final checklist. This will be stored as a supporting document in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/pm_checklist_completed.md`.
+- Output the final checklist. This will be stored as a supporting document using the path: `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/checklists/pm_checklist_completed.md`.
 
 ### 6\. Produce the EFDD for {DevelopmentName}
 
-- Produce the EFDD for `{DevelopmentName}` using `prd-tmpl.md` as a base structure, saving it to `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
-- Ensure all placeholders like `{DevelopmentName}`, `{Subsystem}`, `{PhilosophicalLayer}` are correctly filled.
+- Produce the EFDD for `{DevelopmentName}` using `prd-tmpl.md` as a base structure, saving it to `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/efdd.md`.
+- Ensure all placeholders like `{DevelopmentName}` (which should match `currentDevelopmentName`), and `{currentSubsystem}` are correctly filled.
 
 <important_note>
 **Next Steps for UI/UX Specification (If Shakti aspect exists for {DevelopmentName}):**
@@ -97,7 +97,7 @@ vi. [Offer Advanced Self-Refinement & Elicitation Options](#offer-advanced-self-
 - If `{DevelopmentName}` includes a user interface:
   1.  **Include Design Architect Prompt in EFDD:** Add a dedicated section in the EFDD for `{DevelopmentName}` (as per `prd-tmpl.md` structure) for the **Epi-Logos Design Architect**.
       - Prompt should state operation in **'UI/UX Specification Mode'**.
-      - Instruct to use this EFDD as input to define UI/UX specs for `{DevelopmentName}`, potentially creating/populating `front-end-spec-tmpl.md` (Epi-Logos aligned) at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md`.
+      - Instruct to use this EFDD as input to define UI/UX specs for `{DevelopmentName}`, potentially creating/populating `front-end-spec-tmpl.md` (Epi-Logos aligned) at `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/design/ui-ux-spec.md`.
   2.  **Recommend User Workflow:** After finalizing this EFDD, strongly recommend to the user:
       a. First, engage the **Epi-Logos Design Architect**.
       b. Second, _after_ UI/UX specification, engage the **Epi-Logos Contextual Architect** using the 'Initial Architect Prompt' in this EFDD.

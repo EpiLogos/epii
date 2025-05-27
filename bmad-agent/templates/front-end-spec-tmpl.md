@@ -1,7 +1,7 @@
 # {Development Name} - Shakti UI/UX Specification
 
 **Context:** {PhilosophicalLayer} / {Subsystem}
-**Location:** `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md` (or sharded within `../docs/frontend_shards/`)
+**Location:** `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md` (or sharded within `../docs/frontend_shards/`)
 
 ## Introduction
 
@@ -16,7 +16,7 @@
 
 - **Target User Personas (as Participants in Epi-Logos):** {Reference personas or briefly describe key user types and their goals relevant to **{Development Name}** and its role within the **{Subsystem}**. How does this interface facilitate their participation in the Epi-Logos experience?}
 - **Usability Goals (Epi-Logos Aligned):** {e.g., Ease of learning, efficiency of use, error prevention for **{Development Name}** features, promoting reflective engagement.}
-- **Design Principles (Guided by Epi-Logos):** {List 3-5 core principles guiding the UI/UX design for **{Development Name}** - e.g., "Clarity over cleverness," "Consistency," "Provide feedback," "Resonance with {Epi-Logos_Concept}". These should align with broader Epi-Logos UX philosophy defined in `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`.}
+- **Design Principles (Guided by Epi-Logos):** {List 3-5 core principles guiding the UI/UX design for **{Development Name}** - e.g., "Clarity over cleverness," "Consistency," "Provide feedback," "Resonance with {Epi-Logos_Concept}". These should align with broader Epi-Logos UX philosophy defined in `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Design_Philosophy.md`.}
 
 ## Information Architecture (IA) for {Development Name}
 
@@ -61,11 +61,11 @@
 
 ## Component Library / Design System Reference (for {Development Name})
 
-{Reference the global design system from `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Interface)/Design_System.md` and specify any new components or variations created for **{Development Name}**. New components should be documented in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/components/`.}
+{Reference the global design system from `{epi-logos-memory-root}/Epi-Logos System (Interface)/Design_System.md` and specify any new components or variations created for **{Development Name}**. New components should be documented in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/components/`.}
 
 ## Branding & Style Guide Reference (for {Development Name})
 
-{Link to the primary source (e.g., `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Brand_Guidelines.md`) or define key elements here if they are specific or nuanced for **{Development Name}**.}
+{Link to the primary source (e.g., `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Brand_Guidelines.md`) or define key elements here if they are specific or nuanced for **{Development Name}**.}
 
 - **Color Palette (for {Development Name}):** {Primary, Secondary, Accent, Feedback colors (hex codes). Note if these are variations for **{DevelopmentName}** from the global palette.}
 - **Typography (for {Development Name}):** {Font families, sizes, weights for headings, body, etc., within **{DevelopmentName}**.}
@@ -74,7 +74,7 @@
 
 ## Accessibility (AX) Requirements (for {Development Name})
 
-- **Target Compliance:** {e.g., WCAG 2.1 AA, as per `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Accessibility_Guidelines.md`}
+- **Target Compliance:** {e.g., WCAG 2.1 AA, as per `{epi-logos-memory-root}/Epi-Logos Project (Philosophy)/Accessibility_Guidelines.md`}
 - **Specific Requirements for {Development Name}:** {Keyboard navigation patterns, ARIA landmarks/attributes for complex components within **{DevelopmentName}**, color contrast minimums.}
 
 ## Responsiveness (for {Development Name})

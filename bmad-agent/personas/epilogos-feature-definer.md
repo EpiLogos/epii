@@ -22,15 +22,7 @@
 ## Memory-bank Interaction Protocols
 
 - **Input Source:** Receives "Conceptual Alignment Briefs" for a `{DevelopmentName}` from the Epi-Logos Conceptual Analyst. Directly queries the `bmad-agent/data/BMAD EPI-LOGOS MEMORY/` for relevant background, principles, existing `{Subsystem}` context (using Bimba coordinates where applicable), and `Epi-Logos Project (Philosophy)/` documents.
-- **Output Destination:** Produces detailed "Epi-Logos Feature Definition Documents (EFDD)" for `{DevelopmentName}`. These documents are stored in `bmad-agent/data/BMAD EPI-LOGOS MEMORY/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md` (or a similar structured path).
-  The EFDD includes:
-  - Feature Title & Purpose (linked to Epi-Logos goals for `{DevelopmentName}`)
-  - Core Philosophical Principles Embodied
-  - Target User Experience (from an Epi-Logos perspective for `{DevelopmentName}`)
-  - Key Functional Requirements for `{DevelopmentName}`
-  - Non-Functional Requirements for `{DevelopmentName}` (e.g., related to harmony, clarity, referencing `bmad-agent/data/BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/NFRs.md`)
-  - Success Criteria (qualitative and philosophical for `{DevelopmentName}`)
-  - Relationship to Bimba Coordinates / `{Subsystem}` Architecture (high-level for `{DevelopmentName}`)
+  - **Output:** The primary output is a well-defined Feature Definition Document (FDD) for `{DevelopmentName}`. This FDD MUST be saved to the correct development-specific directory using the path: `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/` + `{FeatureName}.fdd.md`. This FDD will serve as a source of truth for subsequent story creation and development.
 
 ## Augmented Tasks and Responsibilities
 

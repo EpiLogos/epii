@@ -2,15 +2,15 @@
 
 ## Purpose
 
-To define the technical architecture for the frontend (Shakti aspect) of a specific **{Development Name}** within its **{PhilosophicalLayer} / {Subsystem}**. This includes selecting appropriate patterns, structuring the codebase, defining component strategy, planning state management, outlining API interactions, and setting up testing and deployment approaches, all while adhering to the guidelines in the (Epi-Logos aligned) `front-end-architecture-tmpl.md` template. The output document will be stored at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/front-end-architecture.md`.
+To define the technical architecture for the frontend (Shakti aspect) of a specific **{Development Name}** within its **{PhilosophicalLayer} / {Subsystem}**. This includes selecting appropriate patterns, structuring the codebase, defining component strategy, planning state management, outlining API interactions, and setting up testing and deployment approaches, all while adhering to the guidelines in the (Epi-Logos aligned) `front-end-architecture-tmpl.md` template. The output document will be stored at `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/architecture/front-end-architecture.md`.
 
 This task is typically executed by the **Epi-Logos Design Architect**.
 
 ## Inputs (for {Development Name})
 
-- **Epi-Logos Feature Definition Document (EFDD):** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`.
-- **UI/UX Specification for {Development Name}:** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/design/ui-ux-spec.md` (or sharded docs in `.../docs/frontend_shards/`).
-- **Main System Architecture Document for {Development Name} (Feature Context & Bimba-Alignment Package):** From `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md` (or `architecture.md`). Particularly note overall system structure, "Definitive Tech Stack Selections", and API contracts.
+- **Epi-Logos Feature Definition Document (EFDD):** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/features/efdd.md`.
+- **UI/UX Specification for {Development Name}:** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/design/ui-ux-spec.md` (or sharded docs in `.../docs/frontend_shards/`).
+- **Main System Architecture Document for {Development Name} (Feature Context & Bimba-Alignment Package):** From `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/architecture/index.md` (or `architecture.md`). Particularly note overall system structure, "Definitive Tech Stack Selections", and API contracts.
 - **Primary Design Files (Figma, Sketch, etc.):** Linked from UI/UX Spec for **{Development Name}**.
 - **Relevant Epi-Logos Memory Context:**
     - `BMAD EPI-LOGOS MEMORY/Epi-Logos Project (Philosophy)/Design_Philosophy.md`
@@ -103,7 +103,7 @@ This task is typically executed by the **Epi-Logos Design Architect**.
 - Go through each item to ensure the `front-end-architecture.md` for **{DevelopmentName}** is comprehensive.
 - Discuss and address any identified deficiencies for **{DevelopmentName}**.
 - Present a summary of the checklist review to the user.
-- The goal is a complete and actionable `front-end-architecture.md` for **{DevelopmentName}`, stored at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/front-end-architecture.md`.
+- The goal is a complete and actionable `front-end-architecture.md` for **{DevelopmentName}`, stored at `epi-logos-memory-root` (from config) + `currentSubsystem` + `/Developments/` + `currentDevelopmentName` + `/docs/architecture/front-end-architecture.md`.
 
 ## Offer Advanced Self-Refinement & Elicitation Options
 (As defined in other task files, adapted for the context of creating the Frontend Architecture for **{DevelopmentName}**.)

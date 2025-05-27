@@ -8,7 +8,7 @@
 
 ## 1. Understand the Trigger & Context
 
-- [ ] **Identify Triggering Story:** Clearly identify the story (or stories) that revealed the issue within the current **{Development Name}**. (Story location: `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`)
+- [ ] **Identify Triggering Story:** Clearly identify the story (or stories) that revealed the issue within the current **{Development Name}**. (Story location: `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/`)
 - [ ] **Define the Issue:** Articulate the core problem precisely.
   - [ ] Is it a technical limitation/dead-end?
   - [ ] Is it a newly discovered requirement for **{Development Name}**?
@@ -35,19 +35,19 @@
 ## 3. Artifact Conflict & Impact Analysis (for {Development Name})
 
 - [ ] **Review EFDD (Epi-Logos Feature Definition Document):**
-  - [ ] Does the issue conflict with the core goals or requirements stated in the EFDD for **{Development Name}** (located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`)?
+  - [ ] Does the issue conflict with the core goals or requirements stated in the EFDD for **{Development Name}** (located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/1_feature_definition/efdd.md`)?
   - [ ] Does the EFDD need clarification or updates based on the new understanding?
 - [ ] **Review Architecture Document:**
-  - [ ] Does the issue conflict with the documented architecture for **{Development Name}** (located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md`)?
+  - [ ] Does the issue conflict with the documented architecture for **{Development Name}** (located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/index.md`)?
   - [ ] Are specific components/diagrams/sections impacted?
-  - [ ] Does the technology list need updating, referencing `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/TechStack.md`?
-  - [ ] Do data models or schemas need revision, referencing `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/data-models.md` or `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/DataModels.md`?
+  - [ ] Does the technology list need updating, referencing `{epi-logos-memory-root}/Epi-Logos System (Technology)/TechStack.md`?
+  - [ ] Do data models or schemas need revision, referencing `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/data-models.md` or `{epi-logos-memory-root}/Epi-Logos System (Technology)/DataModels.md`?
   - [ ] Are external API integrations affected?
 - [ ] **Review Frontend Spec (if applicable for {Development Name}):**
-  - [ ] Does the issue conflict with the FE architecture, component library choice, or UI/UX design for **{Development Name}** (located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/front-end-architecture.md` or `.../design/ui-ux-spec.md`)?
+  - [ ] Does the issue conflict with the FE architecture, component library choice, or UI/UX design for **{Development Name}** (located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/architecture/front-end-architecture.md` or `.../design/ui-ux-spec.md`)?
   - [ ] Are specific FE components or user flows impacted?
 - [ ] **Review Other Artifacts (if applicable for {Development Name}):**
-  - [ ] Consider impact on deployment scripts, IaC, monitoring setup, sharded documents in `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/`, etc., within the **{Development Name}** context.
+  - [ ] Consider impact on deployment scripts, IaC, monitoring setup, sharded documents in `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/`, etc., within the **{Development Name}** context.
 - [ ] **Summarize Artifact Impact:** List all artifacts for **{Development Name}** requiring updates and the nature of the changes needed.
 
 ## 4. Path Forward Evaluation (for {Development Name})

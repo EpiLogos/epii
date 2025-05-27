@@ -2,7 +2,7 @@
 
 ## Instructions for Epi-Logos Aligned Dev Agent / External AI Builder:
 
-Before marking a story for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) as 'Review', please go through each item in this checklist. Report the status of each item (e.g., [x] Done, [ ] Not Done, [N/A] Not Applicable) and provide brief comments if necessary. The story file is located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/{epicNum}.{storyNum}.story.md`.
+Before marking a story for **{Development Name}** (within **{PhilosophicalLayer} / {Subsystem}**) as 'Review', please go through each item in this checklist. Report the status of each item (e.g., [x] Done, [ ] Not Done, [N/A] Not Applicable) and provide brief comments if necessary. The story file is located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/Stories/{epicNum}.{storyNum}.story.md`.
 
 ## Checklist Items:
 
@@ -13,11 +13,11 @@ Before marking a story for **{Development Name}** (within **{PhilosophicalLayer}
 
 2.  **Coding Standards & Project Structure (for {Development Name}):**
 
-    - [ ] All new/modified code strictly adheres to `Operational Guidelines` for **{Development Name}** (located at `BMAD EPI-LOGOS MEMORY/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/operational-guidelines.md` or global `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Coding_Standards.md`).
+    - [ ] All new/modified code strictly adheres to `Operational Guidelines` for **{Development Name}** (located at `{epi-logos-memory-root}/{PhilosophicalLayer}/{Subsystem}/Developments/{DevelopmentName}/docs/architecture_shards/operational-guidelines.md` or global `{epi-logos-memory-root}/Epi-Logos System (Technology)/Coding_Standards.md`).
     - [ ] All new/modified code aligns with `Project Structure` for **{Development Name}** (file locations, naming, etc., from `.../docs/architecture_shards/project-structure.md`).
     - [ ] Adherence to `Tech Stack` for **{Development Name}** for technologies/versions used (ref: `.../docs/architecture_shards/tech-stack.md`).
     - [ ] Adherence to `Api Reference` and `Data Models` for **{Development Name}** (if story involves API or data model changes, ref: `.../docs/architecture_shards/api-reference.md`, `.../data-models.md`).
-    - [ ] Basic security best practices (e.g., input validation, proper error handling, no hardcoded secrets) applied for new/modified code, aligning with `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Security_Guidelines.md`.
+    - [ ] Basic security best practices (e.g., input validation, proper error handling, no hardcoded secrets) applied for new/modified code, aligning with `{epi-logos-memory-root}/Epi-Logos System (Technology)/Security_Guidelines.md`.
     - [ ] No new linter errors or warnings introduced.
     - [ ] Code is well-commented where necessary (clarifying complex logic, not obvious statements), resonating with Epi-Logos clarity.
 
@@ -26,7 +26,7 @@ Before marking a story for **{Development Name}** (within **{PhilosophicalLayer}
     - [ ] All required unit tests as per the story and `Operational Guidelines` Testing Strategy for **{Development Name}** are implemented.
     - [ ] All required integration tests (if applicable) as per the story and `Operational Guidelines` Testing Strategy for **{Development Name}** are implemented.
     - [ ] All tests (unit, integration, E2E if applicable) pass successfully for **{Development Name}**.
-    - [ ] Test coverage meets project standards for **{Development Name}** (if defined). (Ref: `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/Testing_Strategy.md`).
+    - [ ] Test coverage meets project standards for **{Development Name}** (if defined). (Ref: `{epi-logos-memory-root}/Epi-Logos System (Technology)/Testing_Strategy.md`).
 
 4.  **Functionality & Verification (for {Development Name}):**
 
