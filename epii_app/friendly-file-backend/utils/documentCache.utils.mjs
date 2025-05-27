@@ -9,7 +9,7 @@
  * analysis cache to simplify the architecture.
  */
 
-import bpMCPService from '../services/bpMCPService.mjs';
+// import bpMCPService from '../services/bpMCPService.mjs'; // Commented out for dynamic import
 
 // In-memory document cache
 const documentCache = new Map();
@@ -27,6 +27,7 @@ export async function getDocumentFromCache(documentId, collection = 'Documents')
   if (!documentId) {
     throw new Error('Document ID is required');
   }
+  const { default: bpMCPService } = await import('../services/bpMCPService.mjs'); // Dynamic import
 
   // Check if document is in cache
   const cacheKey = `${collection}:${documentId}`;
@@ -76,6 +77,7 @@ export async function updateDocumentInCache(documentId, updates, collection = 'D
   if (!updates || typeof updates !== 'object') {
     throw new Error('Updates must be an object');
   }
+  const { default: bpMCPService } = await import('../services/bpMCPService.mjs'); // Dynamic import
 
   const cacheKey = `${collection}:${documentId}`;
 
