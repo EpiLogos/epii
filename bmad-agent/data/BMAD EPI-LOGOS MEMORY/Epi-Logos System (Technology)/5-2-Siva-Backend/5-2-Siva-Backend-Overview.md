@@ -76,7 +76,7 @@ friendly-file-backend/ (#5-2 Siva-)
 │   ├── 1_paramasiva/           # QL/AT Logic agent logic
 │   ├── 2_parashakti/           # Harmonic layer agent logic
 │   ├── 3_mahamaya/             # Symbolic transform agent logic
-│   ├── 4_nara/                 # API/contextual agent logic (e.g., specific Nara agent controllers/services)
+│   ├── 4_nara/                 # Nara agent logic (includes synthesis pipeline, contextual processing, user interaction management, and Nara-specific services/controllers)
 │   └── 5_epii/                 # Epii agent logic (includes analysis pipeline, Epii-specific services/controllers)
 ├── shared/                     # Shared components NOT specific to databases (e.g., general app utilities, non-DB models)
 │   ├── services/               # General application services (e.g., authentication, logging not tied to a DB type)

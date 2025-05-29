@@ -67,29 +67,58 @@ The refactoring plan aims to enhance the `friendly-file-back2front` system by fo
 friendly-file-back2front/ (#5-4 Siva-Shakti Integration Layer)
 ├── subsystems/                     # Bimba-aligned expert agent subsystems
 │   ├── 0_anuttara/                 # Foundational services (e.g., database access via agent)
+│   │   ├── a2a/                    # Anuttara-specific A2A components
+│   │   └── ag-ui/                  # Anuttara-specific AG-UI components (if any)
 │   ├── 1_paramasiva/               # QL/AT Logic implementation agent
+│   │   ├── a2a/
+│   │   └── ag-ui/
 │   ├── 2_parashakti/               # Harmonic layer services agent
+│   │   ├── a2a/
+│   │   └── ag-ui/
 │   ├── 3_mahamaya/                 # Symbolic transformation agent
-│   ├── 4_nara/                     # API/contextual agent services
-│   └── 5_epii/                     # Document analysis & Notion integration agent services
-├── shared/                         # Shared utilities, configurations, or base classes for agents
-├── adapters/                       # Enhanced agent adapters (A2A + AG-UI)
-│   ├── epii-agent-adapter.js
-│   └── nara-agent-adapter.js       # (and future agent adapters)
-├── skills/                         # Existing skills structure (potentially refined per subsystem)
-├── agent-cards/                    # Enhanced agent capability definitions (A2A + AG-UI)
-├── a2a/                              # A2A core components (Agent-to-Agent)
-│   ├── a2a-server.js
-│   ├── a2a-message.schema.js
-│   ├── task-state-manager.js
-│   ├── a2a-client.service.js
-│   └── integration.js
-├── ag-ui/                            # AG-UI specific components (Agent-to-User)
-│   ├── ag-ui-websocket-handler.js    # Centralized AG-UI WebSocket gateway
-│   ├── ag-ui-event-definitions.js    # Project-specific AG-UI event extensions
-│   ├── ag-ui-event-emitter.js        # Utility for emitting AG-UI events
-│   └── README.md                     # AG-UI components documentation
-└── README.md                         # Updated main README
+│   │   ├── a2a/
+│   │   └── ag-ui/
+│   ├── 4_nara/                     # Nara agent: Dialogue, Oracle, Journal, User Context
+│   │   ├── a2a/                    # Nara-specific A2A components (e.g., nara-a2a-handler.js)
+│   │   │   └── nara-a2a-client.js  # Client for Nara to communicate with other agents
+│   │   ├── ag-ui/                  # Nara-specific AG-UI components (e.g., nara-ag-ui-handler.js)
+│   │   │   └── nara-ag-ui-event-definitions.js # Nara-specific event extensions
+│   │   ├── skills/                 # Nara-specific skills (e.g., oracle-skill.js, journal-skill.js)
+│   │   └── nara-agent-card.js      # Nara agent capability definition
+│   └── 5_epii/                     # Epii agent: Document analysis & Notion integration
+│       ├── a2a/                    # Epii-specific A2A components
+│       │   └── epii-a2a-client.js
+│       ├── ag-ui/                  # Epii-specific AG-UI components
+│       │   └── epii-ag-ui-event-definitions.js
+│       ├── skills/
+│       └── epii-agent-card.js
+├── shared/                         # Shared utilities, configurations, or base classes
+│   ├── adapters/                   # Generic A2A/AG-UI adapter base classes or utilities
+│   ├── core-a2a/                   # Core A2A components (remains centralized)
+│   │   ├── a2a-server.js           # Main A2A WebSocket server (listens for all agents)
+│   │   ├── a2a-message.schema.js   # Base A2A message schema
+│   │   └── task-state-manager.js   # Global task state management for A2A
+│   └── core-ag-ui/                 # Core AG-UI components (remains centralized)
+│       ├── ag-ui-websocket-handler.js # Central AG-UI WebSocket gateway (listens for all agents)
+│       ├── ag-ui-event-definitions.js # Base AG-UI event definitions
+│       └── ag-ui-event-emitter.js    # Utility for emitting AG-UI events (used by subsystem handlers)
+├── README.md                         # Updated main README
+
+```
+
+### Key Refactoring Goals:
+
+1.  **Bimba Subsystem Alignment & Granularity**: Explicitly organize agent-specific logic, A2A/AG-UI handlers, skills, and agent cards within their respective `subsystems/` directory (e.g., `subsystems/4_nara/`). This promotes modularity and clearer ownership.
+    *   Each subsystem (e.g., `subsystems/4_nara/`) will house:
+        *   `a2a/`: Subsystem-specific A2A message handlers and potentially a client if it initiates A2A with others.
+        *   `ag-ui/`: Subsystem-specific AG-UI event handlers and definitions for events it uniquely produces or consumes.
+        *   `skills/`: Skills directly related to that agent's expertise.
+        *   `[agent-name]-agent-card.js`: The capability definition for that agent.
+2.  **Centralized Core A2A/AG-UI Infrastructure**: Maintain core, shared A2A and AG-UI components (like the main WebSocket servers, base message schemas, and global task managers) in `shared/core-a2a/` and `shared/core-ag-ui/` respectively. Subsystem-specific handlers will interface with this core infrastructure.
+3.  **AG-UI Protocol Integration**: The `shared/core-ag-ui/` directory manages the central AG-UI WebSocket gateway and base event definitions. Subsystem-specific `ag-ui/` directories will contain handlers that process messages from this gateway and define/emit events specific to their domain.
+4.  **Clear Communication Flows**:
+    *   **A2A (Inter-Agent)**: Agents communicate with each other via the central `shared/core-a2a/a2a-server.js`. Subsystem-specific A2A logic resides in `subsystems/[agent]/a2a/`.
+    *   **AG-UI (Agent-to-Frontend)**: Agents communicate with the frontend via the central `shared/core-ag-ui/ag-ui-websocket-handler.js`. Subsystem-specific AG-UI logic (event handling, emission) resides in `subsystems/[agent]/ag-ui/`.
 ```
 
 ### Key Refactoring Goals:

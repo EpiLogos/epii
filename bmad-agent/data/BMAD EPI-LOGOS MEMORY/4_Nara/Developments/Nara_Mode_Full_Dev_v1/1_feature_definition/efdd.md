@@ -57,12 +57,23 @@ The Nara Mode initiative aims to create a transformational digital experience, b
 ## Technical Assumptions (for Nara_Mode_Full_Dev_v1)
 
 - A modular architecture with specialized agents/subsystems for Identity, Oracle, and Journal, coordinated by a central Nara agent.
-- API-driven integration for various symbolic data sources.
-- Robust API integration with the Neo4j knowledge graph.
-- Real-time access to astrological calculation services.
+- API-driven integration for various symbolic data sources, primarily accessed via the Bimba-Pratibimba Memory MCP (BPMCP).
+- Nara will primarily leverage BPMCP's **read operations** for the Neo4j knowledge graph (Bimba), Notion, and MongoDB. Direct write operations to Bimba by Nara will be minimal and highly specific (e.g., user profile elements not suitable for MongoDB).
+- User-specific data (e.g., journal entries, interaction history, preferences) will be stored and managed in MongoDB, accessed via BPMCP.
+- Real-time access to astrological calculation services (potentially via BPMCP if integrated, or directly).
 - Sophisticated prompt engineering for the Nara agent.
-- Adherence to Epi-Logos architectural principles and the Model Context Protocol (MCP).
+- Adherence to Epi-Logos architectural principles and the Model Context Protocol (MCP), with BPMCP serving as the primary interface to backend data and services.
+- Real-time, bidirectional communication between the Nara frontend and backend agents will be facilitated by the AG-UI protocol, built as an extension to the existing A2A server infrastructure.
 - The development will fit into the existing repository structure and high-level service architecture as defined in relevant architecture documents.
+
+## Data Flow and Communication (for Nara_Mode_Full_Dev_v1)
+
+- **User to Nara Agent (Frontend to Backend):** User interactions in the Nara UI (Identity, Oracle, Journal sections) will generate events. These events will be transmitted to the Nara Agent Core via the AG-UI protocol over WebSockets.
+- **Nara Agent to BPMCP:** The Nara Agent Core, upon receiving UI events or as part of its internal logic, will make requests to the BPMCP to fetch data (e.g., `queryBimbaGraph`, `bimbaKnowing` for Bimba; `getDocumentById`, `listDocumentsByCoordinate` for MongoDB; `queryNotion` for Notion) or, in specific cases, store/update user data in MongoDB (`storeDocument`, `updateDocument`).
+- **BPMCP to Databases/Services:** BPMCP will handle the actual interaction with Neo4j, MongoDB, Notion, and other external services based on the Nara Agent's requests.
+- **BPMCP to Nara Agent:** BPMCP will return data or operation status to the Nara Agent Core.
+- **Nara Agent to User (Backend to Frontend):** The Nara Agent Core will process the data from BPMCP and its own internal state to formulate responses, insights, or UI update instructions. These will be streamed back to the Nara UI via AG-UI events (e.g., `TextMessageContent`, `StateDelta`, custom events for Bimba metadata).
+- **Contextual Awareness via AG-UI:** AG-UI events will carry contextual information (e.g., current UI section like 'Oracle-DecanicView', specific interaction like 'Journal-SymbolSearch') to enable the Nara agent to provide highly relevant responses and for the UI to update specific components dynamically. BPMCP tool calls made by the Nara agent will be mapped to AG-UI `ToolCall` events for frontend visibility.
 
 ### Testing requirements (for Nara_Mode_Full_Dev_v1)
 
@@ -75,7 +86,10 @@ The Nara Mode initiative aims to create a transformational digital experience, b
 - **Epic 1: Mahamaya Ground Implementation:** Implement the six nested layers of the #0 Mahamaya Ground, including birthdate encoding, astrological chart integration, Jungian type assessment, Gene Keys and Human Design profile generation, and archetypal quintessence synthesis.
 - **Epic 2: Decanic Embodiment & Oracle Enhancement:** Develop the dynamic card rendering, bodily resonance mapping, and temporal guidance features for the Oracle, and integrate decanic nutrition plans, elemental movement practices, and chakra-deca correspondence into Identity Dynamics.
 - **Epic 3: Tarot-Alchemical Crucible & Journal Synthesis:** Implement advanced Oracle reading modes like Concrescence Spreads and Alchemical Visionary Sequences, and build the Journal Synthesis Engine with NLP for alchemical operation detection and dream imagery mapping.
-- **Epic 4: Nara Agent Core & Coordination:** Develop the central Nara Agent for coordinating specialized agents (Mahamaya, Parashakti, Paramasiva) via the BPMCP service and managing dia-logical interaction.
+- **Epic 4: Nara Agent Core & Coordination:** Develop the central Nara Agent for coordinating specialized agents (Mahamaya, Parashakti, Paramasiva) and managing dia-logical interaction. This includes:
+  - Implementing logic to process user inputs received via AG-UI.
+  - Orchestrating calls to the BPMCP for data retrieval (Bimba, Notion, MongoDB read operations) and user data persistence (MongoDB write operations).
+  - Formatting responses and streaming them back to the UI using AG-UI events, ensuring real-time updates and contextual relevance.
 - **Epic 5: Concrescent Interface Development:** Implement the phase-locked progression across Identity, Oracle, and Journal sections based on the 12-fold concrescence rhythm.
 - **Epic 6: Epi-Logos Emergence Features:** Develop the Dynamic Symbolic Metabolism in the Journal and implement Recursive Interface Design elements.
 

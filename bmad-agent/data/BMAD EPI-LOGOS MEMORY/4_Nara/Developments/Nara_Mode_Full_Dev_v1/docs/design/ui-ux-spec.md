@@ -22,13 +22,13 @@ This document defines the user experience goals, information architecture, user 
   - Provide feedback: Clear feedback on input processing and interpretation generation.
   - Resonance with Epi-Logos_Concept: Design should align with Nara's role in "Dia-Logos" and its internal quaternal structure.
   - Facilitate transformative dialogue: The UI should encourage and and support ongoing interpretive dialogue.
-  - **Quaternary Logic Integration:** The UI/UX should visually and functionally embody the four-fold structure, allowing the system to operate at multiple levels simultaneously.
-  - **Dynamic Triad:** The Identity Dynamics, Oracle, and Journal sections should operate as integrated phases of a larger transformational cycle, with clear feedback loops.
-  - **Personalized Archetypal Map:** The Identity Dynamics section should function as a living archetypal map, evolving with the user's journey, potentially through visual mandala-like representations.
-  - **Rich Symbolic Environment:** The Oracle section should support dynamic, intuitive layouts for card spreads, with visual integration of card imagery and related archetypal symbols, and voice interaction.
-  - **Reflective Mirror:** The Journal section should act as a mirror reflecting unconscious processes, promoting integration and growth through sophisticated NLP.
-  - **Recursive Interface Design:** UI elements should self-modify and evolve based on user interaction and progress through the 12-fold concrescence rhythm, including color temperature shifts, typographic weight changes, and interface opacity levels.
-  - **Multimodal Experience:** Support for multimedia synthesis, including planetary soundscapes, archetypal video collages, and haptic feedback patterns.
+  - **Quaternary Logic Integration:** The UI/UX should visually and functionally embody the four-fold structure, allowing the system to operate at multiple levels simultaneously. (Data for these structures will be primarily sourced via BPMCP from Bimba, Notion, and MongoDB).
+  - **Dynamic Triad:** The Identity Dynamics, Oracle, and Journal sections should operate as integrated phases of a larger transformational cycle, with clear feedback loops. (Real-time state synchronization and event-driven updates between these sections will be managed by AG-UI).
+  - **Personalized Archetypal Map:** The Identity Dynamics section should function as a living archetypal map, evolving with the user's journey, potentially through visual mandala-like representations. (User-specific archetypal data and its evolution will be stored in MongoDB and accessed via BPMCP; updates to the visual map will be pushed via AG-UI).
+  - **Rich Symbolic Environment:** The Oracle section should support dynamic, intuitive layouts for card spreads, with visual integration of card imagery and related archetypal symbols, and voice interaction. (Symbolic data, card meanings, and decanic associations will be fetched via BPMCP from Bimba/Notion. Voice interactions and real-time display updates will be handled by AG-UI).
+  - **Reflective Mirror:** The Journal section should act as a mirror reflecting unconscious processes, promoting integration and growth through sophisticated NLP. (Journal entries stored in MongoDB via BPMCP. NLP processing results and reflective prompts delivered to the UI via AG-UI).
+  - **Recursive Interface Design:** UI elements should self-modify and evolve based on user interaction and progress through the 12-fold concrescence rhythm, including color temperature shifts, typographic weight changes, and interface opacity levels. (Triggers for these changes will be based on backend logic processing data from BPMCP, with UI updates pushed via AG-UI).
+  - **Multimodal Experience:** Support for multimedia synthesis, including planetary soundscapes, archetypal video collages, and haptic feedback patterns. (Content/data for these experiences sourced via BPMCP or related services, with delivery and synchronization to the UI managed by AG-UI events).
 
 ## Information Architecture (IA) for Nara_Mode_Full_Dev_v1
 
@@ -55,9 +55,9 @@ This document defines the user experience goals, information architecture, user 
   ```
   - Nara Main Interface: Entry point for all Nara mode functionalities, reflecting the integrated triad of Identity Dynamics, Oracle, and Journal.
   - Identity Dynamics: Where users explore their archetypal profile and personal foundations, including the foundational Mahamaya Ground.
-  - Mahamaya Ground: A dedicated section for the user's unique archetypal DNA, encompassing Birthdate Encoding, Natal Chart, Jungian Psychological Types, Gene Keys, Human Design, and Archetypal Quintessence.
-  - Oracle: Interface for engaging with structured symbolic readings, including traditional Tarot Readings, Concrescence Spreads, and Alchemical Visionary Sequences.
-  - Journal: For personal reflections, tracking insights, and inverse readings of subjective experiences, powered by a Journal Synthesis Engine.
+  - Mahamaya Ground: A dedicated section for the user's unique archetypal DNA, encompassing Birthdate Encoding, Natal Chart, Jungian Psychological Types, Gene Keys, Human Design, and Archetypal Quintessence. (All data sourced via BPMCP from relevant Bimba/Notion/MongoDB collections).
+  - Oracle: Interface for engaging with structured symbolic readings, including traditional Tarot Readings, Concrescence Spreads, and Alchemical Visionary Sequences. (Symbolic data, interpretations, and dynamic content fetched via BPMCP; interactive elements and real-time updates via AG-UI).
+  - Journal: For personal reflections, tracking insights, and inverse readings of subjective experiences, powered by a Journal Synthesis Engine. (Entries stored/retrieved via BPMCP from MongoDB; synthesis results and prompts delivered via AG-UI).
 
 - **Navigation Structure (within Nara_Mode_Full_Dev_v1):** Primary navigation will allow switching between "Identity Dynamics", "Oracle", and "Journal" modes. The flow within each mode will be guided by the interpretive process, leading to a dialogue interface. The Mahamaya Ground will be a persistent reference within Identity Dynamics. Contextual links will allow access to A2A query results and Notion for deeper dives.
 
@@ -70,11 +70,11 @@ This document defines the user experience goals, information architecture, user 
   ```mermaid
   graph TD
       Start[User initiates Onboarding] --> InputBirthdate[User provides birthdate];
-      InputBirthdate --> GenerateNatalChart[Nara generates Natal Chart];
+      InputBirthdate --> GenerateNatalChart[Nara generates Natal Chart (data via BPMCP)];
       GenerateNatalChart --> CompleteJungianQuiz[User completes Jungian Psychological Types assessment];
-      CompleteJungianQuiz --> DisplayGeneKeys[Nara displays Gene Keys profile];
-      DisplayGeneKeys --> DisplayHumanDesign[Nara displays Human Design chart];
-      DisplayHumanDesign --> SynthesizeQuintessence[Nara synthesizes Archetypal Quintessence];
+      CompleteJungianQuiz --> DisplayGeneKeys[Nara displays Gene Keys profile (data via BPMCP)];
+      DisplayGeneKeys --> DisplayHumanDesign[Nara displays Human Design chart (data via BPMCP)];
+      DisplayHumanDesign --> SynthesizeQuintessence[Nara synthesizes Archetypal Quintessence (data via BPMCP)];
       SynthesizeQuintessence --> End[Mahamaya Ground established and accessible];
   ```
 
@@ -86,9 +86,9 @@ This document defines the user experience goals, information architecture, user 
   graph TD
       Start[User initiates Tarot Reading] --> SelectSpread[User selects spread option (including Concrescence Spreads)];
       SelectSpread --> InputCards[User provides card draws & context];
-      InputCards --> ProcessInterpretation[Nara processes & synthesizes interpretation (incorporating decanic associations, multimedia synthesis)];
+      InputCards --> ProcessInterpretation[Nara processes & synthesizes interpretation (data via BPMCP, multimedia elements via AG-UI)];
       ProcessInterpretation --> DisplayInterpretation[Display rich interpretation (with dynamic card rendering, AR overlay)];
-      DisplayInterpretation --> Dialogue[Engage in responsive dialogue (via text or voice)];
+      DisplayInterpretation --> Dialogue[Engage in responsive dialogue (via AG-UI for text/voice events)];
       Dialogue -- Query Epii --> A2AContext[Display A2A Contextual Query Results];
       A2AContext --> Dialogue;
       Dialogue --> End[User concludes session];
@@ -101,9 +101,9 @@ This document defines the user experience goals, information architecture, user 
   ```mermaid
   graph TD
       Start[User initiates Inverse Reading] --> InputExperience[User shares dream/journal entry];
-      InputExperience --> ProcessDeconstruction[Nara extracts symbols & associates (Journal Synthesis Engine)];
+      InputExperience --> ProcessDeconstruction[Nara extracts symbols & associates (Journal Synthesis Engine, data via BPMCP)];
       ProcessDeconstruction --> DisplayInsights[Display observations & questions (including alchemical operations, codon mappings)];
-      DisplayInsights --> Dialogue[Engage in responsive dialogue (based on archetypal composting)];
+      DisplayInsights --> Dialogue[Engage in responsive dialogue (via AG-UI, insights from BPMCP data)];
       Dialogue -- Query Epii --> A2AContext[Display A2A Contextual Query Results];
       A2AContext --> Dialogue;
       Dialogue --> End[User concludes session];

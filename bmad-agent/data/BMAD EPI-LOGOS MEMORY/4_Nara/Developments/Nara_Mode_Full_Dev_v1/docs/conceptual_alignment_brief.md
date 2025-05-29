@@ -129,7 +129,7 @@ Individuals seeking deep psychological and spiritual growth, interested in arche
 ## Known Technical Constraints or Preferences (from an Epi-Logos Viewpoint)
 
 - **Constraints:** Must adhere to Epi-Logos principles of data privacy and user sovereignty over their symbolic information. Requires robust backend for real-time synthesis and NLP.
-- **Initial Architectural Preferences (if any, Epi-Logos Aligned):** A modular architecture with specialized agents/subsystems for Identity, Oracle, and Journal, coordinated by a central Nara agent. API-driven integration for various symbolic data sources.
+- **Initial Architectural Preferences (if any, Epi-Logos Aligned):** A modular architecture with specialized agents/subsystems for Identity, Oracle, and Journal, coordinated by a central Nara agent (Nara Agent Core). The Bimba-Pratibimba Memory MCP (BPMCP) will serve as the primary API-driven integration layer for accessing symbolic data sources: Neo4j (Bimba - primarily read operations), Notion (read operations), and MongoDB (read/write for user-specific data). Real-time, bidirectional communication between the Nara frontend and backend agents will be facilitated by the AG-UI protocol.
 - **Adherence to Epi-Logos Principles:** All development for Nara_Mode_Full_Dev_v1 must adhere to established Epi-Logos architectural principles (e.g., `BMAD EPI-LOGOS MEMORY/Epi-Logos System (Technology)/System_Design_Principles.md`) and the Model Context Protocol (MCP) where applicable.
 - **Risks (Philosophical & Technical):**
   - Philosophical: Ensuring genuine dia-logical interaction vs. prescriptive AI. Maintaining authenticity of symbolic systems in a digital format.
@@ -142,25 +142,38 @@ Individuals seeking deep psychological and spiritual growth, interested in arche
 
 ## Agent Integration Requirements
 
-Your vision for comprehensive agent coordination through the BPMCP service and eventual A2A protocol implementation creates the technical foundation for truly integrated symbolic guidance. The Nara agent (Nara Agent Core) needs to function as both coordinator and synthesizer, orchestrating inputs from specialized agents while maintaining coherent user experience.
+Nara's architecture hinges on two key integration points: the Bimba-Pratibimba Memory MCP (BPMCP) for data operations and the AG-UI protocol for real-time agent-user communication.
 
-The immediate technical needs include robust API integration with your Neo4j knowledge graph for symbolic associations, real-time access to astrological calculation services, and sophisticated prompt engineering that allows Nara to maintain its unique voice while incorporating specialized knowledge from other agents. The ag-ui protocol integration ensures that frontend context informs backend processing, creating responsive and contextually aware interactions.
+**1. Bimba-Pratibimba Memory MCP (BPMCP) Integration:**
+   - The Nara Agent Core will interact with BPMCP to:
+     - **Read from Bimba (Neo4j):** Perform queries (`queryBimbaGraph`, `bimbaKnowing`, etc.) to retrieve symbolic data, archetypal relationships, and knowledge graph structures. Direct modifications to Bimba by Nara will be rare and highly controlled.
+     - **Read from Notion:** Access supplementary documents, philosophical texts, and extended symbolic interpretations stored in Notion via BPMCP's Notion tools.
+     - **Read/Write to MongoDB:** Store and retrieve user-specific data, including profiles, journal entries, interaction history, preferences, and any user-generated content. MongoDB, accessed via BPMCP, will be the primary repository for personalized information, maintaining a clear separation from the core Bimba graph.
+   - BPMCP will abstract the complexities of these diverse data sources, providing a unified interface for the Nara Agent Core.
 
-**Specialized Agent Architecture (coordinated by Nara Agent Core via BPMCP Service):**
-*   **Mahamaya Agent:** Handles birthdate matrix calculations and codon alignments. Responsible for the mathematical DNA permeating components and quantum state vector transformations. Involved in archetypal video collage generation.
-*   **Parashakti Agent:** Manages decanic timing, elemental resonance, and planetary soundscape synthesis.
-*   **Paramasiva Agent:** Oversees quaternary structural integrity across sessions and haptic feedback waveform translations.
+**2. AG-UI Protocol Integration:**
+   - AG-UI will be the backbone for communication between the Nara frontend (UI) and the Nara Agent Core (backend).
+   - **Frontend to Backend:** User interactions (e.g., selecting a tarot card, writing a journal entry, navigating sections) will generate AG-UI events, transmitting contextual information (e.g., `current_view: 'Oracle'`, `action: 'draw_card'`) and user input to the Nara Agent Core.
+   - **Backend to Frontend:** The Nara Agent Core, after processing inputs and fetching data via BPMCP, will send AG-UI events back to the frontend to update the UI dynamically. This includes text messages, state changes, data payloads for rendering (e.g., card details, journal entries), and custom events for specific Nara features.
+   - **Contextual Awareness:** AG-UI's ability to carry rich contextual payloads will enable the Nara agent to provide highly relevant responses and for the UI to perform targeted updates, ensuring a fluid and responsive user experience.
+   - This integration will leverage the A2A server infrastructure, with AG-UI acting as a specialized extension for agent-user interface communication.
 
-**A2A Protocol Implementation (Future Development Focus):**
-The A2A protocol opens possibilities for truly multimodal experiences where other agents can contribute images, sounds, or even guided meditations that enhance the symbolic work. This creates a rich ecosystem where each agent contributes its specialized capabilities while Nara maintains overall coherence and user relationship.
-*   **Symbolic Request Routing Example:**
-    *   Nara Agent → Mahamaya Agent: "User needs 3rd decan Mars resonance"
-    *   Response: Mars in Sagittarius (Decan 3) glyph animations + corresponding Yantra.
-*   **Multimedia Synthesis Example (coordinated by Nara Agent, leveraging specialized agents):**
-    *   Oracle requests generate real-time:
-        *   Planetary soundscapes (Parashakti audio synthesis)
-        *   Archetypal video collages (Mahamaya visual algorithms)
-        *   Haptic feedback patterns (Paramasiva waveform translations)
+The Nara Agent Core functions as the central orchestrator, receiving contextualized user requests via AG-UI, making appropriate data calls to BPMCP, processing the information, and then using AG-UI to stream responses and UI updates back to the user. Sophisticated prompt engineering will allow Nara to maintain its unique voice while leveraging data from BPMCP and interacting via AG-UI.
+
+**Specialized Agent Functions (Orchestrated by Nara Agent Core):**
+While the primary interaction for data is through BPMCP, the conceptual roles of specialized agents like Mahamaya, Parashakti, and Paramasiva will be embodied within the Nara Agent Core's logic or through specific BPMCP tool calls if such specialized tools are developed within BPMCP.
+*   **Mahamaya Functions (within Nara Core / via BPMCP):** Logic for birthdate matrix calculations, codon alignments, and potentially archetypal video collage generation if supported by BPMCP or an integrated service.
+*   **Parashakti Functions (within Nara Core / via BPMCP):** Logic for managing decanic timing, elemental resonance, and planetary soundscape synthesis, potentially leveraging BPMCP for relevant data or external service calls.
+*   **Paramasiva Functions (within Nara Core / via BPMCP):** Logic for overseeing quaternary structural integrity and haptic feedback waveform translations, if applicable and supported.
+
+**AG-UI for Rich Interaction (Leveraging A2A Infrastructure):**
+The AG-UI protocol, built upon the A2A infrastructure, will facilitate rich, multimodal experiences. While direct agent-to-agent calls between distinct Nara sub-agents (Mahamaya, Parashakti, Paramasiva) might be abstracted through the Nara Agent Core's interaction with BPMCP, AG-UI will carry the necessary information to and from the frontend to render these experiences.
+*   **Example of AG-UI Mediated Interaction:**
+    *   User action in UI (e.g., requests decanic resonance for Mars).
+    *   Frontend sends AG-UI event: `{ "event_type": "request_resonance", "params": { "celestial_body": "Mars", "context": "decanic_view" } }`.
+    *   Nara Agent Core receives event, queries BPMCP for Mars decanic data (potentially involving logic previously conceptualized for Parashakti/Mahamaya).
+    *   Nara Agent Core sends AG-UI event to frontend: `{ "event_type": "display_resonance", "data": { "glyph_animation_url": "...", "yantra_image_url": "...", "soundscape_url": "..." } }`.
+    *   Frontend renders the visual and auditory elements.
 
 ## Session Management and Continuity
 
