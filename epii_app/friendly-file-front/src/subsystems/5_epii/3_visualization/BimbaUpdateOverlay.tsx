@@ -13,6 +13,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Upload, Sparkles, Save, FileText, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // Added Input import
 import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBimbaCoordinates';
 import { useGraphData } from '../2_hooks/useGraphData';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
@@ -1096,10 +1097,13 @@ Provide your response as a JSON object with the following structure:
 
         <div className="flex h-[80vh] gap-4">
           {/* Left Panel - Coordinate Tree */}
-          <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
+          {/* Added flex flex-col to allow button to be pushed to the bottom */}
+          <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto flex flex-col">
+            {/* Wrapped existing content to allow flex-grow and push button down */}
+            <div className="flex-grow">
+              <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
 
-            {isLoadingGraph && (
+              {isLoadingGraph && (
               <div className="text-gray-400 text-sm">Loading graph data...</div>
             )}
 
@@ -1121,6 +1125,19 @@ Provide your response as a JSON object with the following structure:
             {!isLoadingGraph && !graphError && !fullGraphData && (
               <div className="text-gray-400 text-sm">No graph data available</div>
             )}
+            </div> {/* End of flex-grow wrapper */}
+
+            {/* Button to open CreateNodeModal, pushed to the bottom */}
+            <div className="mt-auto pt-4"> 
+              <Button 
+                onClick={() => setShowCreateNodeModal(true)} 
+                variant="outline" 
+                className="w-full text-epii-neon border-epii-neon hover:bg-epii-neon/10 hover:text-epii-neon"
+              >
+                <Plus size={16} className="mr-2" />
+                Create New Bimba Node
+              </Button>
+            </div>
           </div>
 
           {/* Right Panel - Node Editor */}
@@ -1193,7 +1210,7 @@ Provide your response as a JSON object with the following structure:
                               </div>
                               <input
                                 type="text"
-                                value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                value={value === null || value === undefined ? '' : (typeof value === 'object' ? JSON.stringify(value) : String(value))}
                                 onChange={(e) => {
                                   let newValue: any = e.target.value;
                                   // Try to parse as JSON if it looks like an object/array
@@ -1267,7 +1284,7 @@ Provide your response as a JSON object with the following structure:
                                   </label>
                                   <input
                                     type="text"
-                                    value={rel.type}
+                                    value={rel.type || ''}
                                     onChange={(e) => {
                                       const updated = [...editedRelationships];
                                       updated[index] = { ...updated[index], type: e.target.value };
@@ -1279,19 +1296,40 @@ Provide your response as a JSON object with the following structure:
                                 </div>
                                 <div>
                                   <label className="text-xs font-medium text-gray-300 mb-1 block">
-                                    Target Node
+                                    Target Node {rel.action === 'create' ? '(Coordinate)' : ''}
                                   </label>
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-gray-400 text-xs">
-                                      {rel.direction === 'outgoing' ? '→' : '←'}
-                                    </span>
-                                    <span className="text-gray-300 text-xs flex-1">
-                                      {rel.relatedNode.coordinate}
-                                    </span>
-                                    {rel.relatedNode.title && (
-                                      <span className="text-gray-400 text-xs">({rel.relatedNode.title})</span>
-                                    )}
-                                  </div>
+                                  {rel.action === 'create' ? (
+                                    <Input
+                                      type="text"
+                                      value={rel.targetCoordinate || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editedRelationships];
+                                        updated[index] = { 
+                                            ...updated[index], 
+                                            targetCoordinate: e.target.value,
+                                            relatedNode: { 
+                                                ...(updated[index].relatedNode || { title: '', labels: [] }), 
+                                                coordinate: e.target.value 
+                                            }
+                                        };
+                                        setEditedRelationships(updated);
+                                      }}
+                                      placeholder="Enter target coordinate (e.g., #X-Y-Z)"
+                                      className="w-full p-1 bg-epii-dark border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
+                                    />
+                                  ) : (
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-gray-400 text-xs">
+                                        {rel.direction === 'outgoing' ? '→' : '←'}
+                                      </span>
+                                      <span className="text-gray-300 text-xs flex-1">
+                                        {rel.relatedNode.coordinate}
+                                      </span>
+                                      {rel.relatedNode.title && (
+                                        <span className="text-gray-400 text-xs">({rel.relatedNode.title})</span>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
@@ -1336,7 +1374,8 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
-                                          <option value="">Select QL Type</option>
+                                          {/* Ensured default empty option */}
+                                          <option value="">Select QL Type</option> 
                                           <option value="0_POTENTIAL_RELATION">0_POTENTIAL_RELATION</option>
                                           <option value="1_MATERIAL_RELATION">1_MATERIAL_RELATION</option>
                                           <option value="2_PROCESSUAL_RELATION">2_PROCESSUAL_RELATION</option>
@@ -1359,6 +1398,7 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
+                                          {/* Ensured default empty option */}
                                           <option value="">Select QL Dynamics</option>
                                           <option value="foundational_emergence">foundational_emergence</option>
                                           <option value="processual_activation">processual_activation</option>
@@ -1386,6 +1426,7 @@ Provide your response as a JSON object with the following structure:
                                           }}
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
+                                          {/* Ensured default empty option */}
                                           <option value="">Select Context Frame</option>
                                           <option value="0000">0000 - Transcendental</option>
                                           <option value="0/1">0/1 - Foundation & Definition</option>
@@ -1420,7 +1461,7 @@ Provide your response as a JSON object with the following structure:
                                     <div>
                                       <label className="text-xs text-gray-300 block mb-1">Description</label>
                                       <textarea
-                                        value={rel.properties.description || ''}
+                                        value={(rel.properties.description === null || rel.properties.description === undefined) ? '' : rel.properties.description}
                                         onChange={(e) => {
                                           const updated = [...editedRelationships];
                                           updated[index] = {
@@ -2005,6 +2046,14 @@ Provide your response as a JSON object with the following structure:
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Render the CreateNodeModal */}
+      <CreateNodeModal
+        isOpen={showCreateNodeModal}
+        onClose={() => setShowCreateNodeModal(false)}
+        onNodeCreated={handleNodeCreated}
+        fullGraphData={fullGraphData}
+      />
     </Dialog>
   );
 };
