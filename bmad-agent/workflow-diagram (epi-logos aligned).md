@@ -38,7 +38,7 @@ flowchart TD
     end
 
     %% Phase 3: Story Breakdown & Prompt Engineering
-    subgraph P3["Phase 3: Story Breakdown & Prompt Engineering (Epi-Logos Prompt Weaver)"]
+    subgraph P3["Phase 3: Story Breakdown & Prompt Engineering (Epi-Logos Story Steward)"]
         P3_Verify["Verify EFDD & FCBAP"]
         P3_Decompose["Decompose feature into manageable development 'stories'"]
         P3_DraftPrompts["Draft detailed prompts for External AI Builder (embedding/referencing memory-bank info)"]
@@ -50,7 +50,7 @@ flowchart TD
     end
 
     %% Phase 4: Prompt Finalization & Handover
-    subgraph P4["Phase 4: Prompt Finalization & Handover (Epi-Logos Prompt Weaver / Process Steward)"]
+    subgraph P4["Phase 4: Prompt Finalization & Handover (Epi-Logos Story Steward / Process Steward)"]
         P4_Approve["Approve user stories (prompt sets)"]
         P4_Finalize["Finalize prompt packages (ensure memory context links)"]
         P4_Deploy["'Deploy' prompts to External AI Builder environment"]

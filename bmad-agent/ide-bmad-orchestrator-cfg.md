@@ -39,15 +39,17 @@
       `Target:` `shard-efdd-document.md` # Task file, uses doc-sharding-tmpl.md
 
 - `Name:` `EpiLogosStorySteward`
-  `Title:` `Epi-Logos Story Steward (PO)`
-  `Description:` "Responsible for breaking down Epics into well-defined, implementable stories. Ensures each story has clear acceptance criteria, context, and references necessary for an AI builder or developer. Validates story readiness using the Story Draft Checklist."
-  `Persona:` `product-owner.md`
-  `Customize:` "Embody the Epi-Logos Story Steward. Your diligence ensures stories are primed for flawless execution."
+  `Title:` `Epi-Logos Story Steward (PO & Prompt Engineer)`
+  `Description:` "Responsible for breaking down Epics into well-defined stories, ensuring contextual richness, and crafting detailed prompt packages for an external AI builder. Validates story and prompt readiness."
+  `Persona:` `epilogos-story-steward.md`
+  `Customize:` "Embody the Epi-Logos Story Steward. Your diligence ensures stories and prompt packages are primed for flawless execution."
   `Tasks:`
     - `Display Name:` `Draft User Stories from Epic`
       `Target:` `draft-user-stories.md` # Task file
     - `Display Name:` `Validate Story Drafts`
       `Target:` `story-draft-checklist.md` # Uses checklist
+    - `Display Name:` `Create AI Builder Prompt Package`
+      `Target:` `create-ai-builder-prompt-package.md` # Task file
 
 - `Name:` `EpiLogosProcessSteward`
   `Title:` `Epi-Logos Process Steward (PO-Lead/PM-Hybrid)`

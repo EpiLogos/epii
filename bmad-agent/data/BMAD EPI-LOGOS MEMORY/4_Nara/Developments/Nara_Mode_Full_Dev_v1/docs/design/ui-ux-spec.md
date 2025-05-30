@@ -9,7 +9,7 @@ This document defines the user experience goals, information architecture, user 
 
 - **Link to Primary Design Files:** {e.g., Figma, Sketch, Adobe XD URL - specific to **Nara_Mode_Full_Dev_v1**}
 - **Link to Deployed Storybook / Design System (if applicable for Nara_Mode_Full_Dev_v1):** {URL}
-- **Link to Nara_Mode_Full_Dev_v1 Frontend Architecture:** `../architecture/front-end-architecture.md`
+- **Link to Nara_Mode_Full_Dev_v1 Frontend Architecture:** `../architecture/feature-context-bimba-alignment-package_Part1.md` and part2
 - **Link to Nara_Mode_Full_Dev_v1 PRD/EFDD:** `../1_feature_definition/efdd.md`
 
 ## Overall UX Goals & Principles (for Nara_Mode_Full_Dev_v1, Shakti Aspect)
