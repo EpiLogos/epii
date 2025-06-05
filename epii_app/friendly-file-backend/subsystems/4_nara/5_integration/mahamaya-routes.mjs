@@ -57,6 +57,9 @@ router.get('/mahamaya/matrix', mahamayaMatrixController.getUserMatrix);
 // Store Birthdate Encoding data
 router.post('/mahamaya/birthdate-encoding', mahamayaMatrixController.storeBirthdateEncoding);
 
+// Reset Birthdate Encoding data
+router.delete('/mahamaya/birthdate-encoding/reset', mahamayaMatrixController.resetBirthdateEncoding);
+
 // Store Astrological Chart data
 router.post('/mahamaya/astrological-chart', mahamayaMatrixController.storeAstrologicalChart);
 

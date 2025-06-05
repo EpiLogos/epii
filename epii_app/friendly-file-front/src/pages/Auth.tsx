@@ -64,7 +64,7 @@ const Auth = () => {
         localStorage.setItem('accessToken', response.data.accessToken);
 
         // Update user context
-        login(userData);
+        await login(userData);
 
         // Redirect will happen automatically via the useEffect
       } else {

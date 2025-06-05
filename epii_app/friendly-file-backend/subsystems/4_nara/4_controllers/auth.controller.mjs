@@ -215,24 +215,52 @@ class AuthController {
   }
 
   /**
-   * Get user profile
+   * Get user profile (protected route)
    * GET /api/auth/profile
    */
   async getProfile(req, res) {
     try {
-      const { user } = req;
+      const { userId } = req;
+
+      // Get complete user data including Mahamaya Matrix
+      const user = await User.findOne({ userId });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
 
       res.status(200).json({
         success: true,
-        user,
-        message: 'Profile retrieved successfully'
+        user: {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          identityStructure: user.identityStructure || {},
+          profileData: user.profileData || {},
+          preferences: user.preferences || {},
+          systemUsage: user.systemUsage || {},
+          mahamayaMatrix: user.mahamayaMatrix || {
+            completionStatus: {
+              birthdateEncoding: false,
+              astrologicalChart: false,
+              jungianAssessment: false,
+              geneKeysProfile: false,
+              humanDesignProfile: false,
+              archetypalQuintessence: false
+            }
+          }
+        }
       });
     } catch (error) {
       console.error('Get profile error:', error);
       res.status(500).json({
         success: false,
         message: error.message,
-        error: 'Failed to get profile'
+        error: 'Failed to get user profile'
       });
     }
   }
@@ -267,45 +295,6 @@ class AuthController {
         valid: false,
         message: error.message,
         error: 'Token verification failed'
-      });
-    }
-  }
-
-  /**
-   * Get user profile (protected route)
-   * GET /api/auth/profile
-   */
-  async getProfile(req, res) {
-    try {
-      // User data is already available from auth middleware
-      const user = await User.findOne({ userId: req.userId });
-
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        user: {
-          userId: user.userId,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          identityStructure: user.identityStructure,
-          profileData: user.profileData,
-          mahamayaMatrix: user.mahamayaMatrix
-        },
-        message: 'Profile retrieved successfully'
-      });
-    } catch (error) {
-      console.error('Get profile error:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message,
-        error: 'Failed to get profile'
       });
     }
   }

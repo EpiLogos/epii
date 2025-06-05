@@ -22,7 +22,9 @@ import { getDb } from '../../../services/mongo.service.mjs';
 import User from '../../../models/User.model.mjs';
 
 // Encryption configuration
-const ENCRYPTION_KEY = process.env.MAHAMAYA_ENCRYPTION_KEY || crypto.randomBytes(32);
+const ENCRYPTION_KEY = process.env.MAHAMAYA_ENCRYPTION_KEY
+  ? Buffer.from(process.env.MAHAMAYA_ENCRYPTION_KEY, 'hex')
+  : crypto.randomBytes(32);
 const ALGORITHM = 'aes-256-gcm';
 
 /**
@@ -430,12 +432,22 @@ class MahamayaMatrixService {
       matrix.humanDesignProfile = userProfile.mahamayaMatrix?.humanDesignProfile || null;
       matrix.archetypalQuintessence = userProfile.mahamayaMatrix?.archetypalQuintessence || null;
 
+      // Add completion status at the matrix level for frontend access
+      matrix.completionStatus = userProfile.mahamayaMatrix?.completionStatus || {
+        birthdateEncoding: false,
+        astrologicalChart: false,
+        jungianAssessment: false,
+        geneKeysProfile: false,
+        humanDesignProfile: false,
+        archetypalQuintessence: false
+      };
+
       return {
         success: true,
         userId,
         matrix,
         completionPercentage: this.calculateCompletionPercentage(
-          matrix.profile.mahamayaMatrix.completionStatus
+          matrix.completionStatus
         )
       };
     } catch (error) {
@@ -464,6 +476,47 @@ class MahamayaMatrixService {
     } catch (error) {
       console.error('Error getting birthdate encoding:', error);
       return null;
+    }
+  }
+
+  /**
+   * Reset Birthdate Encoding data
+   */
+  async resetBirthdateEncoding(userId) {
+    try {
+      const user = await User.findOne({ userId });
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Clear birthdate encoding data and completion status
+      if (user.mahamayaMatrix) {
+        user.mahamayaMatrix.birthdateEncoding = null;
+        user.mahamayaMatrix.completionStatus.birthdateEncoding = false;
+        user.mahamayaMatrix.metadata.lastSyncedAt = new Date();
+
+        // Mark as modified and save
+        user.markModified('mahamayaMatrix.birthdateEncoding');
+        user.markModified('mahamayaMatrix.completionStatus');
+        user.markModified('mahamayaMatrix.metadata');
+        await user.save();
+      }
+
+      // Also clear profileData.birthdate
+      if (user.profileData) {
+        user.profileData.birthdate = null;
+        user.markModified('profileData');
+        await user.save();
+      }
+
+      return {
+        success: true,
+        userId,
+        message: 'Birthdate encoding data reset successfully'
+      };
+    } catch (error) {
+      console.error('Error resetting birthdate encoding:', error);
+      throw new Error(`Failed to reset birthdate encoding: ${error.message}`);
     }
   }
 

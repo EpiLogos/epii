@@ -158,8 +158,31 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   // Login function
-  const login = (userData: UserData) => {
+  const login = async (userData: UserData) => {
+    // First set the basic user data
     dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
+
+    // Then fetch the complete profile including Mahamaya Matrix
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const accessToken = localStorage.getItem('accessToken');
+
+      if (accessToken) {
+        const response = await axios.get(`${backendUrl}/api/auth/profile`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+        if (response.data.success) {
+          // Update with complete user data including Mahamaya Matrix
+          dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching complete user profile after login:', error);
+      // Don't fail the login, just log the error
+    }
   };
 
   // Logout function

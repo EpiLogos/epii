@@ -1,6 +1,6 @@
 /**
  * User Context Types
- * 
+ *
  * Defines TypeScript interfaces for the user context system.
  * These types are used throughout the application to ensure type safety
  * when working with user data.
@@ -14,7 +14,7 @@ export interface IdentityStructure {
     lifePhilosophy: string;
     spiritualOrientation: string;
   };
-  
+
   // #5-0-1: Individual Identity
   individualIdentity: {
     personalTraits: string[];
@@ -22,28 +22,28 @@ export interface IdentityStructure {
     challenges: string[];
     interests: string[];
   };
-  
+
   // #5-0-2: Collective Identity
   collectiveIdentity: {
     culturalBackground: string;
     communities: string[];
     socialRoles: string[];
   };
-  
+
   // #5-0-3: Soul Identity
   soulIdentity: {
     purpose: string;
     values: string[];
     aspirations: string[];
   };
-  
+
   // #5-0-4: Self Identity
   selfIdentity: {
     selfPerception: string;
     growthAreas: string[];
     lifeStory: string;
   };
-  
+
   // #5-0-5: Integral Identity
   integralIdentity: {
     vision: string;
@@ -95,6 +95,26 @@ export interface UserData {
   profileData: ProfileData;
   preferences: UserPreferences;
   systemUsage: SystemUsage;
+  mahamayaMatrix?: {
+    completionStatus: {
+      birthdateEncoding: boolean;
+      astrologicalChart: boolean;
+      jungianAssessment: boolean;
+      geneKeysProfile: boolean;
+      humanDesignProfile: boolean;
+      archetypalQuintessence: boolean;
+    };
+    birthdateEncoding?: any;
+    astrologicalChart?: any;
+    jungianAssessment?: any;
+    geneKeysProfile?: any;
+    humanDesignProfile?: any;
+    archetypalQuintessence?: any;
+    metadata?: {
+      version: string;
+      lastSyncedAt: string;
+    };
+  };
 }
 
 // User context state
@@ -106,7 +126,7 @@ export interface UserContextState {
 }
 
 // User context actions
-export type UserContextAction = 
+export type UserContextAction =
   | { type: 'LOGIN_SUCCESS'; payload: UserData }
   | { type: 'LOGIN_FAILURE'; payload: string }
   | { type: 'LOGOUT' }
@@ -118,7 +138,7 @@ export type UserContextAction =
 // User context value provided to consumers
 export interface UserContextValue {
   state: UserContextState;
-  login: (userData: UserData) => void;
+  login: (userData: UserData) => Promise<void>;
   logout: () => void;
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
   updateProfile: (profile: Partial<ProfileData>) => void;

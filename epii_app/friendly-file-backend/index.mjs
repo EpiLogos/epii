@@ -21,6 +21,7 @@ import bpmcpRoutes from './routes/bpmcp.routes.mjs'; // Import BPMCP routes
 import userRoutes from './routes/user.routes.mjs'; // Import User routes
 import analysisRoutes from './routes/analysis.routes.mjs'; // Import Analysis routes
 import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
+import decanicRoutes from './subsystems/4_nara/1_routes/decanic.routes.mjs'; // Import Decanic routes for Epic 2
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,12 @@ async function startServer() {
   app.use('/api/users', userRoutes); // Mount User routes under /api/users
   app.use('/api/analysis', analysisRoutes); // Mount Analysis routes under /api/analysis
   app.use('/api', mahamayaRoutes); // Mount Nara Mahamaya routes under /api
+
+  // Mount Decanic routes with debug logging
+  console.log('Mounting decanic routes...');
+  console.log('Decanic routes type:', typeof decanicRoutes);
+  app.use('/api/nara/decanic', decanicRoutes); // Mount Decanic routes under /api/nara/decanic
+  console.log('Decanic routes mounted successfully');
 
   app.listen(port, () => {
     console.log('Server listening on port ' + port);

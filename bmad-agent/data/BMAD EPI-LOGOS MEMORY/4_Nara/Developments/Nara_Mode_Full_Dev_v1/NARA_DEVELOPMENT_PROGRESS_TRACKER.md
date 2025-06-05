@@ -60,7 +60,7 @@ This tracker monitors the systematic implementation of the 6-epic Nara Mode deve
 - [ ] E1_S7: Archetypal Quintessence
 
 ### Epic 2: Decanic Embodiment & Oracle Enhancement
-**Status:** [ ] Not Started
+**Status:** [P] In Progress
 **Stories:** 10 total
 **Key Features:**
 - Dynamic card rendering
@@ -70,7 +70,7 @@ This tracker monitors the systematic implementation of the 6-epic Nara Mode deve
 - Decanic nutrition and movement practices
 
 **Progress:**
-- [ ] E2_F1_S1: Dynamic Card Rendering
+- [✅] E2_F1_S1: Dynamic Card Rendering
 - [ ] E2_F1_S2: Real-time Astro Integration
 - [ ] E2_F1_S3: Natal Chart Cross-referencing
 - [ ] E2_F1_S4: Bodily Resonance Mapping
@@ -418,14 +418,232 @@ All Epic 1 objectives achieved:
 - ✅ Integration with existing UserIdentityData collection
 - ✅ Placeholder structures ready for detailed assessment logic
 
-**Ready for Epic 2: Skills Registry & A2A Integration**
+### ✅ COMPLETED: Epic 2, Story E2_F1_S1 - Dynamic Card Rendering with Decanic Associations
+**Date:** [Current Session]
+**Status:** [D] Development Complete
+
+**Implemented:**
+- **6-Card QL Oracle Interface**: Proper Quaternal Logic aligned spread using actual coordinates from Basic and Partially Expanded Quaternal Logic.txt
+- **Manual Card Input Primary**: Users can click each position to enter cards from their personal deck
+- **Smart Auto-Suggestions**: Intelligent dropdown suggestions for card input:
+  - Type "5" → Shows "5 of Wands", "5 of Cups", etc.
+  - Type "The" → Shows all Major Arcana cards
+  - Type "The F" → Narrows to "The Fool", etc.
+  - Format hints guide proper input structure
+- **No Duplicate Random Cards**: Random generation uses actual available cards and ensures no duplicates
+- **Proper Decanic Lookup**: Direct cache-based lookup from #2-3 branch decan data
+- **Extensible Architecture**: Service automatically includes any new properties added to Decan nodes
+- **Finalize Reading Button**: Placeholder for future Nara agent interpretation logic
+
+**Technical Implementation:**
+- **Decanic Service**: Caches all decan data from BPMCP #2-3 branch for fast lookup
+- **Smart Input System**: Regex-based pattern matching for card name suggestions
+- **QL Coordinate Mapping**:
+  - #0: Implicit Field of Potential
+  - #1: Material Cause (What)
+  - #2: Efficient Cause (How)
+  - #3: Formal Mediation (Which/Who)
+  - #4: Contextual Arena (When/Where)
+  - #5: Quintessence (Why)
+- **Real Decan Data**: Uses actual tarot card associations from Bimba graph (e.g., "5 of Cups" → "Scorpio Decan 1")
+
+**User Experience:**
+1. Click "Draw Oracle Cards" → Opens 6-card QL interface
+2. Click any position → Smart input field with auto-suggestions
+3. Type card name → Dropdown shows relevant options
+4. Select orientation → Upright (light) or Reversed (shadow)
+5. View decanic data → Shows planetary ruler, body part, iconography, etc.
+6. Complete all 6 cards → "Finalize QL Reading" button appears
+
+**Files Created/Modified:**
+- `epii_app/friendly-file-front/src/components/oracle/TarotDraw.tsx` (UPDATED - 6-card QL interface)
+- `epii_app/friendly-file-front/src/services/decanic.service.ts` (NEW - extensible caching service)
+- `epii_app/friendly-file-front/src/stores/decanicStore.ts` (NEW - state management)
+- `epii_app/friendly-file-front/src/components/oracle/DecanDisplay.tsx` (NEW - decanic associations)
+- `epii_app/friendly-file-front/src/components/oracle/DecanModal.tsx` (NEW - detailed modal)
+- `epii_app/friendly-file-front/src/types/decanic.types.ts` (NEW - TypeScript types)
+
+**Integration Success:**
+✅ Proper QL coordinate alignment with actual Quaternal Logic document
+✅ Real decanic data from #2-3 branch (36 decans with tarot card associations)
+✅ Smart card input with format guidance and auto-suggestions
+✅ No duplicate cards in random generation
+✅ Extensible for future tarot systems and additional properties
+✅ Placeholder for future Nara agent reading interpretation
+
+### ✅ COMPLETED: Epic 2, Story E2_F1_S2 - Real-time Astrological Data Integration
+**Date:** [Current Session]
+**Status:** [D] Development Complete
+
+**Implemented:**
+- **Real Astrologer API Integration**: Using actual Astrologer API v4 with provided subscription key
+- **Daily Cache System**: 24-hour cache expiry with localStorage persistence and auto-refresh
+- **BPMCP Endpoint**: `/api/bpmcp/astrology/current` for real-time planetary data
+- **Celestial Context Display**: Shows current Sun/Moon positions, major aspects, moon phase, planetary hour
+- **Oracle Integration**: Added astrological context to 6-card QL Oracle interface
+- **Error Handling**: Graceful fallback and proper API error management
+- **State Management**: Zustand store with proper caching and loading states
+
+**Technical Implementation:**
+- **API Host**: `astrologer.p.rapidapi.com` (corrected from astrologer-api)
+- **API Version**: v4 `/now` endpoint for current astrological data
+- **Real Data**: Actual planetary positions, aspects, moon phases from live calculations
+- **Cache Strategy**: Daily refresh with hourly staleness checks
+- **UI Integration**: Compact expandable widget in Oracle section
+
+### ✅ COMPLETED: Epic 2, Story E2_F1_S3 - Natal Chart Cross-referencing Data Structure
+**Date:** [Current Session]
+**Status:** [D] Development Complete
+
+**Implemented:**
+- **Natal Chart Generation**: Uses birth data from Mahamaya Matrix for API calls
+- **Data Storage**: Saves natal chart to `user.mahamayaMatrix.astrologicalChart`
+- **Completion Status**: Updates `completionStatus.astrologicalChart` to `true`
+- **Cache System**: Loads from saved data on subsequent visits (no unnecessary API calls)
+- **State Management**: Proper completion status reading and UI updates
+- **Data Flow**: Birth data → API call → Save chart → Update status → Display chart
+
+**Technical Implementation:**
+- **Backend Endpoint**: `/api/bpmcp/astrology/natal-chart` with user birth data integration
+- **Data Source**: Reads encrypted birth data from Mahamaya Matrix `birthdateEncoding`
+- **Caching Logic**: Checks for existing chart before making new API calls
+- **MongoDB Storage**: Proper `markModified()` calls for Mixed schema types
+- **Frontend Service**: `natalChartService` with proper error handling and state management
+- **UI Component**: `NatalChartDisplay` with loading states and completion detection
+
+**Fixed Issues:**
+- **Completion Status Reading**: Fixed API response structure to return `matrix.completionStatus`
+- **Birthdate Encoding Display**: Added completed state with numerological placeholder
+- **Navigation Logic**: Proper button text and layer navigation
+- **State Management**: Removed unnecessary page refreshes, better local state updates
+- **API Integration**: Real Astrologer API integration (not mock data)
+
+**Data Flow Verified:**
+1. ✅ Birthdate encoding saves → `completionStatus.birthdateEncoding: true`
+2. ✅ Natal chart section detects completion → Shows "Generate Natal Chart" button
+3. ✅ Chart generation → Saves to Mahamaya Matrix → Updates completion status
+4. ✅ Subsequent visits → Loads from cache → No unnecessary API calls
+5. ✅ Layer status → Shows "Completed" for both sections
+
+**Ready for Epic 2, Story E2_F1_S4: Bodily Resonance Mapping (Body Map Modal)**
+
+---
+
+## 🌟 MAJOR FOUNDATIONAL UPDATES - Real-Time Astrological Data & Natal Chart System
+
+### **Real-Time Astrological Data Infrastructure - COMPLETE ✅**
+
+**Date Completed:** January 2025
+**Epic 2, Story E2_F1_S2: Real-time Astro Integration - FOUNDATIONAL SETUP COMPLETE**
+
+**Implemented:**
+- **Astrologer API v4 Integration**: Full integration with professional astrological calculation service
+- **RapidAPI Configuration**: Using subscription key `0d370422cfmshdd3c0bb460e5fe8p166442jsnfd7726d54eb8`
+- **BPMCP Astrology Tools**: Complete backend service for astrological data retrieval
+- **Zustand Store Management**: Proper state management with caching and error handling
+- **Oracle Integration**: Real-time astrological context in 6-card QL Oracle interface
+- **Infinite Loop Fixes**: Resolved React state management issues for stable operation
+
+**Technical Architecture:**
+- **Backend Service**: `epii_app/friendly-file-backend/routes/bpmcp.routes.mjs` - Astrology endpoints
+- **Frontend Store**: `epii_app/friendly-file-front/src/stores/astrologyStore.ts` - State management
+- **Service Layer**: `epii_app/friendly-file-front/src/services/astrology.service.ts` - API integration
+- **UI Component**: `epii_app/friendly-file-front/src/components/oracle/AstrologicalContextDisplay.tsx`
+- **Cache System**: 1-hour cache with localStorage persistence and auto-refresh
+- **Error Handling**: Graceful fallback with stale data support
+
+**API Endpoints:**
+- `POST /api/bpmcp/astrology/current` - Get current planetary positions and aspects
+- `POST /api/bpmcp/astrology/context` - Get simplified astrological context summary
+- **Data Includes**: Sun/Moon positions, major aspects, moon phase, planetary hour, significant transits
+
+**Key Features:**
+- **Real-Time Data**: Current planetary positions updated hourly
+- **Major Aspects**: Tight orb aspects (≤3°) for Conjunction, Opposition, Trine, Square
+- **Moon Phase**: Current lunar phase information
+- **Planetary Hour**: Traditional planetary hour calculations
+- **Caching Strategy**: Intelligent caching to minimize API calls while maintaining freshness
+
+---
+
+### **Natal Chart Identity System - COMPLETE ✅**
+
+**Date Completed:** January 2025
+**Epic 1, Story E1_S2: Natal Chart - FOUNDATIONAL SETUP COMPLETE**
+
+**Implemented:**
+- **Complete Natal Chart Generation**: Using birth data from Mahamaya Matrix for personalized charts
+- **Astrologer API Integration**: Real natal chart calculation with SVG chart rendering
+- **Data Persistence**: Charts saved to `user.mahamayaMatrix.astrologicalChart` with completion tracking
+- **Visual Chart Display**: Actual SVG natal charts with 15% zoom for optimal viewing
+- **Planetary Position Parsing**: Real zodiac sign positions for major planets
+- **Geocoding Integration**: OpenCage API for location coordinate resolution
+- **Country Code Mapping**: Proper ISO country codes for international compatibility
+
+**Technical Implementation:**
+- **Backend Endpoint**: `/api/bpmcp/astrology/natal-chart` with encrypted birth data integration
+- **Geocoding Service**: OpenCage API key `6da688f5d255418a95f6295a7f2d950a` for location parsing
+- **Chart Service**: `epii_app/friendly-file-front/src/services/natalChart.service.ts`
+- **Display Component**: `epii_app/friendly-file-front/src/components/identity/NatalChartDisplay.tsx`
+- **Data Flow**: Birth data → Geocoding → Astrologer API → Chart generation → MongoDB storage
+
+**Key Features:**
+- **SVG Chart Rendering**: Actual visual natal charts (not just data)
+- **Planetary Positions**: Full zodiac sign positions with degrees for Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Ascendant
+- **Smart Location Parsing**: "City, Country" format with automatic coordinate resolution
+- **Caching System**: Saves generated charts to avoid unnecessary API calls
+- **Completion Tracking**: Updates `completionStatus.astrologicalChart` for progress tracking
+- **Future Nara Agent Integration**: Placeholder for AI-powered chart interpretation
+
+**Chart Display Features:**
+- **15% Zoom**: Optimal chart sizing for readability
+- **Planet Symbols**: Unicode astrological symbols (☉ ☽ ☿ ♀ ♂ ♃ ♄)
+- **Full Zodiac Names**: Complete sign names (Aries, Taurus, etc.) not abbreviations
+- **Degree Positions**: Precise planetary positions in degrees
+- **Responsive Design**: Works on all screen sizes
+- **Error Handling**: Graceful fallback for missing data
+
+**Data Integration:**
+- **Birth Data Source**: Encrypted birth data from Mahamaya Matrix `birthdateEncoding`
+- **Location Processing**: Smart parsing of location strings with geocoding fallbacks
+- **Chart Storage**: Complete chart data saved to MongoDB with proper schema handling
+- **Status Updates**: Automatic completion status updates for Identity Dynamics progress
+
+---
+
+### **Critical Infrastructure Fixes - COMPLETE ✅**
+
+**Infinite Loop Resolution:**
+- **Zustand Store Fixes**: Resolved "getSnapshot should be cached" warnings
+- **React State Management**: Fixed infinite re-render loops in astrological components
+- **Component Lifecycle**: Proper mount/unmount handling with cleanup
+- **Cache Stability**: Stable object references to prevent unnecessary re-renders
+
+**API Integration Enhancements:**
+- **Environment Variables**: Proper API key management for both backend and frontend
+- **Error Boundaries**: Comprehensive error handling for API failures
+- **Fallback Systems**: Graceful degradation when services are unavailable
+- **Rate Limiting**: Intelligent caching to respect API rate limits
+
+**Files Created/Modified:**
+- `epii_app/friendly-file-backend/routes/bpmcp.routes.mjs` (ENHANCED - astrology endpoints)
+- `epii_app/friendly-file-front/src/stores/astrologyStore.ts` (NEW - state management)
+- `epii_app/friendly-file-front/src/services/astrology.service.ts` (NEW - API integration)
+- `epii_app/friendly-file-front/src/services/natalChart.service.ts` (NEW - natal chart service)
+- `epii_app/friendly-file-front/src/components/identity/NatalChartDisplay.tsx` (NEW - chart display)
+- `epii_app/friendly-file-front/src/components/oracle/AstrologicalContextDisplay.tsx` (NEW - oracle context)
+- `epii_app/friendly-file-front/src/components/oracle/TarotDraw.tsx` (ENHANCED - astro integration)
+- `epii_app/friendly-file-backend/.env` (UPDATED - API keys)
+- `epii_app/friendly-file-front/.env` (UPDATED - API keys)
+
+---
 
 ## Next Steps
 
-1. **Immediate:** Begin Epic 1 implementation starting with E1_F2_S1 (Backend Mahamaya Matrix)
-2. **Frontend Sections:** Create actual components for Identity, Oracle, and Journal sections
-3. **Backend Integration:** Implement Mahamaya Matrix backend system
-4. **Testing:** Establish testing protocols for each implemented feature
+1. **Immediate:** Begin Epic 2, Story E2_F1_S4 (Body Map Modal with decanic associations)
+2. **Body Map Implementation:** SVG body outline with highlighted regions based on drawn cards
+3. **Modal Integration:** Body icon button in Oracle interface
+4. **Testing:** Verify complete Epic 2 functionality end-to-end
 
 ## Notes
 

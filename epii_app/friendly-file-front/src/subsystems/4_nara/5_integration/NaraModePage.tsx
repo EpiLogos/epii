@@ -15,6 +15,8 @@ import GeometricBackground from "../../../components/ui/GeometricBackground";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, Eye, BookOpen, Sparkles, Calendar, Save } from "lucide-react";
 import { useUserContext } from "../../0_anuttara/4_context/useUserContext";
+import TarotDraw from "../../../components/oracle/TarotDraw";
+import NatalChartDisplay from "../../../components/identity/NatalChartDisplay";
 import axios from 'axios';
 
 // Import section components (to be created in subsequent epics)
@@ -33,60 +35,99 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
 
+  // Get completion status from user data
+  const completionStatus = userState.userData?.mahamayaMatrix?.completionStatus || {};
+
   const mahamayaLayers = [
     {
       id: 'birthdate-encoding',
       title: 'Birthdate Encoding',
       description: 'Numerological foundation and birth data analysis',
       icon: '🎂',
-      status: 'pending' // Will be dynamic based on user data
+      status: completionStatus.birthdateEncoding ? 'completed' : 'pending'
     },
     {
       id: 'astrological-chart',
       title: 'Astrological Chart',
       description: 'Natal chart, planetary positions, and cosmic influences',
       icon: '⭐',
-      status: 'pending'
+      status: completionStatus.astrologicalChart ? 'completed' : 'pending'
     },
     {
       id: 'jungian-assessment',
       title: 'Jungian Assessment',
       description: 'Personality types, cognitive functions, and archetypes',
       icon: '🧠',
-      status: 'pending'
+      status: completionStatus.jungianAssessment ? 'completed' : 'pending'
     },
     {
       id: 'gene-keys-profile',
       title: 'Gene Keys Profile',
       description: 'Genetic wisdom, life purpose, and activation sequences',
       icon: '🧬',
-      status: 'pending'
+      status: completionStatus.geneKeysProfile ? 'completed' : 'pending'
     },
     {
       id: 'human-design-profile',
       title: 'Human Design Profile',
       description: 'Type, strategy, authority, and energetic blueprint',
       icon: '⚡',
-      status: 'pending'
+      status: completionStatus.humanDesignProfile ? 'completed' : 'pending'
     },
     {
       id: 'archetypal-quintessence',
       title: 'Archetypal Quintessence',
       description: 'Synthesized essence from 6-layer identity + 5 Mahamaya layers',
       icon: '✨',
-      status: 'pending'
+      status: completionStatus.archetypalQuintessence ? 'completed' : 'pending'
     }
   ];
 
   // Load user data on component mount
   useEffect(() => {
-    if (userState.userData?.profileData?.birthdate) {
-      setBirthdate(userState.userData.profileData.birthdate);
-    }
-    // Also check if there's existing Mahamaya Matrix birthdate data
-    if (userState.userData?.mahamayaMatrix?.birthdateEncoding) {
-      // If we have encrypted data, we'd need to decrypt it, but for now just check if it exists
-      console.log('Existing Mahamaya birthdate data found:', userState.userData.mahamayaMatrix.birthdateEncoding);
+    const loadUserBirthData = async () => {
+      // First check profileData for simple birthdate
+      if (userState.userData?.profileData?.birthdate) {
+        setBirthdate(userState.userData.profileData.birthdate);
+        console.log('Loaded birthdate from profileData:', userState.userData.profileData.birthdate);
+      }
+
+      // If we have Mahamaya Matrix data, try to get the decrypted birth data
+      if (userState.userData?.mahamayaMatrix?.birthdateEncoding && userState.userData?.mahamayaMatrix?.completionStatus?.birthdateEncoding) {
+        try {
+          // Call the API to get decrypted birth data
+          const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+          const accessToken = localStorage.getItem('accessToken');
+
+          const response = await axios.get(
+            `${backendUrl}/api/mahamaya/layer/birthdate-encoding`,
+            {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          if (response.data.success && response.data.data) {
+            const birthData = response.data.data;
+            setBirthdate(birthData.birthDate || '');
+            setBirthTime(birthData.birthTime || '');
+            setBirthLocation(birthData.birthLocation?.city || '');
+            console.log('Loaded decrypted birth data from Mahamaya Matrix');
+          }
+        } catch (error) {
+          console.error('Error loading birth data:', error);
+          // Fallback to profileData if available
+          if (userState.userData?.profileData?.birthdate) {
+            setBirthdate(userState.userData.profileData.birthdate);
+          }
+        }
+      }
+    };
+
+    if (userState.userData) {
+      loadUserBirthData();
     }
   }, [userState.userData]);
 
@@ -104,17 +145,71 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const accessToken = localStorage.getItem('accessToken');
 
+      // Parse location input (e.g., "London, England" -> city: "London", country: "England")
+      let locationData = {
+        city: 'Unknown',
+        country: 'Unknown',
+        latitude: 0,
+        longitude: 0,
+        timezone: 'UTC'
+      };
+
+      if (birthLocation && birthLocation.trim()) {
+        const locationParts = birthLocation.split(',').map(part => part.trim());
+        if (locationParts.length >= 2) {
+          locationData.city = locationParts[0];
+          locationData.country = locationParts[1];
+        } else {
+          locationData.city = locationParts[0];
+        }
+
+        // Try to geocode the location
+        try {
+          console.log('[Birthdate Encoding] Geocoding location:', birthLocation);
+          const opencageApiKey = import.meta.env.VITE_OPENCAGE_API_KEY;
+          const geocodeResponse = await fetch(
+            `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(birthLocation)}&key=${opencageApiKey}&limit=1`
+          );
+
+          if (geocodeResponse.ok) {
+            const geocodeData = await geocodeResponse.json();
+            if (geocodeData.results && geocodeData.results.length > 0) {
+              const result = geocodeData.results[0];
+              locationData.latitude = result.geometry.lat;
+              locationData.longitude = result.geometry.lng;
+              locationData.timezone = result.annotations?.timezone?.name || 'UTC';
+              locationData.country = result.components.country || locationData.country;
+              console.log('[Birthdate Encoding] Geocoded successfully:', locationData);
+            }
+          }
+        } catch (geocodeError) {
+          console.warn('[Birthdate Encoding] Geocoding failed, using defaults:', geocodeError);
+          // Use some common defaults for major cities
+          if (birthLocation.toLowerCase().includes('london')) {
+            locationData.latitude = 51.5074;
+            locationData.longitude = -0.1278;
+            locationData.timezone = 'Europe/London';
+            locationData.country = 'United Kingdom';
+          } else if (birthLocation.toLowerCase().includes('new york')) {
+            locationData.latitude = 40.7128;
+            locationData.longitude = -74.0060;
+            locationData.timezone = 'America/New_York';
+            locationData.country = 'United States';
+          } else if (birthLocation.toLowerCase().includes('paris')) {
+            locationData.latitude = 48.8566;
+            locationData.longitude = 2.3522;
+            locationData.timezone = 'Europe/Paris';
+            locationData.country = 'France';
+          }
+        }
+      }
+
       const response = await axios.post(
         `${backendUrl}/api/mahamaya/birthdate-encoding`,
         {
           birthDate: birthdate,
           birthTime: birthTime || '12:00:00',
-          birthLocation: {
-            city: birthLocation || 'Unknown',
-            country: 'Unknown',
-            latitude: 0,
-            longitude: 0
-          },
+          birthLocation: locationData,
           numerologicalProfile: {
             lifePathNumber: 0, // Will be calculated later
             destinyNumber: 0
@@ -133,13 +228,27 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       );
 
       if (response.data.success) {
-        setMessage('Birthdate encoding saved successfully!');
+        setMessage('Birthdate encoding saved successfully! You can now generate your natal chart.');
+
+        // Update the user context with the new completion status
+        if (userState.userData && userState.userData.mahamayaMatrix) {
+          userState.userData.mahamayaMatrix.completionStatus.birthdateEncoding = true;
+          userState.userData.mahamayaMatrix.metadata = {
+            ...userState.userData.mahamayaMatrix.metadata,
+            lastSyncedAt: new Date().toISOString()
+          };
+        }
+
+        // Clear the message after a few seconds
+        setTimeout(() => {
+          setMessage('');
+        }, 3000);
       } else {
         setMessage('Failed to save birthdate encoding');
       }
     } catch (error) {
       console.error('Error saving birthdate encoding:', error);
-      setMessage('Error saving birthdate encoding');
+      setMessage('Error saving birthdate encoding: ' + (error.response?.data?.error || error.message));
     } finally {
       setIsLoading(false);
     }
@@ -151,6 +260,8 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     // Birthdate Encoding Interface
     if (layerId === 'birthdate-encoding') {
+      const isCompleted = completionStatus.birthdateEncoding;
+
       return (
         <div className="p-8">
           <div className="text-center mb-8">
@@ -159,76 +270,207 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <p className="text-gray-300 mb-8 max-w-2xl mx-auto">{layer.description}</p>
           </div>
 
-          <div className="max-w-md mx-auto space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <Calendar className="inline w-4 h-4 mr-2" />
-                  Birth Date *
-                </label>
-                <input
-                  type="date"
-                  value={birthdate}
-                  onChange={(e) => setBirthdate(e.target.value)}
-                  className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
-                  required
-                />
+          {isCompleted ? (
+            // Show completed state with numerological data placeholder
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6 mb-6">
+                <div className="flex items-center gap-2 text-green-400 mb-4">
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-medium">Birthdate Encoding Complete</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="p-3 bg-epii-darker/40 rounded">
+                    <div className="text-xs text-gray-400 mb-1">Birth Date</div>
+                    <div className="text-gray-300">{birthdate || 'Loading...'}</div>
+                  </div>
+                  <div className="p-3 bg-epii-darker/40 rounded">
+                    <div className="text-xs text-gray-400 mb-1">Birth Time</div>
+                    <div className="text-gray-300">{birthTime || 'Loading...'}</div>
+                  </div>
+                  <div className="p-3 bg-epii-darker/40 rounded">
+                    <div className="text-xs text-gray-400 mb-1">Birth Location</div>
+                    <div className="text-gray-300">{birthLocation || 'Loading...'}</div>
+                  </div>
+                  <div className="p-3 bg-epii-darker/40 rounded">
+                    <div className="text-xs text-gray-400 mb-1">Raw Encrypted Data</div>
+                    <div className="text-xs text-gray-500 font-mono break-all">
+                      {userState.userData?.mahamayaMatrix?.birthdateEncoding ?
+                        JSON.stringify(userState.userData.mahamayaMatrix.birthdateEncoding, null, 2).substring(0, 100) + '...'
+                        : 'No encrypted data found'
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-epii-darker/30 rounded-lg border border-epii-neon/20">
+                  <h5 className="text-sm font-semibold text-epii-neon mb-3">Numerological Profile</h5>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span className="text-gray-400">Life Path Number:</span>
+                      <span className="text-gray-300 ml-2">Calculating...</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Destiny Number:</span>
+                      <span className="text-gray-300 ml-2">Calculating...</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Soul Urge:</span>
+                      <span className="text-gray-300 ml-2">Calculating...</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Personality:</span>
+                      <span className="text-gray-300 ml-2">Calculating...</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-gray-500">
+                    Full numerological analysis will be implemented in future updates.
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Birth Time (optional)
-                </label>
-                <input
-                  type="time"
-                  value={birthTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
-                />
-              </div>
+              <div className="text-center space-x-4">
+                <Button
+                  onClick={() => setActiveLayer('astrological-chart')}
+                  className="bg-epii-neon text-epii-darker hover:brightness-110"
+                >
+                  Continue to Astrological Chart
+                </Button>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+                      const accessToken = localStorage.getItem('accessToken');
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Birth Location (optional)
-                </label>
-                <input
-                  type="text"
-                  value={birthLocation}
-                  onChange={(e) => setBirthLocation(e.target.value)}
-                  placeholder="City, Country"
-                  className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
-                />
+                      const response = await axios.get(
+                        `${backendUrl}/api/mahamaya/layer/birthdate-encoding`,
+                        {
+                          headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                          }
+                        }
+                      );
+
+                      console.log('Decryption test result:', response.data);
+                      alert('Check console for decryption test results');
+                    } catch (error) {
+                      console.error('Decryption test failed:', error);
+                      alert('Decryption test failed - check console');
+                    }
+                  }}
+                  variant="outline"
+                  className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  Test Decryption
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!confirm('This will clear your existing birthdate data. Are you sure?')) return;
+
+                    try {
+                      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+                      const accessToken = localStorage.getItem('accessToken');
+
+                      const response = await axios.delete(
+                        `${backendUrl}/api/mahamaya/birthdate-encoding/reset`,
+                        {
+                          headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                          }
+                        }
+                      );
+
+                      if (response.data.success) {
+                        alert('Birthdate data cleared successfully. Please re-enter your information.');
+                        window.location.reload();
+                      }
+                    } catch (error) {
+                      console.error('Reset failed:', error);
+                      alert('Reset failed - check console');
+                    }
+                  }}
+                  variant="outline"
+                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                >
+                  Reset Data
+                </Button>
               </div>
             </div>
+          ) : (
+            // Show input form for incomplete state
+            <div className="max-w-md mx-auto space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <Calendar className="inline w-4 h-4 mr-2" />
+                    Birth Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={birthdate}
+                    onChange={(e) => setBirthdate(e.target.value)}
+                    className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
+                    required
+                  />
+                </div>
 
-            {message && (
-              <div className={`p-3 rounded-md text-sm ${
-                message.includes('success')
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                  : 'bg-red-500/20 text-red-400 border border-red-500/30'
-              }`}>
-                {message}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Birth Time (optional)
+                  </label>
+                  <input
+                    type="time"
+                    value={birthTime}
+                    onChange={(e) => setBirthTime(e.target.value)}
+                    className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Birth Location (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={birthLocation}
+                    onChange={(e) => setBirthLocation(e.target.value)}
+                    placeholder="City, Country"
+                    className="w-full p-3 bg-epii-darker border border-epii-neon/20 rounded-md text-white focus:border-epii-neon/60 focus:outline-none"
+                  />
+                </div>
               </div>
-            )}
 
-            <Button
-              onClick={saveBirthdateEncoding}
-              disabled={isLoading || !birthdate}
-              className="w-full bg-epii-neon text-epii-darker hover:brightness-110 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin w-4 h-4 border-2 border-epii-darker border-t-transparent rounded-full mr-2"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Birthdate Encoding
-                </>
+              {message && (
+                <div className={`p-3 rounded-md text-sm ${
+                  message.includes('success')
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                }`}>
+                  {message}
+                </div>
               )}
-            </Button>
-          </div>
+
+              <Button
+                onClick={saveBirthdateEncoding}
+                disabled={isLoading || !birthdate}
+                className="w-full bg-epii-neon text-epii-darker hover:brightness-110 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-epii-darker border-t-transparent rounded-full mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Birthdate Encoding
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -294,6 +536,26 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <span className="text-xs ml-2">(Complete other layers first)</span>
               </Button>
             </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Astrological Chart Interface
+    if (layerId === 'astrological-chart') {
+      return (
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <div className="text-6xl mb-4">{layer.icon}</div>
+            <h3 className="text-2xl font-semibold text-epii-neon mb-4">{layer.title}</h3>
+            <p className="text-gray-300 mb-8 max-w-2xl mx-auto">{layer.description}</p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <NatalChartDisplay
+              userId={userState.userData?.userId || ''}
+              className="w-full"
+            />
           </div>
         </div>
       );
@@ -422,65 +684,84 @@ const IdentityDynamicsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-const OraclePage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <div className="min-h-screen pt-20 pb-6">
-    <GeometricBackground density={8} opacity={0.02} />
-    <div className="container mx-auto px-4 h-[calc(100vh-8rem)]">
-      <div className="flex flex-col h-full bg-epii-dark/40 neo-glow rounded-lg overflow-hidden">
-        {/* Header with back button */}
-        <div className="p-4 border-b border-epii-neon/20 bg-epii-darker/30">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={onBack}
-              variant="outline"
-              size="sm"
-              className="border-epii-neon/30 text-epii-neon hover:bg-epii-neon/10"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Back to Nara Mode
-            </Button>
-            <div className="flex items-center gap-2">
-              <Eye size={24} className="text-epii-neon" />
-              <h1 className="text-2xl font-light text-epii-neon">Oracle Interface</h1>
-            </div>
-          </div>
-          <p className="text-gray-300 mt-2">Decanic Embodiment & Oracle Enhancement</p>
-        </div>
+const OraclePage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [showTarotDraw, setShowTarotDraw] = useState(false);
 
-        {/* Content area */}
-        <div className="flex-grow p-8 flex flex-col items-center justify-center text-center">
-          <Eye size={64} className="text-epii-neon mb-6" />
-          <h2 className="text-3xl font-semibold text-epii-neon mb-4">Oracle Interface</h2>
-          <p className="text-gray-300 mb-8 max-w-2xl">
-            Engage with synchronicity and intuitive wisdom through dynamic tarot spreads,
-            real-time astrological integration, and personalized oracle guidance.
-          </p>
-          <div className="grid grid-cols-2 gap-6 max-w-4xl">
-            <div className="p-6 bg-epii-darker/50 rounded-lg border border-epii-neon/20">
-              <h3 className="text-lg font-semibold text-epii-neon mb-3">Dynamic Oracle</h3>
-              <div className="space-y-2 text-sm text-gray-400">
-                <p>• Dynamic Tarot Card Rendering</p>
-                <p>• Archetypal Concrescence Spreads</p>
-                <p>• Symbolic Synthesis Engine</p>
+  const handleDrawCards = () => {
+    setShowTarotDraw(true);
+  };
+
+  const handleBackToOracle = () => {
+    setShowTarotDraw(false);
+  };
+
+  if (showTarotDraw) {
+    return <TarotDraw onBack={handleBackToOracle} />;
+  }
+
+  return (
+    <div className="min-h-screen pt-20 pb-6">
+      <GeometricBackground density={8} opacity={0.02} />
+      <div className="container mx-auto px-4 h-[calc(100vh-8rem)]">
+        <div className="flex flex-col h-full bg-epii-dark/40 neo-glow rounded-lg overflow-hidden">
+          {/* Header with back button */}
+          <div className="p-4 border-b border-epii-neon/20 bg-epii-darker/30">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={onBack}
+                variant="outline"
+                size="sm"
+                className="border-epii-neon/30 text-epii-neon hover:bg-epii-neon/10"
+              >
+                <ArrowLeft size={16} className="mr-2" />
+                Back to Nara Mode
+              </Button>
+              <div className="flex items-center gap-2">
+                <Eye size={24} className="text-epii-neon" />
+                <h1 className="text-2xl font-light text-epii-neon">Oracle Interface</h1>
               </div>
             </div>
-            <div className="p-6 bg-epii-darker/50 rounded-lg border border-epii-neon/20">
-              <h3 className="text-lg font-semibold text-epii-neon mb-3">Astrological Integration</h3>
-              <div className="space-y-2 text-sm text-gray-400">
-                <p>• Real-time Astrological Data</p>
-                <p>• Natal Chart Cross-referencing</p>
-                <p>• Bodily Resonance Mapping</p>
-              </div>
-            </div>
+            <p className="text-gray-300 mt-2">Decanic Embodiment & Oracle Enhancement</p>
           </div>
-          <Button className="mt-8 bg-epii-neon text-epii-darker hover:brightness-110 px-8 py-3">
-            Draw Oracle Cards
-          </Button>
+
+          {/* Content area */}
+          <div className="flex-grow p-8 flex flex-col items-center justify-center text-center">
+            <Eye size={64} className="text-epii-neon mb-6" />
+            <h2 className="text-3xl font-semibold text-epii-neon mb-4">Oracle Interface</h2>
+            <p className="text-gray-300 mb-8 max-w-2xl">
+              Engage with synchronicity and intuitive wisdom through dynamic tarot spreads,
+              real-time astrological integration, and personalized oracle guidance.
+            </p>
+            <div className="grid grid-cols-2 gap-6 max-w-4xl">
+              <div className="p-6 bg-epii-darker/50 rounded-lg border border-epii-neon/20">
+                <h3 className="text-lg font-semibold text-epii-neon mb-3">Dynamic Oracle</h3>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <p>• Dynamic Tarot Card Rendering</p>
+                  <p>• Archetypal Concrescence Spreads</p>
+                  <p>• Symbolic Synthesis Engine</p>
+                </div>
+              </div>
+              <div className="p-6 bg-epii-darker/50 rounded-lg border border-epii-neon/20">
+                <h3 className="text-lg font-semibold text-epii-neon mb-3">Astrological Integration</h3>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <p>• Real-time Astrological Data</p>
+                  <p>• Natal Chart Cross-referencing</p>
+                  <p>• Bodily Resonance Mapping</p>
+                </div>
+              </div>
+            </div>
+            <Button
+              onClick={handleDrawCards}
+              className="mt-8 bg-epii-neon text-epii-darker hover:brightness-110 px-8 py-3"
+            >
+              Draw Oracle Cards
+            </Button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const JournalPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <div className="min-h-screen pt-20 pb-6">

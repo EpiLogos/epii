@@ -100,6 +100,8 @@ const userSchema = new mongoose.Schema({
     type: Object,
     default: {
       birthdate: null, // For birthdate encoding
+      birthTime: null, // Birth time for natal chart
+      birthLocation: null, // Birth location for natal chart
       location: '',
       bio: '',
       avatarUrl: '',

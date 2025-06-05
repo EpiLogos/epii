@@ -115,6 +115,27 @@ class MahamayaMatrixController {
   }
 
   /**
+   * Reset Birthdate Encoding data
+   * DELETE /api/mahamaya/birthdate-encoding/reset
+   */
+  async resetBirthdateEncoding(req, res) {
+    try {
+      const { userId } = req;
+
+      const result = await mahamayaMatrixService.resetBirthdateEncoding(userId);
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error resetting birthdate encoding:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message,
+        error: 'Failed to reset birthdate encoding'
+      });
+    }
+  }
+
+  /**
    * Store Astrological Chart data
    * POST /api/mahamaya/astrological-chart
    */
