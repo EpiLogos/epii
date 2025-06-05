@@ -638,12 +638,122 @@ All Epic 1 objectives achieved:
 
 ---
 
+---
+
+## 🔄 STRATEGIC DEVELOPMENT PIVOT - Epic 2 → Epic 4 → Epic 3
+
+**Date:** January 2025
+**Decision Point:** Epic 2, Story E2_F1_S4 (Body Map Modal)
+
+### **Pivot Rationale:**
+
+**Epic 2 has reached a critical dependency bottleneck.** Further development requires:
+
+1. **Nara Agent Processing Logic**: Epic 2's advanced features (body map modal, lifestyle integration, symbolic synthesis) require sophisticated AI interpretation of:
+   - Decanic associations with body parts
+   - Tarot card symbolic meanings
+   - Astrological context integration
+   - Personalized lifestyle recommendations
+
+2. **BPMCP Infrastructure Enhancement**: Current BPMCP needs enrichment before Nara agent development:
+   - Unified RAG tool capabilities
+   - Enhanced document analysis pipeline
+   - Improved Bimba map data processing
+   - Robust database lookup functions
+
+3. **Data Processing Foundation**: Both Epii and Nara modes require:
+   - Sophisticated document analysis → Notion upload → Bimba map updates
+   - Healthy data processing workflows
+   - Refined knowledge graph integration
+
+### **New Development Sequence:**
+
+**PHASE 1: Epic 4 - Nara Agent Core & Coordination (PRIORITY)**
+- **Epic 4, F1**: Nara Agent Foundation
+- **Epic 4, F3**: BPMCP Service Enrichment Assessment
+- **Epic 4, F4**: Neo4j Knowledge Graph Integration
+- **Epic 4, F5**: Prompt Engineering Synthesis Logic
+
+**PHASE 2: Epic 3 - Document Analysis & Knowledge Refinement**
+- **Epic 3, F2**: NLP Symbolic Pattern Recognition
+- **Epic 3, F3**: External Knowledge Base Integration
+- **Document Analysis Pipeline**: Upload results to Notion
+- **Bimba Map Refinement**: Update knowledge graph with analysis results
+
+**PHASE 3: Return to Epic 2 - Enhanced Oracle Features**
+- **Epic 2, F1_S4**: Body Map Modal (with Nara agent interpretation)
+- **Epic 2, F2**: Lifestyle Integration (with AI recommendations)
+- **Epic 2, F3**: Symbolic Synthesis Engine (with advanced NLP)
+
+### **Epic 2 Current Status - FOUNDATIONAL COMPLETE, ADVANCED FEATURES PAUSED**
+
+**✅ COMPLETED:**
+- **E2_F1_S1**: Dynamic Card Rendering - COMPLETE
+- **E2_F1_S2**: Real-time Astro Integration - FOUNDATIONAL SETUP COMPLETE
+- **E2_F1_S3**: Natal Chart Cross-referencing - FOUNDATIONAL SETUP COMPLETE
+
+**⏸️ PAUSED (Awaiting Nara Agent):**
+- **E2_F1_S4**: Bodily Resonance Mapping (Body Map Modal)
+- **E2_F2**: Lifestyle Integration features
+- **E2_F3**: Advanced Symbolic Synthesis Engine
+- **E2_F4**: Enhanced Oracle UI features
+
+**Reason for Pause:** These features require sophisticated AI interpretation logic that depends on:
+1. Nara Agent processing capabilities
+2. Enhanced BPMCP unified tools
+3. Refined Bimba map data from document analysis
+
+---
+
+## 🎯 IMMEDIATE PRIORITIES - Epic 4 Development
+
+### **Epic 4: Nara Agent Core & Coordination - NOW ACTIVE**
+
+**Epic 4 Status:** [ ] In Progress (Moved to Priority)
+
+**Critical Dependencies to Address:**
+
+1. **BPMCP Enhancement (Epic 4, F3)**:
+   - Unified RAG tool development
+   - Enhanced document analysis capabilities
+   - Improved tool workflows and skills registry
+   - Better integration with existing Epii agent pipeline
+
+2. **Nara Agent Foundation (Epic 4, F1)**:
+   - Core agent architecture
+   - Bimba contextualization capabilities
+   - Integration with Mahamaya Matrix data
+   - Processing logic for Oracle, Identity, and Journal contexts
+
+3. **Knowledge Graph Integration (Epic 4, F4)**:
+   - Neo4j integration enhancement
+   - Astrological calculation service refinement
+   - Document analysis → Bimba map update pipeline
+
+4. **Prompt Engineering Synthesis (Epic 4, F5)**:
+   - Advanced interpretation logic for tarot/astrology
+   - Symbolic pattern recognition
+   - Personalized recommendation systems
+
+### **Epic 3: Document Analysis Pipeline - SECONDARY PRIORITY**
+
+**Epic 3 Status:** [ ] Queued (After Epic 4 Foundation)
+
+**Key Objectives:**
+- **Document Analysis → Notion Upload**: Automated pipeline for analysis results
+- **Bimba Map Refinement**: Update knowledge graph with new insights
+- **Knowledge Base Integration**: Enhanced external data sources
+- **Symbolic Pattern Recognition**: NLP capabilities for journal analysis
+
+---
+
 ## Next Steps
 
-1. **Immediate:** Begin Epic 2, Story E2_F1_S4 (Body Map Modal with decanic associations)
-2. **Body Map Implementation:** SVG body outline with highlighted regions based on drawn cards
-3. **Modal Integration:** Body icon button in Oracle interface
-4. **Testing:** Verify complete Epic 2 functionality end-to-end
+1. **IMMEDIATE:** Begin Epic 4, Story E4_F1_S1 (Nara Agent Foundation)
+2. **BPMCP Assessment:** Evaluate current BPMCP capabilities and enhancement needs
+3. **Agent Architecture:** Design Nara agent core with Bimba contextualization
+4. **Knowledge Integration:** Plan Neo4j and document analysis pipeline
+5. **Return to Epic 2:** Complete advanced Oracle features with AI capabilities
 
 ## Notes
 
