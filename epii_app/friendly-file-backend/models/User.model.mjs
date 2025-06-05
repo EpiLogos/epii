@@ -106,6 +106,46 @@ const userSchema = new mongoose.Schema({
       socialLinks: {},
     }
   },
+
+  // Enhanced authentication metadata
+  authMetadata: {
+    type: Object,
+    default: {
+      isEmailVerified: false,
+      lastLoginAt: null,
+      loginCount: 0,
+      registrationIP: null,
+      userAgent: null,
+      createdAt: null,
+      updatedAt: null
+    }
+  },
+
+  // Mahamaya Matrix integration (6 layers total) - flexible schema
+  mahamayaMatrix: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      completionStatus: {
+        birthdateEncoding: false,
+        astrologicalChart: false,
+        jungianAssessment: false,
+        geneKeysProfile: false,
+        humanDesignProfile: false,
+        archetypalQuintessence: false // Synthesized from 6-layer identity + 5 Mahamaya layers
+      },
+      metadata: {
+        version: '1.0',
+        lastSyncedAt: null
+      }
+      // Additional fields will be added dynamically:
+      // birthdateEncoding: { ... }
+      // astrologicalChart: { ... }
+      // jungianAssessment: { ... }
+      // geneKeysProfile: { ... }
+      // humanDesignProfile: { ... }
+      // archetypalQuintessence: { ... }
+    }
+  },
   // User preferences for system interaction
   preferences: {
     type: Object,

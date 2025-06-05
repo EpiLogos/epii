@@ -45,10 +45,14 @@ const Auth = () => {
 
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const endpoint = mode === "signin" ? "signin" : "signup";
+      const endpoint = mode === "signin" ? "login" : "register";
+      const payload = mode === "signin"
+        ? { emailOrName: formData.email || formData.name, password: formData.password }
+        : { name: formData.name, email: formData.email, password: formData.password };
+
       const response = await axios.post(
-        `${backendUrl}/api/users/${endpoint}`,
-        formData
+        `${backendUrl}/api/auth/${endpoint}`,
+        payload
       );
 
       // Store user data in localStorage and update context
@@ -57,6 +61,7 @@ const Auth = () => {
         localStorage.setItem('userId', userData.userId);
         localStorage.setItem('userName', userData.name);
         localStorage.setItem('userRole', userData.role);
+        localStorage.setItem('accessToken', response.data.accessToken);
 
         // Update user context
         login(userData);

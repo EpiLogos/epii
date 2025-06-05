@@ -1,0 +1,473 @@
+openapi: 3.0.3
+info:
+  title: Mahamaya Matrix API
+  description: |
+    Epic 1, Story E1_F2_S1: Backend System for Mahamaya Matrix
+    
+    This API provides secure CRUD operations for managing user data within the Mahamaya Matrix system.
+    The system stores and manages user context data derived from six Mahamaya Ground layers and 
+    the synthesized Archetypal Quintessence.
+    
+    ## Mahamaya Ground Layers:
+    1. Birthdate Encoding Data
+    2. Astrological Chart Data (Natal, Progressed, Transit)
+    3. Jungian Archetype Assessment Results
+    4. Gene Keys Profile Data
+    5. Human Design Profile Data
+    6. I Ching Hexagram Data
+    7. Archetypal Quintessence Data
+    
+    ## Security Features:
+    - JWT-based authentication
+    - Field-level encryption for PII
+    - Secure session management
+    - Data isolation by user
+  version: 1.0.0
+  contact:
+    name: Epi-Logos Development Team
+    email: dev@epi-logos.com
+  license:
+    name: Proprietary
+    url: https://epi-logos.com/license
+
+servers:
+  - url: http://localhost:3001/api
+    description: Development server
+  - url: https://api.epi-logos.com/api
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check API health status
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  service:
+                    type: string
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                  version:
+                    type: string
+
+  /auth/register:
+    post:
+      summary: Register new user
+      description: Register a new user and initialize Mahamaya Matrix profile
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - username
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                username:
+                  type: string
+                  minLength: 3
+                  example: johndoe
+                password:
+                  type: string
+                  minLength: 8
+                  example: securePassword123
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Login user
+      description: Authenticate user and return access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - emailOrUsername
+                - password
+              properties:
+                emailOrUsername:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: securePassword123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      description: Refresh expired access token using refresh token
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token (can also be sent as httpOnly cookie)
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  accessToken:
+                    type: string
+                  expiresIn:
+                    type: string
+                  message:
+                    type: string
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      description: Invalidate user session and clear tokens
+      security: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /auth/profile:
+    get:
+      summary: Get user profile
+      description: Get authenticated user's profile information
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    $ref: '#/components/schemas/UserProfile'
+                  message:
+                    type: string
+
+  /mahamaya/profile:
+    post:
+      summary: Create/update user profile
+      description: Create or update user profile in Mahamaya Matrix
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                username:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+      responses:
+        '200':
+          description: Profile created/updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /mahamaya/matrix:
+    get:
+      summary: Get complete Mahamaya Matrix
+      description: Retrieve user's complete Mahamaya Matrix data
+      responses:
+        '200':
+          description: Matrix retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  userId:
+                    type: string
+                  matrix:
+                    $ref: '#/components/schemas/MahamayaMatrix'
+                  completionPercentage:
+                    type: number
+
+  /mahamaya/birthdate-encoding:
+    post:
+      summary: Store birthdate encoding
+      description: Store encrypted birthdate and numerological data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BirthdateEncodingInput'
+      responses:
+        '200':
+          description: Birthdate encoding stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /mahamaya/astrological-chart:
+    post:
+      summary: Store astrological chart
+      description: Store natal, progressed, or transit chart data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AstrologicalChartInput'
+      responses:
+        '200':
+          description: Astrological chart stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /mahamaya/layer/{layerType}:
+    get:
+      summary: Get specific layer data
+      description: Retrieve data for a specific Mahamaya Ground layer
+      parameters:
+        - name: layerType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - birthdate-encoding
+              - astrological-charts
+              - jungian-assessments
+              - gene-keys-profile
+              - human-design-profile
+              - i-ching-hexagrams
+              - archetypal-quintessence
+      responses:
+        '200':
+          description: Layer data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  userId:
+                    type: string
+                  layerType:
+                    type: string
+                  data:
+                    type: object
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/UserProfile'
+        accessToken:
+          type: string
+        expiresIn:
+          type: string
+        message:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        userId:
+          type: string
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        error:
+          type: string
+
+    MahamayaMatrix:
+      type: object
+      properties:
+        profile:
+          type: object
+        birthdateEncoding:
+          type: object
+        astrologicalCharts:
+          type: array
+          items:
+            type: object
+        jungianAssessments:
+          type: array
+          items:
+            type: object
+        geneKeysProfile:
+          type: object
+        humanDesignProfile:
+          type: object
+        iChingHexagrams:
+          type: array
+          items:
+            type: object
+        archetypalQuintessence:
+          type: object
+
+    BirthdateEncodingInput:
+      type: object
+      required:
+        - birthDate
+      properties:
+        birthDate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        birthTime:
+          type: string
+          format: time
+          example: "12:00:00"
+        birthLocation:
+          type: object
+          properties:
+            city:
+              type: string
+            country:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+        numerologicalProfile:
+          type: object
+          properties:
+            lifePathNumber:
+              type: number
+            destinyNumber:
+              type: number
+
+    AstrologicalChartInput:
+      type: object
+      required:
+        - chartType
+        - chartData
+      properties:
+        chartType:
+          type: string
+          enum: [natal, progressed, transit]
+        chartData:
+          type: object
+        planetaryPositions:
+          type: array
+          items:
+            type: object
+        houses:
+          type: array
+          items:
+            type: object
+        aspects:
+          type: array
+          items:
+            type: object

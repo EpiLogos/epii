@@ -1,10 +1,10 @@
 /**
  * User Context Provider
- * 
+ *
  * Provides user context data and operations to the application.
  * This component manages user authentication state, profile data,
  * preferences, and identity information.
- * 
+ *
  * Bimba Coordinate: #0-4-0
  */
 
@@ -116,8 +116,23 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-        const response = await axios.get(`${backendUrl}/api/users/${userId}`);
-        
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+          // No token, clear session
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userRole');
+          dispatch({ type: 'LOGIN_FAILURE', payload: 'No access token' });
+          return;
+        }
+
+        const response = await axios.get(`${backendUrl}/api/auth/profile`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
         if (response.data.success) {
           dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
         } else {
@@ -125,6 +140,7 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
           localStorage.removeItem('userId');
           localStorage.removeItem('userName');
           localStorage.removeItem('userRole');
+          localStorage.removeItem('accessToken');
           dispatch({ type: 'LOGIN_FAILURE', payload: 'Session expired' });
         }
       } catch (error) {
@@ -133,6 +149,7 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         localStorage.removeItem('userId');
         localStorage.removeItem('userName');
         localStorage.removeItem('userRole');
+        localStorage.removeItem('accessToken');
         dispatch({ type: 'LOGIN_FAILURE', payload: 'Authentication error' });
       }
     };
@@ -150,6 +167,7 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('accessToken');
     dispatch({ type: 'LOGOUT' });
   };
 

@@ -20,6 +20,7 @@ import documentsRoutes from './routes/documents.routes.mjs'; // Import Documents
 import bpmcpRoutes from './routes/bpmcp.routes.mjs'; // Import BPMCP routes
 import userRoutes from './routes/user.routes.mjs'; // Import User routes
 import analysisRoutes from './routes/analysis.routes.mjs'; // Import Analysis routes
+import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,24 +38,42 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' })); // Increased limit to handle large document payloads
 app.use('/uploads', express.static('uploads'));
 
-// Connect to MongoDB
-connectDB();
+// Async server startup function
+async function startServer() {
+  // Connect to MongoDB
+  connectDB();
 
-// Mount routes
-app.use('/api/chat', chatRoutes);
-app.use('/files', filesRoutes);
-app.use('/api/agent', agentRoutes);
-app.use('/api', notionRoutes); // Mount Notion routes under /api
-app.use('/api/graph', graphRoutes); // Mount Graph routes under /api/graph
-app.use('/api/node-details', nodeDetailsRoutes); // Mount Node Details routes under /api/node-details
-app.use('/api/epii-agent', epiiAgentRoutes); // Mount Epii Agent routes under /api/epii-agent
-app.use('/api/documents', documentsRoutes); // Mount Documents routes under /api/documents
-app.use('/api/bpmcp', bpmcpRoutes); // Mount BPMCP routes under /api/bpmcp
-app.use('/api/users', userRoutes); // Mount User routes under /api/users
-app.use('/api/analysis', analysisRoutes); // Mount Analysis routes under /api/analysis
+  // Initialize Nara Mahamaya routes
+  try {
+    await initializeRoutes();
+    console.log('Nara Mahamaya routes initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize Nara Mahamaya routes:', error);
+  }
 
-app.listen(port, () => {
-  console.log('Server listening on port ' + port);
-  console.log('Server URL: http://localhost:' + port);
-  console.log('Backend server started successfully');
+  // Mount routes
+  app.use('/api/chat', chatRoutes);
+  app.use('/files', filesRoutes);
+  app.use('/api/agent', agentRoutes);
+  app.use('/api', notionRoutes); // Mount Notion routes under /api
+  app.use('/api/graph', graphRoutes); // Mount Graph routes under /api/graph
+  app.use('/api/node-details', nodeDetailsRoutes); // Mount Node Details routes under /api/node-details
+  app.use('/api/epii-agent', epiiAgentRoutes); // Mount Epii Agent routes under /api/epii-agent
+  app.use('/api/documents', documentsRoutes); // Mount Documents routes under /api/documents
+  app.use('/api/bpmcp', bpmcpRoutes); // Mount BPMCP routes under /api/bpmcp
+  app.use('/api/users', userRoutes); // Mount User routes under /api/users
+  app.use('/api/analysis', analysisRoutes); // Mount Analysis routes under /api/analysis
+  app.use('/api', mahamayaRoutes); // Mount Nara Mahamaya routes under /api
+
+  app.listen(port, () => {
+    console.log('Server listening on port ' + port);
+    console.log('Server URL: http://localhost:' + port);
+    console.log('Backend server started successfully');
+  });
+}
+
+// Start the server
+startServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });

@@ -533,13 +533,13 @@ const UserSettings: React.FC = () => {
                           placeholder="Enter values separated by commas"
                           value={
                             pendingIdentityUpdates.transcendentFoundation?.coreValues?.join(', ') ||
-                            userData?.identityStructure.transcendentFoundation.coreValues.join(', ') ||
+                            userData?.identityStructure?.transcendentFoundation?.coreValues?.join(', ') ||
                             ''
                           }
                           onChange={(e) => {
                             const values = e.target.value.split(',').map(value => value.trim());
                             const updatedIdentity = {
-                              ...userData?.identityStructure.transcendentFoundation,
+                              ...userData?.identityStructure?.transcendentFoundation,
                               coreValues: values
                             };
                             handleIdentityFieldChange('transcendentFoundation', updatedIdentity);
@@ -554,12 +554,12 @@ const UserSettings: React.FC = () => {
                         <textarea
                           value={
                             pendingIdentityUpdates.transcendentFoundation?.lifePhilosophy ||
-                            userData?.identityStructure.transcendentFoundation.lifePhilosophy ||
+                            userData?.identityStructure?.transcendentFoundation?.lifePhilosophy ||
                             ''
                           }
                           onChange={(e) => {
                             const updatedIdentity = {
-                              ...userData?.identityStructure.transcendentFoundation,
+                              ...userData?.identityStructure?.transcendentFoundation,
                               lifePhilosophy: e.target.value
                             };
                             handleIdentityFieldChange('transcendentFoundation', updatedIdentity);
@@ -576,12 +576,12 @@ const UserSettings: React.FC = () => {
                         <textarea
                           value={
                             pendingIdentityUpdates.transcendentFoundation?.spiritualOrientation ||
-                            userData?.identityStructure.transcendentFoundation.spiritualOrientation ||
+                            userData?.identityStructure?.transcendentFoundation?.spiritualOrientation ||
                             ''
                           }
                           onChange={(e) => {
                             const updatedIdentity = {
-                              ...userData?.identityStructure.transcendentFoundation,
+                              ...userData?.identityStructure?.transcendentFoundation,
                               spiritualOrientation: e.target.value
                             };
                             handleIdentityFieldChange('transcendentFoundation', updatedIdentity);

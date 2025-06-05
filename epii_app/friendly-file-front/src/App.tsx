@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 
 // Bimba-aligned components
 import EpiiModePage from "./subsystems/5_epii/5_integration/EpiiModePage";
+import NaraModePage from "./subsystems/4_nara/5_integration/NaraModePage";
 import UserSettings from "./subsystems/4_nara/5_pages/UserSettings";
 
 // Layout
@@ -38,7 +39,8 @@ const AnimatedRoutes = () => {
         <Route path="/files" element={<FileHub />} />
         <Route path="/meta3d" element={<Meta3D />} />
         <Route path="/meta2d" element={<Meta2D />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat" element={<NaraModePage />} />
+        <Route path="/chat-legacy" element={<Chat />} />
         <Route path="/epii" element={<EpiiModePage />} />
         <Route path="/epii-legacy" element={<EpiiChatPage />} />
         <Route path="/auth" element={<Auth />} />
