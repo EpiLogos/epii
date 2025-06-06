@@ -836,6 +836,84 @@ Provide your response as a JSON object with the following structure:
     return value;
   };
 
+  const handleDeleteNode = async () => {
+    if (!selectedCoordinate) return;
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete node "${selectedCoordinate}" and all its relationships? This action cannot be undone.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
+      // Check if this is a node without bimba coordinate
+      const isNonCoordinateNode = selectedCoordinate.startsWith('node-');
+      const nodeId = isNonCoordinateNode ? selectedCoordinate.replace('node-', '') : null;
+
+      let deleteQuery: string;
+      let params: any;
+
+      if (isNonCoordinateNode) {
+        deleteQuery = `
+          MATCH (n)
+          WHERE toString(id(n)) = $nodeId
+          DETACH DELETE n
+          RETURN count(n) as deletedCount
+        `;
+        params = { nodeId };
+      } else {
+        deleteQuery = `
+          MATCH (n {bimbaCoordinate: $coordinate})
+          DETACH DELETE n
+          RETURN count(n) as deletedCount
+        `;
+        params = { coordinate: selectedCoordinate };
+      }
+
+      const deleteResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          toolName: 'updateBimbaGraph',
+          args: {
+            query: deleteQuery,
+            params: params
+          }
+        })
+      });
+
+      if (!deleteResponse.ok) {
+        throw new Error(`Failed to delete node: ${deleteResponse.statusText}`);
+      }
+
+      const result = await deleteResponse.json();
+      console.log('✅ Node deleted successfully:', result);
+
+      // Clear the selection and refresh the graph
+      setSelectedCoordinate(null);
+      setNodeData(null);
+      setEditedProperties({});
+      setEditedRelationships([]);
+
+      // Clear any pending changes for this node
+      clearChangesFromCache(selectedCoordinate);
+
+      // Force a page refresh to reload the graph data
+      // This is a simple approach - in a more sophisticated app, you'd trigger a graph data refresh
+      window.location.reload();
+
+      alert(`Node "${selectedCoordinate}" has been deleted successfully.`);
+
+    } catch (error) {
+      console.error('Error deleting node:', error);
+      alert(`Failed to delete node: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const applyUpdates = async () => {
     setIsUpdating(true);
     setUpdateError(null);
@@ -851,9 +929,14 @@ Provide your response as a JSON object with the following structure:
       for (const [coordinate, changes] of allChanges.entries()) {
         console.log(`Processing changes for coordinate: ${coordinate}`, changes);
 
-        // Separate property changes from relationship changes
+        // Check if this is a node without bimba coordinate (declare at top of loop)
+        const isNonCoordinateNode = coordinate.startsWith('node-');
+        const nodeId = isNonCoordinateNode ? coordinate.replace('node-', '') : null;
+
+        // Separate property changes from relationship changes and handle labels specially
         const propertyChanges: Record<string, any> = {};
         const relationshipChanges: Record<string, any> = {};
+        let labelChanges: string[] | null = null;
 
         for (const [key, value] of Object.entries(changes)) {
           if (key.startsWith('rel_')) {
@@ -861,22 +944,110 @@ Provide your response as a JSON object with the following structure:
           } else if (key.startsWith('prop_')) {
             // Remove 'prop_' prefix and sanitize the value
             const propKey = key.replace('prop_', '');
-            propertyChanges[propKey] = sanitizePropertyValue(value);
+            if (propKey === 'labels') {
+              // Handle labels specially - parse as array
+              if (typeof value === 'string') {
+                // First try to parse as JSON
+                try {
+                  const parsed = JSON.parse(value);
+                  if (Array.isArray(parsed)) {
+                    labelChanges = parsed;
+                  } else {
+                    // If it's not an array, treat as single label
+                    labelChanges = [String(parsed)];
+                  }
+                } catch {
+                  // If JSON parsing fails, check if it's a malformed JSON array
+                  if (value.startsWith('[') && value.endsWith(']')) {
+                    // Try to fix common JSON issues like missing commas
+                    const fixedValue = value
+                      .replace(/"\s*"/g, '","') // Fix missing commas between quoted strings
+                      .replace(/\]\[/g, '],['); // Fix missing commas between arrays
+                    try {
+                      const parsed = JSON.parse(fixedValue);
+                      labelChanges = Array.isArray(parsed) ? parsed : [String(parsed)];
+                    } catch {
+                      // If still fails, treat as comma-separated string
+                      labelChanges = value.slice(1, -1).split(',').map(l => l.trim().replace(/^"|"$/g, '')).filter(l => l);
+                    }
+                  } else {
+                    // Treat as comma-separated string
+                    labelChanges = value.split(',').map(l => l.trim()).filter(l => l);
+                  }
+                }
+              } else if (Array.isArray(value)) {
+                labelChanges = value;
+              }
+            } else {
+              // Handle qlPosition type conversion - ensure it stays as integer
+              if (propKey === 'qlPosition') {
+                if (typeof value === 'string') {
+                  propertyChanges[propKey] = parseInt(value, 10);
+                } else if (typeof value === 'number') {
+                  propertyChanges[propKey] = Math.floor(value); // Ensure integer
+                } else {
+                  propertyChanges[propKey] = parseInt(String(value), 10);
+                }
+              } else {
+                propertyChanges[propKey] = sanitizePropertyValue(value);
+              }
+            }
           } else {
             // Direct property (no prefix)
-            propertyChanges[key] = sanitizePropertyValue(value);
+            if (key === 'labels') {
+              // Handle labels specially - use same logic as above
+              if (typeof value === 'string') {
+                try {
+                  const parsed = JSON.parse(value);
+                  if (Array.isArray(parsed)) {
+                    labelChanges = parsed;
+                  } else {
+                    labelChanges = [String(parsed)];
+                  }
+                } catch {
+                  if (value.startsWith('[') && value.endsWith(']')) {
+                    const fixedValue = value
+                      .replace(/"\s*"/g, '","')
+                      .replace(/\]\[/g, '],[');
+                    try {
+                      const parsed = JSON.parse(fixedValue);
+                      labelChanges = Array.isArray(parsed) ? parsed : [String(parsed)];
+                    } catch {
+                      labelChanges = value.slice(1, -1).split(',').map(l => l.trim().replace(/^"|"$/g, '')).filter(l => l);
+                    }
+                  } else {
+                    labelChanges = value.split(',').map(l => l.trim()).filter(l => l);
+                  }
+                }
+              } else if (Array.isArray(value)) {
+                labelChanges = value;
+              }
+            } else if (key === 'qlPosition') {
+              // Handle qlPosition type conversion - ensure it stays as integer
+              if (typeof value === 'string') {
+                propertyChanges[key] = parseInt(value, 10);
+              } else if (typeof value === 'number') {
+                propertyChanges[key] = Math.floor(value); // Ensure integer
+              } else {
+                propertyChanges[key] = parseInt(String(value), 10);
+              }
+            } else {
+              propertyChanges[key] = sanitizePropertyValue(value);
+            }
           }
         }
 
         // Update properties if any exist
         if (Object.keys(propertyChanges).length > 0) {
           const setClause = Object.keys(propertyChanges)
-            .map(key => `n.${key} = $${key}`)
+            .map(key => {
+              // Ensure qlPosition is stored as integer in Neo4j
+              if (key === 'qlPosition') {
+                return `n.${key} = toInteger($${key})`;
+              }
+              return `n.${key} = $${key}`;
+            })
             .join(', ');
-
-          // Check if this is a node without bimba coordinate
-          const isNonCoordinateNode = coordinate.startsWith('node-');
-          const nodeId = isNonCoordinateNode ? coordinate.replace('node-', '') : null;
 
           let updateQuery: string;
           let params: any;
@@ -918,6 +1089,87 @@ Provide your response as a JSON object with the following structure:
           if (!updateResponse.ok) {
             const errorText = await updateResponse.text();
             throw new Error(`Failed to update properties for ${coordinate}: ${errorText}`);
+          }
+        }
+
+        // Handle label changes using proper Neo4j SET clause for adding labels
+        if (labelChanges && labelChanges.length > 0) {
+          console.log(`Label changes detected for ${coordinate}:`, labelChanges);
+
+          // Ensure VectorNode is always included and filter out empty labels
+          const sanitizedLabels = labelChanges
+            .filter(l => l && l.trim())
+            .map(label => {
+              // Sanitize label to be a valid Neo4j identifier
+              let sanitized = label.trim();
+
+              // If label starts with a number, prefix with 'Label_'
+              if (/^\d/.test(sanitized)) {
+                sanitized = `Label_${sanitized}`;
+              }
+
+              // Replace invalid characters with underscores
+              sanitized = sanitized.replace(/[^a-zA-Z0-9_]/g, '_');
+
+              // Ensure it doesn't start with underscore (Neo4j preference)
+              if (sanitized.startsWith('_')) {
+                sanitized = `Label${sanitized}`;
+              }
+
+              return sanitized;
+            });
+
+          const finalLabels = [...new Set(['VectorNode', ...sanitizedLabels])];
+          console.log(`Original labels:`, labelChanges);
+          console.log(`Sanitized labels:`, sanitizedLabels);
+          console.log(`Final labels to apply:`, finalLabels);
+
+          // Use Neo4j SET clause to add labels to existing node (preserves relationships!)
+          let labelQuery: string;
+          let labelParams: any;
+
+          if (isNonCoordinateNode) {
+            labelQuery = `
+              MATCH (n)
+              WHERE toString(id(n)) = $nodeId
+              SET n:${finalLabels.join(':')}
+              RETURN n
+            `;
+            labelParams = { nodeId };
+          } else {
+            labelQuery = `
+              MATCH (n)
+              WHERE n.bimbaCoordinate = $coordinate
+              SET n:${finalLabels.join(':')}
+              RETURN n
+            `;
+            labelParams = { coordinate };
+          }
+
+          const labelResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              toolName: 'updateBimbaGraph',
+              args: {
+                query: labelQuery,
+                params: labelParams
+              }
+            })
+          });
+
+          console.log(`Executing label update using SET clause for ${coordinate}:`, labelQuery);
+
+          if (!labelResponse.ok) {
+            const errorText = await labelResponse.text();
+            console.error(`Failed to update labels for ${coordinate}: ${errorText}`);
+            throw new Error(`Label update failed: ${errorText}`);
+          } else {
+            const labelResult = await labelResponse.json();
+            console.log(`✅ Successfully updated labels for ${coordinate}:`, finalLabels);
+            console.log('Label update result:', labelResult);
           }
         }
 
@@ -1173,7 +1425,17 @@ Provide your response as a JSON object with the following structure:
                   <>
                     {/* Node Properties Editor */}
                     <div className="bg-epii-dark p-4 rounded-lg">
-                      <h4 className="text-md font-semibold text-epii-neon mb-3">Node Properties</h4>
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-md font-semibold text-epii-neon">Node Properties</h4>
+                        <Button
+                          onClick={() => handleDeleteNode()}
+                          variant="outline"
+                          size="sm"
+                          className="text-red-400 border-red-400 hover:bg-red-400/10"
+                        >
+                          🗑️ Delete Node
+                        </Button>
+                      </div>
 
                       <div className="space-y-3">
                         {Object.entries(editedProperties).map(([key, value]) => {

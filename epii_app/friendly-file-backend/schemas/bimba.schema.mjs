@@ -73,6 +73,31 @@ export const BimbaNodeSchema = {
     enum: ['0000', '0/1', '0/1/2', '0/1/2/3', '4.0-4/5', '5/0'],
     description: 'The QL context frame this node operates within'
   },
+  qlVariant: {
+    type: 'string',
+    enum: ['0/1', '2/3', '4/6', '7/8/9', '10/12', '16/24'],
+    default: '4/6',
+    description: 'The QL variant for this node (mod6 mappings)'
+  },
+
+  // Relational Properties (from Analysis Pipeline)
+  // These properties store analysis results as simple text fields for easy editing
+  qlOperators: {
+    type: 'string',
+    description: 'Quaternary Logic operators that represent structural and procedural patterns (e.g., "QL-STRUCT-3, QL-PROC-2"). Enter as comma-separated list or free text.'
+  },
+  epistemicEssence: {
+    type: 'string',
+    description: 'Core abstract concepts that this node elaborates on (e.g., "Epistemic Topology, Conceptual Integration"). Enter as comma-separated list or free text.'
+  },
+  archetypalAnchors: {
+    type: 'string',
+    description: 'Symbolic representations and archetypal patterns that resonate with this node (e.g., "Ouroboros, Divine Marriage, Axis Mundi"). Enter as comma-separated list or free text.'
+  },
+  semanticFramework: {
+    type: 'string',
+    description: 'Relationship types and semantic frameworks that connect this node to others (e.g., "Harmonizes With, Synthesizes, Transcends"). Enter as comma-separated list or free text.'
+  },
 
   // Additional metadata
   createdAt: {
@@ -228,6 +253,11 @@ export const NotionPropertyMappings = {
     options: ['structural', 'processual', 'contextual'],
     description: 'QL operator types mapping to Notion multi-select property'
   },
+  qlVariant: {
+    notionType: 'select',
+    options: ['0/1', '2/3', '4/6', '7/8/9', '10/12', '16/24'],
+    description: 'QL variant mapping to Notion select property'
+  },
 
   // Relational Properties (from Analysis Pipeline)
   qlOperators: {
@@ -329,6 +359,20 @@ export function validateBimbaNode(node) {
     errors.push('Invalid qlCategory: must be "implicate" or "explicate"');
   }
 
+  // Check QL variant if provided
+  if (node.qlVariant &&
+      !['0/1', '2/3', '4/6', '7/8/9', '10/12', '16/24'].includes(node.qlVariant)) {
+    errors.push('Invalid qlVariant: must be one of 0/1, 2/3, 4/6, 7/8/9, 10/12, 16/24');
+  }
+
+  // Validate relational properties are strings if provided
+  const relationalProps = ['qlOperators', 'epistemicEssence', 'archetypalAnchors', 'semanticFramework'];
+  for (const prop of relationalProps) {
+    if (node[prop] !== undefined && typeof node[prop] !== 'string') {
+      errors.push(`${prop} must be a string`);
+    }
+  }
+
   return {
     isValid: errors.length === 0,
     errors
@@ -399,3 +443,71 @@ export function validateBimbaRelation(relation) {
     errors
   };
 }
+
+/**
+ * Default property fields for new Bimba nodes
+ * These ensure that all nodes have the required relational property structure
+ */
+export const BimbaNodeDefaults = {
+  // Default relational properties - empty strings that can be populated by analysis pipeline or manual editing
+  qlOperators: '',
+  epistemicEssence: '',
+  archetypalAnchors: '',
+  semanticFramework: '',
+
+  // Default QL properties
+  qlVariant: '4/6',
+  qlPosition: null, // Will be derived from coordinate
+
+  // Default metadata
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
+/**
+ * Helper function to create a complete node properties object with defaults
+ * @param {Object} nodeProperties - The basic node properties (bimbaCoordinate, name, description)
+ * @returns {Object} - Complete node properties with defaults applied
+ */
+export function createNodeWithDefaults(nodeProperties) {
+  // Extract the final number from coordinate for qlPosition (e.g., "#4-3-5-4" → 4)
+  let qlPosition = null;
+  if (nodeProperties.bimbaCoordinate) {
+    const match = nodeProperties.bimbaCoordinate.match(/-(\d+)$/);
+    if (match) {
+      qlPosition = parseInt(match[1], 10);
+    }
+  }
+
+  return {
+    ...BimbaNodeDefaults,
+    ...nodeProperties,
+    qlPosition: qlPosition,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+}
+
+/**
+ * Helper function to generate Cypher CREATE query with default properties
+ * @param {Object} nodeProperties - The node properties
+ * @param {string} labels - Neo4j labels (default: "VectorNode")
+ * @returns {Object} - Query and params for node creation
+ */
+export function generateNodeCreationQuery(nodeProperties, labels = "VectorNode") {
+  const completeProperties = createNodeWithDefaults(nodeProperties);
+
+  const query = `
+    CREATE (newNode:${labels})
+    SET newNode += $nodeProperties
+    RETURN newNode
+  `;
+
+  return {
+    query,
+    params: {
+      nodeProperties: completeProperties
+    }
+  };
+}
+

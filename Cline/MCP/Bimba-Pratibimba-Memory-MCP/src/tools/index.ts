@@ -7,6 +7,7 @@ import * as mongoTools from "./mongo/index.js";
 import * as notionTools from "./notion/index.js";
 import * as webTools from "./web/index.js";
 import * as documentTools from "./document/index.js";
+import * as graphitiTools from "./graphiti/index.js";
 import { broadcastEventTool, broadcastEventHandler } from "./broadcastEvent.js";
 
 // Collect all tool definitions
@@ -43,6 +44,18 @@ export const tools: Tool[] = [
   documentTools.updateDocumentTool,
   documentTools.deleteDocumentTool,
   documentTools.startDocumentAnalysisTool,
+
+  // Graphiti tools (Phase 2 Epic 0)
+  graphitiTools.addGraphitiEpisodeTool,
+  graphitiTools.searchGraphitiEntitiesTool,
+  graphitiTools.searchGraphitiFactsTool,
+  graphitiTools.getGraphitiContextTool,
+  graphitiTools.getGraphitiEpisodesTool,
+  graphitiTools.deleteGraphitiEpisodeTool,
+  graphitiTools.deleteGraphitiEntityEdgeTool,
+  graphitiTools.getGraphitiEntityEdgeTool,
+  graphitiTools.clearGraphitiGraphTool,
+  graphitiTools.getGraphitiStatusTool,
 
   // Event tools
   broadcastEventTool,
@@ -82,6 +95,18 @@ export const handlers: Record<string, ToolHandler> = {
   "updateDocument": documentTools.handleUpdateDocument,
   "deleteDocument": documentTools.handleDeleteDocument,
   "startDocumentAnalysis": documentTools.handleStartDocumentAnalysis,
+
+  // Graphiti handlers (Phase 2 Epic 0)
+  "addGraphitiEpisode": graphitiTools.handleAddGraphitiEpisode,
+  "searchGraphitiEntities": graphitiTools.handleSearchGraphitiEntities,
+  "searchGraphitiFacts": graphitiTools.handleSearchGraphitiFacts,
+  "getGraphitiContext": graphitiTools.handleGetGraphitiContext,
+  "getGraphitiEpisodes": graphitiTools.handleGetGraphitiEpisodes,
+  "deleteGraphitiEpisode": graphitiTools.handleDeleteGraphitiEpisode,
+  "deleteGraphitiEntityEdge": graphitiTools.handleDeleteGraphitiEntityEdge,
+  "getGraphitiEntityEdge": graphitiTools.handleGetGraphitiEntityEdge,
+  "clearGraphitiGraph": graphitiTools.handleClearGraphitiGraph,
+  "getGraphitiStatus": graphitiTools.handleGetGraphitiStatus,
 
   // Event handlers
   "broadcastEvent": broadcastEventHandler,

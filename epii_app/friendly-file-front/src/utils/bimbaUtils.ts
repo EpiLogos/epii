@@ -31,7 +31,7 @@ export const parseCoordinate = (input: string): { fullCoordinate: string; parts:
     // console.error("Invalid coordinate input: No parts found after #.");
     return null;
   }
-  
+
   // Handle the case where input is just "#" after validation checks
   // The existing check `partsString.some(part => isNaN(Number(part)) || part === '')`
   // for input "#", partsString is `[""]`. `part === ''` is true. So it correctly returns null.
@@ -52,7 +52,7 @@ export const parseCoordinate = (input: string): { fullCoordinate: string; parts:
  */
 export const inferParentCoordinate = (coordinate: string): string | null => {
   // Still use parseCoordinate to validate the input and get parts count
-  const parsedDetails = parseCoordinate(coordinate); 
+  const parsedDetails = parseCoordinate(coordinate);
 
   // If input is invalid, or has 0 or 1 part (e.g., "#", "#1"), it cannot have a parent in this context.
   if (!parsedDetails || parsedDetails.parts.length <= 1) {
@@ -67,13 +67,13 @@ export const inferParentCoordinate = (coordinate: string): string | null => {
   const coreCoordinatePart = originalCoordinate.substring(1); // Remove '#'
   const lastDashIndex = coreCoordinatePart.lastIndexOf('-');
   const lastDotIndex = coreCoordinatePart.lastIndexOf('.');
-  
+
   const lastSeparatorIndex = Math.max(lastDashIndex, lastDotIndex);
 
   // If no separator is found in the core part, it means it's a single segment like "123" after "#"
   // This case should have been caught by parsedDetails.parts.length <= 1, but as a safeguard:
   if (lastSeparatorIndex === -1) {
-    return null; 
+    return null;
   }
 
   // Construct the parent coordinate string by taking the substring
@@ -98,18 +98,19 @@ export const initializeQLProperties = (coordinate: string): object | null => {
 
   return {
     bimbaCoordinate: parsed.fullCoordinate,
-    qlPosition: parsed.qlPosition,
-    name: `Node ${parsed.fullCoordinate}`, // Default name
-    title: `QL Position ${parsed.qlPosition} Node`, // Default title
-    // description is intentionally left out from the original plan as BimbaNodeSchema requires it
-    // and it should likely be user-defined or more intelligently generated.
-    // The schema also doesn't list 'title' as a property, but it's in the plan.
-    // For now, adhering to the provided plan's function signature.
-    // Consider aligning with BimbaNodeSchema more closely in a future step if needed.
-    description: `Quaternal Logic position ${parsed.qlPosition} node at ${parsed.fullCoordinate}`, // Added a more descriptive default
+    qlPosition: parsed.qlPosition, // This is the final number in the coordinate
+    qlVariant: '4/6', // Default to 4/6 for all nodes
+    name: `Node ${parsed.fullCoordinate}`, // Keep for now but will be primary identifier
+    description: `Quaternal Logic position ${parsed.qlPosition} node at ${parsed.fullCoordinate}`,
+
+    // Default relational properties - empty strings that can be populated by analysis pipeline or manual editing
+    qlOperators: '',
+    epistemicEssence: '',
+    archetypalAnchors: '',
+    semanticFramework: '',
+
     createdAt: now,
     updatedAt: now,
-    // Other properties from BimbaNodeSchema like qlCategory, parentCoordinate, etc.,
-    // would need to be set based on further logic or user input.
+    // Remove redundant 'title' property - 'name' should be sufficient
   };
 };

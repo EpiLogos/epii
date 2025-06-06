@@ -1,4 +1,5 @@
 import bpMCPService from '../services/bpMCPService.mjs'; // Corrected: Import default export
+import { generateNodeCreationQuery } from '../schemas/bimba.schema.mjs';
 
 // Cypher query to fetch foundational nodes and their relationships
 const getGraphQuery = (depth = 1) => `
@@ -137,13 +138,22 @@ export const handleCreateNode = async (req, res) => {
     return res.status(400).json({ message: 'Suggested relation type is required when parentCoordinate is provided' });
   }
 
-  // Simplified approach: Create node first, then handle relationship separately
-  // ALWAYS add VectorNode label for vector indexing compatibility
-  const creationQuery = `
-    CREATE (newNode:VectorNode $nodeProperties)
-    RETURN newNode
-  `;
-  const queryParams = { nodeProperties };
+  // Use the schema helper to create node with default properties
+  // Extract labels from nodeProperties if they exist
+  let labels = 'VectorNode'; // Only VectorNode label for embeddings
+
+  // If nodeProperties contains labels, add them (but always include VectorNode)
+  if (nodeProperties.labels && Array.isArray(nodeProperties.labels)) {
+    const additionalLabels = nodeProperties.labels.filter(label => label !== 'VectorNode');
+    if (additionalLabels.length > 0) {
+      labels = `VectorNode:${additionalLabels.join(':')}`;
+    }
+    // Remove labels from properties since they're handled as Neo4j labels
+    delete nodeProperties.labels;
+  }
+
+  // Generate query with default properties using schema helper
+  const { query: creationQuery, params: queryParams } = generateNodeCreationQuery(nodeProperties, labels);
 
   console.log('[handleCreateNode] Attempting to create node.');
   console.log('[handleCreateNode] Received nodeProperties:', JSON.stringify(nodeProperties, null, 2));

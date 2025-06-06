@@ -13,7 +13,7 @@ The BPMCP embodies the principle of **unified knowledge operations** - all data 
 
 ## **🎯 Comprehensive Tool Ecosystem**
 
-BPMCP provides **18+ specialized tools** organized into six operational categories, enabling sophisticated cross-database workflows and knowledge operations:
+BPMCP provides **28+ specialized tools** organized into seven operational categories, enabling sophisticated cross-database workflows and knowledge operations:
 
 ### **🔮 Bimba Tools (Neo4j Graph Operations)**
 Core knowledge graph operations for the foundational Bimba structure:
@@ -55,6 +55,64 @@ Vector-based operations for semantic context and similarity:
 - **Technology**: High-performance vector similarity with metadata filtering
 - **Features**: Threshold-based filtering, collection targeting, metadata inclusion
 - **Applications**: Context retrieval, semantic clustering, content discovery
+
+### **🧠 Graphiti Tools (Temporal Knowledge Graph Operations)**
+Dynamic memory operations with Bimba coordinate integration:
+
+#### **`addGraphitiEpisode`** - Episode Creation ⭐
+- **Purpose**: Add episodes to Graphiti's temporal knowledge graph with coordinate context
+- **Features**: Multi-format support (text, JSON, message), coordinate-aware grouping, QL variant integration
+- **Technology**: HTTP client integration with Graphiti MCP server
+- **Applications**: Dynamic memory creation, context-aware episode storage, temporal knowledge building
+
+#### **`searchGraphitiEntities`** - Entity Search
+- **Purpose**: Search for entity nodes with Bimba coordinate filtering
+- **Features**: Coordinate-based filtering, entity type targeting, relationship context
+- **Integration**: QL-aligned search with coordinate hierarchy awareness
+- **Applications**: Entity discovery, relationship mapping, coordinate-specific context retrieval
+
+#### **`searchGraphitiFacts`** - Relationship Search
+- **Purpose**: Search for facts (relationships) between entities with coordinate filtering
+- **Features**: Relationship discovery, temporal context, coordinate-aware filtering
+- **Technology**: Advanced fact retrieval with coordinate integration
+- **Applications**: Relationship analysis, temporal fact discovery, coordinate-based relationship mapping
+
+#### **`getGraphitiContext`** - Dynamic Context Retrieval ⭐
+- **Purpose**: Get comprehensive dynamic context for Bimba coordinates from Graphiti
+- **Features**: Multi-depth context retrieval, related coordinate discovery, entity/fact/episode aggregation
+- **Integration**: Coordinate hierarchy awareness, parent-child relationship mapping
+- **Applications**: Coordinate-centric memory retrieval, dynamic context building, cross-coordinate analysis
+
+#### **`getGraphitiEpisodes`** - Episode Retrieval
+- **Purpose**: Get recent episodes with coordinate filtering and temporal context
+- **Features**: Coordinate-based filtering, temporal ordering, group-based organization
+- **Technology**: Enhanced episode retrieval with coordinate awareness
+- **Applications**: Recent memory access, coordinate-specific episode history, temporal context building
+
+#### **`deleteGraphitiEpisode`** - Episode Management
+- **Purpose**: Delete episodes from Graphiti's temporal knowledge graph
+- **Features**: UUID-based deletion, safe removal with validation
+- **Applications**: Memory cleanup, episode lifecycle management
+
+#### **`deleteGraphitiEntityEdge`** - Relationship Management
+- **Purpose**: Delete entity relationships from the temporal graph
+- **Features**: UUID-based edge deletion, relationship cleanup
+- **Applications**: Relationship management, graph maintenance
+
+#### **`getGraphitiEntityEdge`** - Relationship Retrieval
+- **Purpose**: Get specific entity relationships by UUID
+- **Features**: Detailed relationship data, temporal context
+- **Applications**: Relationship analysis, edge inspection
+
+#### **`clearGraphitiGraph`** - Graph Management
+- **Purpose**: Clear all data from Graphiti's temporal knowledge graph
+- **Features**: Complete graph reset with confirmation requirements
+- **Applications**: Development reset, clean slate operations
+
+#### **`getGraphitiStatus`** - Server Status
+- **Purpose**: Check Graphiti MCP server status and Neo4j connection
+- **Features**: Health monitoring, connection validation
+- **Applications**: System monitoring, troubleshooting, integration validation
 
 ### **📄 Document Tools (MongoDB Operations)**
 Comprehensive document management and lifecycle operations:
@@ -344,10 +402,11 @@ for (const page of notionPages) {
 ## **🌟 Key Achievements**
 
 ### **✅ Universal Data Orchestration**
-- **Multi-Database Coordination**: Seamless operations across Neo4j, Qdrant, MongoDB, and Notion
-- **18+ Specialized Tools**: Comprehensive coverage of all knowledge operations
+- **Multi-Database Coordination**: Seamless operations across Neo4j, Qdrant, MongoDB, Notion, and Graphiti
+- **28+ Specialized Tools**: Comprehensive coverage of all knowledge operations including temporal memory
 - **Cross-System Workflows**: Complex operations spanning multiple data paradigms
 - **Unified Interface**: Consistent tool calling across all system components
+- **Temporal Memory Integration**: Dynamic knowledge graph operations with coordinate-aware context
 
 ### **✅ Advanced Knowledge Operations**
 - **Graph + Vector Fusion**: Combines structural and semantic search capabilities

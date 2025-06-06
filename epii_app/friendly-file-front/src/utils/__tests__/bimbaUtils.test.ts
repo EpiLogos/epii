@@ -35,7 +35,7 @@ describe('bimbaUtils', () => {
         qlPosition: 3,        // Derived from normalized
       });
     });
-    
+
     it('should handle single level coordinate', () => {
         expect(parseCoordinate("#1")).toEqual({
             fullCoordinate: "#1",
@@ -55,7 +55,7 @@ describe('bimbaUtils', () => {
     it('should return null for non-numeric parts', () => {
       expect(parseCoordinate("#1-a-3")).toBeNull();
     });
-    
+
     it('should return null for empty parts like #1--3', () => {
         expect(parseCoordinate("#1--3")).toBeNull();
     });
@@ -63,7 +63,7 @@ describe('bimbaUtils', () => {
     it('should return null for empty parts like #1-2-', () => {
         expect(parseCoordinate("#1-2-")).toBeNull();
     });
-    
+
     it('should return null for null input', () => {
         expect(parseCoordinate(null as any)).toBeNull();
     });
@@ -81,9 +81,9 @@ describe('bimbaUtils', () => {
     it('should infer parent for multi-level dotted coordinate, preserving dot', () => {
       expect(inferParentCoordinate("#1.2.3")).toBe("#1.2"); // Preserves original separator
     });
-    
+
     it('should infer parent for mixed separator coordinate like #1-2.3', () => {
-      expect(inferParentCoordinate("#1-2.3")).toBe("#1-2"); 
+      expect(inferParentCoordinate("#1-2.3")).toBe("#1-2");
     });
 
     it('should infer parent for mixed separator coordinate like #1.2-3', () => {
@@ -131,12 +131,14 @@ describe('bimbaUtils', () => {
       expect(props).toEqual(expect.objectContaining({ // Using objectContaining for robustness
         bimbaCoordinate: "#1-2-3",
         qlPosition: 3,
+        qlVariant: "2/3", // qlPosition 3 maps to "2/3"
         name: "Node #1-2-3",
-        title: "QL Position 3 Node",
         description: "Quaternal Logic position 3 node at #1-2-3",
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
       }));
+      // Ensure title is not included
+      expect(props).not.toHaveProperty('title');
     });
 
     it('should initialize properties for a valid dotted coordinate, preserving original', () => {
@@ -164,7 +166,7 @@ describe('bimbaUtils', () => {
         updatedAt: "2024-01-01T00:00:00.000Z",
       }));
     });
-    
+
     it('should initialize properties for a single level coordinate', () => {
       const props = initializeQLProperties("#5");
       expect(props).toEqual(expect.objectContaining({
