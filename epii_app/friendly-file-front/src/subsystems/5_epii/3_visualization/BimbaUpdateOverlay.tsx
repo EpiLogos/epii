@@ -934,90 +934,82 @@ Provide your response as a JSON object with the following structure:
 
       for (const rel of relationshipActions) {
         if (rel.action === 'create' && rel.targetCoordinate && rel.type) {
-          const createRelQuery = isSourceNonCoord ? `
-            MATCH (source), (target)
-            WHERE toString(id(source)) = $sourceNodeId
-            AND target.bimbaCoordinate = $targetCoordinate
-            CREATE (source)-[r:${rel.type}]->(target)
-            SET r += $relProperties
-            RETURN r
-          ` : `
-            MATCH (source), (target)
-            WHERE source.bimbaCoordinate = $sourceCoordinate
-            AND target.bimbaCoordinate = $targetCoordinate
-            CREATE (source)-[r:${rel.type}]->(target)
-            SET r += $relProperties
-            RETURN r
-          `;
-
-          const relParams = isSourceNonCoord ? {
-            sourceNodeId,
-            targetCoordinate: rel.targetCoordinate,
-            relProperties: rel.properties || {}
-          } : {
-            sourceCoordinate: selectedCoordinate,
-            targetCoordinate: rel.targetCoordinate,
-            relProperties: rel.properties || {}
-          };
-
+          // Use the new manageBimbaRelationships tool instead of raw Cypher
           const relResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              toolName: 'queryBimbaGraph',
+              toolName: 'manageBimbaRelationships',
               args: {
-                query: createRelQuery,
-                params: relParams
+                operation: 'create',
+                sourceCoordinate: isSourceNonCoord ? `node-${sourceNodeId}` : selectedCoordinate,
+                targetCoordinate: rel.targetCoordinate,
+                relationshipType: rel.type,
+                relationshipProperties: rel.properties || {}
               }
             })
           });
 
           if (!relResponse.ok) {
             console.warn(`Failed to create relationship: ${relResponse.statusText}`);
+          } else {
+            const result = await relResponse.json();
+            console.log('✅ Relationship created successfully:', result);
           }
         }
 
-        if (rel.action === 'delete' && rel.targetCoordinate && rel.type) {
-          const deleteRelQuery = isSourceNonCoord ? `
-            MATCH (source)-[r:${rel.type}]-(target)
-            WHERE toString(id(source)) = $sourceNodeId
-            AND target.bimbaCoordinate = $targetCoordinate
-            DELETE r
-            RETURN count(r) as deletedCount
-          ` : `
-            MATCH (source)-[r:${rel.type}]-(target)
-            WHERE source.bimbaCoordinate = $sourceCoordinate
-            AND target.bimbaCoordinate = $targetCoordinate
-            DELETE r
-            RETURN count(r) as deletedCount
-          `;
-
-          const relParams = isSourceNonCoord ? {
-            sourceNodeId,
-            targetCoordinate: rel.targetCoordinate
-          } : {
-            sourceCoordinate: selectedCoordinate,
-            targetCoordinate: rel.targetCoordinate
-          };
-
+        if (rel.action === 'update' && rel.targetCoordinate && rel.type) {
+          // Use the new manageBimbaRelationships tool for updates
           const relResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              toolName: 'queryBimbaGraph',
+              toolName: 'manageBimbaRelationships',
               args: {
-                query: deleteRelQuery,
-                params: relParams
+                operation: 'update',
+                sourceCoordinate: isSourceNonCoord ? `node-${sourceNodeId}` : selectedCoordinate,
+                targetCoordinate: rel.targetCoordinate,
+                relationshipType: rel.type,
+                relationshipProperties: rel.properties || {}
+              }
+            })
+          });
+
+          if (!relResponse.ok) {
+            console.warn(`Failed to update relationship: ${relResponse.statusText}`);
+          } else {
+            const result = await relResponse.json();
+            console.log('✅ Relationship updated successfully:', result);
+          }
+        }
+
+        if (rel.action === 'delete' && rel.targetCoordinate && rel.type) {
+          // Use the new manageBimbaRelationships tool instead of raw Cypher
+          const relResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              toolName: 'manageBimbaRelationships',
+              args: {
+                operation: 'delete',
+                sourceCoordinate: isSourceNonCoord ? `node-${sourceNodeId}` : selectedCoordinate,
+                targetCoordinate: rel.targetCoordinate,
+                relationshipType: rel.type
               }
             })
           });
 
           if (!relResponse.ok) {
             console.warn(`Failed to delete relationship: ${relResponse.statusText}`);
+          } else {
+            const result = await relResponse.json();
+            console.log('✅ Relationship deleted successfully:', result);
           }
         }
       }
@@ -1128,10 +1120,10 @@ Provide your response as a JSON object with the following structure:
             </div> {/* End of flex-grow wrapper */}
 
             {/* Button to open CreateNodeModal, pushed to the bottom */}
-            <div className="mt-auto pt-4"> 
-              <Button 
-                onClick={() => setShowCreateNodeModal(true)} 
-                variant="outline" 
+            <div className="mt-auto pt-4">
+              <Button
+                onClick={() => setShowCreateNodeModal(true)}
+                variant="outline"
                 className="w-full text-epii-neon border-epii-neon hover:bg-epii-neon/10 hover:text-epii-neon"
               >
                 <Plus size={16} className="mr-2" />
@@ -1298,25 +1290,48 @@ Provide your response as a JSON object with the following structure:
                                   <label className="text-xs font-medium text-gray-300 mb-1 block">
                                     Target Node {rel.action === 'create' ? '(Coordinate)' : ''}
                                   </label>
-                                  {rel.action === 'create' ? (
-                                    <Input
-                                      type="text"
-                                      value={rel.targetCoordinate || ''}
-                                      onChange={(e) => {
-                                        const updated = [...editedRelationships];
-                                        updated[index] = { 
-                                            ...updated[index], 
-                                            targetCoordinate: e.target.value,
-                                            relatedNode: { 
-                                                ...(updated[index].relatedNode || { title: '', labels: [] }), 
-                                                coordinate: e.target.value 
-                                            }
-                                        };
-                                        setEditedRelationships(updated);
-                                      }}
-                                      placeholder="Enter target coordinate (e.g., #X-Y-Z)"
-                                      className="w-full p-1 bg-epii-dark border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
-                                    />
+                                  {rel.action === 'create' || rel.isEditingTarget ? (
+                                    <div className="flex items-center gap-1">
+                                      <Input
+                                        type="text"
+                                        value={rel.targetCoordinate || ''}
+                                        onChange={(e) => {
+                                          const updated = [...editedRelationships];
+                                          updated[index] = {
+                                              ...updated[index],
+                                              targetCoordinate: e.target.value,
+                                              relatedNode: {
+                                                  ...(updated[index].relatedNode || { title: '', labels: [] }),
+                                                  coordinate: e.target.value
+                                              },
+                                              // Mark as modified if this is an existing relationship
+                                              ...(rel.action !== 'create' && { action: 'update' })
+                                          };
+                                          setEditedRelationships(updated);
+                                        }}
+                                        placeholder="Enter target coordinate (e.g., #X-Y-Z)"
+                                        className="w-full p-1 bg-epii-dark border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
+                                      />
+                                      {rel.action !== 'create' && (
+                                        <Button
+                                          onClick={() => {
+                                            const updated = [...editedRelationships];
+                                            updated[index] = {
+                                              ...updated[index],
+                                              isEditingTarget: false,
+                                              // Revert to original if cancelled
+                                              targetCoordinate: updated[index].originalTargetCoordinate || updated[index].targetCoordinate
+                                            };
+                                            setEditedRelationships(updated);
+                                          }}
+                                          variant="outline"
+                                          size="sm"
+                                          className="text-xs px-2"
+                                        >
+                                          ✓
+                                        </Button>
+                                      )}
+                                    </div>
                                   ) : (
                                     <div className="flex items-center gap-1">
                                       <span className="text-gray-400 text-xs">
@@ -1328,6 +1343,22 @@ Provide your response as a JSON object with the following structure:
                                       {rel.relatedNode.title && (
                                         <span className="text-gray-400 text-xs">({rel.relatedNode.title})</span>
                                       )}
+                                      <Button
+                                        onClick={() => {
+                                          const updated = [...editedRelationships];
+                                          updated[index] = {
+                                            ...updated[index],
+                                            isEditingTarget: true,
+                                            originalTargetCoordinate: updated[index].targetCoordinate || updated[index].relatedNode.coordinate
+                                          };
+                                          setEditedRelationships(updated);
+                                        }}
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs px-2"
+                                      >
+                                        ✏️
+                                      </Button>
                                     </div>
                                   )}
                                 </div>
@@ -1375,7 +1406,7 @@ Provide your response as a JSON object with the following structure:
                                           className="w-full p-1 bg-epii-darker border border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-epii-neon"
                                         >
                                           {/* Ensured default empty option */}
-                                          <option value="">Select QL Type</option> 
+                                          <option value="">Select QL Type</option>
                                           <option value="0_POTENTIAL_RELATION">0_POTENTIAL_RELATION</option>
                                           <option value="1_MATERIAL_RELATION">1_MATERIAL_RELATION</option>
                                           <option value="2_PROCESSUAL_RELATION">2_PROCESSUAL_RELATION</option>
@@ -1547,6 +1578,11 @@ Provide your response as a JSON object with the following structure:
                                       {rel.action.toUpperCase()}
                                     </span>
                                   )}
+                                  {rel.isEditingTarget && (
+                                    <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded ml-2">
+                                      EDITING TARGET
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="flex gap-1">
                                   {rel.action === 'create' ? (
@@ -1561,18 +1597,37 @@ Provide your response as a JSON object with the following structure:
                                       Remove
                                     </Button>
                                   ) : (
-                                    <Button
-                                      onClick={() => {
-                                        const updated = [...editedRelationships];
-                                        updated[index] = { ...updated[index], action: 'delete' };
-                                        setEditedRelationships(updated);
-                                      }}
-                                      variant="outline"
-                                      size="sm"
-                                      className="text-red-400 border-red-400 hover:bg-red-400/10"
-                                    >
-                                      Delete
-                                    </Button>
+                                    <>
+                                      {rel.action !== 'delete' && (
+                                        <Button
+                                          onClick={() => {
+                                            const updated = [...editedRelationships];
+                                            updated[index] = { ...updated[index], action: 'delete' };
+                                            setEditedRelationships(updated);
+                                          }}
+                                          variant="outline"
+                                          size="sm"
+                                          className="text-red-400 border-red-400 hover:bg-red-400/10"
+                                        >
+                                          Delete
+                                        </Button>
+                                      )}
+                                      {rel.action === 'delete' && (
+                                        <Button
+                                          onClick={() => {
+                                            const updated = [...editedRelationships];
+                                            // Remove the delete action to restore the relationship
+                                            delete updated[index].action;
+                                            setEditedRelationships(updated);
+                                          }}
+                                          variant="outline"
+                                          size="sm"
+                                          className="text-green-400 border-green-400 hover:bg-green-400/10"
+                                        >
+                                          Restore
+                                        </Button>
+                                      )}
+                                    </>
                                   )}
                                 </div>
                               </div>

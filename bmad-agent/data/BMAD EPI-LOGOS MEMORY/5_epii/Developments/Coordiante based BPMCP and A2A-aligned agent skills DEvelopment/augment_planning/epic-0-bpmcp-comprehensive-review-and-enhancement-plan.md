@@ -529,26 +529,63 @@ The Bimba-Pratibimba Memory MCP Server (BPMCP) serves as the **unified operation
 - [ ] Documentation updates
 - [ ] Prepare for Epic 1 implementation
 
-### 10.6 Success Criteria for Epic 0 Completion
+### 10.6 UPDATED IMMEDIATE PLANNING CONTEXT (January 2025)
 
-**Functional Requirements:**
-- [ ] Graphiti MCP server operational on port 8000
-- [ ] All Graphiti tools available in BPMCP
-- [ ] Episode creation and entity management working
-- [ ] Schema harmonization across all systems
-- [ ] bimbaKnowing tool optimized and cached
+**CRITICAL CLARIFICATIONS FROM CURRENT STATE ANALYSIS:**
 
-**Performance Requirements:**
-- [ ] Query response times < 2 seconds
-- [ ] Context window usage reduced by 50%
-- [ ] Cache hit rates > 80%
-- [ ] Error rates < 1%
+1. **Database Targeting Clarification:**
+   - ✅ BPMCP correctly uses default Neo4j database (this IS the Bimba map)
+   - ✅ Graphiti MCP server correctly targets 'pratibimba' database
+   - ❌ Previous concerns about database safety were misplaced - BPMCP should operate on main database
 
-**Integration Requirements:**
-- [ ] Document analysis pipeline using enhanced tools
-- [ ] Agent workflows with unified RAG
-- [ ] Cross-database synchronization accuracy
-- [ ] Coordinate-based data consistency
+2. **Current State Reality Check:**
+   - ✅ Graphiti MCP server EXISTS and is properly configured (port 8002, not 8000)
+   - ✅ Graphiti targets 'pratibimba' database correctly
+   - ❌ ZERO Graphiti tools exist in BPMCP (complete integration gap)
+   - ⚠️ Node creation relation logic has confirmed issues needing fixes
+
+3. **REVISED PRIORITY ORDER:**
+
+   **PHASE 1 (IMMEDIATE - FIRST TASK ONLY):**
+   - Fix Neo4j operations in BPMCP
+   - Fix updateBimbaGraph tool for proper node creation confirmation
+   - Fix relation updating/adding logic (HAS_INTERNAL_COMPONENT to parent nodes)
+   - Ensure relationship editing modes work for target nodes
+   - Complete node creation workflow reliability
+
+   **PHASE 2 (LATER - AFTER PHASE 1 COMPLETE):**
+   - Add Graphiti tools to BPMCP as HTTP client wrappers
+   - Test episode creation and entity management
+   - Schema harmonization between Bimba and Graphiti
+
+**IMMEDIATE ACTION ITEMS (PHASE 1 ONLY):**
+
+1. **Fix updateBimbaGraph Tool Result Processing:**
+   - Current issue: Tool doesn't return proper structured confirmation data
+   - Need: Atomic node and relationship creation confirmation
+   - Target: Reliable parent node detection and relation creation
+
+2. **Fix Node Creation Relation Logic:**
+   - Current issue: HAS_INTERNAL_COMPONENT relations sometimes fail to create
+   - Need: Automatic parent coordinate detection and relation creation
+   - Target: 100% reliable node creation with proper parent relationships
+
+3. **Enhance Relationship Editing Functionality:**
+   - Current issue: Relationship editing modes need target node editing capability
+   - Need: Assignable/editable target nodes in relationship editing
+   - Target: Full CRUD operations for node relationships
+
+**SUCCESS CRITERIA FOR PHASE 1 COMPLETION:**
+- [ ] updateBimbaGraph tool returns proper node creation confirmation
+- [ ] New nodes automatically create HAS_INTERNAL_COMPONENT relations to parent
+- [ ] Relationship editing allows target node assignment/editing
+- [ ] Node creation workflow has 100% reliability
+- [ ] All relation creation operations provide proper feedback
+
+**PHASE 2 DEFERRED UNTIL PHASE 1 COMPLETE:**
+- [ ] Graphiti tools integration (simple copy from Graphiti repo)
+- [ ] Episode creation and entity management
+- [ ] Cross-system schema harmonization
 
 ## 11. Conclusion
 

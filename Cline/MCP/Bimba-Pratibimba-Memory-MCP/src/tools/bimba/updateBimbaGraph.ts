@@ -43,9 +43,22 @@ export async function handleUpdateBimbaGraph(dependencies: ToolDependencies, arg
     });
 
     try {
+      // Debug logging for parameter issues
+      console.log(`${logPrefix} About to execute query with params:`, JSON.stringify(validatedArgs.params, null, 2));
+      console.log(`${logPrefix} Query:`, validatedArgs.query);
+
       // Execute write query
       const result = await session.run(validatedArgs.query, validatedArgs.params || {});
       console.log(`${logPrefix} Write query returned ${result.records.length} records`);
+
+      // Debug the actual Neo4j result
+      console.log(`${logPrefix} Raw Neo4j result:`, JSON.stringify(result.records.map(r => {
+        const obj: any = {};
+        for (const key of r.keys) {
+          obj[key] = r.get(key);
+        }
+        return obj;
+      }), null, 2));
 
       // Process results (same as queryBimbaGraph)
       const records = result.records.map(record => {
@@ -94,21 +107,15 @@ export async function handleUpdateBimbaGraph(dependencies: ToolDependencies, arg
         return recordObj;
       });
 
-      // Extract the graph data from the records
-      let graphData = null;
-      if (records.length > 0 && records[0].graphData) {
-        graphData = records[0].graphData;
-      }
-
-      // Return results (same format as queryBimbaGraph)
+      // Return the actual processed records for node creation confirmation
+      // This allows the caller to access newNode, parent, relationships, etc.
+      // Return direct format for better integration with backend controller
       return {
-        content: [{
-          type: "text",
-          text: JSON.stringify(graphData || {
-            nodes: [],
-            links: []
-          }, null, 2)
-        }]
+        success: true,
+        recordCount: records.length,
+        records: records,
+        // For backward compatibility, include empty graph structure if no records
+        graphData: records.length > 0 ? null : { nodes: [], links: [] }
       };
     } catch (queryError: any) {
       console.error(`${logPrefix} Error executing write query:`, queryError);

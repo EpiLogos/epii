@@ -56,6 +56,14 @@ export const UpdateBimbaGraphSchema = z.object({
 // Removed the .refine call that was causing the error, as 'specificCoordinate'
 // is not a field of UpdateBimbaGraphSchema. The 'query' field is already mandatory.
 
+export const ManageBimbaRelationshipsSchema = z.object({
+  operation: z.enum(['create', 'update', 'delete']).describe("Operation to perform on the relationship."),
+  sourceCoordinate: z.string().describe("Bimba coordinate of the source node (e.g., '#5-2')."),
+  targetCoordinate: z.string().describe("Bimba coordinate of the target node (e.g., '#5-2-1')."),
+  relationshipType: z.string().describe("Type of relationship (e.g., 'HAS_INTERNAL_COMPONENT', 'RELATES_TO')."),
+  relationshipProperties: z.record(z.any()).optional().describe("Optional properties to set on the relationship."),
+});
+
 export const ResolveBimbaCoordinateSchema = z.object({
   targetCoordinate: z.string().describe("The Bimba coordinate to resolve to a Notion page URL (e.g., '#5-2-1')."),
 });
