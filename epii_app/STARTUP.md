@@ -55,6 +55,29 @@ cd /Users/admin/Documents/Cline/MCP/lightrag-mcp-server/ && /Users/admin/Documen
 
 This launches the FastAPI server on port 8001 using the paid Gemini model, with verbose logging and UUID fix active.
 
+## Graphiti MCP Server
+
+To start the Graphiti MCP server for temporal knowledge graph functionality:
+
+**Prerequisites:**
+- Ensure you have configured the `.env` file in the Graphiti MCP server directory
+- Neo4j database should be running with the "pratibimba" database created
+- Google Gemini API key should be set in the environment
+
+**Setup (First Time Only):**
+```bash
+cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/graphiti-mcp-server
+cp .env.example .env
+# Edit .env file with your actual Neo4j credentials and OpenAI API key
+```
+
+**Start Command:**
+```bash
+cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/graphiti-mcp-server && python3 start_server.py
+```
+
+This launches the Graphiti MCP server on port 8002 using the "pratibimba" Neo4j database for temporal knowledge graph storage.
+
 # Epi-Logos Startup Procedure
 
 This document outlines the steps to start all necessary services for the Epi-Logos application development environment on macOS.
@@ -71,8 +94,9 @@ Open separate terminal windows/tabs for each command. Execute them from the root
 
 1. Start the External Bimba-Pratibimba MCP Server first (required for backend connectivity)
 2. Start the LightRAG MCP Server (required for vector search and embeddings)
-3. Start the Backend Server
-4. Start the Frontend Server
+3. Start the Graphiti MCP Server (required for temporal knowledge graph)
+4. Start the Backend Server
+5. Start the Frontend Server
 
 # A2A Service at - cd "/Users/admin/Documents/Epi-Logos_Seed_Files/epii_app/friendly-file-back2front" && npm start
 # A2A epii agent example test - cd "/Users/admin/Documents/Epi-Logos_Seed_Files/epii_app/friendly-file-back2front" && npm run test:client
@@ -89,7 +113,7 @@ A.  **Bimba-Pratibimba MCP Server (Node.js - Port 3030):**
     # Navigate to the INTERNAL MCP server directory
     cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/Bimba-Pratibimba-Memory-MCP && node build/index.js
     # Start the server using its build file
-    
+
     ```
 
 B.  **LightRAG MCP Server (Python/FastAPI/Uvicorn):**
@@ -99,14 +123,21 @@ B.  **LightRAG MCP Server (Python/FastAPI/Uvicorn):**
     cd /Users/admin/Documents/Cline/MCP/lightrag-mcp-server/ && /Users/admin/Documents/Cline/MCP/lightrag-mcp-server/venv_312/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8001
     ```
 
-C.  **Backend (Node.js Server - Port 3001):**
-    *Note: Start this server AFTER both MCP servers are running.*
+C.  **Graphiti MCP Server (Python/FastMCP - Port 8000):**
+    *Note: Start this server THIRD before the backend.*
+    ```bash
+    # Navigate to Graphiti MCP server directory and start the server
+    cd /Users/admin/Documents/Epi-Logos_Seed_Files/Cline/MCP/graphiti-mcp-server && python3 -m mcp_server.graphiti_mcp_server --group-id default --transport sse
+    ```
+
+D.  **Backend (Node.js Server - Port 3001):**
+    *Note: Start this server AFTER all three MCP servers are running.*
     ```bash
     # Kills any process using port 3001, changes to backend dir, starts server
     kill -9 $(lsof -ti:3001) || true && cd epii_app/friendly-file-backend && npm run dev
     ```
 
-D.  **Frontend (Vite Dev Server - Port 3000):**
+E.  **Frontend (Vite Dev Server - Port 3000):**
     *Note: Start this server LAST after the backend is running.*
     ```bash
     # Kills any process using port 3000, changes to frontend dir, starts dev server
@@ -141,12 +172,17 @@ D.  **Frontend (Vite Dev Server - Port 3000):**
    * Terminal should show: "INFO: Application startup complete."
    * Server should be accessible at http://localhost:8001/docs
 
-3. **Backend Server:**
+3. **Graphiti MCP Server:**
+   * Terminal should show: "Starting Graphiti MCP server..." and "Server will be available at: http://localhost:8002"
+   * Server should be accessible at http://localhost:8002
+   * Check that it's using the "pratibimba" database (should see "Using Neo4j database: pratibimba" in logs)
+
+4. **Backend Server:**
    * Terminal should show: "Server running on port 3001"
    * No WebSocket connection errors (ECONNREFUSED)
    * Successful initialization messages for Neo4jGraph, QdrantClient, etc.
 
-4. **Frontend Server:**
+5. **Frontend Server:**
    * Terminal should show: "Local: http://localhost:3000/"
    * Frontend should be accessible at http://localhost:3000
    * No console errors in browser developer tools
