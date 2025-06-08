@@ -400,6 +400,38 @@ export const documentCacheService = {
   },
 
   /**
+   * Get all coordinates that have cached documents
+   * @param collection Optional collection name to filter by
+   * @returns Array of coordinates
+   */
+  getAllCoordinates: (collection?: string): string[] => {
+    const coordinates: string[] = [];
+
+    for (const key of cache.byCoordinate.keys()) {
+      if (key.startsWith('coord:') && !key.includes(':all:')) {
+        if (collection) {
+          // Filter by collection
+          if (key.endsWith(`:${collection}`)) {
+            const coord = key.replace('coord:', '').replace(`:${collection}`, '');
+            coordinates.push(coord);
+          }
+        } else {
+          // Get all coordinates regardless of collection
+          const parts = key.split(':');
+          if (parts.length >= 2) {
+            const coord = parts[1];
+            if (!coordinates.includes(coord)) {
+              coordinates.push(coord);
+            }
+          }
+        }
+      }
+    }
+
+    return coordinates;
+  },
+
+  /**
    * Cache all documents from both collections at once
    * @param bimbaDocuments All documents from the 'Documents' collection
    * @param pratibimbaDocuments All documents from the 'pratibimbaDocuments' collection

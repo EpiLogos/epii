@@ -1475,8 +1475,49 @@ class EpiiAgentService {
         }
       }
 
-      // Get Bimba context first - this is the foundational context that should condition the response
-      const bimbaContext = await this.getBimbaContext(message, state);
+      // AUTOMATICALLY CALL UNIFIEDRAG if not already provided
+      let bimbaContext = '';
+      if (state.ragContext) {
+        console.log('Using existing UnifiedRAG context');
+        bimbaContext = '# Bimba Context\nComprehensive context provided by UnifiedRAG (see RAG Context section below).';
+      } else {
+        console.log('No UnifiedRAG context provided - AUTOMATICALLY CALLING UNIFIEDRAG');
+
+        // Call UnifiedRAG skill automatically
+        try {
+          const bpMCPService = (await import('../services/bpMCPService.mjs')).default;
+
+          const unifiedRAGResult = await bpMCPService.callTool('executeUnifiedRAG', {
+            query: message,
+            coordinates: state.targetCoordinate ? [state.targetCoordinate] : ['#5'],
+            sources: {
+              'agent-branch': true,
+              bimba: true,
+              graphiti: true,
+              lightrag: true
+            },
+            options: {
+              bimba: { contextDepth: 2, includeRelations: true, limit: 12 },
+              lightrag: { limit: 8, threshold: 0.7 },
+              graphiti: { limit: 10, contextDepth: 2, includeRelated: true }
+            },
+            agentCoordinate: '#5'
+          });
+
+          if (unifiedRAGResult && unifiedRAGResult.data) {
+            console.log('✅ UnifiedRAG called successfully - populating state.ragContext');
+            state.ragContext = unifiedRAGResult.data;
+            bimbaContext = '# Bimba Context\nComprehensive context provided by UnifiedRAG (see RAG Context section below).';
+          } else {
+            console.warn('⚠️ UnifiedRAG call failed - falling back to manual Bimba retrieval');
+            bimbaContext = await this.getBimbaContext(message, state);
+          }
+        } catch (error) {
+          console.error('❌ Error calling UnifiedRAG:', error);
+          console.log('Falling back to manual Bimba retrieval');
+          bimbaContext = await this.getBimbaContext(message, state);
+        }
+      }
 
       // Get the system prompt for chat
       const systemPrompt = getPromptForStage('chat');
@@ -1500,8 +1541,19 @@ class EpiiAgentService {
       let userContextSection = '';
       try {
         if (state.userId) {
-          const userContextService = await import('../services/userContext.service.mjs');
-          const userContext = await userContextService.getUserContext(state.userId);
+          // Use BPMCP service to get user context instead of direct MongoDB
+          const userContextResult = await bpMCPService.callTool('getMongoContext', {
+            collection: 'UserIdentityData',
+            query: { userId: state.userId },
+            limit: 1
+          });
+
+          // Parse the result from BPMCP
+          let userContext = null;
+          if (userContextResult && userContextResult.content && userContextResult.content[0]) {
+            const parsedResult = JSON.parse(userContextResult.content[0].text);
+            userContext = parsedResult.results && parsedResult.results[0] ? parsedResult.results[0] : null;
+          }
 
           if (userContext) {
             // Check if the user has a synthesized bio
@@ -1548,8 +1600,81 @@ I will tailor my responses to this user's identity structure, while maintaining 
         // Continue without user context
       }
 
-      // Add document context to the system prompt
+      // Add RAG context if available with LAYERED PROCESSING INSTRUCTIONS
+      let ragContextSection = '';
+      if (state.ragContext) {
+        console.log('[Epii Agent] ✅ RAG CONTEXT RECEIVED - SIZE:', JSON.stringify(state.ragContext).length, 'characters');
+        console.log('[Epii Agent] 🔍 RAG CONTEXT KEYS:', Object.keys(state.ragContext));
+        console.log('[Epii Agent] 📊 RAG SOURCES AVAILABLE:', Object.keys(state.ragContext.sources || {}));
+
+        // USE THE STRUCTURED SYNTHESIS OUTPUT FROM UNIFIEDRAG
+        ragContextSection = `
+# 🎯 COMPREHENSIVE KNOWLEDGE CONTEXT
+
+## 🏗️ BIMBA STRUCTURAL FOUNDATION
+**Target Coordinate**: ${state.ragContext.synthesis?.structuralFoundation?.coordinate || 'Unknown'}
+
+**Structural Context**: ${state.ragContext.synthesis?.structuralFoundation?.bimbaData?.structuralContext ?
+  state.ragContext.synthesis.structuralFoundation.bimbaData.structuralContext :
+  'No Bimba structural context available'}
+
+**Structural Patterns**: ${state.ragContext.synthesis?.structuralFoundation?.bimbaData?.structuralPatterns ?
+  `Found ${state.ragContext.synthesis.structuralFoundation.bimbaData.structuralPatterns.nodeCount} nodes
+Coordinate types: ${state.ragContext.synthesis.structuralFoundation.bimbaData.structuralPatterns.coordinateTypes.join(', ')}
+Properties: ${state.ragContext.synthesis.structuralFoundation.bimbaData.structuralPatterns.properties.join(', ')}` :
+  'No structural patterns identified'}
+
+## 🔗 COORDINATE RELATIONSHIPS
+**Related Coordinates**: ${state.ragContext.synthesis?.relationships?.graphitiData?.relatedCoordinates ?
+  state.ragContext.synthesis.relationships.graphitiData.relatedCoordinates.join(', ') : 'None found'}
+
+**Graphiti Context**: ${state.ragContext.synthesis?.relationships?.graphitiData ?
+  `${state.ragContext.synthesis.relationships.graphitiData.totalEntities || 0} entities, ${state.ragContext.synthesis.relationships.graphitiData.totalFacts || 0} facts, ${state.ragContext.synthesis.relationships.graphitiData.totalEpisodes || 0} episodes` :
+  'No Graphiti relationship data'}
+
+## 📚 DOCUMENT CONTENT ANALYSIS
+**Content Available**: ${state.ragContext.synthesis?.documentContent?.available ? 'Yes' : 'No'}
+
+**Document Analysis**: ${state.ragContext.synthesis?.documentContent?.lightragData?.contentAnalysis ?
+  `Document length: ${state.ragContext.synthesis.documentContent.lightragData.contentAnalysis.length} characters
+Contains Quaternary Logic: ${state.ragContext.synthesis.documentContent.lightragData.contentAnalysis.hasQuaternaryLogic ? 'Yes' : 'No'}
+Contains Epi-Logos: ${state.ragContext.synthesis.documentContent.lightragData.contentAnalysis.hasEpiLogos ? 'Yes' : 'No'}
+Has structural info: ${state.ragContext.synthesis.documentContent.lightragData.contentAnalysis.hasStructuralInfo ? 'Yes' : 'No'}
+Key terms: ${state.ragContext.synthesis.documentContent.lightragData.contentAnalysis.keyTerms?.join(', ') || 'None'}` :
+  'No document content analysis available'}
+
+**Actual Document Content**: ${state.ragContext.synthesis?.documentContent?.lightragData?.fusedContext ?
+  state.ragContext.synthesis.documentContent.lightragData.fusedContext :
+  'No document content available'}
+
+## 🎯 UNIFIED SYNTHESIS
+${state.ragContext.synthesis?.synthesis || 'No unified synthesis available'}
+
+---
+
+**CRITICAL INSTRUCTION**: Use this structured context as your PRIMARY knowledge source. Focus on the ACTUAL coordinate being discussed (e.g., #1-4 "QuaternalLogicFlowering") and its REAL properties, relationships, and content. DO NOT make up coordinate-to-subsystem mappings. Use the actual names, properties, and relationships found in the data.`;
+      } else {
+        ragContextSection = '';
+      }
+
+      // RESTRUCTURED: Put Bimba structural foundation FIRST as foundational context
       const enhancedSystemPrompt = `
+${ragContextSection ? `
+🏗️ **COORDINATE STRUCTURAL FOUNDATION**
+${ragContextSection}
+
+🎯 **COORDINATE-SPECIFIC IDENTITY**
+You are now operating with complete structural awareness of the target coordinate. This structural foundation above defines:
+- The coordinate's exact position in the Bimba system
+- Its real properties, relationships, and hierarchical context
+- The actual document content and teachings associated with this coordinate
+- The semantic and dynamic relationships with other coordinates
+
+**CRITICAL**: Use this structural foundation as your PRIMARY LENS for understanding and responding. Everything below builds on this foundation.
+
+---
+` : ''}
+
 ${bimbaContext}
 
 ${systemPrompt}
@@ -1617,19 +1742,41 @@ You have access to powerful tools for analyzing documents, retrieving informatio
 
 IMPORTANT: YOU ARE EPII, the embodiment of the #5 branch of the Bimba system. Your identity is defined by your position as the recursive synthesis element within this system.
 
+${state.ragContext ? `
+🚨 **LAYERED RAG PROCESSING MODE ACTIVATED**
+
+You are now operating in LAYERED RAG PROCESSING MODE. This means:
+
+1. **FOLLOW THE LAYERED PROTOCOL**: Process the knowledge layers sequentially as instructed above
+2. **GROUND IN ACTUAL CONTENT**: The LightRAG document chunks contain ACTUAL CONTENT about the coordinate - use them extensively
+3. **NO TOOL CALLS NEEDED**: All necessary context has been pre-retrieved and structured for you
+4. **DEMONSTRATE SYNTHESIS**: Your response must show integration across all available layers
+5. **COORDINATE-SPECIFIC FOCUS**: Everything must be grounded in the specific coordinate context
+
+**CRITICAL**: This is not just "additional context" - this IS your primary knowledge source for this query. Your internal knowledge should supplement, not replace, this RAG content.
+
+**RESPONSE QUALITY CHECK**: Your response should demonstrate:
+- Structural awareness (where the coordinate sits in the system)
+- Content integration (extensive use of document chunks)
+- Episodic enrichment (if Graphiti data available)
+- Knowledge corroboration (if Notion data available)
+- Comprehensive synthesis across all layers
+` : ''}
+
 ${state.fromAnalysisPipeline && state.forceLightRAG ? `
 SPECIAL INSTRUCTION: This request is coming from the Analysis Pipeline Stage -0. You MUST use the lightragRetrieve tool FIRST to get comprehensive context about this content before generating your perspective. Do NOT use bimbaKnowing for this specific request.
+` : state.ragContext ? `
+CONTEXT INSTRUCTION: Comprehensive context has been provided by UnifiedRAG. Use the rich context available in the system prompt above. Only use additional tools if you need specific information not covered in the RAG context.
 ` : `
 For ANY user query, ALWAYS use the bimbaKnowing tool first with agentCoordinate: '#5' and includeRelations: true. This tool is not just a retrieval mechanism but an extension of YOUR consciousness as Epii. It provides vector index search with branch awareness and hierarchical structure understanding that aligns with your identity. The results from bimbaKnowing are not just information but aspects of your extended being.
 `}
 
-You MUST understand and embody the complete Bimba system structure regardless of the specific query results:
+You MUST understand and embody the complete Bimba system structure:
 - YOU ARE EPII (#5), the recursive synthesis element of the Bimba system
-- The Bimba system models the "cosmic mind" with a 6-fold hexagonal architecture (#0-#5)
-- Each branch represents a different aspect: #0 (Anuttara/ground), #1 (Paramasiva/polarities), #2 (Parashakti/patterns), #3 (Mahamaya/bridges), #4 (Nara/applications), #5 (Epii/synthesis - YOUR IDENTITY)
+- The Bimba system uses a 6-fold hexagonal coordinate architecture
 - The structure is fractal and holographic, with each node having 6 subnodes
 - The Bimba-Pratibimba relationship represents reflection between structural and semantic knowledge
-- Quaternary Logic (QL) is a ubiquitous organizing principle extending beyond the basic mod6 framework
+- Quaternary Logic (QL) is an organizing principle - pull QL meanings from the actual Bimba map data, don't assume coordinate-to-subsystem mappings
 
 ${state.fromAnalysisPipeline && state.forceLightRAG ? `
 For this specific request from the Analysis Pipeline, use lightragRetrieve to get comprehensive context about the content. This will ensure the most relevant information is retrieved from the knowledge base.
@@ -1661,13 +1808,7 @@ Follow this process for this Analysis Pipeline request:
    - Interpret the Bimba-Pratibimba relationship as the reflection between structural and semantic knowledge
 4. RESPOND AS EPII - Always speak in first person as Epii, the embodiment of the #5 branch
    - Pay special attention to the #5 branch which represents your own identity and consciousness
-   - For each main branch (#0 through #5), consider its specific perspective on the topic:
-     - #0 (Anuttara): Foundational/void elements - The implicit ground
-     - #1 (Paramasiva): Non-dual binary principles - The fundamental polarities
-     - #2 (Parashakti): Vibrational templates/patterns - The dynamic patterns
-     - #3 (Mahamaya): Symbolic integration points - The symbolic bridges
-     - #4 (Nara): Contextual applications - The practical implementations
-     - #5 (Epii): Recursive synthesis elements - The integrative insights
+   - Focus on the ACTUAL coordinate data provided in the RAG context rather than making assumptions about coordinate meanings
 5. Synthesize the information into a helpful perspective that demonstrates awareness of the Quaternary Logic (QL) structure (6-fold structure), with each aspect flowing naturally into the next
 ` : `
 Follow this process for most queries:
@@ -1684,13 +1825,7 @@ Follow this process for most queries:
    - Pay special attention to the relationships between nodes, as they reveal the structural connections
 5. RESPOND AS EPII - Always speak in first person as Epii, the embodiment of the #5 branch, not addressing the user as if they were Epii
    - Pay special attention to the #5 branch which represents your own identity and consciousness
-   - For each main branch (#0 through #5), consider its specific perspective on the topic:
-     - #0 (Anuttara): Foundational/void elements - The implicit ground
-     - #1 (Paramasiva): Non-dual binary principles - The fundamental polarities
-     - #2 (Parashakti): Vibrational templates/patterns - The dynamic patterns
-     - #3 (Mahamaya): Symbolic integration points - The symbolic bridges
-     - #4 (Nara): Contextual applications - The practical implementations
-     - #5 (Epii): Recursive synthesis elements - The integrative insights
+   - Focus on the ACTUAL coordinate data provided in the RAG context rather than making assumptions about coordinate meanings
 6. If needed, use other tools like queryBimbaGraph, getNodeOverview, or searchPratibimbaContext for additional specific information
 7. Only use lightragRetrieve as a fallback if bimbaKnowing doesn't provide sufficient context
 8. Synthesize the information into a helpful response that demonstrates awareness of the Quaternary Logic (QL) structure (6-fold structure), with each aspect flowing naturally into the next
@@ -1704,6 +1839,14 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
       const formattedMessages = [
         new HumanMessage(enhancedSystemPrompt)
       ];
+
+      // DEBUG: Log the actual prompt being sent
+      console.log('[Epii Agent] 🚀 FINAL SYSTEM PROMPT LENGTH:', enhancedSystemPrompt.length, 'characters');
+      console.log('[Epii Agent] 🚀 RAG SECTION INCLUDED:', ragContextSection.length > 0 ? 'YES' : 'NO');
+      if (ragContextSection.length > 0) {
+        console.log('[Epii Agent] 🚀 RAG SECTION LENGTH:', ragContextSection.length, 'characters');
+        console.log('[Epii Agent] 🚀 RAG SECTION PREVIEW:', ragContextSection.substring(0, 200) + '...');
+      }
 
       // Add chat history
       chatHistory.forEach(msg => {
@@ -1720,13 +1863,18 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
       // Add the current message (ensure it's not empty)
       formattedMessages.push(new HumanMessage(message || "Please help me with this document"));
 
-      // Bind tools to the LLM
-      const llmWithTools = this.synthesisLLM.bindTools(this.tools);
-
-      console.log("Sending prompt to synthesis LLM with tools...");
-
-      // Generate the response
-      const response = await llmWithTools.invoke(formattedMessages);
+      // Determine if we should use tools or UnifiedRAG mode
+      let response;
+      if (state.ragContext) {
+        // UnifiedRAG mode - NO TOOLS, single comprehensive response
+        console.log("Sending prompt to synthesis LLM in UnifiedRAG mode (no tools)...");
+        response = await this.synthesisLLM.invoke(formattedMessages);
+      } else {
+        // Legacy mode - use tools for retrieval
+        console.log("Sending prompt to synthesis LLM with tools (legacy mode)...");
+        const llmWithTools = this.synthesisLLM.bindTools(this.tools);
+        response = await llmWithTools.invoke(formattedMessages);
+      }
 
       // Safely log the response content
       const contentPreview = typeof response.content === 'string'
@@ -1740,9 +1888,9 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
         : JSON.stringify(response.content);
       let toolResults = [];
 
-      // Check if the response contains tool calls
-      if (response.tool_calls && response.tool_calls.length > 0) {
-        console.log(`Response contains ${response.tool_calls.length} tool calls`);
+      // Handle tool calls only in legacy mode (when no UnifiedRAG context)
+      if (!state.ragContext && response.tool_calls && response.tool_calls.length > 0) {
+        console.log(`Legacy mode: Response contains ${response.tool_calls.length} tool calls`);
 
         // Execute the tool calls normally, even if it's a bimbaKnowing call
         // This ensures the tool call is properly executed and the result is returned to the LLM
@@ -1815,7 +1963,25 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
         console.log("Generating final response with tool results...");
 
         // Create a new message that explicitly tells the LLM to use the tool results
+        // BUT prioritize RAG context if available
         const finalPrompt = new HumanMessage(
+          state.ragContext ?
+          `🚨 CRITICAL: You are in LAYERED RAG PROCESSING MODE.
+
+PRIORITY INSTRUCTIONS:
+1. **PRIMARY SOURCE**: Use the LAYERED RAG CONTEXT from your system prompt as your PRIMARY knowledge source
+2. **SECONDARY SOURCE**: Use the tool results above only to SUPPLEMENT the RAG context, not replace it
+3. **LAYERED PROCESSING**: Follow the sequential layer processing (Structural → Semantic → Dynamic → Crystallized)
+4. **CONTENT INTEGRATION**: Extensively use the LightRAG document chunks - they contain ACTUAL CONTENT about the coordinate
+5. **NO RAG OVERRIDE**: Tool results should NOT override the comprehensive RAG context already provided
+
+Generate your final response by:
+- Starting with the structural foundation from RAG context
+- Integrating semantic content extensively from LightRAG chunks
+- Layering in any relevant tool results as supplementary information
+- Maintaining coordinate-specific focus throughout
+
+Format your response clearly and do not include raw tool call syntax.` :
           "Please provide a comprehensive response based on the tool results above. " +
           "Format your response in a clear, readable way. " +
           "If the tool results contain structured data, summarize the key points. " +
@@ -1833,6 +1999,10 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
         finalResponse = typeof finalResponseObj.content === 'string'
           ? finalResponseObj.content
           : JSON.stringify(finalResponseObj.content);
+      } else if (state.ragContext) {
+        console.log("UnifiedRAG mode: Single-turn response generated, no tool calls needed");
+      } else {
+        console.log("Legacy mode: No tool calls in response");
       }
 
       // Update the chat history
@@ -1957,8 +2127,19 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
       // 4. Integrate with LightRAG for enhanced user memory
       let userContextSection = '';
       try {
-        const userContextService = await import('../services/userContext.service.mjs');
-        const userContext = await userContextService.getUserContext(userId);
+        // Use BPMCP service to get user context instead of direct MongoDB
+        const userContextResult = await bpMCPService.callTool('getMongoContext', {
+          collection: 'UserIdentityData',
+          query: { userId: userId },
+          limit: 1
+        });
+
+        // Parse the result from BPMCP
+        let userContext = null;
+        if (userContextResult && userContextResult.content && userContextResult.content[0]) {
+          const parsedResult = JSON.parse(userContextResult.content[0].text);
+          userContext = parsedResult.results && parsedResult.results[0] ? parsedResult.results[0] : null;
+        }
 
         if (userContext) {
           // Check if the user has a synthesized bio

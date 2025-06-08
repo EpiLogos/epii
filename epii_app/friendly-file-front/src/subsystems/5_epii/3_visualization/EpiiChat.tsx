@@ -219,17 +219,97 @@ const EpiiChat: React.FC<EpiiChatProps> = ({ userId }) => {
         enhancedMessage = `${message}\n\n[SELECTIONS CONTEXT]\n${selectionsInfo}`;
       }
 
-      const response = await fetch(`${backendUrl}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          mode: 'epii',
-          message: enhancedMessage,
-          ...contentToSend
-        }),
+      // Call the A2A service instead of the old backend
+      const a2aUrl = 'http://localhost:3033'; // A2A service URL
+
+      // Create WebSocket connection to A2A service for chat
+      const ws = new WebSocket(a2aUrl);
+
+      const response = await new Promise((resolve, reject) => {
+        let responseData = null;
+
+        ws.onopen = () => {
+          // Register as client
+          ws.send(JSON.stringify({
+            type: 'registration',
+            agentId: 'epii-chat-client',
+            agentName: 'Epii Chat Client'
+          }));
+        };
+
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+
+          if (message.type === 'registration_confirmation') {
+            // Send chat request to Epii agent
+            ws.send(JSON.stringify({
+              jsonrpc: "2.0",
+              id: Date.now().toString(),
+              method: "executeSkill",
+              params: {
+                skillId: "epii-chat",
+                parameters: {
+                  message: enhancedMessage,
+                  history: [], // TODO: Add chat history
+                  targetCoordinate: contentToSend.bimbaCoordinate || bimbaCoordinate,
+                  documentId: contentToSend.documentId,
+                  // Don't send full document content - let UnifiedRAG fetch it if needed
+                  // documentContent: contentToSend.documentContent
+                },
+                context: {
+                  agentId: "epii-chat-client",
+                  userId: userId
+                }
+              }
+            }));
+          } else if (message.jsonrpc === "2.0" && (message.result || message.error)) {
+            responseData = message;
+            ws.close();
+
+            if (message.result && message.result.success) {
+              // Handle nested data structure - check multiple possible paths
+              let responseMessage = null;
+
+              // Try different possible paths for the message
+              if (message.result.data?.message) {
+                responseMessage = message.result.data.message;
+              } else if (message.result.data?.data?.message) {
+                responseMessage = message.result.data.data.message;
+              } else if (message.result.data?.result?.data?.message) {
+                responseMessage = message.result.data.result.data.message;
+              } else {
+                responseMessage = "Response received but message format not recognized";
+              }
+
+              console.log('A2A Response structure:', JSON.stringify(message.result, null, 2));
+              console.log('Extracted message:', responseMessage);
+
+              resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                  message: responseMessage,
+                  documentId: message.result.data?.context?.documentId || message.result.data?.data?.context?.documentId,
+                  targetCoordinate: message.result.data?.context?.targetCoordinate || message.result.data?.data?.context?.targetCoordinate,
+                  tool_calls: null // A2A doesn't use tool_calls format yet
+                })
+              });
+            } else {
+              reject(new Error(message.error?.message || message.result?.error || 'Chat failed'));
+            }
+          }
+        };
+
+        ws.onerror = (error) => {
+          reject(new Error('WebSocket connection failed'));
+        };
+
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          if (!responseData) {
+            ws.close();
+            reject(new Error('Chat request timeout'));
+          }
+        }, 30000);
       });
 
       if (!response.ok) {

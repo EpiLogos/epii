@@ -267,7 +267,7 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
     }));
 
     // Handle messages
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message);
 
@@ -284,6 +284,48 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
             agentId: data.agentId,
             message: `Registered as ${data.agentName || data.agentId}`
           }));
+
+          return;
+        }
+
+        // Handle skill execution requests
+        if (data.type === 'skill-execution' || (data.jsonrpc === '2.0' && data.method === 'executeSkill')) {
+          console.log(`Received skill execution request: ${data.params?.skillId || data.skillId}`);
+
+          // Extract skill execution parameters
+          const skillId = data.params?.skillId || data.skillId;
+          const parameters = data.params?.parameters || data.parameters || {};
+          const context = data.params?.context || data.context || {};
+          const requestId = data.id || Date.now().toString();
+
+          // Execute the skill using the adapter
+          try {
+            const result = await epiiAgentAdapter.executeSkill(skillId, parameters, context);
+            console.log(`Skill execution result:`, JSON.stringify(result, null, 2));
+
+            // Send success response
+            const response = {
+              jsonrpc: '2.0',
+              id: requestId,
+              result: result
+            };
+            console.log(`Sending response to frontend:`, JSON.stringify(response, null, 2));
+            ws.send(JSON.stringify(response));
+
+          } catch (error) {
+            console.error('Skill execution error:', error);
+
+            // Send error response
+            ws.send(JSON.stringify({
+              jsonrpc: '2.0',
+              id: requestId,
+              error: {
+                code: -32603,
+                message: 'Internal error',
+                data: error.message
+              }
+            }));
+          }
 
           return;
         }

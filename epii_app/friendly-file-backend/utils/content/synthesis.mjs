@@ -402,15 +402,24 @@ Generate a concise Epii perspective that captures the essence of this content an
             if (result && result.epiiPerspective) {
                 response = result.epiiPerspective;
                 console.log(`Successfully generated Epii perspective using Epii agent (${response.length} chars)`);
+
+                // CREATE GRAPHITI EPISODE with the structured analysis results
+                await createGraphitiEpisodeFromAnalysis(synthesis, coreElements, targetCoordinate, response, relationalProperties);
             } else {
                 console.warn("Epii agent did not return a valid perspective, falling back to direct LLM call");
                 // Fall back to direct LLM call
                 response = await generateEpiiPerspectiveWithLLM(synthesis, coreElements, targetCoordinate, llmService);
+
+                // CREATE GRAPHITI EPISODE even with fallback response
+                await createGraphitiEpisodeFromAnalysis(synthesis, coreElements, targetCoordinate, response, relationalProperties);
             }
         } else {
             // Fall back to direct LLM call if Epii agent service is not available
             console.log("Falling back to direct LLM call for Epii perspective generation");
             response = await generateEpiiPerspectiveWithLLM(synthesis, coreElements, targetCoordinate, llmService);
+
+            // CREATE GRAPHITI EPISODE even with direct LLM call
+            await createGraphitiEpisodeFromAnalysis(synthesis, coreElements, targetCoordinate, response, relationalProperties);
         }
 
         // Update tracing if available
@@ -623,5 +632,210 @@ Create a comprehensive synthesis that includes the following sections:
     } catch (error) {
         console.error("Error in synthesizeAnalysis:", error);
         throw new Error(`Failed to synthesize analysis: ${error.message}`);
+    }
+}
+
+/**
+ * Creates a Graphiti episode from the structured analysis results
+ * This enriches Graphiti with detailed analysis context for future RAG operations
+ *
+ * @param {string} synthesis - The synthesized analysis
+ * @param {Array} coreElements - The core elements extracted from the document
+ * @param {string} targetCoordinate - The target Bimba coordinate
+ * @param {string} epiiPerspective - The generated Epii perspective
+ * @param {object} relationalProperties - The relational properties extracted
+ */
+async function createGraphitiEpisodeFromAnalysis(synthesis, coreElements, targetCoordinate, epiiPerspective, relationalProperties) {
+    try {
+        console.log(`Creating Graphiti episode for coordinate ${targetCoordinate}...`);
+
+        // Import the BPMCP service to call Graphiti
+        const bpMCPService = (await import('../../services/bpMCPService.mjs')).default;
+
+        // Prepare COMPREHENSIVE structured episode content
+        const episodeBody = `# COMPREHENSIVE DOCUMENT ANALYSIS EPISODE
+**Target Coordinate**: ${targetCoordinate}
+**Analysis Timestamp**: ${new Date().toISOString()}
+**Analysis Stage**: Stage -0 (Epii Perspective Generation)
+
+---
+
+## 🎯 EPII PERSPECTIVE
+${epiiPerspective}
+
+---
+
+## 🔍 DETAILED CORE ELEMENTS ANALYSIS (${coreElements.length} Elements)
+
+${coreElements.map((element, index) => `
+### ${index + 1}. ${element.name}
+**Type**: ${element.elementType}
+**Bimba Coordinates**: ${element.coordinates?.join(', ') || 'None specified'}
+
+**Description**:
+${element.description}
+
+**Analytical Relevance**:
+${element.relevance}
+
+**Supporting Evidence**:
+${element.evidence}
+
+**Structural Context**: This element relates to coordinate ${targetCoordinate} as ${element.elementType.toLowerCase()} that ${element.relevance.toLowerCase()}
+
+---`).join('\n')}
+
+## 🧠 COMPREHENSIVE RELATIONAL PROPERTIES MATRIX
+
+### QL OPERATORS (${relationalProperties.qlOperators?.length || 0} Identified)
+*Quaternal Logic operators that structure the content and provide operational frameworks*
+
+${relationalProperties.qlOperators?.map((op, index) => `
+#### ${index + 1}. ${op.name}
+**Operational Description**: ${op.description}
+**Evidence Base**: ${op.evidence}
+**Structural Function**: This QL operator manifests within coordinate ${targetCoordinate} as a ${op.name.includes('STRUCT') ? 'structural' : op.name.includes('PROC') ? 'processual' : 'contextual'} framework that organizes the content's logical architecture.
+`).join('\n') || '*No QL Operators identified in this analysis*'}
+
+### EPISTEMIC ESSENCE (${relationalProperties.epistemicEssence?.length || 0} Identified)
+*Core abstract concepts and epistemological patterns that define the knowledge framework*
+
+${relationalProperties.epistemicEssence?.map((essence, index) => `
+#### ${index + 1}. ${essence.name}
+**Conceptual Framework**: ${essence.description}
+**Evidence Base**: ${essence.evidence}
+**Epistemic Function**: This essence operates within coordinate ${targetCoordinate} as a fundamental knowledge pattern that shapes understanding and interpretation.
+`).join('\n') || '*No Epistemic Essence patterns identified in this analysis*'}
+
+### ARCHETYPAL ANCHORS (${relationalProperties.archetypalAnchors?.length || 0} Identified)
+*Deep structural patterns and archetypal energies inferred from content dynamics*
+
+${relationalProperties.archetypalAnchors?.map((anchor, index) => `
+#### ${index + 1}. ${anchor.name}
+**Archetypal Pattern**: ${anchor.description}
+**Evidence Base**: ${anchor.evidence}
+**Symbolic Function**: This archetypal pattern manifests within coordinate ${targetCoordinate} as a deep structural dynamic that provides symbolic meaning and energetic coherence.
+`).join('\n') || '*No Archetypal Anchors identified in this analysis*'}
+
+### SEMANTIC FRAMEWORK (${relationalProperties.semanticFramework?.length || 0} Identified)
+*Relationship types that define how concepts connect and interact*
+
+${relationalProperties.semanticFramework?.map((framework, index) => `
+#### ${index + 1}. ${framework.name}
+**Relational Pattern**: ${framework.description}
+**Evidence Base**: ${framework.evidence}
+**Semantic Function**: This framework operates within coordinate ${targetCoordinate} as a relational structure that defines how concepts and elements interconnect.
+`).join('\n') || '*No Semantic Framework patterns identified in this analysis*'}
+
+---
+
+## 📊 ANALYSIS METRICS & METADATA
+
+**Core Elements Count**: ${coreElements.length}
+**Total Relational Properties**: ${Object.values(relationalProperties).reduce((sum, arr) => sum + (arr?.length || 0), 0)}
+- QL Operators: ${relationalProperties.qlOperators?.length || 0}
+- Epistemic Essence: ${relationalProperties.epistemicEssence?.length || 0}
+- Archetypal Anchors: ${relationalProperties.archetypalAnchors?.length || 0}
+- Semantic Framework: ${relationalProperties.semanticFramework?.length || 0}
+
+**Synthesis Length**: ${synthesis.length} characters
+**Perspective Length**: ${epiiPerspective.length} characters
+
+---
+
+## 📝 COMPLETE SYNTHESIS CONTENT
+
+### Full Synthesis Analysis
+${synthesis}
+
+---
+
+## 🔗 COORDINATE INTEGRATION NOTES
+
+This analysis episode is specifically anchored to coordinate **${targetCoordinate}** and provides:
+
+1. **Structural Context**: How the document content aligns with and enriches the understanding of this coordinate
+2. **Relational Mapping**: How the identified patterns connect to the broader Bimba coordinate system
+3. **Operational Framework**: How the QL operators and other relational properties function within this coordinate's domain
+4. **Epistemic Contribution**: What new knowledge and understanding this analysis contributes to the coordinate's meaning
+5. **Archetypal Resonance**: How the deep patterns identified resonate with the coordinate's symbolic and energetic signature
+
+This episode serves as a comprehensive knowledge artifact that can inform future RAG operations, coordinate-based queries, and systemic understanding of the Bimba knowledge structure.
+
+---
+
+**Episode Creation**: ${new Date().toISOString()}
+**Analysis Pipeline**: Epii Document Analysis Pipeline - Stage -0
+**Coordinate Focus**: ${targetCoordinate}
+**Episode Type**: Comprehensive Document Analysis`;
+
+        // Prepare comprehensive entities array
+        const comprehensiveEntities = [
+            // Core elements as entities
+            ...coreElements.map(element => element.name),
+            // QL Operators as entities
+            ...(relationalProperties.qlOperators?.map(op => op.name) || []),
+            // Epistemic Essence as entities
+            ...(relationalProperties.epistemicEssence?.map(essence => essence.name) || []),
+            // Archetypal Anchors as entities
+            ...(relationalProperties.archetypalAnchors?.map(anchor => anchor.name) || []),
+            // Semantic Framework as entities
+            ...(relationalProperties.semanticFramework?.map(framework => framework.name) || []),
+            // Target coordinate as entity
+            targetCoordinate,
+            // Analysis stage as entity
+            'Stage -0 Analysis',
+            'Epii Perspective Generation',
+            'Document Analysis Episode'
+        ];
+
+        // Prepare comprehensive facts array
+        const comprehensiveFacts = [
+            // Core element facts
+            ...coreElements.map(element => `${element.name} is a ${element.elementType} relevant to ${targetCoordinate}: ${element.relevance}`),
+            // QL Operator facts
+            ...(relationalProperties.qlOperators?.map(op => `QL Operator ${op.name} operates within ${targetCoordinate}: ${op.description}`) || []),
+            // Epistemic Essence facts
+            ...(relationalProperties.epistemicEssence?.map(essence => `Epistemic Essence ${essence.name} manifests in ${targetCoordinate}: ${essence.description}`) || []),
+            // Archetypal Anchor facts
+            ...(relationalProperties.archetypalAnchors?.map(anchor => `Archetypal Anchor ${anchor.name} resonates with ${targetCoordinate}: ${anchor.description}`) || []),
+            // Semantic Framework facts
+            ...(relationalProperties.semanticFramework?.map(framework => `Semantic Framework ${framework.name} structures relationships in ${targetCoordinate}: ${framework.description}`) || []),
+            // Meta facts about the analysis
+            `Document analysis for ${targetCoordinate} completed in Stage -0`,
+            `Epii perspective generated for ${targetCoordinate} with ${epiiPerspective.length} characters`,
+            `Analysis identified ${coreElements.length} core elements for ${targetCoordinate}`,
+            `Total of ${Object.values(relationalProperties).reduce((sum, arr) => sum + (arr?.length || 0), 0)} relational properties identified for ${targetCoordinate}`
+        ];
+
+        // Create the Graphiti episode using the exact method signature from the codebase
+        const episodeResult = await bpMCPService.callTool('addGraphitiEpisode', {
+            bimbaCoordinate: targetCoordinate,
+            episodeBody: episodeBody,
+            episodeType: 'comprehensive_document_analysis',
+            entities: comprehensiveEntities,
+            facts: comprehensiveFacts,
+            metadata: {
+                analysisStage: 'stage_minus0',
+                timestamp: new Date().toISOString(),
+                coreElementsCount: coreElements.length,
+                relationalPropertiesCount: Object.values(relationalProperties).reduce((sum, arr) => sum + (arr?.length || 0), 0),
+                synthesisLength: synthesis.length,
+                perspectiveLength: epiiPerspective.length,
+                entitiesCount: comprehensiveEntities.length,
+                factsCount: comprehensiveFacts.length,
+                episodeBodyLength: episodeBody.length,
+                analysisCompleteness: 'comprehensive',
+                coordinateContext: targetCoordinate,
+                pipelineStage: 'epii_perspective_generation'
+            }
+        });
+
+        console.log(`Successfully created Graphiti episode for ${targetCoordinate}:`, episodeResult);
+
+    } catch (error) {
+        console.error(`Error creating Graphiti episode for ${targetCoordinate}:`, error);
+        // Don't throw - this shouldn't break the analysis pipeline
+        console.warn('Continuing analysis pipeline despite Graphiti episode creation failure');
     }
 }

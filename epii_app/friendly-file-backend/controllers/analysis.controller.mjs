@@ -589,11 +589,67 @@ export const createCrystallizationFromAnalysis = async (req, res) => {
       - relatedCoordinates: ${JSON.stringify(notionUpdatePayload.relatedCoordinates || [])}
     `);
 
-    // Create a crystallization document
+    // ENHANCED: Include Epii perspective as structured content blocks
+    console.log(`Structuring crystallization content with Epii perspective...`);
+
+    // Get the Epii perspective from the analysis results
+    const epiiPerspective = cachedResults?.fullAnalysisResults?.epiiPerspective ||
+                           cachedResults?.epiiPerspective ||
+                           'No Epii perspective available';
+
+    console.log(`Found Epii perspective: ${epiiPerspective.length} characters`);
+
+    // Structure the content as blocks for comprehensive crystallization
+    const contentBlocks = [
+      {
+        type: 'heading_2',
+        heading_2: {
+          rich_text: [{
+            type: 'text',
+            text: { content: '📊 Document Analysis Synthesis' }
+          }]
+        }
+      },
+      {
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{
+            type: 'text',
+            text: { content: content }
+          }]
+        }
+      },
+      {
+        type: 'divider',
+        divider: {}
+      },
+      {
+        type: 'heading_2',
+        heading_2: {
+          rich_text: [{
+            type: 'text',
+            text: { content: '🎯 Epii Perspective' }
+          }]
+        }
+      },
+      {
+        type: 'callout',
+        callout: {
+          icon: { emoji: '🧠' },
+          rich_text: [{
+            type: 'text',
+            text: { content: epiiPerspective }
+          }]
+        }
+      }
+    ];
+
+    // Create a crystallization document with structured content blocks
     const crystallization = await crystallizationService.createCrystallization({
       originalDocumentId: documentId,
       userId,
-      content,
+      content, // Keep legacy content for compatibility
+      contentBlocks, // Add structured content blocks
       title,
       targetCoordinate,
       relatedCoordinates: notionUpdatePayload.relatedCoordinates || []

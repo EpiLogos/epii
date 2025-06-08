@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink, X } from 'lucide-react';
+import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink, X, Map } from 'lucide-react';
 import { AnalysisResults } from '../0_foundation/epiiTypes';
 import { formatBimbaCoordinate } from '../1_utils/epiiFormatters';
 import { isValidBimbaCoordinate } from '../1_utils/epiiHelpers';
@@ -13,6 +13,7 @@ interface DocumentControlsProps {
   onStartAnalysis: (targetCoordinate: string) => void;
   onCrystallize?: (results: AnalysisResults) => void;
   onCrystalliseToNotion?: () => void;
+  onOpenBimbaUpdate?: (coordinate: string) => void;
   onClose?: () => void;
   isAnalyzing?: boolean;
   isSendingToNotion?: boolean;
@@ -27,6 +28,7 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
   onStartAnalysis,
   onCrystallize,
   onCrystalliseToNotion,
+  onOpenBimbaUpdate,
   onClose,
   isAnalyzing = false,
   isSendingToNotion = false,
@@ -237,6 +239,22 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
                     <span>Crystallise to Notion</span>
                   </>
                 )}
+              </button>
+            )}
+
+            {/* Update Bimba Map button */}
+            {onOpenBimbaUpdate && (
+              <button
+                onClick={() => onOpenBimbaUpdate(targetCoordinate)}
+                disabled={isSendingToNotion}
+                className={`w-full px-4 py-2 rounded-md flex items-center justify-center space-x-2 ${
+                  isSendingToNotion
+                    ? 'bg-epii-dark text-gray-500 cursor-not-allowed'
+                    : 'bg-epii-neon/20 border border-epii-neon/50 text-epii-neon hover:bg-epii-neon/30'
+                }`}
+              >
+                <Map size={18} />
+                <span>Update Bimba Map for {formatBimbaCoordinate(targetCoordinate)}</span>
               </button>
             )}
 

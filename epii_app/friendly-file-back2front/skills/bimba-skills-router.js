@@ -107,14 +107,31 @@ class BimbaSkillsRouter {
         qlMetadata: skill.qlMetadata
       };
 
-      const result = await skill.handler(request.content, enhancedContext);
+      // Prepare parameters for the skill
+      const skillParams = {
+        message: request.content,
+        history: enhancedContext.history || [],
+        targetCoordinate: request.bimbaCoordinate || enhancedContext.targetCoordinate,
+        documentId: enhancedContext.documentId,
+        documentContent: enhancedContext.documentContent,
+        context: enhancedContext
+      };
+
+      const result = await skill.handler(skillParams, enhancedContext);
+
+      // If the skill already returns a properly formatted response, use it directly
+      if (result && result.success !== undefined && result.data) {
+        return result;
+      }
+
+      // Otherwise, wrap it in the standard format
       return {
         success: true,
         skillId: skill.id,
         bimbaCoordinate: skill.bimbaCoordinate,
         agentId: skill.agentId,
         qlMetadata: skill.qlMetadata,
-        result
+        data: result
       };
     } catch (error) {
       console.error(`Error executing skill ${skill.id}:`, error);
@@ -141,12 +158,38 @@ class BimbaSkillsRouter {
 
     const contentLower = content.toLowerCase();
 
-    // Check for explicit Bimba coordinate mentions
+    // PRIORITY 1: Check for explicit Bimba coordinate mentions first
     const bimbaMatch = content.match(/#(\d+)-(\d+)/);
     if (bimbaMatch) {
       const coordinate = bimbaMatch[0];
       const skill = this.skillsRegistry.getSkillByBimbaCoordinate(coordinate);
-      if (skill) return skill;
+      if (skill) {
+        console.log(`Found explicit coordinate ${coordinate}, routing to specific skill`);
+        return skill;
+      }
+    }
+
+    // PRIORITY 2: Check if this is a general conversational request
+    // If no specific analysis/operational keywords are found, default to chat
+    const isAnalysisRequest = contentLower.includes('analyze') ||
+                             contentLower.includes('analysis') ||
+                             contentLower.includes('pipeline') ||
+                             contentLower.includes('process document') ||
+                             contentLower.includes('crystallize') ||
+                             contentLower.includes('bimba update');
+
+    const isOperationalRequest = contentLower.includes('create node') ||
+                                contentLower.includes('update graph') ||
+                                contentLower.includes('manage relationship') ||
+                                contentLower.includes('notion page');
+
+    // If it's not clearly an analysis or operational request, use chat skill
+    if (!isAnalysisRequest && !isOperationalRequest) {
+      const chatSkill = this.skillsRegistry.getSkillById('epii-chat');
+      if (chatSkill) {
+        console.log('Routing to chat skill for conversational request');
+        return chatSkill;
+      }
     }
 
     // Check for QL position mentions

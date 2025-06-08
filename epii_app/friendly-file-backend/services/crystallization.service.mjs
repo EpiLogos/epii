@@ -30,6 +30,7 @@ export const createCrystallization = async ({
   originalDocumentId,
   userId,
   content,
+  contentBlocks = [],
   title,
   targetCoordinate,
   relatedCoordinates = []
@@ -40,6 +41,7 @@ export const createCrystallization = async ({
       - originalDocumentId: ${originalDocumentId}
       - userId: ${userId}
       - content length: ${content ? content.length : 0} characters
+      - contentBlocks: ${contentBlocks.length} structured blocks
       - title: ${title}
       - targetCoordinate: ${targetCoordinate}
     `);
@@ -101,6 +103,7 @@ export const createCrystallization = async ({
     const crystallizationData = {
       title: safeTitle,
       textContent: safeContent, // Use textContent as the primary field
+      contentBlocks: contentBlocks.length > 0 ? contentBlocks : undefined, // Include structured content blocks
       userId: safeUserId,
       documentType: 'pratibimba', // Use 'pratibimba' instead of 'crystallization'
       // Add required fields for the storeDocument tool
@@ -115,7 +118,8 @@ export const createCrystallization = async ({
         originalTitle: originalDocument.title || originalDocument.fileName || 'Unknown',
         relatedCoordinates,
         crystallizationDate: new Date(),
-        status: 'draft'
+        status: 'draft',
+        hasStructuredContent: contentBlocks.length > 0 // Flag to indicate structured content
       }
     };
 

@@ -37,6 +37,7 @@ const EpiiModeContent: React.FC = () => {
   const [selectedCoordinate, setSelectedCoordinate] = useState<BimbaCoordinate | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [bimbaUpdateOpen, setBimbaUpdateOpen] = useState<boolean>(false);
+  const [bimbaUpdateCoordinate, setBimbaUpdateCoordinate] = useState<string | undefined>(undefined);
 
   // Use the Bimba coordinates hook
   const { coordinates, getRelatedCoordinates, refreshCoordinateDocuments } = useBimbaCoordinates();
@@ -79,7 +80,9 @@ const EpiiModeContent: React.FC = () => {
   };
 
   // Handle opening the Bimba update overlay
-  const handleOpenBimbaUpdate = () => {
+  const handleOpenBimbaUpdate = (coordinate?: string) => {
+    console.log(`Opening Bimba Update Manager with coordinate: ${coordinate}`);
+    setBimbaUpdateCoordinate(coordinate);
     setBimbaUpdateOpen(true);
     setSidebarOpen(false); // Close sidebar when opening overlay
   };
@@ -236,6 +239,7 @@ const EpiiModeContent: React.FC = () => {
                         setSidebarOpen(true);
                       }, 500);
                     }}
+                    onOpenBimbaUpdate={handleOpenBimbaUpdate}
                   />
                 </div>
 
@@ -266,7 +270,11 @@ const EpiiModeContent: React.FC = () => {
         {/* Bimba Update Overlay */}
         <BimbaUpdateOverlay
           isOpen={bimbaUpdateOpen}
-          onClose={() => setBimbaUpdateOpen(false)}
+          onClose={() => {
+            setBimbaUpdateOpen(false);
+            setBimbaUpdateCoordinate(undefined);
+          }}
+          initialCoordinate={bimbaUpdateCoordinate}
         />
       </div> {/* End Page Wrapper */}
     </PageTransition>

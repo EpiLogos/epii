@@ -90,6 +90,10 @@ This document outlines the steps to start all necessary services for the Epi-Log
 
 Open separate terminal windows/tabs for each command. Execute them from the root project directory (`/Users/admin/Documents/Epi-Logos_Seed_Files`).
 
+**Startup Script:**
+- ./startup.sh
+# Stop all servers  
+- ./shutdown.sh
 **Recommended Startup Order:**
 
 1. Start the External Bimba-Pratibimba MCP Server first (required for backend connectivity)

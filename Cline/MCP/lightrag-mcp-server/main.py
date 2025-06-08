@@ -41,11 +41,23 @@ class IngestResponse(BaseModel):
 
 class RetrieveRequest(BaseModel):
     query: str
-    # Add other potential parameters like top_k, filters?
+    mode: str = Field(default="mix", description="LightRAG query mode: naive, local, global, hybrid, mix")
+    top_k: int = Field(default=50, description="Number of results to retrieve")
 
 class RetrieveResponse(BaseModel):
     fused_context: Any # Define more specifically later
     lightrag_raw_result: Any # Optional: for debugging
+    status: str
+
+class RawChunksRequest(BaseModel):
+    query: str
+    coordinate_filter: List[str] = Field(default_factory=list)
+    max_chunks: int = Field(default=10)
+    threshold: float = Field(default=0.7)
+
+class RawChunksResponse(BaseModel):
+    chunks: List[Dict[str, Any]]
+    total_found: int
     status: str
 
 # --- Configuration Loading (Example - Refine as needed) ---
@@ -283,18 +295,18 @@ async def retrieve_context(request: RetrieveRequest = Body(...)):
         # Import QueryParam here or globally if used elsewhere
         from lightrag.base import QueryParam # Corrected import path
 
-        # TODO: Potentially allow top_k etc. to be passed in RetrieveRequest
-        top_k_value = 50 # Default or from config/request
-        query_param = QueryParam(mode="mix", top_k=top_k_value)
+        # Use parameters from request
+        top_k_value = request.top_k
+        query_param = QueryParam(mode=request.mode, top_k=top_k_value)
 
         # --- Direct Neo4j Connection Test ---
         from neo4j import AsyncGraphDatabase # Import driver
-        
+
         temp_driver = None
         try:
             logger.debug("Attempting direct Neo4j connection test...")
             # Use credentials and DB name from loaded env vars
-            temp_driver = AsyncGraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD), database=LIGHTRAG_NEO4J_DATABASE) 
+            temp_driver = AsyncGraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD), database=LIGHTRAG_NEO4J_DATABASE)
             async with temp_driver.session() as session:
                 result_cursor = await session.run("MATCH (n) RETURN count(n) AS count")
                 record = await result_cursor.single()
@@ -310,22 +322,126 @@ async def retrieve_context(request: RetrieveRequest = Body(...)):
                 logger.debug("Direct Neo4j test driver closed.")
         # --- End Direct Neo4j Connection Test ---
 
-        # Original aquery call follows...
-        logger.info(f"Calling lightrag_instance.aquery with mode='mix', top_k={top_k_value}")
-        # The query method itself handles the interaction with Neo4j (archetypes DB) and Qdrant
-        result = await lightrag_instance.aquery(request.query, param=query_param)
+        # Use different LightRAG methods based on mode
+        logger.info(f"Calling LightRAG with mode='{request.mode}', top_k={top_k_value}")
 
-        # The result is typically the final synthesized string response from the LLM
-        # based on the retrieved context from the 'mix' mode.
-        logger.info(f"LightRAG retrieval successful. Result type: {type(result)}")
-        logger.debug(f"LightRAG Raw Result: {result}")
+        if request.mode == "naive":
+            # Use naive mode for raw vector search (no synthesis)
+            logger.info("Using naive mode for raw vector search")
 
-        # We return this synthesized result. The Node.js side will treat this as one source of context.
-        return RetrieveResponse(status="success", fused_context=result, lightrag_raw_result=result)
+            # DEBUG: Check what's actually in the database
+            try:
+                # Check Qdrant collection info
+                collection_info = await lightrag_instance.chunks_vdb._client.get_collection(QDRANT_COLLECTION)
+                logger.info(f"Qdrant collection '{QDRANT_COLLECTION}' has {collection_info.points_count} points")
+
+                # Try a broader search to see if there's ANY data
+                broad_search = await lightrag_instance.chunks_vdb._client.search(
+                    collection_name=QDRANT_COLLECTION,
+                    query_vector=query_embedding,
+                    limit=5,
+                    score_threshold=0.0,  # Very low threshold
+                    with_payload=True
+                )
+                logger.info(f"Broad search found {len(broad_search)} results")
+                for i, result in enumerate(broad_search):
+                    logger.info(f"Result {i}: score={result.score}, coordinates={result.payload.get('bimba_coordinates', 'none')}")
+
+            except Exception as debug_e:
+                logger.error(f"Debug search failed: {debug_e}")
+
+            result = await lightrag_instance.aquery(request.query, param=query_param)
+
+            # For naive mode, result should be raw search results
+            logger.info(f"LightRAG naive retrieval successful. Result type: {type(result)}")
+            logger.debug(f"LightRAG Naive Result: {result}")
+
+            return RetrieveResponse(status="success", fused_context=result, lightrag_raw_result=result)
+        else:
+            # Use aquery for synthesis modes (mix, local, global, hybrid)
+            logger.info(f"Using synthesis mode: {request.mode}")
+            result = await lightrag_instance.aquery(request.query, param=query_param)
+
+            # The result is the synthesized string response from the LLM
+            logger.info(f"LightRAG synthesis retrieval successful. Result type: {type(result)}")
+            logger.debug(f"LightRAG Synthesis Result: {result}")
+
+            return RetrieveResponse(status="success", fused_context=result, lightrag_raw_result=result)
 
     except Exception as e:
         logger.error(f"LightRAG retrieval call failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"LightRAG retrieval call failed: {str(e)}")
+
+@app.post("/raw-chunks", response_model=RawChunksResponse, summary="Retrieve Raw Document Chunks")
+async def retrieve_raw_chunks(request: RawChunksRequest = Body(...)):
+    """
+    Retrieves raw document chunks from Qdrant vector storage with coordinate filtering.
+    Returns actual document chunks with scores, not synthesized responses.
+    """
+    logger.info(f"Received raw chunks request for query: '{request.query}' with coordinates: {request.coordinate_filter}")
+
+    if not lightrag_instance or not lightrag_instance.chunks_vdb:
+        raise HTTPException(status_code=503, detail="LightRAG vector storage not initialized")
+
+    try:
+        # Generate embedding for the query
+        embedding_vector_array = await embedding_func_instance(texts=[request.query])
+        if embedding_vector_array is None or len(embedding_vector_array) == 0:
+            raise ValueError("Failed to generate embedding for query")
+
+        query_embedding = embedding_vector_array[0]
+        logger.info(f"Generated query embedding with dimension: {len(query_embedding)}")
+
+        # Prepare search filter for coordinates if provided
+        search_filter = None
+        if request.coordinate_filter:
+            # Create Qdrant filter for bimba_coordinates
+            from qdrant_client.models import Filter, FieldCondition, MatchAny
+            search_filter = Filter(
+                must=[
+                    FieldCondition(
+                        key="bimba_coordinates",
+                        match=MatchAny(any=request.coordinate_filter)
+                    )
+                ]
+            )
+            logger.info(f"Applied coordinate filter: {request.coordinate_filter}")
+
+        # Search Qdrant directly for raw chunks
+        search_results = await lightrag_instance.chunks_vdb._client.search(
+            collection_name=QDRANT_COLLECTION,
+            query_vector=query_embedding,
+            limit=request.max_chunks,
+            score_threshold=request.threshold,
+            query_filter=search_filter,
+            with_payload=True
+        )
+
+        # Format results as raw chunks with metadata
+        chunks = []
+        for result in search_results:
+            chunk_data = {
+                "id": result.id,
+                "score": float(result.score),
+                "content": result.payload.get("content", ""),
+                "bimba_coordinates": result.payload.get("bimba_coordinates", []),
+                "full_doc_id": result.payload.get("full_doc_id", ""),
+                "file_path": result.payload.get("file_path", ""),
+                "metadata": result.payload
+            }
+            chunks.append(chunk_data)
+
+        logger.info(f"Retrieved {len(chunks)} raw chunks")
+
+        return RawChunksResponse(
+            status="success",
+            chunks=chunks,
+            total_found=len(chunks)
+        )
+
+    except Exception as e:
+        logger.error(f"Raw chunks retrieval failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Raw chunks retrieval failed: {str(e)}")
 
 # --- Main Execution ---
 if __name__ == "__main__":

@@ -131,21 +131,27 @@ async function startA2AService(options = {}) {
     }
 
     // Import the Nara agent service if not provided
-    const naraService = naraAgentService || await importNaraAgentService();
+    // TEMPORARILY COMMENTED OUT - Nara agent service import issues
+    // const naraService = naraAgentService || await importNaraAgentService();
+    const naraService = null; // Mock for now
 
     // Log available methods in the Nara agent service
-    console.log('Nara agent service methods:',
-      Object.keys(naraService)
-        .filter(key => typeof naraService[key] === 'function')
-        .join(', ')
-    );
+    if (naraService) {
+      console.log('Nara agent service methods:',
+        Object.keys(naraService)
+          .filter(key => typeof naraService[key] === 'function')
+          .join(', ')
+      );
 
-    // Check for naraAgentNode method in Nara agent
-    if (naraService.naraAgentNode) {
-      console.log('Found naraAgentNode method in Nara agent service');
+      // Check for naraAgentNode method in Nara agent
+      if (naraService.naraAgentNode) {
+        console.log('Found naraAgentNode method in Nara agent service');
+      } else {
+        console.warn('No naraAgentNode method found in Nara agent service');
+        console.warn('Nara agent functionality may be limited');
+      }
     } else {
-      console.warn('No naraAgentNode method found in Nara agent service');
-      console.warn('Nara agent functionality may be limited');
+      console.log('Nara agent service: DISABLED (commented out for testing)');
     }
 
     // Start the A2A server
@@ -167,13 +173,17 @@ async function startA2AService(options = {}) {
     await epiiClient.connect();
 
     // Connect the Nara agent as a client
-    console.log('Connecting Nara agent as client...');
-    const naraClient = new NaraAgentClient({
-      naraAgentService: naraService,
-      url: `ws://localhost:${port}`
-    });
-
-    await naraClient.connect();
+    let naraClient = null;
+    if (naraService) {
+      console.log('Connecting Nara agent as client...');
+      naraClient = new NaraAgentClient({
+        naraAgentService: naraService,
+        url: `ws://localhost:${port}`
+      });
+      await naraClient.connect();
+    } else {
+      console.log('Skipping Nara agent client connection (service disabled)');
+    }
 
     console.log('A2A service started successfully');
     console.log(`A2A Server running on port ${port}`);
@@ -190,7 +200,9 @@ async function startA2AService(options = {}) {
       stop: async () => {
         console.log('Stopping A2A service...');
         epiiClient.close();
-        naraClient.close();
+        if (naraClient) {
+          naraClient.close();
+        }
 
         return new Promise((resolve) => {
           server.close(() => {

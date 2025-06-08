@@ -24,9 +24,10 @@ import {
 interface DocumentCanvasProps {
   userId: string;
   onDocumentDeleted?: (documentId: string, coordinate?: string) => void;
+  onOpenBimbaUpdate?: (coordinate: string) => void;
 }
 
-const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDeleted }) => {
+const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDeleted, onOpenBimbaUpdate }) => {
   const { state, dispatch } = useEpii();
   const {
     currentDocumentId,
@@ -1527,6 +1528,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
               onStartAnalysis={handleStartAnalysis}
               onCrystallize={handleCrystallizeResults}
               onCrystalliseToNotion={handleCrystalliseToNotion}
+              onOpenBimbaUpdate={onOpenBimbaUpdate}
               isAnalyzing={isAnalyzing}
               isSendingToNotion={isSendingToNotion}
               analysisResults={latestSession?.results || null}

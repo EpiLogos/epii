@@ -341,4 +341,46 @@ class BimbaSkillsRegistry {
   }
 }
 
+// Create singleton instance
+let registryInstance = null;
+
+// Auto-register core skills
+const UnifiedRAGSkill = require('./unifiedRAG');
+const EpiiChatSkill = require('./epii-chat-skill');
+const { initializeEpiiOperationalSkills } = require('./epii-operational-skills');
+const BimbaUpdateManagementSkill = require('./bimba-update-management-skill');
+
+function getRegistryInstance() {
+  if (!registryInstance) {
+    registryInstance = new BimbaSkillsRegistry();
+
+    // Register the foundational UnifiedRAG skill at root coordinate #
+    const unifiedRAGSkill = new UnifiedRAGSkill();
+    registryInstance.registerSkill({
+      ...unifiedRAGSkill.getSkillMetadata(),
+      handler: unifiedRAGSkill.execute.bind(unifiedRAGSkill)
+    });
+
+    // Register the Epii Chat skill at coordinate #5
+    const epiiChatSkill = new EpiiChatSkill();
+    registryInstance.registerSkill({
+      ...epiiChatSkill.getSkillMetadata(),
+      handler: epiiChatSkill.execute.bind(epiiChatSkill)
+    });
+
+    // Register the Bimba Update Management skill at coordinate #5-2
+    const bimbaUpdateSkill = new BimbaUpdateManagementSkill();
+    registryInstance.registerSkill({
+      ...bimbaUpdateSkill.getSkillMetadata(),
+      handler: bimbaUpdateSkill.execute.bind(bimbaUpdateSkill)
+    });
+
+    console.log('[BimbaSkillsRegistry] Core skills registered (UnifiedRAG at #, EpiiChat at #5, BimbaUpdate at #5-2)');
+  }
+  return registryInstance;
+}
+
+// Export both the class and the singleton instance
 module.exports = BimbaSkillsRegistry;
+module.exports.getInstance = getRegistryInstance;
+module.exports.initializeEpiiOperationalSkills = initializeEpiiOperationalSkills;

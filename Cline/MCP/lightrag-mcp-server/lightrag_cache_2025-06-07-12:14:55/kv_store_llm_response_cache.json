@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "c853891e30cb451042cf39cb825fc670": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logical systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  }
+}

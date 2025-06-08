@@ -186,7 +186,7 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
     }
   });
 
-  // #5-2: Technical Architecture
+  // #5-2: Technical Architecture (placeholder - actual Bimba Update Management skill is registered separately)
   skillsRegistry.registerSkill({
     id: 'technical-architecture',
     name: 'Technical Architecture',

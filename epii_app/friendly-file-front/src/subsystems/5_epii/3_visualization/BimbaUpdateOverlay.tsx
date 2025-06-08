@@ -60,11 +60,13 @@ interface SelectedFile {
 interface BimbaUpdateOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  initialCoordinate?: string;
 }
 
 const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   isOpen,
-  onClose
+  onClose,
+  initialCoordinate
 }) => {
   const [selectedCoordinate, setSelectedCoordinate] = useState<string | null>(null);
   const [nodeData, setNodeData] = useState<BimbaNode | null>(null);
@@ -119,6 +121,14 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       [nodeId]: !prev[nodeId]
     }));
   };
+
+  // Auto-select initial coordinate when overlay opens (only if provided as string)
+  useEffect(() => {
+    if (isOpen && initialCoordinate && typeof initialCoordinate === 'string' && !selectedCoordinate) {
+      console.log(`BimbaUpdateOverlay: Auto-selecting coordinate ${initialCoordinate}`);
+      setSelectedCoordinate(initialCoordinate);
+    }
+  }, [isOpen, initialCoordinate, selectedCoordinate]);
 
   // Change tracking utilities
   const saveChangesToCache = (coordinate: string, changes: Map<string, any>) => {
@@ -202,6 +212,8 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     }
   }, [selectedCoordinate]);
 
+
+
   // Update global change count on mount and when localStorage changes
   useEffect(() => {
     const updateGlobalCount = () => {
@@ -228,14 +240,25 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       return;
     }
 
+    console.log(`🔍 Loading documents for coordinate: ${coordinate}`);
     setIsLoadingDocuments(true);
     try {
       // Import document cache service
       const documentCacheService = (await import('../1_services/documentCacheService')).default;
 
+      console.log(`📋 Document cache service loaded, checking for documents...`);
+
       // Get documents from cache ONLY - no MongoDB fallback
       const cachedBimbaDocuments = documentCacheService.getDocumentsByCoordinate(coordinate, 'Documents');
       const cachedPratibimbaDocuments = documentCacheService.getDocumentsByCoordinate(coordinate, 'pratibimbaDocuments');
+
+      console.log(`📄 Found ${cachedBimbaDocuments.length} bimba documents and ${cachedPratibimbaDocuments.length} pratibimba documents`);
+
+      // Debug: Log all available coordinates in cache
+      const allBimbaCoords = documentCacheService.getAllCoordinates('Documents');
+      const allPratibimbaCoords = documentCacheService.getAllCoordinates('pratibimbaDocuments');
+      console.log(`🗺️ Available bimba coordinates:`, allBimbaCoords);
+      console.log(`🔮 Available pratibimba coordinates:`, allPratibimbaCoords);
 
       // Combine both document types
       const documents = [
@@ -243,21 +266,23 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
         ...cachedPratibimbaDocuments.map(doc => ({ ...doc, documentType: 'pratibimba' }))
       ];
 
+      console.log(`📚 Combined documents:`, documents);
+
       // Standardize document format
       const formattedDocs = documents.map(doc => ({
         id: doc._id || doc.id,
         name: doc.name || doc.originalName || doc.fileName || 'Unnamed Document',
-        lastModified: new Date(doc.uploadDate || doc.lastModified),
+        lastModified: new Date(doc.uploadDate || doc.lastModified || Date.now()),
         bimbaCoordinate: doc.targetCoordinate || doc.bimbaCoordinate,
         documentType: doc.documentType,
         hasContent: !!(doc.content || doc.textContent)
       }));
 
       setCoordinateDocuments(formattedDocs);
-      console.log(`Loaded ${formattedDocs.length} documents for coordinate ${coordinate} from cache`);
+      console.log(`✅ Loaded ${formattedDocs.length} documents for coordinate ${coordinate} from cache`);
 
     } catch (error) {
-      console.error('Error loading coordinate documents:', error);
+      console.error('❌ Error loading coordinate documents:', error);
       setCoordinateDocuments([]);
     } finally {
       setIsLoadingDocuments(false);
@@ -529,144 +554,114 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
         }
       }
 
-      // Get QL context using bimbaKnowing
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const qlContextResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          toolName: 'bimbaKnowing',
-          args: {
-            query: `Retrieve Quaternal Logic operators (structural, processual, contextual) relevant to ${selectedCoordinate}`,
-            contextDepth: 2,
-            focusCoordinate: selectedCoordinate,
-            limit: 10
+      // Filter out embedding data and large objects from node properties
+      const filteredProperties = Object.fromEntries(
+        Object.entries(nodeData.properties).filter(([key, value]) => {
+          // Filter out embedding vectors and other large data
+          if (key.toLowerCase().includes('embedding') || key.toLowerCase().includes('vector')) {
+            return false;
           }
+          // Filter out very large objects/arrays
+          if (typeof value === 'object' && JSON.stringify(value).length > 500) {
+            return false;
+          }
+          return true;
         })
-      });
+      );
 
-      let qlContext = {};
-      if (qlContextResponse.ok) {
-        const qlResult = await qlContextResponse.json();
-        if (qlResult.content && qlResult.content[0]) {
-          try {
-            qlContext = JSON.parse(qlResult.content[0].text);
-          } catch (e) {
-            console.warn('Failed to parse QL context');
-          }
-        }
-      }
+      // Call the A2A service directly using WebSocket like EpiiChat does
+      console.log('🚀 Calling Bimba Update Management skill (#5-2) via A2A WebSocket...');
 
-      // Prepare the LLM prompt for suggestions
-      const prompt = `You are an expert in Quaternal Logic (QL) and Bimba knowledge graph management.
+      const a2aUrl = 'ws://localhost:3033';
+      const ws = new WebSocket(a2aUrl);
 
-Current Bimba Node:
-- Coordinate: ${selectedCoordinate}
-- Properties: ${JSON.stringify(nodeData.properties, null, 2)}
-- Current Relationships: ${JSON.stringify(nodeData.relationships, null, 2)}
+      const response = await new Promise((resolve, reject) => {
+        let responseData = null;
 
-QL Context:
-${JSON.stringify(qlContext, null, 2)}
-
-Document Content to Analyze:
-${fileContent.substring(0, 4000)}${fileContent.length > 4000 ? '...' : ''}
-
-QL RELATIONSHIP SCHEMA REFERENCE:
-QL Relationship Types:
-- 0_POTENTIAL_RELATION: Position #0 (Implicit Theme or Field of Potential)
-- 1_MATERIAL_RELATION: Position #1 (Material Cause or "What")
-- 2_PROCESSUAL_RELATION: Position #2 (Efficient Cause or "How")
-- 3_MEDIATING_RELATION: Position #3 (Formal Mediation)
-- 4_CONTEXTUAL_RELATION: Position #4 (Contextual Arena)
-- 5_QUINTESSENTIAL_RELATION: Position #5 (Quintessence)
-
-QL Dynamics:
-- foundational_emergence: 0→1 (From potential to material definition)
-- processual_activation: 1→2 (From definition to process)
-- formal_mediation: 2→3 (From process to integration)
-- contextual_embedding: 3→4 (From integration to context)
-- quintessential_synthesis: 4→5 (From context to synthesis)
-- recursive_renewal: 5→0 (From synthesis back to potential)
-
-QL Context Frames: 0000, 0/1, 0/1/2, 0/1/2/3, 4.0-4/5, 5/0
-
-Based on the document content and the current node structure, suggest specific updates to:
-
-1. Node Properties: Suggest new or updated properties that would better reflect the document content
-2. Relationships: Suggest new QL-aware relationships to create or existing ones to modify/delete
-3. QL Alignment: Ensure suggestions align with Quaternal Logic principles and use proper QL relationship properties
-
-Provide your response as a JSON object with the following structure:
-{
-  "propertyUpdates": {
-    "property_name": "new_value",
-    ...
-  },
-  "relationshipSuggestions": [
-    {
-      "action": "create|update|delete",
-      "type": "RELATIONSHIP_TYPE",
-      "targetCoordinate": "#X-Y-Z",
-      "properties": {
-        "qlType": "1_MATERIAL_RELATION",
-        "qlDynamics": "foundational_emergence",
-        "qlContextFrame": "0/1",
-        "strength": 0.8,
-        "description": "Detailed description"
-      },
-      "reasoning": "Why this relationship is suggested"
-    }
-  ],
-  "reasoning": "Overall reasoning for the suggestions",
-  "qlAlignment": "How these suggestions align with QL principles"
-}`;
-
-      // Call the LLM through BPMCP service
-      const llmResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          toolName: 'callLLM',
-          args: {
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an expert in Quaternal Logic and Bimba knowledge graph management. Provide precise, structured suggestions for node updates.'
-              },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ],
-            model: 'claude-3-5-sonnet-20241022',
-            temperature: 0.3
-          }
-        })
-      });
-
-      if (!llmResponse.ok) {
-        throw new Error(`Failed to generate suggestions: ${llmResponse.statusText}`);
-      }
-
-      const llmResult = await llmResponse.json();
-
-      let suggestions;
-      try {
-        // Parse the LLM response
-        const responseText = llmResult.content?.[0]?.text || llmResult.response || '';
-        suggestions = JSON.parse(responseText);
-      } catch (parseError) {
-        console.warn('Could not parse LLM response as JSON, returning raw response');
-        suggestions = {
-          rawResponse: llmResult.content?.[0]?.text || llmResult.response || '',
-          error: 'Could not parse as structured JSON'
+        ws.onopen = () => {
+          // Register as client
+          ws.send(JSON.stringify({
+            type: 'registration',
+            agentId: 'bimba-update-client',
+            agentName: 'Bimba Update Client'
+          }));
         };
+
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+
+          if (message.type === 'registration_confirmation') {
+            // Send skill execution request
+            ws.send(JSON.stringify({
+              jsonrpc: "2.0",
+              id: Date.now().toString(),
+              method: "executeSkill",
+              params: {
+                skillId: "bimba-update-management",
+                parameters: {
+                  coordinate: selectedCoordinate,
+                  nodeProperties: filteredProperties,
+                  relationships: nodeData.relationships,
+                  documentContent: fileContent.substring(0, 4000) + (fileContent.length > 4000 ? '...' : ''),
+                  documentType: selectedFile.documentType,
+                  documentName: selectedFile.name
+                },
+                context: {
+                  agentId: "bimba-update-client",
+                  agentCoordinate: '#5-2',
+                  targetCoordinate: selectedCoordinate,
+                  requestType: 'bimba-update-suggestions'
+                }
+              }
+            }));
+          } else if (message.jsonrpc === "2.0" && (message.result || message.error)) {
+            responseData = message;
+            ws.close();
+
+            if (message.result && message.result.success) {
+              // Extract the suggestions from the nested result structure
+              let suggestions = null;
+
+              // Try different possible paths for the result
+              if (message.result.data?.result) {
+                suggestions = message.result.data.result;
+              } else if (message.result.data) {
+                suggestions = message.result.data;
+              } else {
+                suggestions = message.result;
+              }
+
+              console.log('A2A Response structure:', JSON.stringify(message.result, null, 2));
+              console.log('Extracted suggestions:', suggestions);
+
+              resolve({
+                ok: true,
+                json: () => Promise.resolve(suggestions)
+              });
+            } else {
+              reject(new Error(message.error?.message || message.result?.error || 'Skill execution failed'));
+            }
+          }
+        };
+
+        ws.onerror = (error) => {
+          reject(new Error('WebSocket connection failed'));
+        };
+
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          if (!responseData) {
+            ws.close();
+            reject(new Error('Skill execution timeout'));
+          }
+        }, 30000);
+      });
+
+      if (!response.ok) {
+        throw new Error(`Skill execution failed: ${response.statusText}`);
       }
 
+      const suggestions = await response.json();
       setLLMSuggestions(suggestions);
 
     } catch (error) {
@@ -675,6 +670,50 @@ Provide your response as a JSON object with the following structure:
     } finally {
       setIsGeneratingSuggestions(false);
     }
+  };
+
+  // Apply suggestions to the form fields
+  const applySuggestionsToForm = (suggestions: any) => {
+    console.log('🚀 Applying suggestions to form fields...');
+
+    // Apply property updates to current coordinate
+    if (suggestions.propertyUpdates) {
+      setEditedProperties(prev => ({
+        ...prev,
+        ...suggestions.propertyUpdates
+      }));
+
+      // Track changes for current coordinate
+      const newChanges = new Map(pendingChanges);
+      Object.entries(suggestions.propertyUpdates).forEach(([key, value]) => {
+        newChanges.set(`prop_${key}`, value);
+      });
+      setPendingChanges(newChanges);
+      setHasUnsavedChanges(true);
+
+      if (selectedCoordinate) {
+        saveChangesToCache(selectedCoordinate, newChanges);
+      }
+    }
+
+    // Apply relationship suggestions
+    if (suggestions.relationshipSuggestions) {
+      const newRelationships = suggestions.relationshipSuggestions
+        .filter((rel: any) => rel.action === 'create')
+        .map((rel: any) => ({
+          action: 'create',
+          type: rel.type,
+          targetCoordinate: rel.targetCoordinate,
+          properties: rel.properties
+        }));
+
+      setEditedRelationships(prev => [...prev, ...newRelationships]);
+    }
+
+    // Update global change count
+    const globalChanges = collectAllChanges();
+    const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
+    setGlobalChangeCount(totalChanges);
   };
 
   const readFileContent = (file: File): Promise<string> => {
@@ -1352,7 +1391,7 @@ Provide your response as a JSON object with the following structure:
             )}
 
             {graphError && (
-              <div className="text-red-400 text-sm">Failed to load graph data: {graphError.message}</div>
+              <div className="text-red-400 text-sm">Failed to load graph data: {graphError instanceof Error ? graphError.message : String(graphError)}</div>
             )}
 
             {!isLoadingGraph && !graphError && fullGraphData && (
@@ -2164,9 +2203,9 @@ Provide your response as a JSON object with the following structure:
                         {llmSuggestions && (
                           <div className="bg-epii-darker p-3 rounded-md">
                             <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-semibold text-epii-neon">LLM Suggestions</h5>
+                              <h5 className="font-semibold text-epii-neon">🚀 Epii Agent Suggestions</h5>
                               <Button
-                                onClick={applyLLMSuggestions}
+                                onClick={() => applySuggestionsToForm(llmSuggestions)}
                                 size="sm"
                                 className="bg-epii-neon text-epii-darker hover:bg-epii-neon/90"
                               >
@@ -2178,11 +2217,14 @@ Provide your response as a JSON object with the following structure:
                               <div>
                                 <strong>Reasoning:</strong> {llmSuggestions.reasoning}
                               </div>
-                              <div>
-                                <strong>QL Alignment:</strong> {llmSuggestions.qlAlignment}
-                              </div>
 
-                              {Object.keys(llmSuggestions.propertyUpdates).length > 0 && (
+                              {llmSuggestions.qlAlignment && (
+                                <div>
+                                  <strong>QL Alignment:</strong> {llmSuggestions.qlAlignment}
+                                </div>
+                              )}
+
+                              {llmSuggestions.propertyUpdates && Object.keys(llmSuggestions.propertyUpdates).length > 0 && (
                                 <div>
                                   <strong>Property Updates:</strong>
                                   <pre className="text-xs bg-epii-dark p-2 rounded mt-1 overflow-x-auto">
@@ -2191,7 +2233,7 @@ Provide your response as a JSON object with the following structure:
                                 </div>
                               )}
 
-                              {llmSuggestions.relationshipSuggestions.length > 0 && (
+                              {llmSuggestions.relationshipSuggestions && llmSuggestions.relationshipSuggestions.length > 0 && (
                                 <div>
                                   <strong>Relationship Suggestions:</strong>
                                   <div className="space-y-1 mt-1">
@@ -2202,6 +2244,18 @@ Provide your response as a JSON object with the following structure:
                                       </div>
                                     ))}
                                   </div>
+                                </div>
+                              )}
+
+                              {llmSuggestions.error && (
+                                <div className="text-yellow-400 text-xs bg-yellow-900/20 p-2 rounded">
+                                  <strong>Note:</strong> {llmSuggestions.error}
+                                  {llmSuggestions.rawResponse && (
+                                    <details className="mt-2">
+                                      <summary className="cursor-pointer">View Raw Response</summary>
+                                      <pre className="text-xs mt-1 overflow-x-auto">{llmSuggestions.rawResponse}</pre>
+                                    </details>
+                                  )}
                                 </div>
                               )}
                             </div>

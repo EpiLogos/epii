@@ -5,6 +5,24 @@ import { zodToJsonSchema } from "../../utils/zodToJsonSchema.js";
 import { Tool, ToolDependencies } from "../../types/index.js";
 import { handleError } from "../../utils/error.js";
 
+// Properties to exclude from bimbaKnowing output for cleaner responses
+const EXCLUDED_PROPERTIES = ['embedding', 'updatedAt', 'createdAt', 'notionPageId'];
+
+/**
+ * Filter out unnecessary properties from node properties
+ * @param properties - Raw node properties
+ * @returns Filtered properties
+ */
+function filterNodeProperties(properties: Record<string, any>): Record<string, any> {
+  const filtered: Record<string, any> = {};
+  for (const key in properties) {
+    if (!EXCLUDED_PROPERTIES.includes(key)) {
+      filtered[key] = properties[key];
+    }
+  }
+  return filtered;
+}
+
 // Tool definition
 export const bimbaKnowingTool: Tool = {
   name: "bimbaKnowing",
@@ -116,11 +134,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
 
           // Process root node if it exists
           if (rootNode && rootNode.properties) {
-            const rootProperties: Record<string, any> = {};
-            for (const key in rootNode.properties) {
-              if (key === 'embedding') continue;
-              rootProperties[key] = rootNode.properties[key];
-            }
+            const rootProperties = filterNodeProperties(rootNode.properties);
 
             // Add root node to results
             results.push({
@@ -158,11 +172,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
             // Skip if branchNode.properties is null
             if (!branchNode.properties) return;
 
-            const branchProperties: Record<string, any> = {};
-            for (const key in branchNode.properties) {
-              if (key === 'embedding') continue;
-              branchProperties[key] = branchNode.properties[key];
-            }
+            const branchProperties = filterNodeProperties(branchNode.properties);
 
             // Track branch distribution
             if (branchProperties.bimbaCoordinate) {
@@ -198,11 +208,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
             // Skip if subnodeNode.properties is null
             if (!subnodeNode.properties) return;
 
-            const subnodeProperties: Record<string, any> = {};
-            for (const key in subnodeNode.properties) {
-              if (key === 'embedding') continue;
-              subnodeProperties[key] = subnodeNode.properties[key];
-            }
+            const subnodeProperties = filterNodeProperties(subnodeNode.properties);
 
             // Track branch hierarchy
             if (subnodeProperties.bimbaCoordinate) {
@@ -238,7 +244,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           MATCH (agent)
           WHERE agent.bimbaCoordinate = $agentCoordinate
         `;
-        
+
         const agentQueryParams: Record<string, any> = { agentCoordinate: validatedArgs.agentCoordinate };
         const subnodeWhereClauses: string[] = ["subnode.bimbaCoordinate STARTS WITH $agentCoordinate + '-'"];
 
@@ -264,7 +270,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           subnodeWhereClauses.push(Array.isArray(validatedArgs.qlContextFrame) ? "subnode.qlContextFrame IN $qlContextFrame" : "subnode.qlContextFrame = $qlContextFrame");
           agentQueryParams.qlContextFrame = validatedArgs.qlContextFrame;
         }
-        
+
         agentQuery += `
           // Get its immediate subnodes, potentially filtered by QL properties
           OPTIONAL MATCH (agent)-[r]->(subnode)
@@ -286,11 +292,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
 
           // Process agent node if it exists
           if (agentNode && agentNode.properties) {
-            const agentProperties: Record<string, any> = {};
-            for (const key in agentNode.properties) {
-              if (key === 'embedding') continue;
-              agentProperties[key] = agentNode.properties[key];
-            }
+            const agentProperties = filterNodeProperties(agentNode.properties);
 
             // Add agent node to results
             results.push({
@@ -335,11 +337,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
             // Skip if subnodeNode.properties is null
             if (!subnodeNode.properties) return;
 
-            const subnodeProperties: Record<string, any> = {};
-            for (const key in subnodeNode.properties) {
-              if (key === 'embedding') continue;
-              subnodeProperties[key] = subnodeNode.properties[key];
-            }
+            const subnodeProperties = filterNodeProperties(subnodeNode.properties);
 
             // Track branch distribution
             if (subnodeProperties.bimbaCoordinate) {
@@ -408,7 +406,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
             params.focusCoordinate = validatedArgs.focusCoordinate;
           }
         }
-        
+
         // A. QL Property Integration
         if (validatedArgs.qlPosition !== undefined) {
           if (Array.isArray(validatedArgs.qlPosition)) {
@@ -464,7 +462,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
               WITH node // This is the 'node' from the main vector search
               MATCH path = (node)-[*1..${validatedArgs.contextDepth}]-(related)
               // Apply subsystemPrefix to related nodes if focusCoordinate was given
-              WHERE related.bimbaCoordinate IS NOT NULL 
+              WHERE related.bimbaCoordinate IS NOT NULL
                 ${validatedArgs.focusCoordinate ? "AND related.bimbaCoordinate STARTS WITH $subsystemPrefix" : ""}
               RETURN related,
                     size([x IN nodes(path) WHERE x.bimbaCoordinate IS NOT NULL]) AS pathLength
@@ -496,11 +494,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           const relatedNodes = record.get('relatedNodes') || [];
 
           // Extract node properties
-          const nodeProperties: Record<string, any> = {};
-          for (const key in node.properties) {
-            if (key === 'embedding') continue; // Skip embedding property
-            nodeProperties[key] = node.properties[key];
-          }
+          const nodeProperties = filterNodeProperties(node.properties);
 
           // Track branch distribution
           if (nodeProperties.bimbaCoordinate) {
@@ -534,11 +528,7 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
             const pathLength = relatedItem.pathLength;
 
             // Extract related node properties
-            const relatedProperties: Record<string, any> = {};
-            for (const key in relatedNode.properties) {
-              if (key === 'embedding') continue;
-              relatedProperties[key] = relatedNode.properties[key];
-            }
+            const relatedProperties = filterNodeProperties(relatedNode.properties);
 
             return {
               id: relatedNode.identity.toString(),
@@ -566,77 +556,114 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
       // We will add 'parents', 'children', 'siblings' properties to each result item.
       // Limit detailed fetching to top N results for performance.
       const topNResultsForRelationalFetching = 3; // Configurable: fetch details for top 3 results
-      const processedResults = []; 
+      const processedResults = [];
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
-        const nodeId = result.id; 
-        const nodeCoordinate = result.properties.bimbaCoordinate; 
+        const nodeId = result.id;
+        const nodeCoordinate = result.properties.bimbaCoordinate;
 
         if (!nodeId || !nodeCoordinate) {
           processedResults.push(result); // Push result as is if no ID/coordinate
           continue;
         }
-        
+
         const relationalData: { parents: any[], children: any[], siblings: any[] } = {
           parents: [],
           children: [],
           siblings: [],
         };
 
-        // Only fetch detailed relations for top N results OR 
+        // Only fetch detailed relations for top N results OR
         // if it's the agent's direct node or one of its direct subnodes in agent awareness mode
-        const shouldFetchRelations = validatedArgs.includeRelations && 
-                                     (i < topNResultsForRelationalFetching || 
+        const shouldFetchRelations = validatedArgs.includeRelations &&
+                                     (i < topNResultsForRelationalFetching ||
                                       (isAgentAwarenessQuery && (result.relevanceType === "direct" || result.relevanceType === "branch")));
 
         if (shouldFetchRelations) {
-          // Fetch Parents
-          const parentQuery = `
-            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(current)
-            WHERE id(current) = $nodeId
-            RETURN parent.name AS name, parent.bimbaCoordinate AS coordinate, labels(parent) as labels, id(parent) as id
-            LIMIT 5`;
-          const parentResult = await session.run(parentQuery, { nodeId: neo4j.int(nodeId) });
-          relationalData.parents = parentResult.records.map(r => ({ 
-            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
-          }));
+          // Optimized 6-fold structural query - single query for parent, ALL siblings, ALL children
+          const structuralQuery = `
+            MATCH (current) WHERE id(current) = $nodeId
 
-          // Fetch Children
-          const childrenQuery = `
-            MATCH (current)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(child)
-            WHERE id(current) = $nodeId
-            RETURN child.name AS name, child.bimbaCoordinate AS coordinate, labels(child) as labels, id(child) as id
-            LIMIT 10`;
-          const childrenResult = await session.run(childrenQuery, { nodeId: neo4j.int(nodeId) });
-          relationalData.children = childrenResult.records.map(r => ({ 
-            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
-          }));
-          
-          // Fetch Siblings
-          const siblingQuery = `
-            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(current)
-            WHERE id(current) = $nodeId
-            WITH parent
-            MATCH (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO]->(sibling)
-            WHERE id(sibling) <> $nodeId AND sibling.bimbaCoordinate IS NOT NULL 
-            RETURN sibling.name AS name, sibling.bimbaCoordinate AS coordinate, labels(sibling) as labels, id(sibling) as id
-            LIMIT 10`;
-          const siblingResult = await session.run(siblingQuery, { nodeId: neo4j.int(nodeId) });
-          relationalData.siblings = siblingResult.records.map(r => ({ 
-            id: r.get('id').toString(), name: r.get('name'), coordinate: r.get('coordinate'), labels: r.get('labels') 
-          })).filter((s, index, self) => index === self.findIndex(t => t.id === s.id)); // Deduplicate siblings
+            // Get parent using coordinate-based logic
+            OPTIONAL MATCH (parent)
+            WHERE current.bimbaCoordinate IS NOT NULL
+              AND parent.bimbaCoordinate IS NOT NULL
+              AND (
+                // Direct parent relationship (e.g., #2-1 -> #2)
+                (current.bimbaCoordinate STARTS WITH parent.bimbaCoordinate + '-'
+                 AND size(split(current.bimbaCoordinate, '-')) = size(split(parent.bimbaCoordinate, '-')) + 1)
+                OR
+                // Fallback to relationship-based parent
+                (parent)-[:HAS_CHILD|CONTAINS|RELATES_TO|HAS_INTERNAL_COMPONENT]->(current)
+              )
+
+            // Get ALL siblings using coordinate-based 6-fold logic
+            OPTIONAL MATCH (sibling)
+            WHERE current.bimbaCoordinate IS NOT NULL
+              AND sibling.bimbaCoordinate IS NOT NULL
+              AND sibling <> current
+              AND (
+                // Coordinate-based siblings (same parent coordinate)
+                CASE
+                  WHEN current.bimbaCoordinate CONTAINS '-' THEN
+                    sibling.bimbaCoordinate STARTS WITH
+                    substring(current.bimbaCoordinate, 0, size(current.bimbaCoordinate) - size(split(current.bimbaCoordinate, '-')[-1]) - 1) + '-'
+                    AND size(split(sibling.bimbaCoordinate, '-')) = size(split(current.bimbaCoordinate, '-'))
+                  ELSE false
+                END
+              )
+
+            // Get ALL children using coordinate-based logic
+            OPTIONAL MATCH (child)
+            WHERE current.bimbaCoordinate IS NOT NULL
+              AND child.bimbaCoordinate IS NOT NULL
+              AND (
+                // Direct children (e.g., #2 -> #2-0, #2-1, etc.)
+                child.bimbaCoordinate STARTS WITH current.bimbaCoordinate + '-'
+                AND size(split(child.bimbaCoordinate, '-')) = size(split(current.bimbaCoordinate, '-')) + 1
+              )
+
+            RETURN
+              collect(DISTINCT {
+                id: toString(id(parent)),
+                name: parent.name,
+                coordinate: parent.bimbaCoordinate,
+                labels: labels(parent)
+              }) as parents,
+              collect(DISTINCT {
+                id: toString(id(sibling)),
+                name: sibling.name,
+                coordinate: sibling.bimbaCoordinate,
+                labels: labels(sibling)
+              }) as siblings,
+              collect(DISTINCT {
+                id: toString(id(child)),
+                name: child.name,
+                coordinate: child.bimbaCoordinate,
+                labels: labels(child)
+              }) as children
+          `;
+
+          const structuralResult = await session.run(structuralQuery, { nodeId: neo4j.int(nodeId) });
+
+          if (structuralResult.records.length > 0) {
+            const record = structuralResult.records[0];
+            relationalData.parents = record.get('parents').filter((p: any) => p.coordinate !== null);
+            relationalData.siblings = record.get('siblings').filter((s: any) => s.coordinate !== null);
+            relationalData.children = record.get('children').filter((c: any) => c.coordinate !== null);
+          }
         }
-        
+
         processedResults.push({ ...result, ...relationalData });
       }
-      results = processedResults; 
+      results = processedResults;
 
       // 6. Ensure complete branch structure for holistic response
       // The existing logic for 'graphRelationships' might be redundant now with specific parent/child/sibling fetching.
       // I'll comment it out for now as it fetches generic relationships.
       // if (validatedArgs.includeRelations && results.length > 0) { ... }
-      
+
       // The branch structure completion (placeholder nodes) can remain as is.
       // If we have a focus on a specific branch (especially for agent queries), ensure all 6 subnodes are represented
       if (validatedArgs.agentCoordinate && validatedArgs.agentCoordinate.startsWith('#')) {
@@ -741,11 +768,11 @@ export async function handleBimbaKnowing(dependencies: ToolDependencies, args: a
           }
         }
       });
-      
+
       // Update counts in hexagonalStructure
       organizedResults.hexagonalStructure.mainBranches = Object.keys(branchCounts).length;
       organizedResults.hexagonalStructure.totalResults = results.length;
-      
+
       // Update branchDistribution and branchHierarchy in the final object
       organizedResults.branchDistribution = branchCounts;
       organizedResults.branchHierarchy = branchHierarchy;

@@ -122,7 +122,9 @@ class EpiiAgentAdapter {
         context: {
           ...initialState,
           taskId: task.id,
-          files
+          files,
+          _epiiAgentService: this.epiiAgentService, // Pass the Epii agent service to skills
+          agentId: 'epii-agent'
         }
       };
 
@@ -244,6 +246,51 @@ class EpiiAgentAdapter {
       setTimeout(() => {
         this.taskStore.delete(task.id);
       }, 60000); // Keep task state for 1 minute for potential follow-up
+    }
+  }
+
+  /**
+   * Execute a skill directly
+   * @param {string} skillId The skill ID to execute
+   * @param {Object} parameters The skill parameters
+   * @param {Object} context The execution context
+   * @returns {Promise<Object>} The skill execution result
+   */
+  async executeSkill(skillId, parameters, context = {}) {
+    console.log(`[EpiiAgentAdapter] Executing skill: ${skillId}`);
+
+    try {
+      // Use the skills router to execute the skill
+      const request = {
+        skillId: skillId, // Use skillId for routing, not bimbaCoordinate
+        content: parameters.message || JSON.stringify(parameters),
+        context: {
+          ...context,
+          _epiiAgentService: this.epiiAgentService,
+          agentId: 'epii-agent',
+          skillId: skillId,
+          parameters: parameters,
+          targetCoordinate: parameters.targetCoordinate || context.targetCoordinate
+        }
+      };
+
+      const result = await this.skillsRouter.routeRequest(request);
+
+      return {
+        success: true,
+        data: result,
+        skillId: skillId,
+        executionTime: result.executionTime || 0
+      };
+
+    } catch (error) {
+      console.error(`[EpiiAgentAdapter] Skill execution error:`, error);
+
+      return {
+        success: false,
+        error: error.message,
+        skillId: skillId
+      };
     }
   }
 

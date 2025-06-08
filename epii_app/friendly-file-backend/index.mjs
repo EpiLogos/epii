@@ -22,6 +22,7 @@ import userRoutes from './routes/user.routes.mjs'; // Import User routes
 import analysisRoutes from './routes/analysis.routes.mjs'; // Import Analysis routes
 import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
 import decanicRoutes from './subsystems/4_nara/1_routes/decanic.routes.mjs'; // Import Decanic routes for Epic 2
+import skillsRoutes from './routes/skills.routes.mjs'; // Import A2A Skills routes
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,6 +72,11 @@ async function startServer() {
   console.log('Decanic routes type:', typeof decanicRoutes);
   app.use('/api/nara/decanic', decanicRoutes); // Mount Decanic routes under /api/nara/decanic
   console.log('Decanic routes mounted successfully');
+
+  // Mount A2A Skills routes
+  console.log('Mounting A2A skills routes...');
+  app.use('/api/skills', skillsRoutes); // Mount Skills routes under /api/skills
+  console.log('A2A skills routes mounted successfully');
 
   app.listen(port, () => {
     console.log('Server listening on port ' + port);
