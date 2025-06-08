@@ -1,7 +1,7 @@
 /**
  * Bimba Update Management Skill
  * Analyzes documents and suggests Bimba node updates with QL-aware relationships
- * 
+ *
  * Bimba Coordinate: #5-2 (Technical Architecture / Process Dynamics)
  */
 
@@ -27,49 +27,45 @@ class BimbaUpdateManagementSkill {
    * @returns {Promise<Object>} Structured suggestions for Bimba updates
    */
   async execute(params, context) {
-    const logPrefix = `[BimbaUpdateManagement:${params.coordinate}]`;
+    // Extract parameters from the nested structure that A2A sends
+    const actualParams = params.parameters || params;
+
+    const logPrefix = `[BimbaUpdateManagement:${actualParams.coordinate}]`;
     console.log(`${logPrefix} Executing skill with params:`, {
-      coordinate: params.coordinate,
-      documentType: params.documentType,
-      documentName: params.documentName,
-      hasContent: !!params.documentContent,
-      propertiesCount: Object.keys(params.nodeProperties || {}).length,
-      relationshipsCount: (params.relationships || []).length
+      coordinate: actualParams.coordinate,
+      documentType: actualParams.documentType,
+      documentName: actualParams.documentName,
+      hasContent: !!actualParams.documentContent,
+      propertiesCount: Object.keys(actualParams.nodeProperties || {}).length,
+      relationshipsCount: (actualParams.relationships || []).length
     });
 
     try {
-      // Get the Epii agent service from context
-      const epiiAgentService = context._epiiAgentService;
-      if (!epiiAgentService) {
-        throw new Error('Epii agent service not available in context');
-      }
+      // Build the analysis prompt
+      const analysisPrompt = this._buildAnalysisPrompt(actualParams);
 
-      // Build the analysis prompt for the Epii agent
-      const analysisPrompt = this._buildAnalysisPrompt(params);
+      // Make a direct LLM call using ChatGoogleGenerativeAI
+      console.log(`${logPrefix} Making direct LLM call for analysis...`);
 
-      // Process through Epii agent with enhanced context
-      console.log(`${logPrefix} Calling Epii agent for analysis...`);
-      const result = await epiiAgentService.processChatMessage(analysisPrompt, {
-        ...context,
-        targetCoordinate: '#5-2',
-        mode: 'bimba-update-analysis',
-        qlMetadata: {
-          qlPosition: 2,
-          contextFrame: '(0/1/2)',
-          qlMode: 'ascending'
-        },
-        documentContext: {
-          coordinate: params.coordinate,
-          documentType: params.documentType,
-          documentName: params.documentName,
-          hasContent: !!params.documentContent
-        }
+      // Import the LLM
+      const { ChatGoogleGenerativeAI } = await import('@langchain/google-genai');
+
+      const llm = new ChatGoogleGenerativeAI({
+        apiKey: process.env.GOOGLE_API_KEY,
+        model: 'gemini-2.0-flash-exp',
+        temperature: 0.3,
+        maxOutputTokens: 4096
       });
 
-      console.log(`${logPrefix} Epii agent response received`);
+      const response = await llm.invoke([
+        ["system", "You are an expert in Quaternal Logic and Bimba knowledge graph management. Analyze the provided document and current node state to suggest precise, structured updates. Always respond with valid JSON in the exact format requested."],
+        ["human", analysisPrompt]
+      ]);
+
+      console.log(`${logPrefix} LLM response received`);
 
       // Parse and structure the response
-      const structuredResult = this._parseEpiiResponse(result, logPrefix);
+      const structuredResult = this._parseLLMResponse(response, logPrefix);
 
       console.log(`${logPrefix} Skill execution completed successfully`);
       return structuredResult;
@@ -80,7 +76,9 @@ class BimbaUpdateManagementSkill {
         error: 'Skill execution failed',
         message: error.message,
         reasoning: 'Unable to process document for Bimba updates',
-        coordinate: params.coordinate
+        coordinate: actualParams.coordinate,
+        propertyUpdates: {},
+        relationshipSuggestions: []
       };
     }
   }
@@ -151,41 +149,54 @@ Respond with a JSON object in this exact format:
   }
 
   /**
-   * Parse the Epii agent response and structure it
-   * @param {*} result - Raw result from Epii agent
+   * Parse the LLM response and structure it
+   * @param {*} result - Raw result from LLM
    * @param {string} logPrefix - Logging prefix
    * @returns {Object} Structured result
    */
-  _parseEpiiResponse(result, logPrefix) {
-    // Try to extract JSON from the result
-    if (typeof result === 'string') {
-      const jsonMatch = result.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try {
-          const parsed = JSON.parse(jsonMatch[0]);
-          console.log(`${logPrefix} Successfully parsed JSON response`);
-          return parsed;
-        } catch (parseError) {
-          console.warn(`${logPrefix} Could not parse JSON from Epii agent response:`, parseError);
-        }
+  _parseLLMResponse(result, logPrefix) {
+    try {
+      // Extract content from LLM response
+      let responseText = '';
+      if (result && result.content && Array.isArray(result.content) && result.content.length > 0) {
+        responseText = result.content[0].text || result.content[0].content || '';
+      } else if (result && typeof result === 'string') {
+        responseText = result;
+      } else if (result && result.response) {
+        responseText = result.response;
+      } else {
+        throw new Error('No valid response content found');
       }
-    }
 
-    // If result is already an object, validate and return it
-    if (typeof result === 'object' && result !== null) {
-      console.log(`${logPrefix} Using object response directly`);
-      return result;
-    }
+      // Try to extract JSON from the response
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        console.log(`${logPrefix} Successfully parsed JSON response`);
 
-    // Fallback for unparseable responses
-    console.warn(`${logPrefix} Could not parse response, returning fallback structure`);
-    return {
-      rawResponse: typeof result === 'string' ? result : JSON.stringify(result),
-      error: 'Could not parse as structured JSON',
-      reasoning: 'Skill executed but response format needs adjustment',
-      propertyUpdates: {},
-      relationshipSuggestions: []
-    };
+        // Ensure required fields exist
+        return {
+          propertyUpdates: parsed.propertyUpdates || {},
+          relationshipSuggestions: parsed.relationshipSuggestions || [],
+          reasoning: parsed.reasoning || 'Analysis completed',
+          qlAlignment: parsed.qlAlignment || 'QL principles applied'
+        };
+      } else {
+        throw new Error('No JSON found in response');
+      }
+
+    } catch (parseError) {
+      console.warn(`${logPrefix} Could not parse LLM response:`, parseError);
+
+      // Return fallback structure
+      return {
+        rawResponse: typeof result === 'string' ? result : JSON.stringify(result),
+        error: 'Could not parse as structured JSON',
+        reasoning: 'Skill executed but response format needs adjustment',
+        propertyUpdates: {},
+        relationshipSuggestions: []
+      };
+    }
   }
 
   /**
