@@ -9,8 +9,15 @@
 const WebSocket = require('ws');
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 const EpiiAgentAdapter = require('./adapters/epii-agent-adapter');
 const { epiiAgentCard } = require('./agent-cards');
+
+// Load environment variables from the backend .env file
+require('dotenv').config({ path: path.resolve(__dirname, '../friendly-file-backend/.env') });
+
+console.log('[A2A Server] Environment variables loaded');
+console.log('[A2A Server] GOOGLE_API_KEY available:', !!process.env.GOOGLE_API_KEY);
 
 // Mock implementation of the existing Epii agent service
 // In a real implementation, this would be imported from your existing codebase

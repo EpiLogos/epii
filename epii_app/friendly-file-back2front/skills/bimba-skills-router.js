@@ -114,8 +114,17 @@ class BimbaSkillsRouter {
         targetCoordinate: request.bimbaCoordinate || enhancedContext.targetCoordinate,
         documentId: enhancedContext.documentId,
         documentContent: enhancedContext.documentContent,
-        context: enhancedContext
+        context: enhancedContext,
+        // Include any parameters that were passed from the context
+        ...(enhancedContext.parameters || {}),
+        // Include any parameters that were passed directly in the request
+        ...(request.parameters || {})
       };
+
+      console.log(`[BimbaSkillsRouter] Calling skill ${skill.id} with params:`, {
+        ...skillParams,
+        documentContent: skillParams.documentContent ? `${skillParams.documentContent.substring(0, 100)}...` : 'none'
+      });
 
       const result = await skill.handler(skillParams, enhancedContext);
 

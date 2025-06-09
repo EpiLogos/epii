@@ -6,9 +6,16 @@
  * Represents the main service for the Siva-Shakti A2A framework
  */
 
+const path = require('path');
 const { integrateA2AWithEpiiAgent } = require('./integration');
 const EpiiAgentClient = require('./epii-agent-client');
 const NaraAgentClient = require('./nara-agent-client');
+
+// Load environment variables from the backend .env file
+require('dotenv').config({ path: path.resolve(__dirname, '../friendly-file-backend/.env') });
+
+console.log('[A2A Service] Environment variables loaded');
+console.log('[A2A Service] GOOGLE_API_KEY available:', !!process.env.GOOGLE_API_KEY);
 
 // Configuration
 const PORT = process.env.A2A_PORT || 3033;

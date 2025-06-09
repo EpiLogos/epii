@@ -264,6 +264,7 @@ class EpiiAgentAdapter {
       const request = {
         skillId: skillId, // Use skillId for routing, not bimbaCoordinate
         content: parameters.message || JSON.stringify(parameters),
+        parameters: parameters, // Pass parameters directly in the request
         context: {
           ...context,
           _epiiAgentService: this.epiiAgentService,
@@ -273,6 +274,13 @@ class EpiiAgentAdapter {
           targetCoordinate: parameters.targetCoordinate || context.targetCoordinate
         }
       };
+
+      console.log(`[EpiiAgentAdapter] Routing request with parameters:`, {
+        skillId,
+        hasParameters: !!parameters,
+        parameterKeys: Object.keys(parameters || {}),
+        contextKeys: Object.keys(request.context)
+      });
 
       const result = await this.skillsRouter.routeRequest(request);
 
