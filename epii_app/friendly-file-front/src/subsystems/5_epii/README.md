@@ -19,7 +19,7 @@ Epii Mode recognizes that all knowledge operations must honor the **sacred natur
 ### **Technical Implementation**
 The subsystem is organized into specialized layers:
 - **1_state**: Unified state management for bimba-pratibimba coordination
-- **2_hooks**: Reactive interfaces for document and knowledge operations  
+- **2_hooks**: Reactive interfaces for document and knowledge operations
 - **3_visualization**: Sacred editing interfaces and coordinate tree navigation
 - **4_analysis**: [Backend] QL-aware document processing pipeline
 
@@ -91,6 +91,32 @@ toolName: 'updateBimbaGraph'  // NEW: Write-enabled BPMCP tool
 6. **State Cleanup**: All caches cleared and UI refreshed after successful updates
 
 ---
+
+## **🌊 AG-UI Integration System**
+
+### **Mathematical Essence: Real-time Agent-UI Communication**
+The AG-UI (Agent-Generated User Interface) integration provides seamless real-time communication between frontend components and backend skills through the A2A server's AG-UI Gateway. This system enables skills to directly update UI components with progress reports, suggestions, and results.
+
+### **Key Features**
+- **Centralized WebSocket Service**: Single connection point for all AG-UI communication
+- **Real-time Progress Reporting**: Live updates during skill execution with detailed progress tracking
+- **Automatic Suggestion Application**: Skills can directly populate form fields and update UI state
+- **Comprehensive Change Management**: Individual and bulk deletion of suggestions with state persistence
+- **Event-Driven Architecture**: Reactive UI updates based on backend skill emissions
+
+### **Reference Implementation**
+The `BimbaUpdateOverlay` component serves as the reference implementation for AG-UI integration, demonstrating:
+- Proper WebSocket service usage and event handler management
+- Real-time progress reporting with user feedback
+- Automatic suggestion application with change tracking integration
+- Comprehensive suggestion management (individual/bulk deletion)
+- Error handling and graceful degradation patterns
+
+### **Documentation**
+- **Frontend Integration**: `docs/AG-UI_Integration_Guide.md`
+- **Backend Development**: `../friendly-file-back2front/docs/AG-UI_Backend_Integration.md`
+- **BPMCP Tools**: `../../Cline/MCP/Bimba-Pratibimba-Memory-MCP/docs/manageBimbaRelationships_Tool_Guide.md`
+- **Cross-Platform Standards**: `../../../docs/AG-UI_Cross_Platform_Development_Standards.md`
 
 ## **🌊 Notion Crystallization Pipeline**
 

@@ -19,6 +19,12 @@ import { useGraphData } from '../2_hooks/useGraphData';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
 import RecursiveFullBimbaTree from './RecursiveFullBimbaTree';
 import CreateNodeModal from './CreateNodeModal';
+import webSocketService, {
+  subscribeToAGUIEvents,
+  onAGUIEvent,
+  offAGUIEvent,
+  executeSkillWithAGUI
+} from '../1_services/webSocketService';
 
 interface BimbaNode {
   coordinate: string;
@@ -96,6 +102,15 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   const [coordinateDocuments, setCoordinateDocuments] = useState<any[]>([]);
   const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 
+  // AG-UI state
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+  const [analysisProgress, setAnalysisProgress] = useState<{
+    stage: string;
+    progress: number;
+    currentStep: string;
+  } | null>(null);
+
   // Update state
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
@@ -129,6 +144,117 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       setSelectedCoordinate(initialCoordinate);
     }
   }, [isOpen, initialCoordinate, selectedCoordinate]);
+
+  // Setup AG-UI event handlers when overlay opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    console.log('🎯 Setting up AG-UI event handlers for BimbaUpdateOverlay');
+    console.log('🔌 WebSocket connection status:', webSocketService.isWebSocketConnected());
+
+    // Handler for Bimba Update Suggestions
+    const handleUpdateSuggestions = (event: any) => {
+      console.log('🚀 Received BIMBA_UPDATE_SUGGESTIONS event:', event);
+      console.log('📊 Event structure analysis:', {
+        hasPropertyUpdates: !!event.propertyUpdates,
+        propertyUpdateKeys: event.propertyUpdates ? Object.keys(event.propertyUpdates) : [],
+        hasRelationshipSuggestions: !!event.relationshipSuggestions,
+        relationshipCount: event.relationshipSuggestions ? event.relationshipSuggestions.length : 0,
+        targetCoordinate: event.targetCoordinate,
+        currentSelectedCoordinate: selectedCoordinate
+      });
+
+      // Verify this is for the current coordinate
+      if (event.targetCoordinate && event.targetCoordinate !== selectedCoordinate) {
+        console.log(`⚠️ Ignoring suggestions for different coordinate: ${event.targetCoordinate} (current: ${selectedCoordinate})`);
+        return;
+      }
+
+      // Extract suggestions from AG-UI event with comprehensive validation
+      const suggestions = {
+        propertyUpdates: event.propertyUpdates || {},
+        relationshipSuggestions: event.relationshipSuggestions || [],
+        reasoning: event.reasoning || 'Analysis completed via AG-UI',
+        qlAlignment: event.qlAlignment || 'QL aligned',
+        targetCoordinate: event.targetCoordinate || selectedCoordinate
+      };
+
+      console.log('✨ Processed suggestions for form application:', {
+        propertyCount: Object.keys(suggestions.propertyUpdates).length,
+        relationshipCount: suggestions.relationshipSuggestions.length,
+        targetCoordinate: suggestions.targetCoordinate
+      });
+
+      // Detailed property updates logging
+      if (Object.keys(suggestions.propertyUpdates).length > 0) {
+        console.log('📝 Property updates to apply:', suggestions.propertyUpdates);
+      }
+
+      // Detailed relationship suggestions logging
+      if (suggestions.relationshipSuggestions.length > 0) {
+        console.log('🔗 Relationship suggestions to apply:', suggestions.relationshipSuggestions);
+      }
+
+      // Set suggestions first
+      setLLMSuggestions(suggestions);
+
+      // Apply them to form with detailed logging
+      console.log('🎯 Calling applySuggestionsToForm...');
+      console.log('🔍 Current state at time of application:', {
+        selectedCoordinate,
+        editedPropertiesKeys: Object.keys(editedProperties),
+        editedRelationshipsCount: editedRelationships.length,
+        pendingChangesSize: pendingChanges.size
+      });
+      applySuggestionsToForm(suggestions);
+
+      // Clear loading state
+      setIsGeneratingSuggestions(false);
+      setAnalysisProgress(null);
+      setSuggestionError(null);
+
+      console.log('✅ AG-UI suggestions processing completed');
+    };
+
+    // Handler for Analysis Progress
+    const handleAnalysisProgress = (event: any) => {
+      console.log('📊 Analysis progress update:', event);
+
+      setAnalysisProgress({
+        stage: event.stage || 'processing',
+        progress: event.progress || 0,
+        currentStep: event.currentStep || 'Processing...'
+      });
+    };
+
+    // Handler for Run Errors
+    const handleRunError = (event: any) => {
+      console.error('❌ AG-UI Run Error:', event);
+
+      setIsGeneratingSuggestions(false);
+      setAnalysisProgress(null);
+      setSuggestionError(event.message || 'Analysis failed');
+    };
+
+    // Register event handlers
+    console.log('📝 Registering AG-UI event handlers...');
+    onAGUIEvent('BimbaUpdateSuggestions', handleUpdateSuggestions);
+    onAGUIEvent('BimbaAnalysisProgress', handleAnalysisProgress);
+    onAGUIEvent('RunError', handleRunError);
+
+    // Test WebSocket connection status
+    console.log('🔌 WebSocket connected:', webSocketService.isWebSocketConnected());
+
+    // Note: Global subscription to AG-UI events happens in webSocketService.ts
+
+    // Cleanup on unmount or when overlay closes
+    return () => {
+      console.log('🧹 Cleaning up AG-UI event handlers');
+      offAGUIEvent('BimbaUpdateSuggestions', handleUpdateSuggestions);
+      offAGUIEvent('BimbaAnalysisProgress', handleAnalysisProgress);
+      offAGUIEvent('RunError', handleRunError);
+    };
+  }, [isOpen, selectedCoordinate]);
 
   // Change tracking utilities
   const saveChangesToCache = (coordinate: string, changes: Map<string, any>) => {
@@ -211,6 +337,36 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       loadCoordinateDocuments(selectedCoordinate);
     }
   }, [selectedCoordinate]);
+
+  // Debug state changes for form field updates
+  useEffect(() => {
+    console.log('🔄 editedProperties state changed:', {
+      coordinate: selectedCoordinate,
+      propertyKeys: Object.keys(editedProperties),
+      propertyCount: Object.keys(editedProperties).length,
+      sampleProperties: Object.keys(editedProperties).slice(0, 5).reduce((acc, key) => {
+        acc[key] = editedProperties[key];
+        return acc;
+      }, {} as any)
+    });
+  }, [editedProperties, selectedCoordinate]);
+
+  useEffect(() => {
+    console.log('🔗 editedRelationships state changed:', {
+      coordinate: selectedCoordinate,
+      relationshipCount: editedRelationships.length,
+      relationships: editedRelationships.map(rel => `${rel.type} → ${rel.targetCoordinate}`)
+    });
+  }, [editedRelationships, selectedCoordinate]);
+
+  useEffect(() => {
+    console.log('📊 pendingChanges state changed:', {
+      coordinate: selectedCoordinate,
+      changesCount: pendingChanges.size,
+      changes: Array.from(pendingChanges.entries()),
+      hasUnsavedChanges
+    });
+  }, [pendingChanges, hasUnsavedChanges, selectedCoordinate]);
 
 
 
@@ -569,100 +725,65 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
         })
       );
 
-      // Call the A2A service directly using WebSocket like EpiiChat does
-      console.log('🚀 Calling Bimba Update Management skill (#5-2) via A2A WebSocket...');
+      // Generate AG-UI run identifiers
+      const runId = `bimba_update_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const threadId = `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      const a2aUrl = 'ws://localhost:3033';
-      const ws = new WebSocket(a2aUrl);
+      setCurrentRunId(runId);
+      setCurrentThreadId(threadId);
 
-      const response = await new Promise((resolve, reject) => {
-        let responseData = null;
+      console.log('🚀 Calling Bimba Update Management skill via centralized AG-UI WebSocket service...');
+      console.log(`📋 AG-UI Run ID: ${runId}`);
+      console.log(`🧵 AG-UI Thread ID: ${threadId}`);
+      console.log(`🎯 Target Coordinate: ${selectedCoordinate}`);
 
-        ws.onopen = () => {
-          // Register as client
-          ws.send(JSON.stringify({
-            type: 'registration',
-            agentId: 'bimba-update-client',
-            agentName: 'Bimba Update Client'
-          }));
-        };
+      // Verify WebSocket connection before proceeding
+      if (!webSocketService.isWebSocketConnected()) {
+        console.error('❌ WebSocket not connected! Attempting to reconnect...');
+        webSocketService.initializeWebSocket();
 
-        ws.onmessage = (event) => {
-          const message = JSON.parse(event.data);
+        // Wait a moment for connection
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
-          if (message.type === 'registration_confirmation') {
-            // Send skill execution request
-            ws.send(JSON.stringify({
-              jsonrpc: "2.0",
-              id: Date.now().toString(),
-              method: "executeSkill",
-              params: {
-                skillId: "bimba-update-management",
-                parameters: {
-                  coordinate: selectedCoordinate,
-                  nodeProperties: filteredProperties,
-                  relationships: nodeData.relationships,
-                  documentContent: fileContent.substring(0, 4000) + (fileContent.length > 4000 ? '...' : ''),
-                  documentType: selectedFile.documentType,
-                  documentName: selectedFile.name
-                },
-                context: {
-                  agentId: "bimba-update-client",
-                  agentCoordinate: '#5-2',
-                  targetCoordinate: selectedCoordinate,
-                  requestType: 'bimba-update-suggestions'
-                }
-              }
-            }));
-          } else if (message.jsonrpc === "2.0" && (message.result || message.error)) {
-            responseData = message;
-            ws.close();
-
-            if (message.result && message.result.success) {
-              // Extract the suggestions from the nested result structure
-              let suggestions = null;
-
-              // Try different possible paths for the result
-              if (message.result.data?.result) {
-                suggestions = message.result.data.result;
-              } else if (message.result.data) {
-                suggestions = message.result.data;
-              } else {
-                suggestions = message.result;
-              }
-
-              console.log('A2A Response structure:', JSON.stringify(message.result, null, 2));
-              console.log('Extracted suggestions:', suggestions);
-
-              resolve({
-                ok: true,
-                json: () => Promise.resolve(suggestions)
-              });
-            } else {
-              reject(new Error(message.error?.message || message.result?.error || 'Skill execution failed'));
-            }
-          }
-        };
-
-        ws.onerror = (error) => {
-          reject(new Error('WebSocket connection failed'));
-        };
-
-        // Timeout after 30 seconds
-        setTimeout(() => {
-          if (!responseData) {
-            ws.close();
-            reject(new Error('Skill execution timeout'));
-          }
-        }, 30000);
-      });
-
-      if (!response.ok) {
-        throw new Error(`Skill execution failed: ${response.statusText}`);
+        if (!webSocketService.isWebSocketConnected()) {
+          throw new Error('WebSocket connection failed. Please check if the A2A server is running on ws://localhost:3033');
+        }
       }
 
-      const suggestions = await response.json();
-      setLLMSuggestions(suggestions);
+      console.log('✅ WebSocket connected, proceeding with AG-UI skill execution');
+
+      // Note: Already globally subscribed to AG-UI events
+      console.log(`📡 Ready to receive AG-UI events for run: ${runId}`);
+
+      // Execute skill using centralized WebSocket service with AG-UI support
+      const result = await executeSkillWithAGUI(
+        'bimba-update-management',
+        {
+          coordinate: selectedCoordinate,
+          nodeProperties: filteredProperties,
+          relationships: nodeData.relationships,
+          documentContent: fileContent.substring(0, 4000) + (fileContent.length > 4000 ? '...' : ''),
+          documentType: selectedFile.documentType,
+          documentName: selectedFile.name
+        },
+        {
+          agentId: 'bimba-update-client',
+          agentCoordinate: '#5-2',
+          targetCoordinate: selectedCoordinate,
+          requestType: 'bimba-update-suggestions'
+        },
+        {
+          runId,
+          threadId,
+          enableAGUI: true
+        }
+      );
+
+      console.log('✅ Skill execution completed via AG-UI:', result);
+      console.log(`🎯 Target coordinate preserved: ${result.targetCoordinate || selectedCoordinate}`);
+
+      // The AG-UI event handlers will automatically process the suggestions
+      // No need to manually set suggestions here - they come via events
 
     } catch (error) {
       console.error('Error generating LLM suggestions:', error);
@@ -672,48 +793,148 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     }
   };
 
-  // Apply suggestions to the form fields
+  // Apply suggestions using the EXACT same pattern as handlePropertyChange
   const applySuggestionsToForm = (suggestions: any) => {
-    console.log('🚀 Applying suggestions to form fields...');
+    console.log('🚀 Starting applySuggestionsToForm with suggestions:', suggestions);
+    console.log('📋 Current state before applying suggestions:', {
+      selectedCoordinate,
+      currentEditedPropertiesKeys: Object.keys(editedProperties),
+      currentRelationshipsCount: editedRelationships.length,
+      currentPendingChangesSize: pendingChanges.size,
+      hasUnsavedChanges
+    });
 
-    // Apply property updates to current coordinate
-    if (suggestions.propertyUpdates) {
-      setEditedProperties(prev => ({
-        ...prev,
-        ...suggestions.propertyUpdates
-      }));
+    if (!selectedCoordinate) {
+      console.error('❌ No selectedCoordinate - cannot apply suggestions');
+      return;
+    }
 
-      // Track changes for current coordinate
-      const newChanges = new Map(pendingChanges);
+    // Apply property updates using the EXACT same pattern as handlePropertyChange
+    if (suggestions.propertyUpdates && Object.keys(suggestions.propertyUpdates).length > 0) {
+      console.log('📝 Applying property updates using handlePropertyChange pattern:', suggestions.propertyUpdates);
+
+      // Apply each property update individually using the existing change tracking logic
       Object.entries(suggestions.propertyUpdates).forEach(([key, value]) => {
-        newChanges.set(`prop_${key}`, value);
+        console.log(`🔧 Applying property change: ${key} = ${JSON.stringify(value)}`);
+
+        // Use the existing handlePropertyChange logic directly
+        setEditedProperties(prev => {
+          const updated = { ...prev, [key]: value };
+          console.log(`📝 Updated editedProperties[${key}] from ${JSON.stringify(prev[key])} to ${JSON.stringify(value)}`);
+          return updated;
+        });
+
+        // Track the change using the existing pattern
+        setPendingChanges(prevChanges => {
+          const newChanges = new Map(prevChanges);
+          const changeKey = `prop_${key}`;
+
+          // Check if this is actually a change from original
+          const isChanged = isPropertyChanged(key, value);
+          console.log(`🔍 Property ${key} changed from original: ${isChanged}`);
+
+          if (isChanged) {
+            newChanges.set(changeKey, value);
+            console.log(`✅ Added to pending changes: ${changeKey}`);
+          } else {
+            newChanges.delete(changeKey);
+            console.log(`🗑️ Removed from pending changes: ${changeKey}`);
+          }
+
+          console.log('📊 Updated pending changes:', Array.from(newChanges.entries()));
+
+          // Update hasUnsavedChanges
+          setHasUnsavedChanges(newChanges.size > 0);
+
+          // Save to cache immediately
+          saveChangesToCache(selectedCoordinate, newChanges);
+
+          // Update global change count
+          setTimeout(() => {
+            const globalChanges = collectAllChanges();
+            const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
+            setGlobalChangeCount(totalChanges);
+            console.log(`🔢 Updated global change count: ${totalChanges}`);
+          }, 0);
+
+          return newChanges;
+        });
       });
-      setPendingChanges(newChanges);
-      setHasUnsavedChanges(true);
-
-      if (selectedCoordinate) {
-        saveChangesToCache(selectedCoordinate, newChanges);
-      }
+    } else {
+      console.log('📝 No property updates to apply');
     }
 
-    // Apply relationship suggestions
-    if (suggestions.relationshipSuggestions) {
+    // Apply relationship suggestions with proper change tracking
+    if (suggestions.relationshipSuggestions && suggestions.relationshipSuggestions.length > 0) {
+      console.log('🔗 Processing relationship suggestions:', suggestions.relationshipSuggestions);
+
       const newRelationships = suggestions.relationshipSuggestions
-        .filter((rel: any) => rel.action === 'create')
-        .map((rel: any) => ({
-          action: 'create',
-          type: rel.type,
-          targetCoordinate: rel.targetCoordinate,
-          properties: rel.properties
-        }));
+        .filter((rel: any) => {
+          console.log(`🔍 Filtering relationship: ${rel.action} ${rel.type} → ${rel.targetCoordinate}`);
+          return rel.action === 'create';
+        })
+        .map((rel: any, index: number) => {
+          const mappedRel = {
+            action: 'create',
+            type: rel.type,
+            targetCoordinate: rel.targetCoordinate,
+            properties: rel.properties || {},
+            suggestionId: `agui_rel_${Date.now()}_${index}` // Unique ID for tracking
+          };
+          console.log(`🔄 Mapped relationship:`, mappedRel);
+          return mappedRel;
+        });
 
-      setEditedRelationships(prev => [...prev, ...newRelationships]);
+      console.log(`🔗 Adding ${newRelationships.length} new relationships to existing ${editedRelationships.length}`);
+
+      // Update relationships state
+      setEditedRelationships(prev => {
+        const updated = [...prev, ...newRelationships];
+        console.log(`🔗 Updated relationships count: ${updated.length}`);
+        return updated;
+      });
+
+      // Track relationship changes in pending changes for proper change counting
+      setPendingChanges(prevChanges => {
+        const newChanges = new Map(prevChanges);
+
+        newRelationships.forEach((rel, index) => {
+          const changeKey = `rel_create_${rel.suggestionId}`;
+          newChanges.set(changeKey, {
+            action: 'create',
+            type: rel.type,
+            targetCoordinate: rel.targetCoordinate,
+            properties: rel.properties,
+            source: 'agui_suggestion'
+          });
+          console.log(`📊 Added relationship change: ${changeKey}`);
+        });
+
+        console.log('📊 Updated pending changes with relationships:', Array.from(newChanges.entries()));
+
+        // Update hasUnsavedChanges
+        setHasUnsavedChanges(newChanges.size > 0);
+
+        // Save to cache
+        if (selectedCoordinate) {
+          saveChangesToCache(selectedCoordinate, newChanges);
+        }
+
+        // Update global change count
+        setTimeout(() => {
+          const globalChanges = collectAllChanges();
+          const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
+          setGlobalChangeCount(totalChanges);
+          console.log(`🔢 Updated global change count with relationships: ${totalChanges}`);
+        }, 0);
+
+        return newChanges;
+      });
+    } else {
+      console.log('🔗 No relationship suggestions to apply');
     }
 
-    // Update global change count
-    const globalChanges = collectAllChanges();
-    const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
-    setGlobalChangeCount(totalChanges);
+    console.log('✅ applySuggestionsToForm completed using existing change tracking patterns');
   };
 
   const readFileContent = (file: File): Promise<string> => {
@@ -768,27 +989,7 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     }
   };
 
-  const applyLLMSuggestions = () => {
-    if (!llmSuggestions) return;
-
-    // Apply property updates
-    setEditedProperties(prev => ({
-      ...prev,
-      ...llmSuggestions.propertyUpdates
-    }));
-
-    // Apply relationship suggestions (for now, just add create actions)
-    const newRelationships = llmSuggestions.relationshipSuggestions
-      .filter(rel => rel.action === 'create')
-      .map(rel => ({
-        action: 'create',
-        type: rel.type,
-        targetCoordinate: rel.targetCoordinate,
-        properties: rel.properties
-      }));
-
-    setEditedRelationships(prev => [...prev, ...newRelationships]);
-  };
+  // Note: applyLLMSuggestions removed - now using applySuggestionsToForm with AG-UI events
 
   const handlePropertyChange = (key: string, value: any) => {
     setEditedProperties(prev => ({
@@ -840,6 +1041,115 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
       setGlobalChangeCount(totalChanges);
     }
+  };
+
+  // Delete a specific change from the review modal
+  const deleteSpecificChange = (coordinate: string, changeKey: string) => {
+    console.log(`🗑️ Deleting specific change: ${coordinate} -> ${changeKey}`);
+
+    // Remove from localStorage cache
+    const cacheKey = `bimba-changes-${coordinate}`;
+    const cachedChanges = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+    delete cachedChanges[changeKey];
+
+    if (Object.keys(cachedChanges).length === 0) {
+      localStorage.removeItem(cacheKey);
+    } else {
+      localStorage.setItem(cacheKey, JSON.stringify(cachedChanges));
+    }
+
+    // If this is the current coordinate, update local state
+    if (coordinate === selectedCoordinate) {
+      const newChanges = new Map(pendingChanges);
+      newChanges.delete(changeKey);
+      setPendingChanges(newChanges);
+      setHasUnsavedChanges(newChanges.size > 0);
+
+      // Revert the property in the form if it's a property change
+      if (changeKey.startsWith('prop_')) {
+        const propKey = changeKey.replace('prop_', '');
+        const originalValue = originalProperties[propKey];
+        setEditedProperties(prev => ({
+          ...prev,
+          [propKey]: originalValue
+        }));
+      }
+
+      // Remove relationship if it's a relationship change
+      if (changeKey.startsWith('rel_create_')) {
+        const suggestionId = changeKey.replace('rel_create_', '');
+        setEditedRelationships(prev =>
+          prev.filter(rel => rel.suggestionId !== suggestionId)
+        );
+      }
+    }
+
+    // Update the review modal state
+    const updatedAllChanges = new Map(allCoordinateChanges);
+    const coordinateChanges = updatedAllChanges.get(coordinate) || {};
+    delete coordinateChanges[changeKey];
+
+    if (Object.keys(coordinateChanges).length === 0) {
+      updatedAllChanges.delete(coordinate);
+    } else {
+      updatedAllChanges.set(coordinate, coordinateChanges);
+    }
+
+    setAllCoordinateChanges(updatedAllChanges);
+
+    // Update global change count
+    const globalChanges = collectAllChanges();
+    const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
+    setGlobalChangeCount(totalChanges);
+
+    console.log(`✅ Deleted change ${changeKey} for coordinate ${coordinate}`);
+  };
+
+  // Delete all suggestions across all coordinates
+  const deleteAllSuggestions = () => {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete ALL suggestions across all coordinates? This will revert all pending changes and cannot be undone.'
+    );
+
+    if (!confirmDelete) return;
+
+    console.log('🗑️ Deleting all suggestions across all coordinates...');
+
+    // Clear all cached changes from localStorage
+    const keys = Object.keys(localStorage);
+    for (const key of keys) {
+      if (key.startsWith('bimba-changes-')) {
+        localStorage.removeItem(key);
+        console.log(`🗑️ Cleared cache: ${key}`);
+      }
+    }
+
+    // Reset current coordinate state to original values
+    if (selectedCoordinate && nodeData) {
+      console.log(`🔄 Reverting ${selectedCoordinate} to original state`);
+
+      // Revert properties to original values
+      setEditedProperties({ ...originalProperties });
+
+      // Remove all AG-UI suggested relationships
+      setEditedRelationships(prev =>
+        prev.filter(rel => !rel.suggestionId || !rel.suggestionId.startsWith('agui_rel_'))
+      );
+
+      // Clear pending changes
+      setPendingChanges(new Map());
+      setHasUnsavedChanges(false);
+    }
+
+    // Clear LLM suggestions
+    setLLMSuggestions(null);
+
+    // Clear review modal state
+    setAllCoordinateChanges(new Map());
+    setGlobalChangeCount(0);
+    setShowReviewModal(false);
+
+    console.log('✅ All suggestions deleted and state reverted to original');
   };
 
   // Sanitize property values for Neo4j compatibility
@@ -2193,6 +2503,67 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                           )}
                         </div>
 
+                        {/* AG-UI Real-time Progress Display */}
+                        {analysisProgress && (
+                          <div className="bg-epii-darker p-4 rounded-md border border-epii-neon/30">
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-semibold text-epii-neon">🤖 AG-UI Analysis Progress</h5>
+                              <span className="text-xs text-gray-400">
+                                Run ID: {currentRunId?.slice(-8)}
+                              </span>
+                            </div>
+
+                            <div className="space-y-3">
+                              {/* Progress Bar */}
+                              <div className="w-full bg-gray-700 rounded-full h-2">
+                                <div
+                                  className="bg-epii-neon h-2 rounded-full transition-all duration-300 ease-out"
+                                  style={{ width: `${analysisProgress.progress}%` }}
+                                />
+                              </div>
+
+                              {/* Progress Details */}
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-300">
+                                  Stage: <span className="text-epii-neon font-medium">{analysisProgress.stage}</span>
+                                </span>
+                                <span className="text-gray-300">
+                                  {analysisProgress.progress}%
+                                </span>
+                              </div>
+
+                              {/* Current Step */}
+                              <div className="text-xs text-gray-400">
+                                {analysisProgress.currentStep}
+                              </div>
+
+                              {/* Stage Indicators */}
+                              <div className="flex items-center space-x-2 text-xs">
+                                {['llm-analysis', 'json-parsing', 'validation', 'completion'].map((stage, index) => (
+                                  <div
+                                    key={stage}
+                                    className={`flex items-center space-x-1 px-2 py-1 rounded ${
+                                      analysisProgress.stage === stage
+                                        ? 'bg-epii-neon/20 text-epii-neon'
+                                        : analysisProgress.progress > (index * 25)
+                                        ? 'bg-green-600/20 text-green-300'
+                                        : 'bg-gray-600/20 text-gray-400'
+                                    }`}
+                                  >
+                                    {analysisProgress.stage === stage && (
+                                      <div className="animate-spin h-3 w-3 border border-epii-neon border-t-transparent rounded-full" />
+                                    )}
+                                    {analysisProgress.progress > (index * 25) && analysisProgress.stage !== stage && (
+                                      <CheckCircle size={12} />
+                                    )}
+                                    <span>{stage.replace('-', ' ')}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         {suggestionError && (
                           <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded-md">
                             <AlertTriangle size={16} className="inline mr-2" />
@@ -2201,9 +2572,16 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                         )}
 
                         {llmSuggestions && (
-                          <div className="bg-epii-darker p-3 rounded-md">
+                          <div className="bg-epii-darker p-3 rounded-md border border-green-500/30">
                             <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-semibold text-epii-neon">🚀 Epii Agent Suggestions</h5>
+                              <div className="flex items-center space-x-2">
+                                <h5 className="font-semibold text-epii-neon">🚀 AG-UI Suggestions</h5>
+                                {llmSuggestions.targetCoordinate && (
+                                  <span className="text-xs bg-epii-neon/20 text-epii-neon px-2 py-1 rounded">
+                                    Target: {llmSuggestions.targetCoordinate}
+                                  </span>
+                                )}
+                              </div>
                               <Button
                                 onClick={() => applySuggestionsToForm(llmSuggestions)}
                                 size="sm"
@@ -2354,9 +2732,19 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                                   </span>
                                   <span className="font-medium text-gray-200">{displayKey}</span>
                                 </div>
-                                <span className="text-xs bg-epii-neon/20 text-epii-neon px-2 py-1 rounded">
-                                  CHANGED
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs bg-epii-neon/20 text-epii-neon px-2 py-1 rounded">
+                                    CHANGED
+                                  </span>
+                                  <Button
+                                    onClick={() => deleteSpecificChange(coordinate, changeKey)}
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-6 px-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-600/30"
+                                  >
+                                    🗑️ Delete
+                                  </Button>
+                                </div>
                               </div>
 
                               <div className="text-sm">
@@ -2387,30 +2775,40 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                   onClick={() => setShowReviewModal(false)}
                   variant="outline"
                 >
-                  Cancel Review
+                  Close Review
                 </Button>
 
                 {allCoordinateChanges.size > 0 && (
-                  <Button
-                    onClick={async () => {
-                      setShowReviewModal(false);
-                      await applyUpdates();
-                    }}
-                    disabled={isUpdating}
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    {isUpdating ? (
-                      <>
-                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        Applying Sacred Changes...
-                      </>
-                    ) : (
-                      <>
-                        <Save size={16} className="mr-2" />
-                        🔮 Apply Sacred Changes
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    <Button
+                      onClick={deleteAllSuggestions}
+                      variant="outline"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-600/30"
+                    >
+                      🗑️ Delete All Suggestions
+                    </Button>
+
+                    <Button
+                      onClick={async () => {
+                        setShowReviewModal(false);
+                        await applyUpdates();
+                      }}
+                      disabled={isUpdating}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {isUpdating ? (
+                        <>
+                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                          Applying Sacred Changes...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} className="mr-2" />
+                          🔮 Apply Sacred Changes
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )}
               </div>
             </div>

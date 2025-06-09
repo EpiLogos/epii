@@ -9,6 +9,8 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../friendly-file-backend/.env') });
 
+const { AGUIEventTypes, createAGUIEvent } = require('../ag-ui-event-schema');
+
 class BimbaUpdateManagementSkill {
   constructor() {
     this.skillId = 'bimba-update-management';
@@ -119,21 +121,83 @@ class BimbaUpdateManagementSkill {
 
       console.log(`${logPrefix} Parameters validated, proceeding with analysis`);
 
-      // Fetch complete node data from the Bimba graph instead of using limited params
-      console.log(`${logPrefix} Fetching complete node data from Bimba graph for coordinate: ${actualParams.coordinate}`);
-      const completeNodeData = await this._fetchCompleteNodeData(actualParams.coordinate, logPrefix);
+      // Check if AG-UI gateway is available for progress reporting
+      const aguiGateway = context?.aguiGateway;
+      const runId = context?.runId;
+      const threadId = context?.threadId;
+      const isAGUIEnabled = !!(aguiGateway && runId);
 
-      // Update actualParams with complete data
-      actualParams.nodeProperties = completeNodeData.properties;
-      actualParams.relationships = completeNodeData.relationships;
+      // Emit progress event: Starting analysis
+      if (isAGUIEnabled) {
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'llm-analysis',
+          progress: 10,
+          currentStep: 'Validating parameters and preparing analysis'
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)'
+        });
+      }
 
-      console.log(`${logPrefix} Complete node data retrieved:`, {
-        propertiesCount: Object.keys(actualParams.nodeProperties).length,
-        relationshipsCount: actualParams.relationships.length
+      // Note: In Phase 1, we're using the existing parameter data
+      // Phase 2 will implement complete node data fetching from Bimba graph
+      console.log(`${logPrefix} Using provided node data (Phase 1 implementation)`);
+      console.log(`${logPrefix} Node data summary:`, {
+        propertiesCount: Object.keys(actualParams.nodeProperties || {}).length,
+        relationshipsCount: (actualParams.relationships || []).length
       });
 
-      // Build the analysis prompt with complete data
+      // Log detailed relationship information for debugging
+      if (actualParams.relationships && actualParams.relationships.length > 0) {
+        console.log(`${logPrefix} Detailed relationships:`,
+          actualParams.relationships.map(rel => ({
+            type: rel.type,
+            direction: rel.direction,
+            properties: rel.properties,
+            relatedNode: {
+              coordinate: rel.relatedNode?.coordinate,
+              title: rel.relatedNode?.title,
+              labels: rel.relatedNode?.labels
+            }
+          }))
+        );
+      }
+
+      // Emit progress event: Building prompt
+      if (isAGUIEnabled) {
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'llm-analysis',
+          progress: 30,
+          currentStep: 'Building analysis prompt'
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)'
+        });
+      }
+
+      // Build the analysis prompt
       const analysisPrompt = this._buildAnalysisPrompt(actualParams);
+
+      // Emit progress event: Starting LLM call
+      if (isAGUIEnabled) {
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'llm-analysis',
+          progress: 50,
+          currentStep: 'Calling LLM for analysis'
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)'
+        });
+      }
 
       // Make a direct LLM call using ChatGoogleGenerativeAI
       console.log(`${logPrefix} Making direct LLM call for analysis...`);
@@ -155,23 +219,126 @@ class BimbaUpdateManagementSkill {
 
       console.log(`${logPrefix} LLM response received:`, JSON.stringify(response, null, 2));
 
+      // Emit progress event: Parsing response
+      if (isAGUIEnabled) {
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'json-parsing',
+          progress: 80,
+          currentStep: 'Parsing LLM response'
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)'
+        });
+      }
+
       // Parse and structure the response
       const structuredResult = this._parseLLMResponse(response, logPrefix, actualParams);
+
+      // Emit progress event: Validation and completion
+      if (isAGUIEnabled) {
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'validation',
+          progress: 90,
+          currentStep: 'Validating results'
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)'
+        });
+      }
+
+      // Emit comprehensive AG-UI event with suggestions for frontend consumption
+      if (isAGUIEnabled) {
+        console.log(`${logPrefix} Emitting comprehensive AG-UI update suggestions event`);
+
+        // Enhanced suggestions event with complete data for frontend
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_UPDATE_SUGGESTIONS, {
+          runId,
+          threadId,
+          targetCoordinate: actualParams.coordinate, // Critical: target coordinate for frontend
+          propertyUpdates: structuredResult.propertyUpdates || {},
+          relationshipSuggestions: structuredResult.relationshipSuggestions || [],
+          reasoning: 'Comprehensive analysis completed with enhanced property extraction',
+          qlAlignment: `Aligned with QL position #2 (Process Dynamics) analyzing target coordinate ${actualParams.coordinate}`,
+          analysisMetadata: {
+            llmModel: 'gemini-2.0-flash-exp',
+            processingTime: Date.now(),
+            targetCoordinate: actualParams.coordinate,
+            skillCoordinate: this.bimbaCoordinate,
+            documentSource: actualParams.documentName,
+            documentType: actualParams.documentType,
+            propertyCount: Object.keys(structuredResult.propertyUpdates || {}).length,
+            relationshipCount: (structuredResult.relationshipSuggestions || []).length,
+            analysisDepth: 'comprehensive'
+          },
+          // Include complete context for frontend processing
+          analysisContext: {
+            originalNodeProperties: actualParams.nodeProperties,
+            originalRelationships: actualParams.relationships,
+            documentContent: actualParams.documentContent.substring(0, 500) + '...',
+            targetCoordinate: actualParams.coordinate,
+            skillExecutionPath: `${this.bimbaCoordinate} -> ${actualParams.coordinate}`
+          }
+        }), {
+          bimbaCoordinates: [actualParams.coordinate], // Target coordinate, not skill coordinate
+          qlStage: 2,
+          contextFrame: '(0/1/2)',
+          targetCoordinate: actualParams.coordinate
+        });
+
+        // Final progress event with completion details
+        aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
+          runId,
+          threadId,
+          stage: 'completion',
+          progress: 100,
+          currentStep: `Analysis completed for coordinate ${actualParams.coordinate}`,
+          completionDetails: {
+            targetCoordinate: actualParams.coordinate,
+            propertiesGenerated: Object.keys(structuredResult.propertyUpdates || {}).length,
+            relationshipsGenerated: (structuredResult.relationshipSuggestions || []).length,
+            analysisSuccess: true
+          }
+        }), {
+          bimbaCoordinates: [actualParams.coordinate],
+          qlStage: 2,
+          contextFrame: '(0/1/2)',
+          targetCoordinate: actualParams.coordinate
+        });
+
+        console.log(`${logPrefix} AG-UI events emitted successfully for coordinate ${actualParams.coordinate}`);
+      }
 
       console.log(`${logPrefix} Skill execution completed successfully`);
 
       // Return the result in the format expected by the A2A server
+      // IMPORTANT: Use the TARGET coordinate, not the skill's coordinate
       return {
         success: true,
         skillId: this.skillId,
-        bimbaCoordinate: this.bimbaCoordinate,
+        bimbaCoordinate: actualParams.coordinate, // TARGET coordinate, not skill coordinate
+        targetCoordinate: actualParams.coordinate, // Explicitly set target coordinate
         agentId: 'epii-agent',
         qlMetadata: {
-          qlPosition: 2,
+          qlPosition: 2, // This is the skill's QL position
           contextFrame: '(0/1/2)',
-          qlMode: 'ascending'
+          qlMode: 'ascending',
+          targetCoordinate: actualParams.coordinate // Target coordinate metadata
         },
-        data: structuredResult
+        data: {
+          ...structuredResult,
+          targetCoordinate: actualParams.coordinate, // Ensure target coordinate is in data
+          analysisContext: {
+            skillCoordinate: this.bimbaCoordinate, // #5-2 (skill's coordinate)
+            targetCoordinate: actualParams.coordinate, // The actual target being analyzed
+            documentSource: actualParams.documentName
+          }
+        }
       };
 
     } catch (error) {
@@ -217,10 +384,59 @@ DOCUMENT ANALYSIS:
 - Document Name: ${params.documentName}
 - Content: ${params.documentContent}
 
-TASK: Provide structured suggestions for updating this Bimba node based on the document content. Focus on:
+TASK: Generate foundational property updates for this Bimba node based on the document content, strictly prioritizing the four core relational properties from the Notion crystallisation framework.
 
-1. Property updates that reflect the document insights
-2. New QL-aware relationships to create based on semantic analysis
+**🎯 FOUNDATIONAL PRIORITY: The Four Core Relational Properties**
+
+These FOUR properties are the foundational layer and MUST be prioritized above all others:
+
+1. **qlOperators** (Rich Text) - ESSENTIAL FOUNDATION
+   - Identify and structure the quaternary logic operators present in the document
+   - Format as structured text describing the QL operational patterns
+   - Focus on how the document reveals specific QL operational dynamics
+   - Example: "Material emergence (0→1), processual activation (1→2), formal mediation (2→3), contextual embedding (3→4)"
+
+2. **epistemicEssence** (Rich Text) - ESSENTIAL FOUNDATION
+   - Extract deep insights about the epistemic nature revealed by the document
+   - Focus on knowledge structures, truth patterns, and cognitive architectures
+   - Capture the essential knowing patterns embedded in the content
+   - Example: "Recursive knowledge structures that self-reference through quaternary logic patterns, revealing emergent epistemic properties"
+
+3. **archetypalAnchors** (Rich Text) - ESSENTIAL FOUNDATION
+   - Identify archetypal patterns and symbolic anchors for manual page creation
+   - Focus on universal patterns, symbolic structures, and archetypal resonances
+   - Provide structured content suitable for Notion page creation
+   - Example: "The Quaternary Mandala: Four-fold patterns reflecting cosmic order, with center-periphery dynamics and recursive self-similarity"
+
+4. **semanticFramework** (Rich Text) - ESSENTIAL FOUNDATION
+   - Derive the semantic framework structure from document analysis
+   - Focus on meaning relationships, conceptual hierarchies, and semantic networks
+   - Capture how concepts relate within the quaternary logic structure
+   - Example: "Hierarchical semantic network with quaternary branching: concept → sub-concepts (4) → sub-sub-concepts (16) → applications (64)"
+
+**Secondary QL Properties** (include if document supports them):
+- qlPosition → Select (0,1,2,3,4,5)
+- qlCategory → Select (implicate, explicate)
+- qlOperatorTypes → Multi-select (structural, processual, contextual)
+- qlVariant → Text (default: "4/6")
+- qlDynamics → Select (emergence, activation, mediation, etc.)
+- relationshipStrength → Number (percentage)
+
+**Moderate Additional Properties** (only if strongly supported):
+- description → Enhanced description (only if document provides significant new insights)
+- summary → Concise summary (only if document warrants it)
+- lastAnalyzed → Current date
+- documentSource → Source document name
+- contextualRelevance → "high", "medium", or "low"
+
+**CRITICAL GUIDELINES**:
+1. **Foundation First**: The four core relational properties are MANDATORY - always attempt to generate meaningful content for these
+2. **Quality over Quantity**: 6-10 total properties maximum, with the four foundational properties taking priority
+3. **Semantic Alignment**: Ensure each foundational property captures the specific aspect it represents
+4. **Document Grounding**: All suggestions must be directly supported by document content
+5. **Structured Format**: Format foundational properties as rich text suitable for Notion database integration
+
+2. **QL-Aware Relationship Suggestions**: Create meaningful connections based on semantic analysis
 
 QL RELATIONSHIP SCHEMA REFERENCE:
 - 0_POTENTIAL_RELATION: Position #0 (Implicit Theme or Field of Potential)
@@ -238,10 +454,29 @@ QL Dynamics:
 - quintessential_synthesis: 4→5 (From context to synthesis)
 - recursive_renewal: 5→0 (From synthesis back to potential)
 
-Respond with a JSON object in this exact format:
+Respond with a JSON object in this exact format, prioritizing the FOUR FOUNDATIONAL RELATIONAL PROPERTIES:
 {
   "propertyUpdates": {
-    "property_name": "new_value"
+    // 🎯 FOUNDATIONAL LAYER - MANDATORY (The Four Core Relational Properties)
+    "qlOperators": "Structured description of quaternary logic operators identified in the document - focus on operational patterns and QL dynamics",
+    "epistemicEssence": "Deep insights about the epistemic nature and knowledge structures revealed by the document content",
+    "archetypalAnchors": "Archetypal patterns, symbolic structures, and universal resonances suitable for Notion page creation",
+    "semanticFramework": "Semantic framework structure showing meaning relationships and conceptual hierarchies within QL context",
+
+    // SECONDARY QL PROPERTIES (include if document supports them)
+    "qlPosition": 2,
+    "qlCategory": "explicate",
+    "qlOperatorTypes": ["processual", "contextual"],
+    "qlVariant": "4/6",
+    "qlDynamics": "mediation",
+    "relationshipStrength": 0.85,
+
+    // MODERATE ADDITIONAL PROPERTIES (only if strongly supported by document)
+    "description": "Enhanced description only if document provides significant new insights",
+    "summary": "Concise summary only if document warrants it",
+    "lastAnalyzed": "2024-01-XX",
+    "documentSource": "source_document_name",
+    "contextualRelevance": "high"
   },
   "relationshipSuggestions": [
     {
@@ -253,18 +488,25 @@ Respond with a JSON object in this exact format:
         "qlDynamics": "foundational_emergence",
         "qlContextFrame": "0/1",
         "strength": 0.8,
-        "description": "Detailed description"
+        "description": "Detailed description",
+        "semanticBasis": "Why this relationship exists semantically",
+        "functionalRole": "What role this relationship plays"
       },
-      "reasoning": "Why this relationship is suggested"
+      "reasoning": "Detailed reasoning for this relationship suggestion",
+      "confidence": 0.8
     }
   ]
 }
 
-IMPORTANT:
-1. Do NOT include any reasoning or qlAlignment fields in the top level of your JSON response.
-2. Focus on extracting actual property values from the document content.
-3. Ensure all property names match exactly what would be expected in the Bimba node.
-4. For relationships, use standard Neo4j relationship types like RELATES_TO, IMPLEMENTS, DEFINES, etc.`;
+CRITICAL REQUIREMENTS:
+1. **FOUNDATIONAL PRIORITY**: The four core relational properties (qlOperators, epistemicEssence, archetypalAnchors, semanticFramework) are MANDATORY and must be included with meaningful content derived from the document.
+2. **Quality over Quantity**: Maximum 6-10 total properties, with foundational properties taking precedence.
+3. **Document Grounding**: Every property must be directly supported by document content - no generic or template responses.
+4. **Structured Format**: Format foundational properties as rich text suitable for Notion database integration.
+5. **Semantic Alignment**: Ensure each foundational property captures its specific epistemic aspect as defined above.
+6. **No Generic Content**: Avoid placeholder text - provide substantive, document-specific insights for each foundational property.
+7. Do NOT include reasoning or qlAlignment fields in the top level of your JSON response.
+8. For relationships, use standard Neo4j relationship types like RELATES_TO, IMPLEMENTS, DEFINES, etc.`;
   }
 
   /**

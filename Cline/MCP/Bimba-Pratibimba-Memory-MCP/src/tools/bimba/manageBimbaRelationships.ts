@@ -7,7 +7,7 @@ import { handleError } from "../../utils/error.js";
 // Tool definition
 export const manageBimbaRelationshipsTool: Tool = {
   name: "manageBimbaRelationships",
-  description: "Create, update, or delete relationships between nodes in the Bimba graph. Supports assignable/editable target nodes for relationship editing.",
+  description: "Pure relationship management tool - create, update, or delete relationships between any nodes regardless of labels. Works with nodes identified by bimbaCoordinate property or node IDs.",
   inputSchema: zodToJsonSchema(ManageBimbaRelationshipsSchema),
 };
 
@@ -51,17 +51,17 @@ export async function handleManageBimbaRelationships(dependencies: ToolDependenc
         query = buildCreateRelationshipQuery(validatedArgs);
         params = buildCreateRelationshipParams(validatedArgs);
         break;
-      
+
       case 'update':
         query = buildUpdateRelationshipQuery(validatedArgs);
         params = buildUpdateRelationshipParams(validatedArgs);
         break;
-      
+
       case 'delete':
         query = buildDeleteRelationshipQuery(validatedArgs);
         params = buildDeleteRelationshipParams(validatedArgs);
         break;
-      
+
       default:
         throw new McpError(ErrorCode.InvalidParams, `Unsupported operation: ${validatedArgs.operation}`);
     }
@@ -160,13 +160,23 @@ export async function handleManageBimbaRelationships(dependencies: ToolDependenc
 
 /**
  * Build Cypher query for creating relationships
+ * Pure relationship management - works with any nodes that have bimbaCoordinate property
  */
 function buildCreateRelationshipQuery(args: any): string {
   const safeRelationType = String(args.relationshipType).replace(/[^a-zA-Z0-9_]/g, '');
-  
+
+  // Handle both bimbaCoordinate and node-ID formats
+  const sourceMatch = args.sourceCoordinate.startsWith('node-')
+    ? `MATCH (source) WHERE toString(id(source)) = $sourceId`
+    : `MATCH (source) WHERE source.bimbaCoordinate = $sourceCoordinate`;
+
+  const targetMatch = args.targetCoordinate.startsWith('node-')
+    ? `MATCH (target) WHERE toString(id(target)) = $targetId`
+    : `MATCH (target) WHERE target.bimbaCoordinate = $targetCoordinate`;
+
   return `
-    MATCH (source:BimbaNode {bimbaCoordinate: $sourceCoordinate})
-    MATCH (target:BimbaNode {bimbaCoordinate: $targetCoordinate})
+    ${sourceMatch}
+    ${targetMatch}
     CREATE (source)-[r:${safeRelationType}]->(target)
     SET r += $relationshipProperties
     SET r.createdAt = datetime()
@@ -179,23 +189,48 @@ function buildCreateRelationshipQuery(args: any): string {
 
 /**
  * Build parameters for creating relationships
+ * Handles both bimbaCoordinate and node-ID formats
  */
 function buildCreateRelationshipParams(args: any): Record<string, any> {
-  return {
-    sourceCoordinate: args.sourceCoordinate,
-    targetCoordinate: args.targetCoordinate,
+  const params: Record<string, any> = {
     relationshipProperties: args.relationshipProperties || {}
   };
+
+  // Handle source coordinate/ID
+  if (args.sourceCoordinate.startsWith('node-')) {
+    params.sourceId = args.sourceCoordinate.replace('node-', '');
+  } else {
+    params.sourceCoordinate = args.sourceCoordinate;
+  }
+
+  // Handle target coordinate/ID
+  if (args.targetCoordinate.startsWith('node-')) {
+    params.targetId = args.targetCoordinate.replace('node-', '');
+  } else {
+    params.targetCoordinate = args.targetCoordinate;
+  }
+
+  return params;
 }
 
 /**
  * Build Cypher query for updating relationships
+ * Pure relationship management - works with any nodes
  */
 function buildUpdateRelationshipQuery(args: any): string {
   const safeRelationType = String(args.relationshipType).replace(/[^a-zA-Z0-9_]/g, '');
-  
+
+  // Handle both bimbaCoordinate and node-ID formats
+  const sourceMatch = args.sourceCoordinate.startsWith('node-')
+    ? `(source) WHERE toString(id(source)) = $sourceId`
+    : `(source) WHERE source.bimbaCoordinate = $sourceCoordinate`;
+
+  const targetMatch = args.targetCoordinate.startsWith('node-')
+    ? `(target) WHERE toString(id(target)) = $targetId`
+    : `(target) WHERE target.bimbaCoordinate = $targetCoordinate`;
+
   return `
-    MATCH (source:BimbaNode {bimbaCoordinate: $sourceCoordinate})-[r:${safeRelationType}]->(target:BimbaNode {bimbaCoordinate: $targetCoordinate})
+    MATCH ${sourceMatch}-[r:${safeRelationType}]->${targetMatch}
     SET r += $relationshipProperties
     SET r.updatedAt = datetime()
     RETURN source, target, r,
@@ -206,23 +241,48 @@ function buildUpdateRelationshipQuery(args: any): string {
 
 /**
  * Build parameters for updating relationships
+ * Handles both bimbaCoordinate and node-ID formats
  */
 function buildUpdateRelationshipParams(args: any): Record<string, any> {
-  return {
-    sourceCoordinate: args.sourceCoordinate,
-    targetCoordinate: args.targetCoordinate,
+  const params: Record<string, any> = {
     relationshipProperties: args.relationshipProperties || {}
   };
+
+  // Handle source coordinate/ID
+  if (args.sourceCoordinate.startsWith('node-')) {
+    params.sourceId = args.sourceCoordinate.replace('node-', '');
+  } else {
+    params.sourceCoordinate = args.sourceCoordinate;
+  }
+
+  // Handle target coordinate/ID
+  if (args.targetCoordinate.startsWith('node-')) {
+    params.targetId = args.targetCoordinate.replace('node-', '');
+  } else {
+    params.targetCoordinate = args.targetCoordinate;
+  }
+
+  return params;
 }
 
 /**
  * Build Cypher query for deleting relationships
+ * Pure relationship management - works with any nodes
  */
 function buildDeleteRelationshipQuery(args: any): string {
   const safeRelationType = String(args.relationshipType).replace(/[^a-zA-Z0-9_]/g, '');
-  
+
+  // Handle both bimbaCoordinate and node-ID formats
+  const sourceMatch = args.sourceCoordinate.startsWith('node-')
+    ? `(source) WHERE toString(id(source)) = $sourceId`
+    : `(source) WHERE source.bimbaCoordinate = $sourceCoordinate`;
+
+  const targetMatch = args.targetCoordinate.startsWith('node-')
+    ? `(target) WHERE toString(id(target)) = $targetId`
+    : `(target) WHERE target.bimbaCoordinate = $targetCoordinate`;
+
   return `
-    MATCH (source:BimbaNode {bimbaCoordinate: $sourceCoordinate})-[r:${safeRelationType}]->(target:BimbaNode {bimbaCoordinate: $targetCoordinate})
+    MATCH ${sourceMatch}-[r:${safeRelationType}]->${targetMatch}
     DELETE r
     RETURN source, target,
            true as relationshipFound,
@@ -232,10 +292,24 @@ function buildDeleteRelationshipQuery(args: any): string {
 
 /**
  * Build parameters for deleting relationships
+ * Handles both bimbaCoordinate and node-ID formats
  */
 function buildDeleteRelationshipParams(args: any): Record<string, any> {
-  return {
-    sourceCoordinate: args.sourceCoordinate,
-    targetCoordinate: args.targetCoordinate
-  };
+  const params: Record<string, any> = {};
+
+  // Handle source coordinate/ID
+  if (args.sourceCoordinate.startsWith('node-')) {
+    params.sourceId = args.sourceCoordinate.replace('node-', '');
+  } else {
+    params.sourceCoordinate = args.sourceCoordinate;
+  }
+
+  // Handle target coordinate/ID
+  if (args.targetCoordinate.startsWith('node-')) {
+    params.targetId = args.targetCoordinate.replace('node-', '');
+  } else {
+    params.targetCoordinate = args.targetCoordinate;
+  }
+
+  return params;
 }
