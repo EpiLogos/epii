@@ -78,24 +78,47 @@ export const useDocumentAnalysis = () => {
         }
       });
 
-      // Call API to analyze document with graph data for enhanced Bimba awareness
-      const response = await fetch('/api/epii-agent/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fileId: currentDocumentId,
+      // Call A2A service to execute epii-analysis-pipeline skill with AG-UI support
+      const { executeSkillWithAGUI } = await import('../1_services/webSocketService');
+
+      // Generate AG-UI run identifiers
+      const runId = `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const threadId = `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      console.log('🚀 Calling Epii Analysis Pipeline skill via A2A service...');
+      console.log(`📋 AG-UI Run ID: ${runId}`);
+      console.log(`🧵 AG-UI Thread ID: ${threadId}`);
+
+      const response = await executeSkillWithAGUI(
+        'epii-analysis-pipeline',
+        {
+          content: '', // Will be fetched by the skill using documentId
           targetCoordinate: coordinate,
-          graphData: { nodes, edges } // Pass graph data to backend
-        }),
-      });
+          fileName: `document_${currentDocumentId}`,
+          userId: 'default-user',
+          analysisDepth: 'standard',
+          includeNotion: true,
+          includeBimba: true,
+          includeGraphiti: true,
+          includeLightRAG: true,
+          documentMetadata: {
+            documentId: currentDocumentId,
+            graphData: { nodes, edges } // Pass graph data for enhanced Bimba awareness
+          }
+        },
+        {
+          agentId: 'epii-agent',
+          userId: 'default-user'
+        },
+        {
+          runId,
+          threadId,
+          enableAGUI: true
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`Analysis request failed: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      // Response is already the result object from A2A service
+      const data = response;
 
       // Set analysis results
       dispatch({

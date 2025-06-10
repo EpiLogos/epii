@@ -411,11 +411,20 @@ export function getFullBimbaMapFromGraphData(graphData) {
         // Generate the hierarchical structure (this will only include nodes with coordinates)
         const structure = getBimbaHierarchy(validatedData);
 
-        // Find root nodes (nodes with coordinates like #, #0, #1, etc.)
+        // Find root nodes (nodes with coordinates like #, #0, #1, #2, #3, #4, #5 ONLY)
         // The "#" coordinate represents the overarching project node
+        // Exclude nodes with dots (like #4.0, #4.1) as these are not root nodes
         const rootNodes = nodes
-            .filter(node => node.coordinate &&
-                   (node.coordinate === '#' || node.coordinate.split('-').length === 1))
+            .filter(node => {
+                if (!node.coordinate) return false;
+
+                // Must start with # and not contain dots
+                if (!node.coordinate.startsWith('#') || node.coordinate.includes('.')) return false;
+
+                // Either exact "#" or single digit after # (like #0, #1, #2, #3, #4, #5)
+                const afterHash = node.coordinate.substring(1);
+                return afterHash === '' || (afterHash.length === 1 && /^[0-5]$/.test(afterHash));
+            })
             .map(node => ({
                 coordinate: node.coordinate,
                 name: node.name,

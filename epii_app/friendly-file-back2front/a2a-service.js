@@ -163,7 +163,7 @@ async function startA2AService(options = {}) {
 
     // Start the A2A server
     console.log('Starting A2A server...');
-    const server = integrateA2AWithEpiiAgent({
+    const server = await integrateA2AWithEpiiAgent({
       port,
       epiiAgentService: epiiService
     });

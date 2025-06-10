@@ -4,10 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink, X, Map } from 'lucide-react';
+import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink, X, Map, CheckCircle } from 'lucide-react';
 import { AnalysisResults } from '../0_foundation/epiiTypes';
 import { formatBimbaCoordinate } from '../1_utils/epiiFormatters';
 import { isValidBimbaCoordinate } from '../1_utils/epiiHelpers';
+import { onAGUIEvent, offAGUIEvent } from '../1_services/webSocketService';
 
 interface DocumentControlsProps {
   onStartAnalysis: (targetCoordinate: string) => void;
@@ -41,13 +42,164 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
   const [targetCoordinate, setTargetCoordinate] = useState(defaultCoordinate);
   const [isCoordinateValid, setIsCoordinateValid] = useState(true);
 
+  // AG-UI Progress state
+  const [analysisProgress, setAnalysisProgress] = useState<{
+    stage: string;
+    progress: number;
+    currentStep: string;
+    stageId?: string;
+    currentStageNumber?: number;
+    totalStages?: number;
+  } | null>(null);
+  const [progressError, setProgressError] = useState<string | null>(null);
+
   // Update target coordinate when default changes
   useEffect(() => {
     if (defaultCoordinate && defaultCoordinate !== targetCoordinate) {
+      console.log(`DocumentControls: Setting target coordinate from defaultCoordinate: ${defaultCoordinate}`);
       setTargetCoordinate(defaultCoordinate);
       setIsCoordinateValid(isValidBimbaCoordinate(defaultCoordinate));
     }
-  }, [defaultCoordinate]);
+  }, [defaultCoordinate, targetCoordinate]);
+
+  // Initialize target coordinate on mount if not set
+  useEffect(() => {
+    if (!targetCoordinate && defaultCoordinate) {
+      console.log(`DocumentControls: Initializing target coordinate with defaultCoordinate: ${defaultCoordinate}`);
+      setTargetCoordinate(defaultCoordinate);
+      setIsCoordinateValid(isValidBimbaCoordinate(defaultCoordinate));
+    }
+  }, []);
+
+  // AG-UI Event Handlers for Pipeline Progress
+  useEffect(() => {
+    // Handler for Step Started (AG-UI Protocol)
+    const handleStepStarted = (event: any) => {
+      console.log('📊 DocumentControls: Pipeline step started:', event);
+
+      setAnalysisProgress({
+        stage: event.stepName || 'processing',
+        progress: event.progress || 0,
+        currentStep: `Starting: ${event.stepName || 'Unknown Step'}`,
+        stageId: event.details?.stageId,
+        currentStageNumber: event.details?.currentStage,
+        totalStages: event.details?.totalStages || 6
+      });
+      setProgressError(null);
+    };
+
+    // Handler for Step Finished (AG-UI Protocol)
+    const handleStepFinished = (event: any) => {
+      console.log('✅ DocumentControls: Pipeline step finished:', event);
+
+      setAnalysisProgress({
+        stage: event.stepName || 'processing',
+        progress: event.progress || 0,
+        currentStep: `Completed: ${event.stepName || 'Unknown Step'}`,
+        stageId: event.details?.stageId,
+        currentStageNumber: event.details?.currentStage,
+        totalStages: event.details?.totalStages || 6
+      });
+    };
+
+    // Handler for Analysis Completion
+    const handleAnalysisCompleted = (event: any) => {
+      console.log('🎉 DocumentControls: Analysis completed:', event);
+
+      // Keep progress visible after completion - don't clear it
+      // Update to show completion status
+      setAnalysisProgress(prev => prev ? {
+        ...prev,
+        currentStep: 'Analysis completed successfully',
+        progress: 100
+      } : null);
+      setProgressError(null);
+    };
+
+    // Handler for Run Errors - only stop on true critical errors
+    const handleRunError = (event: any) => {
+      console.error('❌ DocumentControls: AG-UI Run Error:', event);
+      console.log('🔍 DocumentControls: Error event details:', JSON.stringify(event, null, 2));
+
+      // Check if this is a critical error that should stop the pipeline
+      const isCriticalError = event.code === 'CRITICAL_PIPELINE_FAILURE' ||
+                             event.code === 'PIPELINE_EXECUTION_ERROR' ||
+                             event.details?.critical === true;
+
+      if (isCriticalError) {
+        // Only stop tracking on true critical errors
+        console.log('🛑 Critical error detected - stopping analysis tracking');
+        setAnalysisProgress(prev => prev ? {
+          ...prev,
+          currentStep: 'Analysis failed - critical error',
+          progress: prev.progress
+        } : null);
+        setProgressError(event.message || 'Analysis failed');
+        onAnalysisComplete(); // Stop the analysis
+      } else {
+        // For non-critical errors, just log but continue tracking
+        console.warn('⚠️ Non-critical error during analysis - continuing to track progress');
+        setAnalysisProgress(prev => prev ? {
+          ...prev,
+          currentStep: `Warning: ${event.message || 'Non-critical error'} - continuing...`,
+          progress: prev.progress
+        } : null);
+        // Clear the warning after a delay to avoid persistent warning states
+        setTimeout(() => {
+          setAnalysisProgress(prev => prev ? {
+            ...prev,
+            currentStep: prev.currentStep.includes('Warning:') ? 'Processing...' : prev.currentStep
+          } : null);
+        }, 3000);
+      }
+    };
+
+    // Handler for Run Finished - properly stop tracking with deduplication
+    const handleRunFinished = (event: any) => {
+      console.log('✅ DocumentControls: AG-UI Run Finished:', event);
+      console.log('🔍 DocumentControls: Run Finished event details:', JSON.stringify(event, null, 2));
+
+      // Check if we've already completed this analysis to prevent duplicate completion handling
+      if (analysisProgress?.currentStep === 'Analysis completed successfully') {
+        console.log('🔄 DocumentControls: Ignoring duplicate RUN_FINISHED event - analysis already completed');
+        return;
+      }
+
+      setAnalysisProgress(prev => prev ? {
+        ...prev,
+        currentStep: 'Analysis completed successfully',
+        progress: 100
+      } : null);
+      setProgressError(null);
+      onAnalysisComplete(); // Stop the analysis
+    };
+
+    // Register event handlers only when analyzing
+    if (isAnalyzing) {
+      console.log('📝 DocumentControls: Registering AG-UI event handlers...');
+      onAGUIEvent('StepStarted', handleStepStarted);
+      onAGUIEvent('StepFinished', handleStepFinished);
+      onAGUIEvent('DocumentAnalysisCompleted', handleAnalysisCompleted);
+      onAGUIEvent('RunFinished', handleRunFinished);
+      onAGUIEvent('RunError', handleRunError);
+
+      // Cleanup on unmount or when analysis stops
+      return () => {
+        console.log('🧹 DocumentControls: Cleaning up AG-UI event handlers');
+        offAGUIEvent('StepStarted', handleStepStarted);
+        offAGUIEvent('StepFinished', handleStepFinished);
+        offAGUIEvent('DocumentAnalysisCompleted', handleAnalysisCompleted);
+        offAGUIEvent('RunFinished', handleRunFinished);
+        offAGUIEvent('RunError', handleRunError);
+      };
+    } else {
+      // Don't clear progress when not analyzing - keep it visible for user reference
+      // Only clear if there's no progress to show
+      if (!analysisProgress) {
+        setProgressError(null);
+      }
+    }
+  }, [isAnalyzing]);
 
   // Handle coordinate change
   const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,8 +216,22 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
 
   // Handle start analysis
   const handleStartAnalysis = () => {
-    if (isCoordinateValid && !isAnalyzing) {
+    if (isCoordinateValid && !isAnalyzing && targetCoordinate) {
+      console.log(`DocumentControls: Starting analysis with coordinate: ${targetCoordinate}`);
+
+      // Set initial progress state immediately when analysis starts
+      setAnalysisProgress({
+        stage: 'Initializing',
+        progress: 0,
+        currentStep: 'Starting analysis pipeline...',
+        currentStageNumber: 1,
+        totalStages: 6
+      });
+      setProgressError(null);
+
       onStartAnalysis(targetCoordinate);
+    } else {
+      console.warn(`DocumentControls: Cannot start analysis - isValid: ${isCoordinateValid}, isAnalyzing: ${isAnalyzing}, coordinate: ${targetCoordinate}`);
     }
   };
 
@@ -193,6 +359,136 @@ const DocumentControls: React.FC<DocumentControlsProps> = ({
                 Analysis will use coordinate: {formatBimbaCoordinate(targetCoordinate)}
               </p>
             </div>
+
+            {/* AG-UI Pipeline Progress Display - Show when analyzing or when there's progress to display */}
+            {(isAnalyzing || analysisProgress) && (
+              <div className="bg-epii-darker p-4 rounded-md border border-epii-neon/30 mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h5 className="font-semibold text-epii-neon text-sm">🤖 Analysis Progress</h5>
+                  {analysisProgress && (
+                    <span className="text-xs text-gray-400">
+                      Stage {analysisProgress.currentStageNumber || 1} of {analysisProgress.totalStages || 6}
+                    </span>
+                  )}
+                </div>
+
+                {progressError ? (
+                  <div className="text-red-400 text-sm bg-red-900/20 p-2 rounded">
+                    ❌ {progressError}
+                  </div>
+                ) : analysisProgress ? (
+                  <div className="space-y-3">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-epii-neon h-2 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${analysisProgress.progress}%` }}
+                      />
+                    </div>
+
+                    {/* Progress Details */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">
+                        Stage: <span className="text-epii-neon font-medium">{analysisProgress.stage}</span>
+                      </span>
+                      <span className="text-gray-300">
+                        {analysisProgress.progress}%
+                      </span>
+                    </div>
+
+                    {/* Current Step */}
+                    <div className="text-xs text-gray-400">
+                      {analysisProgress.currentStep}
+                    </div>
+
+                    {/* Pipeline Stage Indicators */}
+                    <div className="flex items-center space-x-1 text-xs overflow-x-auto">
+                      {[
+                        { name: 'Fetch Document', progress: 10 },
+                        { name: 'Contextualize', progress: 25 },
+                        { name: 'Integrate Structure', progress: 40 },
+                        { name: 'Relate Concepts', progress: 60 },
+                        { name: 'Define Elements', progress: 80 },
+                        { name: 'Synthesize', progress: 100 }
+                      ].map((stage, index) => {
+                        const isActive = analysisProgress?.stage === stage.name;
+                        const isCompleted = (analysisProgress?.progress || 0) >= stage.progress;
+                        const isNext = !isCompleted && (analysisProgress?.progress || 0) >= (index > 0 ? [10, 25, 40, 60, 80, 100][index - 1] : 0);
+
+                        return (
+                          <div
+                            key={stage.name}
+                            className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
+                              isActive
+                                ? 'bg-epii-neon/20 text-epii-neon border border-epii-neon/50'
+                                : isCompleted
+                                ? 'bg-green-600/20 text-green-300'
+                                : isNext
+                                ? 'bg-yellow-600/20 text-yellow-300'
+                                : 'bg-gray-600/20 text-gray-400'
+                            }`}
+                            title={`Stage ${index + 1}: ${stage.name} (${stage.progress}%)`}
+                          >
+                            {isActive && (
+                              <div className="animate-spin h-3 w-3 border border-epii-neon border-t-transparent rounded-full" />
+                            )}
+                            {isCompleted && !isActive && (
+                              <CheckCircle size={12} />
+                            )}
+                            {isNext && !isActive && !isCompleted && (
+                              <div className="h-3 w-3 border border-yellow-300 border-dashed rounded-full" />
+                            )}
+                            <span className="whitespace-nowrap">{stage.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  // Show initial state when no progress data yet
+                  <div className="space-y-3">
+                    {/* Initial Progress Bar */}
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div className="bg-epii-neon h-2 rounded-full transition-all duration-300 ease-out animate-pulse" style={{ width: '5%' }} />
+                    </div>
+
+                    {/* Initial Progress Details */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">
+                        Stage: <span className="text-epii-neon font-medium">Initializing...</span>
+                      </span>
+                      <span className="text-gray-300">0%</span>
+                    </div>
+
+                    {/* Current Step */}
+                    <div className="text-xs text-gray-400">
+                      Starting analysis pipeline...
+                    </div>
+
+                    {/* Initial Pipeline Stage Indicators */}
+                    <div className="flex items-center space-x-1 text-xs overflow-x-auto">
+                      {[
+                        { name: 'Fetch Document', progress: 10 },
+                        { name: 'Contextualize', progress: 25 },
+                        { name: 'Integrate Structure', progress: 40 },
+                        { name: 'Relate Concepts', progress: 60 },
+                        { name: 'Define Elements', progress: 80 },
+                        { name: 'Synthesize', progress: 100 }
+                      ].map((stage, index) => (
+                        <div
+                          key={stage.name}
+                          className="flex items-center space-x-1 px-2 py-1 rounded text-xs bg-gray-600/20 text-gray-400"
+                          title={`Stage ${index + 1}: ${stage.name} (${stage.progress}%)`}
+                        >
+                          <div className="h-3 w-3 border border-gray-400 border-dashed rounded-full" />
+                          <span className="whitespace-nowrap">{stage.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Crystallize button (only shown when results are available) */}
             {showCrystallizeButton && (

@@ -65,12 +65,12 @@ class EpiiLLMService {
       maxOutputTokens: 4096,
     });
 
-    // Stage -1: Core Element Definition LLM (needs precision)
+    // Stage -1: Core Element Definition LLM (needs precision and longer output)
     this.elementLLM = new ChatGoogleGenerativeAI({
       apiKey,
       model: process.env.EPII_ELEMENT_LLM_MODEL || process.env.SYNTHESIS_LLM_MODEL_PAID,
       temperature: 0.1,
-      maxOutputTokens: 4096,
+      maxOutputTokens: 8192,  // Increased from 4096 to handle detailed core elements
     });
 
     // Stage -0: Payload Synthesis LLM (needs creativity and integration)

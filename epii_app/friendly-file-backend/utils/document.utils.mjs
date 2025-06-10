@@ -595,14 +595,21 @@ export async function sendChunksToLightRAG(chunks, sourceMetadata, bpMCPService)
                 // Extract coordinates from metadata or use target coordinate
                 const coordinates = [];
                 if (sourceMetadata.targetCoordinate) {
-                    coordinates.push(sourceMetadata.targetCoordinate);
+                    // Ensure target coordinate has "#" prefix
+                    const normalizedTargetCoordinate = sourceMetadata.targetCoordinate.startsWith('#')
+                        ? sourceMetadata.targetCoordinate
+                        : `#${sourceMetadata.targetCoordinate}`;
+                    coordinates.push(normalizedTargetCoordinate);
                 }
 
                 // Add any coordinates from chunk metadata if available
                 if (chunk.metadata && chunk.metadata.contextWindow &&
                     chunk.metadata.contextWindow.bimbaContext &&
                     chunk.metadata.contextWindow.bimbaContext.mentionedCoordinates) {
-                    coordinates.push(...chunk.metadata.contextWindow.bimbaContext.mentionedCoordinates);
+                    // Ensure all mentioned coordinates have "#" prefix
+                    const normalizedMentionedCoordinates = chunk.metadata.contextWindow.bimbaContext.mentionedCoordinates
+                        .map(coord => coord.startsWith('#') ? coord : `#${coord}`);
+                    coordinates.push(...normalizedMentionedCoordinates);
                 }
 
                 // Check if originalContent exists
@@ -673,11 +680,16 @@ export async function sendChunksToLightRAG(chunks, sourceMetadata, bpMCPService)
             // Just focus on the ingestion status
 
             // Store metadata for later use - simplified to focus on ingestion status
+            // Ensure target coordinate has "#" prefix
+            const normalizedTargetCoordinate = sourceMetadata.targetCoordinate?.startsWith('#')
+                ? sourceMetadata.targetCoordinate
+                : `#${sourceMetadata.targetCoordinate}`;
+
             sourceMetadata.lightRagMetadata = {
                 ingestionDate: new Date(),
                 totalChunks: chunks.length,
                 ingestionStatus: processedCount > 0 ? 'completed' : 'failed',
-                targetCoordinate: sourceMetadata.targetCoordinate
+                targetCoordinate: normalizedTargetCoordinate
             };
 
             console.log(`Stored LightRAG metadata for document ${sourceMetadata.documentId} (will be updated at end of pipeline)`);
@@ -687,7 +699,7 @@ export async function sendChunksToLightRAG(chunks, sourceMetadata, bpMCPService)
                 try {
                     await updateDocumentIngestionMetadata(
                         sourceMetadata.documentId,
-                        null, // Unused parameter
+                        sourceMetadata.documentContent, // Pass document content for hash generation
                         sourceMetadata.targetCoordinate,
                         bpMCPService
                     );
@@ -858,7 +870,7 @@ export function generateDocumentHash(documentContent, targetCoordinate) {
  * @param {object} bpMCPService - The BPMCP service
  * @returns {Promise<boolean>} - True if the document has been successfully ingested
  */
-export async function hasBeenRecentlyIngested(documentId, _, targetCoordinate, bpMCPService) {
+export async function hasBeenRecentlyIngested(documentId, documentContent, targetCoordinate, bpMCPService) {
     if (!documentId || !bpMCPService) {
         return false;
     }
@@ -868,12 +880,16 @@ export async function hasBeenRecentlyIngested(documentId, _, targetCoordinate, b
 
         // IMPORTANT: Force bypass the cache by setting useCache=false
         // This ensures we always get the latest document state from MongoDB
+        console.log(`Fetching document ${documentId} from MongoDB (bypassing cache)...`);
         const document = await bpMCPService.getDocumentById(documentId, 'Documents', false);
 
         if (!document) {
             console.log(`Document ${documentId} not found in MongoDB, will need to ingest`);
             return false;
         }
+
+        console.log(`Document ${documentId} found in MongoDB. Checking LightRAG metadata...`);
+        console.log(`Document metadata:`, JSON.stringify(document.metadata?.lightRagMetadata || {}, null, 2));
 
         console.log(`Retrieved document ${documentId} directly from MongoDB (bypassing cache)`);
         console.log(`Checking LightRAG ingestion status for document ${documentId}...`);
@@ -894,19 +910,31 @@ export async function hasBeenRecentlyIngested(documentId, _, targetCoordinate, b
              document.metadata.lightRagMetadata.ingestionStatus === 'skipped')) {
 
             // Check if the document has a different target coordinate
-            if (targetCoordinate &&
-                document.metadata.lightRagMetadata.targetCoordinate &&
-                document.metadata.lightRagMetadata.targetCoordinate !== targetCoordinate) {
-                console.log(`Document ${documentId} target coordinate has changed from ${document.metadata.lightRagMetadata.targetCoordinate} to ${targetCoordinate}, will need to reingest`);
-                return false;
+            // Normalize both coordinates for comparison
+            if (targetCoordinate && document.metadata.lightRagMetadata.targetCoordinate) {
+                const normalizedRequestedCoordinate = targetCoordinate.startsWith('#') ? targetCoordinate : `#${targetCoordinate}`;
+                const normalizedStoredCoordinate = document.metadata.lightRagMetadata.targetCoordinate.startsWith('#')
+                    ? document.metadata.lightRagMetadata.targetCoordinate
+                    : `#${document.metadata.lightRagMetadata.targetCoordinate}`;
+
+                if (normalizedStoredCoordinate !== normalizedRequestedCoordinate) {
+                    console.log(`Document ${documentId} target coordinate has changed from ${normalizedStoredCoordinate} to ${normalizedRequestedCoordinate}, will need to reingest`);
+                    return false;
+                }
             }
 
-            console.log(`Document ${documentId} has been successfully ingested with status 'completed', skipping ingestion`);
+            // SIMPLIFIED: Don't check content hash - if status is 'completed' and coordinate matches, skip ingestion
+            // The original system was working fine without complex hashing
+            console.log(`Document ${documentId} content hash checking disabled - using simple status check`);
+            console.log(`Document has completed ingestion status for coordinate ${document.metadata.lightRagMetadata.targetCoordinate}`);
+
+
+            console.log(`Document ${documentId} has been successfully ingested with status '${document.metadata.lightRagMetadata.ingestionStatus}', skipping ingestion`);
             return true;
         }
 
         // If we get here, the document needs to be ingested
-        console.log(`Document ${documentId} needs to be ingested into LightRAG (status not 'completed')`);
+        console.log(`Document ${documentId} needs to be ingested into LightRAG (status: ${document.metadata?.lightRagMetadata?.ingestionStatus || 'none'})`);
         return false;
     } catch (error) {
         console.error(`Error checking if document ${documentId} has been recently ingested:`, error);
@@ -924,7 +952,7 @@ export async function hasBeenRecentlyIngested(documentId, _, targetCoordinate, b
  * @param {object} bpMCPService - The BPMCP service
  * @returns {Promise<object>} - The updated document
  */
-export async function updateDocumentIngestionMetadata(documentId, _, targetCoordinate, bpMCPService) {
+export async function updateDocumentIngestionMetadata(documentId, documentContent, targetCoordinate, bpMCPService) {
     if (!documentId || !bpMCPService) {
         throw new Error("Missing required parameters for updateDocumentIngestionMetadata");
     }
@@ -937,10 +965,17 @@ export async function updateDocumentIngestionMetadata(documentId, _, targetCoord
             'metadata.lightRagMetadata.ingestionDate': new Date()
         };
 
-        // Add target coordinate if provided
+        // Add target coordinate if provided - ensure it has "#" prefix
         if (targetCoordinate) {
-            updateObj['metadata.lightRagMetadata.targetCoordinate'] = targetCoordinate;
+            const normalizedCoordinate = targetCoordinate.startsWith('#') ? targetCoordinate : `#${targetCoordinate}`;
+            updateObj['metadata.lightRagMetadata.targetCoordinate'] = normalizedCoordinate;
+            console.log(`Storing normalized target coordinate: ${normalizedCoordinate}`);
         }
+
+        // SIMPLIFIED: Don't generate content hash - the original system was working fine without it
+        // Just focus on setting the ingestion status to 'completed' and target coordinate
+        console.log(`Simplified LightRAG metadata update - no hash generation needed`);
+
 
         // Update the document in MongoDB with minimal required fields
         const updatedDocument = await bpMCPService.updateDocument(documentId, {
@@ -961,6 +996,26 @@ export async function updateDocumentIngestionMetadata(documentId, _, targetCoord
         } catch (cacheError) {
             console.warn(`Could not invalidate document cache using utility: ${cacheError.message}`);
             // Continue even if cache invalidation fails - the direct cache.delete above should work
+        }
+
+        // Invalidate UnifiedRAG cache for the target coordinate
+        if (targetCoordinate) {
+            try {
+                const { getInstance } = await import('../../friendly-file-back2front/skills/bimba-skills-registry.js');
+                const registry = await getInstance();
+                const unifiedRAGSkill = registry.getSkillById('unifiedRAG');
+
+                if (unifiedRAGSkill && unifiedRAGSkill.handler) {
+                    // Get the actual skill instance to call invalidateCoordinateCache
+                    const skillInstance = unifiedRAGSkill.handler.__self || unifiedRAGSkill;
+                    if (skillInstance && typeof skillInstance.invalidateCoordinateCache === 'function') {
+                        skillInstance.invalidateCoordinateCache(targetCoordinate);
+                        console.log(`Invalidated UnifiedRAG cache for coordinate ${targetCoordinate}`);
+                    }
+                }
+            } catch (ragCacheError) {
+                console.warn(`Could not invalidate UnifiedRAG cache: ${ragCacheError.message}`);
+            }
         }
 
         console.log(`Updated LightRAG ingestion metadata for document ${documentId} - status set to 'completed'`);

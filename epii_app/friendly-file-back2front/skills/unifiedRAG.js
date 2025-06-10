@@ -68,16 +68,27 @@ class UnifiedRAGSkill {
     const startTime = Date.now();
     const logPrefix = `[UnifiedRAG]`;
 
-    console.log(`${logPrefix} Starting unified RAG for query: "${params.query}"`);
-    console.log(`${logPrefix} Target coordinates: ${JSON.stringify(params.coordinates)}`);
+    console.log(`${logPrefix} Starting unified RAG for coordinates: ${JSON.stringify(params.coordinates)}`);
 
     // Validate and normalize inputs
     const validatedParams = this._validateAndNormalizeParams(params);
     const { query, coordinates, sources, options, agentCoordinate, uiContext } = validatedParams;
 
-    // TEMPORARILY DISABLE CACHE FOR DEBUGGING
-    console.log(`${logPrefix} Cache DISABLED for debugging - forcing fresh retrieval`);
-    const cacheKey = this._generateCacheKey(query, coordinates, sources); // Still need this for later
+    // Check cache first
+    const cacheKey = this._generateCacheKey(query, coordinates, sources);
+    const cachedResult = this._getCachedResult(cacheKey);
+    if (cachedResult) {
+      this.cacheHits++;
+      console.log(`${logPrefix} Cache HIT for ${coordinates.join(', ')} (${this.cacheHits}/${this.cacheHits + this.cacheMisses})`);
+      return {
+        success: true,
+        data: cachedResult,
+        skillId: this.skillId,
+        executionTime: Date.now() - startTime,
+        cached: true
+      };
+    }
+    this.cacheMisses++;
 
     // Initialize result structure
     const unifiedContext = {
@@ -233,18 +244,12 @@ class UnifiedRAGSkill {
       unifiedContext.metadata.sourcesQueried = Object.keys(unifiedContext.sources);
       unifiedContext.metadata.coordinatesCovered = this._extractCoordinatesCovered(unifiedContext);
 
-      console.log(`${logPrefix} Completed in ${unifiedContext.metadata.executionTime}ms`);
-      console.log(`${logPrefix} Sources: ${unifiedContext.metadata.sourcesQueried.join(', ')}`);
-
-      // *** FULL PAYLOAD LOGGING ***
-      console.log(`${logPrefix} ========== FULL UNIFIED RAG PAYLOAD ==========`);
-      console.log(JSON.stringify(unifiedContext, null, 2));
-      console.log(`${logPrefix} ============================================`);
+      console.log(`${logPrefix} Completed in ${unifiedContext.metadata.executionTime}ms - Sources: ${unifiedContext.metadata.sourcesQueried.join(', ')}`);
 
       // Cache the result for coordinate-based queries
       if (coordinates.length > 0) {
         this._setCachedResult(cacheKey, unifiedContext);
-        console.log(`${logPrefix} Cached result for key: ${cacheKey}`);
+        console.log(`${logPrefix} Cached result for coordinates: ${coordinates.join(', ')}`);
       }
 
       return {
@@ -581,11 +586,12 @@ class UnifiedRAGSkill {
     try {
       // Get LightRAG server URL from environment
       const LIGHTRAG_MCP_SERVER_URL = process.env.LIGHTRAG_MCP_SERVER_URL || "http://localhost:8001";
-      console.log(`${logPrefix} Using LightRAG server at: ${LIGHTRAG_MCP_SERVER_URL}`);
 
       // Get document IDs for the coordinates from document cache
       const documentIds = await this._getDocumentIdsForCoordinates(coordinates);
-      console.log(`${logPrefix} Found ${documentIds.length} documents for coordinates ${coordinates.join(', ')}:`, documentIds);
+      if (documentIds.length > 0) {
+        console.log(`${logPrefix} Found ${documentIds.length} documents for coordinates ${coordinates.join(', ')}`);
+      }
 
       // Build document-focused query using the document names we already found
       let enhancedQuery = query;
@@ -2011,6 +2017,31 @@ ${JSON.stringify(unifiedContext.sources.lightrag?.data || {}, null, 2)}
     this.cache.clear();
     this.cacheHits = 0;
     this.cacheMisses = 0;
+  }
+
+  /**
+   * Invalidate cache for specific coordinates
+   * @param {string|Array} coordinates - Coordinate(s) to invalidate
+   */
+  invalidateCoordinateCache(coordinates) {
+    const coordsArray = Array.isArray(coordinates) ? coordinates : [coordinates];
+    let invalidatedCount = 0;
+
+    for (const [cacheKey, cachedData] of this.cache.entries()) {
+      // Check if this cache entry involves any of the coordinates to invalidate
+      const keyCoords = cacheKey.split(':')[0].split(',');
+      const hasInvalidCoord = coordsArray.some(coord =>
+        keyCoords.includes(coord) || keyCoords.some(keyCoord => keyCoord.includes(coord))
+      );
+
+      if (hasInvalidCoord) {
+        this.cache.delete(cacheKey);
+        invalidatedCount++;
+      }
+    }
+
+    console.log(`[UnifiedRAG] Invalidated ${invalidatedCount} cache entries for coordinates: ${coordsArray.join(', ')}`);
+    return invalidatedCount;
   }
 
   /**

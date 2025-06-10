@@ -24,8 +24,80 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
 }) => {
   const { state, dispatch } = useEpii();
   const { isLoading: isLoadingDocuments } = state;
-  const { coordinates, isLoading: isLoadingCoordinates, error, fetchDocumentsForCoordinate } = useBimbaCoordinates(isLoadingDocuments);
+  const { coordinates, isLoading: isLoadingCoordinates, error, fetchDocumentsForCoordinate, refreshCoordinateDocuments } = useBimbaCoordinates(isLoadingDocuments);
   const { uploadDocument, isUploading } = useDocumentUpload('default-user');
+
+  // AG-UI Event Integration for Real-time Sidebar Updates
+  useEffect(() => {
+    const setupAGUIEventHandlers = async () => {
+      try {
+        const { onAGUIEvent, offAGUIEvent } = await import('../1_services/webSocketService');
+
+        // Handler for document created events
+        const handleDocumentCreated = (event: any) => {
+          console.log('📄 EpiiSidebar: Document created event received:', event);
+
+          // Refresh the coordinate where the document was created
+          if (event.targetCoordinate) {
+            console.log(`🔄 Refreshing coordinate ${event.targetCoordinate} after document creation`);
+            refreshCoordinateDocuments(event.targetCoordinate);
+          }
+        };
+
+        // Handler for document deleted events
+        const handleDocumentDeleted = (event: any) => {
+          console.log('🗑️ EpiiSidebar: Document deleted event received:', event);
+
+          // Refresh the coordinate where the document was deleted
+          if (event.targetCoordinate) {
+            console.log(`🔄 Refreshing coordinate ${event.targetCoordinate} after document deletion`);
+            refreshCoordinateDocuments(event.targetCoordinate);
+          }
+        };
+
+        // Handler for pratibimba created events
+        const handlePratibimbaCreated = (event: any) => {
+          console.log('💎 EpiiSidebar: Pratibimba created event received:', event);
+
+          // Refresh the coordinate where the pratibimba was created
+          if (event.targetCoordinate) {
+            console.log(`🔄 Refreshing coordinate ${event.targetCoordinate} after pratibimba creation`);
+            refreshCoordinateDocuments(event.targetCoordinate);
+          }
+        };
+
+        // Register event handlers
+        onAGUIEvent('DocumentCreated', handleDocumentCreated);
+        onAGUIEvent('DocumentDeleted', handleDocumentDeleted);
+        onAGUIEvent('PratibimbaCreated', handlePratibimbaCreated);
+
+        console.log('✅ EpiiSidebar: AG-UI event handlers registered');
+
+        // Return cleanup function
+        return () => {
+          offAGUIEvent('DocumentCreated', handleDocumentCreated);
+          offAGUIEvent('DocumentDeleted', handleDocumentDeleted);
+          offAGUIEvent('PratibimbaCreated', handlePratibimbaCreated);
+          console.log('🧹 EpiiSidebar: AG-UI event handlers cleaned up');
+        };
+      } catch (error) {
+        console.error('❌ Failed to setup AG-UI event handlers in EpiiSidebar:', error);
+      }
+    };
+
+    const cleanup = setupAGUIEventHandlers();
+
+    // Return cleanup function
+    return () => {
+      if (cleanup && typeof cleanup.then === 'function') {
+        cleanup.then(cleanupFn => {
+          if (typeof cleanupFn === 'function') {
+            cleanupFn();
+          }
+        });
+      }
+    };
+  }, [refreshCoordinateDocuments]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCoordinate, setSelectedCoordinate] = useState<string | null>(null);
@@ -69,10 +141,7 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
     });
   };
 
-  // Force refresh documents for a coordinate
-  const refreshCoordinateDocuments = (coordinate: string) => {
-    fetchDocumentsForCoordinate(coordinate);
-  };
+
 
   // Handle file upload
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

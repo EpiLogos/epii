@@ -7,6 +7,7 @@
 // Import required modules
 import bimbaKnowingService from '../../services/bimbaKnowing.service.mjs';
 import bpMCPService from '../../services/bpMCPService.mjs';
+import { getParentCoordinate } from './utils.mjs';
 
 /**
  * Formats QL context for inclusion in context windows.
@@ -100,30 +101,89 @@ export async function extractRelevantBimbaContext(chunkContent, fullBimbaMap, ta
             console.log(`Using first mentioned coordinate: ${focusCoordinate}`);
         }
 
-        // If we have a focus coordinate, use bimbaKnowing to get enhanced context
+        // If we have a focus coordinate, use queryBimbaGraph with targetCoordinate for parent-child-sibling logic
         if (focusCoordinate) {
-            console.log(`Retrieving Bimba context for ${focusCoordinate} using bimbaKnowing tool`);
+            // Check cache first to avoid redundant calls
+            if (!generateContextWindow._coordinateCache) {
+                generateContextWindow._coordinateCache = new Map();
+            }
 
-            // Call bimbaKnowing tool with comprehensive parameters including QL context
-            const bimbaKnowingResult = await bpMCPService.callTool('bimbaKnowing', {
-                query: `Provide comprehensive context for ${focusCoordinate} including neighboring coordinates, their relationships, and Quaternal Logic operators`,
-                contextDepth: 3,
-                focusCoordinate: focusCoordinate,
-                includeRelations: true,
-                includeQLContext: true
-            });
+            let bimbaKnowingResult;
+            if (generateContextWindow._coordinateCache.has(focusCoordinate)) {
+                console.log(`Using cached Bimba context for ${focusCoordinate}`);
+                bimbaKnowingResult = generateContextWindow._coordinateCache.get(focusCoordinate);
+            } else {
+                console.log(`Retrieving Bimba context for ${focusCoordinate} using queryBimbaGraph tool`);
 
-            // The bimbaKnowing tool returns a JSON string in the first content item
-            const bimbaKnowingData = JSON.parse(bimbaKnowingResult.content[0].text);
+                // Use queryBimbaGraph with specificCoordinate to get proper parent-child-sibling relationships
+                bimbaKnowingResult = await bpMCPService.callTool('queryBimbaGraph', {
+                    specificCoordinate: focusCoordinate
+                });
+
+                // Cache the result
+                generateContextWindow._coordinateCache.set(focusCoordinate, bimbaKnowingResult);
+            }
+
+            // queryBimbaGraph with targetCoordinate returns structured parent-child-sibling data
+            const bimbaKnowingData = bimbaKnowingResult;
 
             // Store the full context for later use
             bimbaContext = bimbaKnowingData;
 
-            // Extract nodes and relationships
-            const nodes = bimbaKnowingData.results || [];
-            relationships.push(...(bimbaKnowingData.relationships || []));
+            // Extract nodes from the structured response (target + parents + children + siblings)
+            const nodes = [];
+            let relationshipCount = 0;
 
-            console.log(`BimbaKnowing returned ${nodes.length} nodes and ${relationships.length} relationships for coordinate ${focusCoordinate}`);
+            // Add target node
+            if (bimbaKnowingData.properties) {
+                nodes.push({
+                    id: 'target',
+                    labels: ['Node'],
+                    properties: bimbaKnowingData.properties,
+                    relevanceType: 'target'
+                });
+            }
+
+            // Add parent nodes
+            if (bimbaKnowingData.relations?.parents) {
+                bimbaKnowingData.relations.parents.forEach(parent => {
+                    nodes.push({
+                        id: `parent_${parent.bimbaCoordinate}`,
+                        labels: ['Node'],
+                        properties: { ...parent.properties, bimbaCoordinate: parent.bimbaCoordinate },
+                        relevanceType: 'parent'
+                    });
+                    relationshipCount++;
+                });
+            }
+
+            // Add child nodes
+            if (bimbaKnowingData.relations?.children) {
+                bimbaKnowingData.relations.children.forEach(child => {
+                    nodes.push({
+                        id: `child_${child.bimbaCoordinate}`,
+                        labels: ['Node'],
+                        properties: { ...child.properties, bimbaCoordinate: child.bimbaCoordinate },
+                        relevanceType: 'child'
+                    });
+                    relationshipCount++;
+                });
+            }
+
+            // Add sibling nodes
+            if (bimbaKnowingData.relations?.siblings) {
+                bimbaKnowingData.relations.siblings.forEach(sibling => {
+                    nodes.push({
+                        id: `sibling_${sibling.bimbaCoordinate}`,
+                        labels: ['Node'],
+                        properties: { ...sibling.properties, bimbaCoordinate: sibling.bimbaCoordinate },
+                        relevanceType: 'sibling'
+                    });
+                    relationshipCount++;
+                });
+            }
+
+            console.log(`QueryBimbaGraph returned ${nodes.length} nodes and ${relationshipCount} relationships for coordinate ${focusCoordinate}`);
 
             if (nodes.length === 0) {
                 console.warn(`BimbaKnowing returned no nodes for coordinate ${focusCoordinate}`);

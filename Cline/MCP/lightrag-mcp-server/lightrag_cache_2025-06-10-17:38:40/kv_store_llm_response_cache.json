@@ -1,0 +1,22 @@
+{
+  "global": {
+    "d7bea510061af4af8e83448d2712195a": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logical systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Basic applications\", \"Expanded applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    },
+    "ec6581709705a571f39fa1b9f66c3c42": {
+      "return": "Quaternary Logic, a core component of the Epi-Logos system, is a six-position (mod 6, 0-5) cyclical system—not a four-valued system as the name might suggest.  It transcends binary logic via a \"double-covering principle,\" operating simultaneously as a geometric lattice, a dynamic process, and a recursive pattern generator. The six positions represent a complete cycle integrating implicate (hidden/transcendent) and explicate (manifest/immanent) elements: Primordial cause (Position #0), formal causes (Positions #1 and #2), a final cause (Position #4), and Positions 3 and 5, which complete the cycle. Each position contains all others in embryonic form, enabling self-similarity, infinite development, and fractal expansion; the completion of one cycle initiates another.  The system generates numerical patterns primarily based on multiples of 6 (6, 12, 36, 72), but also incorporates 4, 8, and 64 through recursive expansion.  Key principles include quaternionic rotation and the integration of ascending and descending pathways. Its three-dimensional quaternary nesting produces a 4-fold, 8-fold, and 64-fold expansion, underpinned by mathematical and geometric principles based on groups of four, including double covering, recursive nesting, and parallel tracks.  As a non-Boolean system, it integrates structure and process, being and becoming, part and whole, surpassing binary true/false logic by incorporating multiple states.  It includes implicit themes, latent potential, and manifest operations.  The 4-fold Explicit Structure represents the manifest aspects of a cycle within the quaternary logic system, focusing on positions 1-4.  This structure is a direct result of applying the principles of quaternary logic.  Quaternary Logic incorporates principles of vortex mathematics.  It is the mathematical foundation of the Epi-Logos System, a system that transcends conventional binary thinking.  It likely utilizes or is based upon the principles of quaternionic mathematics. Further details are available in the document 'Bimba-Enhanced Context for Basic and Partially Expanded Quaternal Logic.txt'.\n\n\n**References:**\n\n* [KG] api_ingest (Entity ID 0,  Description of Quaternary Logic)\n* [KG] api_ingest (Entity ID 1, Description of Vortex Mathematics)\n* [KG] api_ingest (Entity ID 2, Description of 4-fold Explicit Structure)\n* [KG] api_ingest (Relationship ID 0, Quaternary Logic and Vortex Mathematics relationship)\n* [KG] api_ingest (Relationship ID 1, 4-fold Explicit Structure and Quaternary Logic relationship)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  }
+}

@@ -33,7 +33,7 @@ const createEpiiAgentServiceAdapter = require('./adapters/epii-agent-service-ada
  * @param {Object} options Configuration options
  * @returns {Object} The initialized A2A server
  */
-function integrateA2AWithEpiiAgent(options = {}) {
+async function integrateA2AWithEpiiAgent(options = {}) {
   const {
     port = 3033,
     epiiAgentService = null
@@ -79,7 +79,7 @@ function integrateA2AWithEpiiAgent(options = {}) {
     };
 
     // Use the mock service
-    return initializeA2AServer(mockEpiiAgentService, port);
+    return await initializeA2AServer(mockEpiiAgentService, port);
   }
 
   // Create an adapter for the provided Epii agent service
@@ -87,7 +87,7 @@ function integrateA2AWithEpiiAgent(options = {}) {
   const adaptedEpiiAgentService = createEpiiAgentServiceAdapter(epiiAgentService);
 
   // Use the adapted Epii agent service
-  return initializeA2AServer(adaptedEpiiAgentService, port);
+  return await initializeA2AServer(adaptedEpiiAgentService, port);
 }
 
 /**

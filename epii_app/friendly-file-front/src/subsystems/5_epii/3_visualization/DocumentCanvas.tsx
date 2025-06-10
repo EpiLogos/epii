@@ -16,6 +16,7 @@ import documentService from '../1_services/documentService';
 import DocumentControls from './DocumentControls';
 import AnalysisResultsPanel from './AnalysisResultsPanel';
 import CrystalliseToNotionOverlay from './CrystalliseToNotionOverlay';
+import { sendWebSocketMessage } from '../1_services/webSocketService';
 import {
   // syncTextContentToMetadata, // DEFERRED: Sync feature temporarily disabled
   processPayloadForNotion
@@ -93,6 +94,32 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
   // but the source of truth is in the EpiiContext
   const [, setCurrentSelection] = useState<TextSelection | null>(null);
 
+  // AG-UI Event Emission Helper
+  const emitDocumentEvent = async (eventType: string, documentData: any) => {
+    try {
+      const event = {
+        type: 'ag-ui-event',
+        eventType,
+        data: {
+          ...documentData,
+          timestamp: new Date().toISOString(),
+          metadata: {
+            bimbaCoordinates: documentData.targetCoordinate ? [documentData.targetCoordinate] : [],
+            qlStage: 5,
+            contextFrame: '(5/0)',
+            source: 'DocumentCanvas'
+          }
+        }
+      };
+
+      await sendWebSocketMessage(event);
+      console.log(`📡 AG-UI Event emitted: ${eventType}`, documentData);
+    } catch (error) {
+      console.warn(`Failed to emit AG-UI event ${eventType}:`, error);
+      // Don't throw - AG-UI events are enhancement, not critical
+    }
+  };
+
   // Update local state when current document changes
   useEffect(() => {
     // Check if we have a current document
@@ -106,9 +133,18 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       // Set the document name
       setDocumentName(currentDocument.name);
 
-      // Set the target coordinate if available
-      if (currentDocument.bimbaCoordinate) {
-        setTargetCoordinate(currentDocument.bimbaCoordinate);
+      // Set the target coordinate from the document's stored coordinate
+      // Priority: targetCoordinate -> metadata.targetCoordinate -> bimbaCoordinate (deprecated)
+      const documentCoordinate =
+        currentDocument.targetCoordinate ||
+        currentDocument.metadata?.targetCoordinate ||
+        currentDocument.bimbaCoordinate;
+
+      if (documentCoordinate) {
+        console.log(`Setting target coordinate from document: ${documentCoordinate}`);
+        setTargetCoordinate(documentCoordinate);
+      } else {
+        console.log('No coordinate found in document, keeping current target coordinate');
       }
 
       // CRITICAL FIX: Immediately set document content if it's available in the document object
@@ -464,6 +500,16 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       // Update local state
       setDocumentContent(initialContent);
       setDocumentName(initialName);
+
+      // Emit AG-UI document created event
+      await emitDocumentEvent('DocumentCreated', {
+        documentId: newDoc.id,
+        documentName: initialName,
+        targetCoordinate: targetCoordinate || '#5-2-1',
+        documentType: 'bimba',
+        collection: 'Documents',
+        metadata: {}
+      });
 
       // Show success message
       dispatch({
@@ -956,6 +1002,15 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
         // Show success message based on the result
         if (result.success) {
+          // Emit AG-UI document deleted event
+          await emitDocumentEvent('DocumentDeleted', {
+            documentId: documentIdToDelete,
+            documentName: documentName,
+            targetCoordinate: documentCoordinate,
+            documentType: isPratibimba ? 'pratibimba' : 'bimba',
+            collection: collection
+          });
+
           dispatch({
             type: 'SET_STATUS_MESSAGE',
             payload: {
@@ -1208,6 +1263,20 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
           console.log(`${isPratibimba ? 'Pratibimba' : 'Bimba'} document ${currentDocumentId} saved successfully to MongoDB`);
 
+          // Emit AG-UI document updated event
+          await emitDocumentEvent('DocumentUpdated', {
+            documentId: currentDocumentId,
+            documentName: documentName,
+            targetCoordinate: coordinateToSave,
+            documentType: isPratibimba ? 'pratibimba' : 'bimba',
+            changes: {
+              textContent: documentContent,
+              name: documentName,
+              targetCoordinate: coordinateToSave
+            },
+            metadata: currentDocument?.metadata || {}
+          });
+
           // Show success message
           dispatch({
             type: 'SET_STATUS_MESSAGE',
@@ -1281,25 +1350,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       return;
     }
 
-    try {
-      // Crystallize results
-      await crystallizeResults();
-
-      // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: 'Analysis results crystallized successfully.'
-        }
-      });
-    } catch (error) {
-      console.error('Error crystallizing results:', error);
-      dispatch({
-        type: 'SET_ERROR',
-        payload: 'Failed to crystallize results. Please try again.'
-      });
-    }
+    // Crystallize results - let the crystallizeResults function handle all messaging
+    await crystallizeResults(latestSession.results);
   };
 
   // Only show the empty state when there's no current document ID
@@ -1433,6 +1485,15 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
                         }
 
                         console.log(`Successfully updated coordinate for document ${currentDocument.id} to ${targetCoordinate}`);
+
+                        // Emit AG-UI coordinate assignment event
+                        await emitDocumentEvent('DocumentCoordinateAssigned', {
+                          documentId: currentDocument.id,
+                          documentName: documentName,
+                          previousCoordinate: currentDocument.bimbaCoordinate,
+                          newCoordinate: targetCoordinate,
+                          documentType: isPratibimba ? 'pratibimba' : 'bimba'
+                        });
                       }
                     } catch (apiError) {
                       console.warn('Error updating coordinate in MongoDB:', apiError);

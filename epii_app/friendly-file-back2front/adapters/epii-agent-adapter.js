@@ -19,11 +19,12 @@ class EpiiAgentAdapter {
   constructor(options = {}) {
     this.epiiAgentService = options.epiiAgentService; // Existing Epii agent service
     this.taskStore = new Map(); // Store for active tasks
+    this.skillsRegistry = null;
+    this.skillsRouter = null;
+    this.initialized = false;
 
-    // Initialize the skills module
-    const { skillsRegistry, skillsRouter } = initializeSkillsModule(this.epiiAgentService);
-    this.skillsRegistry = skillsRegistry;
-    this.skillsRouter = skillsRouter;
+    // Initialize the skills module asynchronously
+    this.initializeSkills();
 
     // Bind methods
     this.handleTask = this.handleTask.bind(this);
@@ -31,12 +32,31 @@ class EpiiAgentAdapter {
     this.getSkillsForAgent = this.getSkillsForAgent.bind(this);
   }
 
+  async initializeSkills() {
+    try {
+      const { skillsRegistry, skillsRouter } = await initializeSkillsModule(this.epiiAgentService);
+      this.skillsRegistry = skillsRegistry;
+      this.skillsRouter = skillsRouter;
+      this.initialized = true;
+      console.log('[EpiiAgentAdapter] Skills initialized successfully');
+    } catch (error) {
+      console.error('[EpiiAgentAdapter] Failed to initialize skills:', error);
+    }
+  }
+
+  async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initializeSkills();
+    }
+  }
+
   /**
    * Get all skills for a specific agent
    * @param {string} agentId The ID of the agent
    * @returns {Array} Array of skills provided by the agent
    */
-  getSkillsForAgent(agentId) {
+  async getSkillsForAgent(agentId) {
+    await this.ensureInitialized();
     return this.skillsRegistry.getSkillsForAgent(agentId);
   }
 
@@ -258,6 +278,9 @@ class EpiiAgentAdapter {
    */
   async executeSkill(skillId, parameters, context = {}) {
     console.log(`[EpiiAgentAdapter] Executing skill: ${skillId}`);
+
+    // Ensure skills are initialized
+    await this.ensureInitialized();
 
     try {
       // Use the skills router to execute the skill

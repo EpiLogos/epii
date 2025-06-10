@@ -260,7 +260,10 @@ export async function runStageMinus1(state) {
             sourceMetadata: state.sourceMetadata,
 
             // Service for document operations - needed for stage -0
-            bpMCPService: state.bpMCPService
+            bpMCPService: state.bpMCPService,
+
+            // AG-UI context for event emission
+            skillContext: state.skillContext
         };
 
         // Ensure no unnecessary data is included

@@ -296,7 +296,10 @@ export async function runStageMinus5(initialState) {
             },
 
             // Essential services
-            bpMCPService: initialState.bpMCPService
+            bpMCPService: initialState.bpMCPService,
+
+            // AG-UI context for event emission
+            skillContext: initialState.skillContext
         };
 
         // Validate the output state with more detailed checks

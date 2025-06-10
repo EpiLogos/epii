@@ -63,11 +63,21 @@ export async function runStageMinus3(state) {
                     skipLightRagIngestion = true;
 
                     // Add LightRAG metadata to indicate ingestion was skipped but successful
+                    // Ensure target coordinate has "#" prefix
+                    const normalizedTargetCoordinate = sourceMetadata.targetCoordinate?.startsWith('#')
+                        ? sourceMetadata.targetCoordinate
+                        : `#${sourceMetadata.targetCoordinate}`;
+
                     sourceMetadata.lightRagMetadata = {
                         ingestionDate: new Date(),
                         ingestionStatus: 'skipped',
-                        skippedReason: 'Document recently ingested'
+                        skippedReason: 'Document recently ingested',
+                        targetCoordinate: normalizedTargetCoordinate
                     };
+
+                    // SIMPLIFIED: Don't generate content hash when skipping - the original system was working fine
+                    console.log(`Skipped LightRAG ingestion for document ${sourceMetadata.documentId} - no hash generation needed`);
+
                 } else {
                     console.log(`Document ${sourceMetadata.documentId} needs to be ingested into LightRAG.`);
                 }
@@ -75,21 +85,58 @@ export async function runStageMinus3(state) {
                 console.warn(`Error checking if document has been recently ingested: ${checkError.message}. Proceeding with ingestion.`);
             }
         }
-        // 1. Chunk the document with context windows
-        console.log(`Chunking document (${documentContent.length} chars) with context windows...`);
+        // 1. Chunk the document with enhanced coordinate-based metadata
+        console.log(`Chunking document (${documentContent.length} chars) with enhanced coordinate metadata...`);
+
+        // Prepare enhanced metadata for coordinate-based chunking
+        const enhancedChunkingOptions = {
+            generateContextWindow,
+            CHUNK_SIZE,
+            CHUNK_OVERLAP,
+            bimbaMapSummary: state.bimbaMapSummary,
+            // Enhanced coordinate metadata for LightRAG integration
+            coordinateMetadata: {
+                targetCoordinate: sourceMetadata.targetCoordinate,
+                sourceFileName: sourceMetadata.sourceFileName,
+                sourceType: sourceMetadata.sourceType,
+                documentId: sourceMetadata.documentId,
+                analysisTimestamp: new Date().toISOString(),
+                pipelineStage: 'stage_minus3',
+                // Add hierarchical coordinate context
+                coordinateHierarchy: sourceMetadata.targetCoordinate.split('-').map((part, index, arr) =>
+                    '#' + arr.slice(0, index + 1).join('-')
+                ),
+                // Add coordinate-specific context
+                coordinateContext: {
+                    primary: sourceMetadata.targetCoordinate,
+                    related: [], // Will be populated from Bimba context if available
+                    depth: sourceMetadata.targetCoordinate.split('-').length - 1
+                }
+            }
+        };
+
+        // Extract related coordinates from Bimba context if available
+        if (bimbaEnhancedContext && typeof bimbaEnhancedContext === 'string') {
+            try {
+                // Look for coordinate references in the context
+                const coordinateMatches = bimbaEnhancedContext.match(/#[0-9]+(-[0-9]+)*/g);
+                if (coordinateMatches) {
+                    enhancedChunkingOptions.coordinateMetadata.coordinateContext.related =
+                        [...new Set(coordinateMatches)].filter(coord => coord !== sourceMetadata.targetCoordinate);
+                }
+            } catch (contextError) {
+                console.warn(`Error extracting coordinates from Bimba context: ${contextError.message}`);
+            }
+        }
+
         const chunks = await chunkDocument(
             documentContent,
             bimbaEnhancedContext,
             fullBimbaMap,
             projectContext,
-            {
-                generateContextWindow,
-                CHUNK_SIZE,
-                CHUNK_OVERLAP,
-                bimbaMapSummary: state.bimbaMapSummary // Pass the Bimba map summary from stage -4
-            }
+            enhancedChunkingOptions
         );
-        console.log(`Document chunked into ${chunks.length} chunks with context windows`);
+        console.log(`Document chunked into ${chunks.length} chunks with enhanced coordinate metadata`);
 
         // 2. Send chunks to LightRAG for ingestion synchronously (if not skipped)
         let results = [];
@@ -121,8 +168,22 @@ export async function runStageMinus3(state) {
             const LIGHTRAG_MCP_SERVER_URL = process.env.LIGHTRAG_MCP_SERVER_URL || "http://localhost:8001";
             console.log(`Using LightRAG server at: ${LIGHTRAG_MCP_SERVER_URL}`);
 
-            // Send chunks to LightRAG and properly propagate errors
-            results = await sendChunksToLightRAG(chunks, sourceMetadata, bpMCPService);
+            // Send chunks to LightRAG with enhanced coordinate metadata
+            const enhancedSourceMetadata = {
+                ...sourceMetadata,
+                // Add the enhanced coordinate metadata to source metadata
+                coordinateMetadata: enhancedChunkingOptions.coordinateMetadata,
+                // Add chunk-level metadata for better retrieval
+                chunkMetadata: {
+                    totalChunks: chunks.length,
+                    chunkSize: CHUNK_SIZE,
+                    chunkOverlap: CHUNK_OVERLAP,
+                    hasContextWindows: chunks.every(chunk => chunk.metadata?.contextWindow),
+                    coordinateEnhanced: true
+                }
+            };
+
+            results = await sendChunksToLightRAG(chunks, enhancedSourceMetadata, bpMCPService);
 
             // Add null/undefined check before filtering results
             successCount = results && Array.isArray(results)
@@ -179,7 +240,9 @@ export async function runStageMinus3(state) {
             // Include bpMCPService for document operations
             bpMCPService: state.bpMCPService,
             // Include original document content for reference
-            documentContent
+            documentContent,
+            // AG-UI context for event emission
+            skillContext: state.skillContext
             // Explicitly NOT including graphData to prevent leakage
         };
 

@@ -121,9 +121,14 @@ const documentMetadataSchema = new mongoose.Schema({
     chunkIds: [String],
     ingestionStatus: {
       type: String,
-      enum: ['pending', 'processing', 'completed', 'failed', 'deprecated'],
+      enum: ['pending', 'processing', 'completed', 'failed', 'deprecated', 'skipped'],
       default: 'pending'
-    }
+    },
+    targetCoordinate: String,
+    contentHash: String, // SHA256 hash of content + targetCoordinate for duplicate detection
+    totalChunks: Number,
+    processedCount: Number,
+    errorCount: Number
   }
 }, { _id: false });
 

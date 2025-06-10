@@ -114,8 +114,15 @@ const handleWebSocketMessage = (data: WebSocketMessage): void => {
 
   // Handle AG-UI events
   if (isAGUIEvent(data)) {
+    console.log('✅ Identified as AG-UI event:', data.type);
     handleAGUIEvent(data as AGUIEvent);
     return;
+  } else {
+    console.log('❌ Not identified as AG-UI event. Type:', data.type);
+    console.log('🔍 Available AG-UI event types:', [
+      'BimbaUpdateSuggestions', 'BimbaAnalysisProgress', 'BimbaContextUpdate',
+      'RunStarted', 'RunFinished', 'RunError', 'StepStarted', 'StepFinished'
+    ]);
   }
 
   // Handle traditional message types
@@ -164,7 +171,20 @@ const isAGUIEvent = (data: WebSocketMessage): boolean => {
     'RunFinished',
     'RunError',
     'StepStarted',
-    'StepFinished'
+    'StepFinished',
+    // Document lifecycle AG-UI events
+    'DocumentCreated',
+    'DocumentUpdated',
+    'DocumentDeleted',
+    'DocumentAnalysisCompleted',
+    'DocumentCoordinateAssigned',
+    'DocumentServiceCreated',
+    'DocumentServiceUpdated',
+    'DocumentServiceDeleted',
+    'DocumentServiceCreatedWithType',
+    'PratibimbaCreated',
+    'CoordinateDocumentsUpdated',
+    'DocumentStateRefresh'
   ];
 
   return aguiEventTypes.includes(data.type);
@@ -395,11 +415,14 @@ export const executeSkillWithAGUI = (
       reject(new Error('Failed to send skill execution request'));
     }
 
-    // Set timeout
+    // Set timeout based on skill type
+    // Analysis pipeline needs longer timeout due to LLM operations in stage -1
+    const timeoutDuration = skillId === 'epii-analysis-pipeline' ? 300000 : 30000; // 5 minutes for analysis, 30s for others
+
     setTimeout(() => {
       socket?.removeEventListener('message', responseHandler);
       reject(new Error('Skill execution timeout'));
-    }, 30000); // 30 second timeout
+    }, timeoutDuration);
   });
 };
 

@@ -53,7 +53,24 @@ router.post('/call-tool', async (req, res) => {
     } else {
       // For all other tools, use the normal flow
       const result = await bpmcpService.callTool(toolName, args);
-      return res.status(200).json(result);
+
+      // Parse BPMCP tool result format and return the actual data
+      let processedResult = result;
+
+      // Check if result has the BPMCP tool format: { content: [{ type: "text", text: "..." }] }
+      if (result && result.content && Array.isArray(result.content) && result.content[0] && result.content[0].text) {
+        try {
+          // Parse the JSON from the BPMCP tool format
+          processedResult = JSON.parse(result.content[0].text);
+          console.log(`Successfully parsed BPMCP tool result format for ${toolName}`);
+        } catch (parseError) {
+          console.error(`Error parsing BPMCP tool result for ${toolName}:`, parseError);
+          // Return the original result if parsing fails
+          processedResult = result;
+        }
+      }
+
+      return res.status(200).json(processedResult);
     }
   } catch (error) {
     console.error(`Error calling BPMCP tool:`, error);

@@ -347,10 +347,9 @@ let registryInstance = null;
 // Auto-register core skills
 const UnifiedRAGSkill = require('./unifiedRAG');
 const EpiiChatSkill = require('./epii-chat-skill');
-const { initializeEpiiOperationalSkills } = require('./epii-operational-skills');
 const BimbaUpdateManagementSkill = require('./bimba-update-management-skill');
 
-function getRegistryInstance() {
+async function getRegistryInstance() {
   if (!registryInstance) {
     registryInstance = new BimbaSkillsRegistry();
 
@@ -375,7 +374,20 @@ function getRegistryInstance() {
       handler: bimbaUpdateSkill.execute.bind(bimbaUpdateSkill)
     });
 
-    console.log('[BimbaSkillsRegistry] Core skills registered (UnifiedRAG at #, EpiiChat at #5, BimbaUpdate at #5-2)');
+    // Register the Epii Analysis Pipeline skill at coordinate #5-0
+    try {
+      const { EpiiAnalysisPipelineSkill } = await import('./epii-analysis-pipeline-skill.js');
+      const pipelineSkill = new EpiiAnalysisPipelineSkill();
+      registryInstance.registerSkill({
+        ...pipelineSkill.getSkillMetadata(),
+        handler: pipelineSkill.execute.bind(pipelineSkill)
+      });
+      console.log('[BimbaSkillsRegistry] Epii Analysis Pipeline skill registered at #5-0');
+    } catch (error) {
+      console.error('[BimbaSkillsRegistry] Failed to register Epii Analysis Pipeline skill:', error);
+    }
+
+    console.log('[BimbaSkillsRegistry] Core skills registered (UnifiedRAG at #, EpiiChat at #5, BimbaUpdate at #5-2, AnalysisPipeline at #5-0)');
   }
   return registryInstance;
 }
@@ -383,4 +395,3 @@ function getRegistryInstance() {
 // Export both the class and the singleton instance
 module.exports = BimbaSkillsRegistry;
 module.exports.getInstance = getRegistryInstance;
-module.exports.initializeEpiiOperationalSkills = initializeEpiiOperationalSkills;

@@ -1040,6 +1040,88 @@ export const EpiiProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading: true // Add loading state to track document loading progress
   });
 
+  // Initialize document state service for AG-UI integration
+  useEffect(() => {
+    const initializeDocumentStateService = async () => {
+      try {
+        const documentStateService = (await import('../1_services/documentStateService')).default;
+
+        // Initialize the service
+        documentStateService.initialize();
+
+        // Register callbacks for state updates
+        documentStateService.onStateUpdate(() => {
+          console.log('📡 AG-UI triggered state update - refreshing documents...');
+          // Force refresh of documents from MongoDB
+          loadDocuments();
+        });
+
+        documentStateService.onDocumentUpdate((documentId: string, changes: any) => {
+          console.log(`📡 AG-UI triggered document update for ${documentId}:`, changes);
+
+          // Update document in state if it exists
+          dispatch({
+            type: 'UPDATE_DOCUMENT',
+            payload: {
+              id: documentId,
+              ...changes,
+              forceSync: true
+            }
+          });
+        });
+
+        console.log('✅ Document state service initialized with AG-UI integration');
+
+        // Cleanup on unmount
+        return () => {
+          documentStateService.cleanup();
+        };
+      } catch (error) {
+        console.error('❌ Failed to initialize document state service:', error);
+      }
+    };
+
+    initializeDocumentStateService();
+  }, []);
+
+  // Function to reload documents (can be called by AG-UI events)
+  const loadDocuments = useCallback(async () => {
+    try {
+      console.log('🔄 Loading documents from MongoDB...');
+
+      // First load bimba documents
+      const fetchedBimbaDocuments = await documentService.getAllDocuments('Documents');
+
+      // Then load pratibimba documents
+      const fetchedPratibimbaDocuments = await documentService.getAllDocuments('pratibimbaDocuments');
+
+      // Cache ALL documents at once
+      documentCacheService.cacheAllDocuments(fetchedBimbaDocuments, fetchedPratibimbaDocuments);
+
+      // Combine all documents
+      const documents = [...fetchedBimbaDocuments, ...fetchedPratibimbaDocuments];
+
+      // Update state with all documents
+      dispatch({
+        type: 'SET_DOCUMENTS',
+        payload: documents
+      });
+
+      console.log(`✅ Loaded ${documents.length} documents (${fetchedBimbaDocuments.length} bimba, ${fetchedPratibimbaDocuments.length} pratibimba)`);
+    } catch (error) {
+      console.error('❌ Error loading documents:', error);
+      dispatch({
+        type: 'SET_ERROR',
+        payload: `Failed to load documents: ${error instanceof Error ? error.message : 'Unknown error'}`
+      });
+    } finally {
+      dispatch({
+        type: 'SET_LOADING',
+        payload: false
+      });
+    }
+  }, []);
+
   // Define the loadDocumentsFromMongoDB function with useCallback
   // to ensure it's only created once and to fix dependency issues
   const loadDocumentsFromMongoDB = useCallback(async () => {

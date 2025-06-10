@@ -10,12 +10,30 @@
  */
 
 import bpMCPService from '../services/bpMCPService.mjs';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Cache directory for persistent storage
+const CACHE_DIR = path.join(__dirname, '../cache');
 
 // In-memory document cache
 const documentCache = new Map();
 
 // In-memory analysis results cache (stored separately from documents for cleaner separation)
 const analysisResultsCache = new Map();
+
+// Ensure cache directory exists
+async function ensureCacheDir() {
+  try {
+    await fs.mkdir(CACHE_DIR, { recursive: true });
+  } catch (error) {
+    console.warn('Failed to create cache directory:', error.message);
+  }
+}
 
 /**
  * Get a document from the cache or fetch it from MongoDB
@@ -197,11 +215,24 @@ export async function storeAnalysisResultsInCache(documentId, analysisResults) {
       console.warn(`WARNING: notionUpdatePayload is NOT present at the top level in the cache for document ${documentId}`);
     }
 
-    // Store in cache with timestamp
-    analysisResultsCache.set(documentId, {
+    const cacheEntry = {
       results: resultsToStore,
       timestamp: new Date()
-    });
+    };
+
+    // Store in memory cache
+    analysisResultsCache.set(documentId, cacheEntry);
+
+    // Store in persistent file cache
+    try {
+      await ensureCacheDir();
+      const filePath = path.join(CACHE_DIR, `analysis_${documentId}.json`);
+      await fs.writeFile(filePath, JSON.stringify(cacheEntry, null, 2), 'utf8');
+      console.log(`💾 Stored analysis results in persistent cache: ${filePath}`);
+    } catch (fileError) {
+      console.warn(`⚠️ Failed to store persistent cache file: ${fileError.message}`);
+      // Continue anyway - memory cache is still working
+    }
 
     console.log(`Successfully stored analysis results in cache for document ${documentId}`);
     return true;
@@ -222,11 +253,29 @@ export async function getAnalysisResultsFromCache(documentId) {
   }
 
   try {
-    // Check if results are in cache
-    if (analysisResultsCache.has(documentId)) {
-      const cachedData = analysisResultsCache.get(documentId);
-      console.log(`Found analysis results in cache for document ${documentId} (cached at ${cachedData.timestamp})`);
+    let cachedData = null;
 
+    // Check if results are in memory cache
+    if (analysisResultsCache.has(documentId)) {
+      cachedData = analysisResultsCache.get(documentId);
+      console.log(`Found analysis results in memory cache for document ${documentId} (cached at ${cachedData.timestamp})`);
+    } else {
+      // Check persistent file cache
+      try {
+        const filePath = path.join(CACHE_DIR, `analysis_${documentId}.json`);
+        const fileContent = await fs.readFile(filePath, 'utf8');
+        cachedData = JSON.parse(fileContent);
+
+        // Restore to memory cache for faster future access
+        analysisResultsCache.set(documentId, cachedData);
+
+        console.log(`📁 Found analysis results in persistent cache for document ${documentId} (cached at ${cachedData.timestamp})`);
+      } catch (fileError) {
+        console.log(`No analysis results found in persistent cache for document ${documentId}: ${fileError.message}`);
+      }
+    }
+
+    if (cachedData) {
       // Ensure notionUpdatePayload is at the top level if it exists nested
       let results = { ...cachedData.results };
 
@@ -271,12 +320,19 @@ export async function clearAnalysisResultsFromCache(documentId) {
   }
 
   try {
-    // Remove from cache
+    // Remove from memory cache
     if (analysisResultsCache.has(documentId)) {
       analysisResultsCache.delete(documentId);
-      console.log(`Cleared analysis results from cache for document ${documentId}`);
-    } else {
-      console.log(`No analysis results found in cache for document ${documentId}, nothing to clear`);
+      console.log(`Cleared analysis results from memory cache for document ${documentId}`);
+    }
+
+    // Remove from persistent file cache
+    try {
+      const filePath = path.join(CACHE_DIR, `analysis_${documentId}.json`);
+      await fs.unlink(filePath);
+      console.log(`🗑️ Removed persistent cache file: ${filePath}`);
+    } catch (fileError) {
+      console.log(`No persistent cache file to remove for document ${documentId}: ${fileError.message}`);
     }
 
     return true;

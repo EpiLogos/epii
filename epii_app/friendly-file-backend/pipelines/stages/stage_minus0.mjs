@@ -220,6 +220,24 @@ export async function runStageMinus0(state) {
             langsmithTracing.endRunSuccess(perspectiveRun, {
                 perspectiveLength: epiiPerspective.length
             });
+
+            // CREATE GRAPHITI EPISODE with the structured analysis results
+            console.log(`Creating Graphiti episode for analysis results...`);
+            try {
+                const { createGraphitiEpisodeFromAnalysis } = await import('../../utils/content/synthesis.mjs');
+                await createGraphitiEpisodeFromAnalysis(
+                    synthesis,
+                    coreElements,
+                    sourceMetadata.targetCoordinate,
+                    epiiPerspective,
+                    relationalProperties,
+                    sourceMetadata
+                );
+                console.log(`✅ Successfully created Graphiti episode for ${sourceMetadata.targetCoordinate}`);
+            } catch (graphitiError) {
+                console.error(`❌ Failed to create Graphiti episode:`, graphitiError);
+                // Don't throw - this shouldn't break the pipeline
+            }
         } catch (perspectiveError) {
             // End the perspective run with error
             try {
@@ -230,6 +248,55 @@ export async function runStageMinus0(state) {
 
             // Rethrow the error to stop the pipeline
             throw new Error(`Failed to generate Epii perspective: ${perspectiveError.message}`);
+        }
+
+        // 3.5. CRITICAL: Add Epii Perspective to Notion Payload
+        console.log(`Adding Epii perspective to Notion update payload...`);
+        try {
+            // Add the Epii perspective as a content block to the Notion payload
+            if (!notionUpdatePayload.contentBlocks) {
+                notionUpdatePayload.contentBlocks = [];
+            }
+
+            // Add Epii perspective as a dedicated section
+            notionUpdatePayload.contentBlocks.push({
+                type: 'heading_2',
+                heading_2: {
+                    rich_text: [{
+                        type: 'text',
+                        text: { content: '🎯 Epii Perspective' }
+                    }]
+                }
+            });
+
+            notionUpdatePayload.contentBlocks.push({
+                type: 'paragraph',
+                paragraph: {
+                    rich_text: [{
+                        type: 'text',
+                        text: { content: epiiPerspective }
+                    }]
+                }
+            });
+
+            // Also add it to the properties for easy access
+            if (!notionUpdatePayload.properties) {
+                notionUpdatePayload.properties = {};
+            }
+
+            // Add Epii perspective as a rich text property
+            notionUpdatePayload.properties.epiiPerspective = {
+                type: 'rich_text',
+                rich_text: [{
+                    type: 'text',
+                    text: { content: epiiPerspective }
+                }]
+            };
+
+            console.log(`Successfully added Epii perspective (${epiiPerspective.length} chars) to Notion payload`);
+        } catch (perspectiveAddError) {
+            console.error(`Error adding Epii perspective to Notion payload: ${perspectiveAddError.message}`);
+            // Don't throw - this shouldn't break the pipeline, but log the issue
         }
 
         // 4. Update the file's analysis status if this was a file upload
@@ -457,7 +524,10 @@ export async function runStageMinus0(state) {
             userId: state.userId,
 
             // Source metadata
-            sourceMetadata: state.sourceMetadata
+            sourceMetadata: state.sourceMetadata,
+
+            // AG-UI context for event emission
+            skillContext: state.skillContext
         };
 
         // End the stage run

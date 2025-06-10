@@ -224,7 +224,10 @@ Content Length: ${documentContent.length} characters
 
             // Document reference and services
             document: state.document,
-            bpMCPService: state.bpMCPService
+            bpMCPService: state.bpMCPService,
+
+            // AG-UI context for event emission
+            skillContext: state.skillContext
         };
 
         // 11. Validate the output state

@@ -229,6 +229,108 @@ export const useDocumentAnalysis = () => {
   // Get graph data for enhanced Bimba awareness
   const { nodes, edges } = useGraphData();
 
+  // Initialize target coordinate when document changes
+  useEffect(() => {
+    const { currentDocumentId, documents } = state;
+
+    if (!currentDocumentId) {
+      setTargetCoordinate(null);
+      return;
+    }
+
+    // Find the current document
+    const currentDocument = documents.find(doc => doc.id === currentDocumentId);
+    if (currentDocument) {
+      // Set target coordinate from document's stored coordinate
+      // Priority: targetCoordinate -> metadata.targetCoordinate -> bimbaCoordinate (deprecated)
+      const documentCoordinate =
+        currentDocument.targetCoordinate ||
+        currentDocument.metadata?.targetCoordinate ||
+        currentDocument.bimbaCoordinate;
+
+      if (documentCoordinate) {
+        console.log(`useDocumentAnalysis: Setting target coordinate from document: ${documentCoordinate}`);
+        setTargetCoordinate(documentCoordinate);
+      }
+    }
+  }, [state.currentDocumentId, state.documents]);
+
+  // AG-UI Event Handler for Analysis Completion
+  useEffect(() => {
+    const handleAnalysisCompleted = (event: any) => {
+      console.log('🎉 useDocumentAnalysis: Analysis completed event received:', event);
+
+      const { currentDocumentId } = state;
+
+      // Check if this event is for the current document
+      if (event.documentId === currentDocumentId) {
+        console.log('✅ Analysis completion event matches current document, updating latestSession...');
+
+        // Create a session from the analysis results
+        const sessionId = `session-${Date.now()}`;
+        const session = {
+          id: sessionId,
+          documentId: event.documentId,
+          targetCoordinate: event.targetCoordinate,
+          startTime: new Date(Date.now() - 60000), // Assume started 1 minute ago
+          endTime: new Date(),
+          status: 'completed',
+          results: event.analysisResults || {}
+        };
+
+        // Update latest session to trigger results panel display
+        setLatestSession(session);
+
+        // Also add to document sessions
+        dispatch({
+          type: 'ADD_ANALYSIS_SESSION',
+          payload: session
+        });
+
+        // Show completion status message
+        dispatch({
+          type: 'SET_STATUS_MESSAGE',
+          payload: {
+            type: 'success',
+            text: `Analysis completed successfully for coordinate ${event.targetCoordinate}.`
+          }
+        });
+
+        console.log('✅ Updated latestSession with analysis results - results panel should now be visible');
+      }
+    };
+
+    // Import webSocketService and register event handler
+    const setupEventHandler = async () => {
+      try {
+        const { onAGUIEvent, offAGUIEvent } = await import('../1_services/webSocketService');
+
+        // Register the event handler
+        onAGUIEvent('DocumentAnalysisCompleted', handleAnalysisCompleted);
+
+        // Cleanup function
+        return () => {
+          offAGUIEvent('DocumentAnalysisCompleted', handleAnalysisCompleted);
+        };
+      } catch (error) {
+        console.error('Failed to setup DocumentAnalysisCompleted event handler:', error);
+      }
+    };
+
+    const cleanup = setupEventHandler();
+
+    // Return cleanup function
+    return () => {
+      if (cleanup && typeof cleanup.then === 'function') {
+        cleanup.then(cleanupFn => {
+          if (typeof cleanupFn === 'function') {
+            cleanupFn();
+          }
+        });
+      }
+    };
+  }, [state.currentDocumentId, dispatch]);
+
   // Check for existing analysis results when document changes
   useEffect(() => {
     const { currentDocumentId } = state;
@@ -380,11 +482,20 @@ export const useDocumentAnalysis = () => {
   // Start analysis for the current document
   const startAnalysis = useCallback(async () => {
     const { currentDocumentId } = state;
+    const currentDocument = state.documents.find(doc => doc.id === currentDocumentId);
 
     if (!currentDocumentId) {
       dispatch({
         type: 'SET_ERROR',
         payload: 'No document selected for analysis'
+      });
+      return null;
+    }
+
+    if (!currentDocument) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: 'Current document not found'
       });
       return null;
     }
@@ -401,24 +512,71 @@ export const useDocumentAnalysis = () => {
     dispatch({ type: 'SET_LOADING', payload: true });
 
     try {
-      // Call the API to start analysis
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/api/documents/${currentDocumentId}/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      // Generate AG-UI run identifiers
+      const runId = `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const threadId = `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      console.log('🚀 Calling Epii Analysis Pipeline skill via centralized AG-UI WebSocket service...');
+      console.log(`📋 AG-UI Run ID: ${runId}`);
+      console.log(`🧵 AG-UI Thread ID: ${threadId}`);
+      console.log(`🎯 Target Coordinate: ${targetCoordinate}`);
+
+      // Import the executeSkillWithAGUI function
+      const { executeSkillWithAGUI } = await import('../1_services/webSocketService');
+
+      // Execute skill using centralized WebSocket service with AG-UI support
+      // Pass complete document metadata AND graphData through AG-UI protocol
+      const result = await executeSkillWithAGUI(
+        'epii-analysis-pipeline',
+        {
+          content: currentDocument.textContent || '',
           targetCoordinate,
-          graphData: { nodes, edges } // Pass graph data to backend
-        })
-      });
+          fileName: currentDocument.fileName || 'document.txt',
+          userId: 'default-user',
+          analysisDepth: 'standard',
+          includeNotion: true,
+          includeBimba: true,
+          includeGraphiti: true,
+          includeLightRAG: true,
+          // Pass complete document metadata to avoid separate MongoDB fetch
+          documentMetadata: {
+            documentId: currentDocumentId,
+            lightRagMetadata: currentDocument.metadata?.lightRagMetadata || null,
+            analysisStatus: currentDocument.metadata?.analysisStatus || null,
+            targetCoordinate: currentDocument.targetCoordinate || targetCoordinate,
+            collection: currentDocument.collection || 'Documents',
+            documentType: currentDocument.documentType || 'bimba',
+            lastModified: currentDocument.lastModified || new Date().toISOString(),
+            // Include any other relevant metadata
+            ...currentDocument.metadata
+          },
+          // CRITICAL: Pass graphData from frontend state to be transformed into bimbaMap
+          graphData: {
+            nodes: nodes || [],
+            edges: edges || []
+          }
+        },
+        {
+          agentId: 'epii-analysis-client',
+          agentCoordinate: '#5-0',
+          targetCoordinate,
+          requestType: 'document-analysis',
+          // Include document state in context
+          documentState: {
+            documentId: currentDocumentId,
+            hasLightRagMetadata: !!(currentDocument.metadata?.lightRagMetadata),
+            lightRagStatus: currentDocument.metadata?.lightRagMetadata?.ingestionStatus || 'none',
+            lastAnalysis: currentDocument.metadata?.analysisStatus || 'none'
+          }
+        },
+        {
+          runId,
+          threadId,
+          enableAGUI: true
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      console.log('✅ Analysis pipeline skill execution completed:', result);
 
       // Create a new analysis session
       const sessionId = uuidv4();

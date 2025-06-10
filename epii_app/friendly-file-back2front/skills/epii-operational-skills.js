@@ -2,7 +2,7 @@
  * Epii Operational Skills
  * Registers Epii's actual operational capabilities as A2A-aligned skills
  * These are the functions that other agents can call to leverage Epii's capabilities
- * 
+ *
  * Focus: Operational capabilities, not domain knowledge
  * Domain knowledge is accessed via UnifiedRAG at coordinate #
  */
@@ -14,56 +14,17 @@
  * @param {Object} bpMCPService The BPMCP service
  * @returns {Object} The initialized skills registry
  */
-function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCPService) {
+async function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCPService) {
   console.log('[EpiiOperationalSkills] Registering Epii operational capabilities...');
 
-  // #5-0: Document Analysis Pipeline
-  skillsRegistry.registerSkill({
-    id: 'epii-document-analysis',
-    name: 'Epii Document Analysis Pipeline',
-    description: 'Runs the complete Epii document analysis pipeline on uploaded content',
-    bimbaCoordinate: '#5-0',
-    agentId: 'epii-agent',
-    version: '1.0.0',
-    inputSchema: {
-      type: 'object',
-      required: ['content'],
-      properties: {
-        content: { type: 'string', description: 'Document content to analyze' },
-        targetCoordinate: { type: 'string', description: 'Target Bimba coordinate for analysis' },
-        analysisDepth: { type: 'string', enum: ['basic', 'standard', 'deep'], default: 'standard' },
-        includeNotion: { type: 'boolean', default: true, description: 'Whether to crystallize to Notion' },
-        includeBimba: { type: 'boolean', default: true, description: 'Whether to update Bimba graph' }
-      }
-    },
-    handler: async (params, context) => {
-      try {
-        // Use the Epii agent service to run the analysis pipeline
-        const result = await epiiAgentService.processDocumentAnalysis({
-          content: params.content,
-          targetCoordinate: params.targetCoordinate,
-          analysisDepth: params.analysisDepth,
-          options: {
-            includeNotion: params.includeNotion,
-            includeBimba: params.includeBimba
-          },
-          context
-        });
+  // Import the new A2A-integrated pipeline skill
+  const { EpiiAnalysisPipelineSkill } = await import('./epii-analysis-pipeline-skill.js');
 
-        return {
-          success: true,
-          data: result,
-          skillId: 'epii-document-analysis',
-          coordinate: params.targetCoordinate
-        };
-      } catch (error) {
-        return {
-          success: false,
-          error: error.message,
-          skillId: 'epii-document-analysis'
-        };
-      }
-    }
+  // #5-0: Document Analysis Pipeline (A2A-Integrated)
+  const pipelineSkill = new EpiiAnalysisPipelineSkill();
+  skillsRegistry.registerSkill({
+    ...pipelineSkill.getSkillMetadata(),
+    handler: pipelineSkill.execute.bind(pipelineSkill)
   });
 
   // #5-1: Notion Crystallization
@@ -134,7 +95,7 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
     handler: async (params, context) => {
       try {
         let result;
-        
+
         switch (params.operation) {
           case 'create':
             result = await bpMCPService.createBimbaNode({
@@ -143,28 +104,28 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
               relations: params.relations
             });
             break;
-            
+
           case 'update':
             result = await bpMCPService.updateBimbaGraph(
               `MATCH (n {bimbaCoordinate: $coord}) SET n += $props RETURN n`,
               { coord: params.coordinate, props: params.properties }
             );
             break;
-            
+
           case 'relate':
             result = await bpMCPService.manageBimbaRelationships({
               sourceCoordinate: params.coordinate,
               relationships: params.relations
             });
             break;
-            
+
           case 'delete':
             result = await bpMCPService.updateBimbaGraph(
               `MATCH (n {bimbaCoordinate: $coord}) DETACH DELETE n`,
               { coord: params.coordinate }
             );
             break;
-            
+
           default:
             if (params.query) {
               result = await bpMCPService.queryBimbaGraph(params.query, params.properties || {});
@@ -253,23 +214,23 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
     handler: async (params, context) => {
       try {
         let result;
-        
+
         switch (params.workflow) {
           case 'document-to-knowledge':
             // Full pipeline: Document → Analysis → Notion → Bimba
             result = await epiiAgentService.processDocumentToKnowledge(params.input, params.options);
             break;
-            
+
           case 'research-synthesis':
             // Research → Synthesis → Crystallization
             result = await epiiAgentService.processResearchSynthesis(params.input, params.options);
             break;
-            
+
           case 'coordinate-expansion':
             // Expand knowledge around a coordinate
             result = await epiiAgentService.processCoordinateExpansion(params.input, params.options);
             break;
-            
+
           default:
             throw new Error(`Unknown workflow: ${params.workflow}`);
         }
@@ -313,7 +274,7 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
         // This delegates to the UnifiedRAG skill but with Epii-specific enhancements
         const unifiedRAGSkill = skillsRegistry.getSkillById('unifiedRAG');
         const ragResult = await unifiedRAGSkill.handler(params, context);
-        
+
         // Add Epii-specific context enhancement
         if (ragResult.success) {
           const enhancedResult = await epiiAgentService.enhanceKnowledgeContext(
@@ -321,7 +282,7 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
             params.query,
             context
           );
-          
+
           return {
             success: true,
             data: enhancedResult,
@@ -329,7 +290,7 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
             baseRAG: ragResult.data
           };
         }
-        
+
         return ragResult;
       } catch (error) {
         return {
@@ -341,7 +302,7 @@ function initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, bpMCP
     }
   });
 
-  console.log('[EpiiOperationalSkills] Registered 6 operational skills for Epii agent');
+  console.log('[EpiiOperationalSkills] Registered 6 operational skills for Epii agent (including A2A-integrated pipeline)');
   return skillsRegistry;
 }
 

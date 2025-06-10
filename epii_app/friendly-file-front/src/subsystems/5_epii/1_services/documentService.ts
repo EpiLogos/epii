@@ -4,6 +4,35 @@
  */
 
 import documentCacheService, { CachedDocument } from './documentCacheService';
+import { sendWebSocketMessage } from './webSocketService';
+
+/**
+ * AG-UI Event Emission Helper for DocumentService
+ */
+const emitDocumentServiceEvent = async (eventType: string, documentData: any) => {
+  try {
+    const event = {
+      type: 'ag-ui-event',
+      eventType,
+      data: {
+        ...documentData,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          bimbaCoordinates: documentData.targetCoordinate ? [documentData.targetCoordinate] : [],
+          qlStage: 5,
+          contextFrame: '(5/1)',
+          source: 'DocumentService'
+        }
+      }
+    };
+
+    await sendWebSocketMessage(event);
+    console.log(`📡 DocumentService AG-UI Event emitted: ${eventType}`, documentData);
+  } catch (error) {
+    console.warn(`Failed to emit DocumentService AG-UI event ${eventType}:`, error);
+    // Don't throw - AG-UI events are enhancement, not critical
+  }
+};
 
 /**
  * Handles all MongoDB operations for documents
@@ -137,21 +166,30 @@ const documentServiceImpl = {
 
       // Return a merged object with the MongoDB ID and the original document
       // If we have a created document from MongoDB, use its content and other fields
-      if (createdDoc) {
-        return {
-          id: mongoId,
-          ...document,
-          // Include the textContent from the created document if available
-          ...(createdDoc.textContent && { textContent: createdDoc.textContent }),
-          // Include other useful fields from the created document
-          ...(createdDoc.fileName && { fileName: createdDoc.fileName }),
-          ...(createdDoc.originalName && { originalName: createdDoc.originalName }),
-          ...(createdDoc.targetCoordinate && { targetCoordinate: createdDoc.targetCoordinate })
-        };
-      } else {
+      const resultDocument = createdDoc ? {
+        id: mongoId,
+        ...document,
+        // Include the textContent from the created document if available
+        ...(createdDoc.textContent && { textContent: createdDoc.textContent }),
+        // Include other useful fields from the created document
+        ...(createdDoc.fileName && { fileName: createdDoc.fileName }),
+        ...(createdDoc.originalName && { originalName: createdDoc.originalName }),
+        ...(createdDoc.targetCoordinate && { targetCoordinate: createdDoc.targetCoordinate })
+      } : {
         // Fallback to just the ID and original document
-        return { id: mongoId, ...document };
-      }
+        id: mongoId, ...document
+      };
+
+      // Emit AG-UI document created event
+      await emitDocumentServiceEvent('DocumentServiceCreated', {
+        documentId: mongoId,
+        documentName: document.name,
+        targetCoordinate: document.targetCoordinate,
+        collection: collectionName,
+        documentType: 'bimba'
+      });
+
+      return resultDocument;
     } catch (error) {
       console.error('Error creating document in MongoDB:', error);
       throw error;
@@ -381,6 +419,16 @@ const documentServiceImpl = {
             console.warn(`Error verifying document update: ${verifyError.message}`);
           }
 
+          // Emit AG-UI document updated event
+          await emitDocumentServiceEvent('DocumentServiceUpdated', {
+            documentId: documentId,
+            changes: updates,
+            collection: collection,
+            coordinateChanged: oldCoordinate !== updates.targetCoordinate,
+            previousCoordinate: oldCoordinate,
+            newCoordinate: updates.targetCoordinate
+          });
+
           // Wait a moment to ensure the update is processed
           await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error) {
@@ -596,6 +644,13 @@ const documentServiceImpl = {
         console.log(`Document ${documentId} deleted from MongoDB:`, result);
         documentDeleted = true;
 
+        // Emit AG-UI document deleted event
+        await emitDocumentServiceEvent('DocumentServiceDeleted', {
+          documentId: documentId,
+          collection: collection,
+          result: result
+        });
+
         // Return success
         return { success: true, message: 'Document deleted from MongoDB', result };
       } catch (error) {
@@ -759,22 +814,30 @@ const documentServiceImpl = {
       }
 
       // Return a merged object with the MongoDB ID and the original document
-      if (createdDoc) {
-        return {
-          id: mongoId,
-          ...document,
-          documentType,
-          crystallizationDate: documentType === 'pratibimba' ? new Date().toISOString() : undefined
-        };
-      } else {
+      const resultDocument = createdDoc ? {
+        id: mongoId,
+        ...document,
+        documentType,
+        crystallizationDate: documentType === 'pratibimba' ? new Date().toISOString() : undefined
+      } : {
         // Fallback to just the ID and original document
-        return {
-          id: mongoId,
-          ...document,
-          documentType,
-          crystallizationDate: documentType === 'pratibimba' ? new Date().toISOString() : undefined
-        };
-      }
+        id: mongoId,
+        ...document,
+        documentType,
+        crystallizationDate: documentType === 'pratibimba' ? new Date().toISOString() : undefined
+      };
+
+      // Emit AG-UI document created event
+      await emitDocumentServiceEvent('DocumentServiceCreatedWithType', {
+        documentId: mongoId,
+        documentName: document.name,
+        targetCoordinate: document.bimbaCoordinate || document.targetCoordinate,
+        collection: collection,
+        documentType: documentType,
+        bimbaId: document.bimbaId
+      });
+
+      return resultDocument;
     } catch (error) {
       console.error(`Error creating ${documentType} document in MongoDB:`, error);
       throw error;

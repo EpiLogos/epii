@@ -129,6 +129,29 @@ export const createCrystallization = async ({
       collection: 'pratibimbaDocuments' // Explicitly specify the collection name
     });
 
+    // Emit AG-UI event for pratibimba document creation
+    try {
+      const { emitDocumentCreated } = await import('../utils/agui-integration.mjs');
+
+      emitDocumentCreated({
+        documentId: result.documentId || crystallizationData._id,
+        documentName: crystallizationData.title || crystallizationData.fileName || 'Crystallized Document',
+        targetCoordinate: crystallizationData.targetCoordinate || '#5',
+        documentType: 'pratibimba',
+        collection: 'pratibimbaDocuments',
+        metadata: {
+          originalDocumentId: originalDocumentId,
+          crystallizationType: 'analysis_results',
+          crystallizationDate: new Date().toISOString()
+        }
+      }, 'crystallization-service', 'crystallization-thread');
+
+      console.log('✅ Emitted AG-UI DocumentCreated event for pratibimba document');
+    } catch (aguiError) {
+      console.warn('⚠️ Failed to emit AG-UI DocumentCreated event:', aguiError);
+      // Don't throw - AG-UI events are enhancement, not critical
+    }
+
     // Parse the result to get the crystallization document
     let crystallization;
     try {

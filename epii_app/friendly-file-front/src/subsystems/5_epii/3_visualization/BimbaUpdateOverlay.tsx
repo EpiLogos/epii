@@ -109,6 +109,9 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     stage: string;
     progress: number;
     currentStep: string;
+    stageId?: string;
+    currentStageNumber?: number;
+    totalStages?: number;
   } | null>(null);
 
   // Update state
@@ -208,22 +211,39 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       });
       applySuggestionsToForm(suggestions);
 
-      // Clear loading state
+      // Clear loading state but keep progress visible
       setIsGeneratingSuggestions(false);
-      setAnalysisProgress(null);
+      // Don't clear analysisProgress - keep it visible for user reference
       setSuggestionError(null);
 
       console.log('✅ AG-UI suggestions processing completed');
     };
 
-    // Handler for Analysis Progress
-    const handleAnalysisProgress = (event: any) => {
-      console.log('📊 Analysis progress update:', event);
+    // Handler for Step Started (AG-UI Protocol)
+    const handleStepStarted = (event: any) => {
+      console.log('🚀 Pipeline step started:', event);
 
       setAnalysisProgress({
-        stage: event.stage || 'processing',
+        stage: event.stepName || 'processing',
         progress: event.progress || 0,
-        currentStep: event.currentStep || 'Processing...'
+        currentStep: `Starting: ${event.stepName || 'Unknown Step'}`,
+        stageId: event.details?.stageId,
+        currentStageNumber: event.details?.currentStage,
+        totalStages: event.details?.totalStages || 6
+      });
+    };
+
+    // Handler for Step Finished (AG-UI Protocol)
+    const handleStepFinished = (event: any) => {
+      console.log('✅ Pipeline step finished:', event);
+
+      setAnalysisProgress({
+        stage: event.stepName || 'processing',
+        progress: event.progress || 0,
+        currentStep: `Completed: ${event.stepName || 'Unknown Step'}`,
+        stageId: event.details?.stageId,
+        currentStageNumber: event.details?.currentStage,
+        totalStages: event.details?.totalStages || 6
       });
     };
 
@@ -232,14 +252,20 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       console.error('❌ AG-UI Run Error:', event);
 
       setIsGeneratingSuggestions(false);
-      setAnalysisProgress(null);
+      // Keep progress visible but show error state
+      setAnalysisProgress(prev => prev ? {
+        ...prev,
+        currentStep: 'Analysis failed - see error below',
+        progress: prev.progress // Keep current progress
+      } : null);
       setSuggestionError(event.message || 'Analysis failed');
     };
 
     // Register event handlers
     console.log('📝 Registering AG-UI event handlers...');
     onAGUIEvent('BimbaUpdateSuggestions', handleUpdateSuggestions);
-    onAGUIEvent('BimbaAnalysisProgress', handleAnalysisProgress);
+    onAGUIEvent('StepStarted', handleStepStarted);
+    onAGUIEvent('StepFinished', handleStepFinished);
     onAGUIEvent('RunError', handleRunError);
 
     // Test WebSocket connection status
@@ -251,7 +277,8 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     return () => {
       console.log('🧹 Cleaning up AG-UI event handlers');
       offAGUIEvent('BimbaUpdateSuggestions', handleUpdateSuggestions);
-      offAGUIEvent('BimbaAnalysisProgress', handleAnalysisProgress);
+      offAGUIEvent('StepStarted', handleStepStarted);
+      offAGUIEvent('StepFinished', handleStepFinished);
       offAGUIEvent('RunError', handleRunError);
     };
   }, [isOpen, selectedCoordinate]);
@@ -2537,28 +2564,47 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                                 {analysisProgress.currentStep}
                               </div>
 
-                              {/* Stage Indicators */}
-                              <div className="flex items-center space-x-2 text-xs">
-                                {['llm-analysis', 'json-parsing', 'validation', 'completion'].map((stage, index) => (
-                                  <div
-                                    key={stage}
-                                    className={`flex items-center space-x-1 px-2 py-1 rounded ${
-                                      analysisProgress.stage === stage
-                                        ? 'bg-epii-neon/20 text-epii-neon'
-                                        : analysisProgress.progress > (index * 25)
-                                        ? 'bg-green-600/20 text-green-300'
-                                        : 'bg-gray-600/20 text-gray-400'
-                                    }`}
-                                  >
-                                    {analysisProgress.stage === stage && (
-                                      <div className="animate-spin h-3 w-3 border border-epii-neon border-t-transparent rounded-full" />
-                                    )}
-                                    {analysisProgress.progress > (index * 25) && analysisProgress.stage !== stage && (
-                                      <CheckCircle size={12} />
-                                    )}
-                                    <span>{stage.replace('-', ' ')}</span>
-                                  </div>
-                                ))}
+                              {/* Pipeline Stage Indicators */}
+                              <div className="flex items-center space-x-1 text-xs overflow-x-auto">
+                                {[
+                                  { name: 'Fetch Document', progress: 10 },
+                                  { name: 'Contextualize', progress: 25 },
+                                  { name: 'Integrate Structure', progress: 40 },
+                                  { name: 'Relate Concepts', progress: 60 },
+                                  { name: 'Define Elements', progress: 80 },
+                                  { name: 'Synthesize', progress: 100 }
+                                ].map((stage, index) => {
+                                  const isActive = analysisProgress.stage === stage.name;
+                                  const isCompleted = analysisProgress.progress >= stage.progress;
+                                  const isNext = !isCompleted && analysisProgress.progress >= (index > 0 ? [10, 25, 40, 60, 80, 100][index - 1] : 0);
+
+                                  return (
+                                    <div
+                                      key={stage.name}
+                                      className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
+                                        isActive
+                                          ? 'bg-epii-neon/20 text-epii-neon border border-epii-neon/50'
+                                          : isCompleted
+                                          ? 'bg-green-600/20 text-green-300'
+                                          : isNext
+                                          ? 'bg-yellow-600/20 text-yellow-300'
+                                          : 'bg-gray-600/20 text-gray-400'
+                                      }`}
+                                      title={`Stage ${index + 1}: ${stage.name} (${stage.progress}%)`}
+                                    >
+                                      {isActive && (
+                                        <div className="animate-spin h-3 w-3 border border-epii-neon border-t-transparent rounded-full" />
+                                      )}
+                                      {isCompleted && !isActive && (
+                                        <CheckCircle size={12} />
+                                      )}
+                                      {isNext && !isActive && !isCompleted && (
+                                        <div className="h-3 w-3 border border-yellow-300 border-dashed rounded-full" />
+                                      )}
+                                      <span className="whitespace-nowrap">{stage.name}</span>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           </div>

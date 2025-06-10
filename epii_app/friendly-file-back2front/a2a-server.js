@@ -93,7 +93,7 @@ const mockEpiiAgentService = {
  * @param {number} port The port to listen on
  * @returns {Object} The initialized server
  */
-function initializeA2AServer(epiiAgentService, port = 3033) {
+async function initializeA2AServer(epiiAgentService, port = 3033) {
   // Create the Epii agent adapter
   const epiiAgentAdapter = new EpiiAgentAdapter({
     epiiAgentService
@@ -285,6 +285,7 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message);
+        console.log(`[A2A Server] Received message from ${clientId}:`, JSON.stringify(data, null, 2));
 
         // Handle registration message
         if (data.type === 'registration') {
@@ -336,7 +337,8 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
 
         // Handle skill execution requests
         if (data.type === 'skill-execution' || (data.jsonrpc === '2.0' && data.method === 'executeSkill')) {
-          console.log(`Received skill execution request: ${data.params?.skillId || data.skillId}`);
+          console.log(`✅ Received skill execution request: ${data.params?.skillId || data.skillId}`);
+          console.log(`🔍 Message type check: type=${data.type}, jsonrpc=${data.jsonrpc}, method=${data.method}`);
 
           // Extract skill execution parameters
           const skillId = data.params?.skillId || data.skillId;
@@ -383,7 +385,11 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
             console.log(`Skill execution result:`, JSON.stringify(result, null, 2));
 
             // Emit AG-UI RunFinished event if this is an AG-UI request
-            if (isAGUIRequest) {
+            // Skip for pipeline skills that handle their own completion events
+            const pipelineSkills = ['epii-analysis-pipeline'];
+            const shouldEmitCompletion = isAGUIRequest && !pipelineSkills.includes(skillId);
+
+            if (shouldEmitCompletion) {
               console.log(`[A2A Server] Completing AG-UI run: ${runId}`);
 
               aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.RUN_FINISHED, {
@@ -398,6 +404,8 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
                 qlStage: 2,
                 contextFrame: '(0/1/2)'
               });
+            } else if (isAGUIRequest && pipelineSkills.includes(skillId)) {
+              console.log(`[A2A Server] Skipping RUN_FINISHED emission for pipeline skill: ${skillId} (skill wrapper will handle completion)`);
             }
 
             // Send success response with enhanced metadata
@@ -489,7 +497,9 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
           }
         } else {
           // Unknown message type
-          console.log(`Received unknown message type from ${clientId}`);
+          console.log(`❌ Received unknown message type from ${clientId}`);
+          console.log(`🔍 Message analysis: type=${data.type}, jsonrpc=${data.jsonrpc}, method=${data.method}, performative=${data.performative}`);
+          console.log(`📋 Available message keys:`, Object.keys(data));
           ws.send(JSON.stringify({
             type: 'error',
             error: {
@@ -541,12 +551,16 @@ function initializeA2AServer(epiiAgentService, port = 3033) {
   // Note: The agent will be properly registered when it connects via WebSocket
   console.log(`Epii agent card loaded: ${epiiAgentCard.id}`);
 
-  // Get the skills for the Epii agent
-  const epiiSkills = epiiAgentAdapter.getSkillsForAgent('epii-agent');
-  console.log(`Epii agent skills loaded: ${epiiSkills.length}`);
-  epiiSkills.forEach(skill => {
-    console.log(`  - ${skill.name} (${skill.bimbaCoordinate}): ${skill.description}`);
-  });
+  // Get the skills for the Epii agent (async)
+  try {
+    const epiiSkills = await epiiAgentAdapter.getSkillsForAgent('epii-agent');
+    console.log(`Epii agent skills loaded: ${epiiSkills.length}`);
+    epiiSkills.forEach(skill => {
+      console.log(`  - ${skill.name} (${skill.bimbaCoordinate}): ${skill.description}`);
+    });
+  } catch (error) {
+    console.error('Failed to load Epii agent skills:', error);
+  }
 
   // Start the server
   server.listen(port, () => {

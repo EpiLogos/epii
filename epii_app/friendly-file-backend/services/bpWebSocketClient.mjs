@@ -9,7 +9,7 @@ dotenv.config();
 
 // Configuration
 const WS_SERVER_URL = process.env.BP_MCP_WS_URL || 'ws://localhost:3030/mcp';
-const REQUEST_TIMEOUT = parseInt(process.env.BP_MCP_REQUEST_TIMEOUT || '120000', 10); // Increased to 120s (2 minutes)
+const REQUEST_TIMEOUT = parseInt(process.env.BP_MCP_REQUEST_TIMEOUT || '300000', 10); // Increased to 300s (5 minutes) for LLM calls
 const RECONNECT_INTERVAL = parseInt(process.env.BP_MCP_RECONNECT_INTERVAL || '5000', 10);
 const MAX_RETRIES = parseInt(process.env.BP_MCP_MAX_RETRIES || '3', 10);
 const CACHE_ENABLED = process.env.BP_MCP_CACHE_ENABLED !== 'false'; // Enable caching by default

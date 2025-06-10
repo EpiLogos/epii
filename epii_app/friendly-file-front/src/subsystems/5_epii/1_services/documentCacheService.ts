@@ -497,6 +497,55 @@ export const documentCacheService = {
     for (const id of cache.byId.keys()) {
       cache.lastFetched.set(`doc:${id}`, now);
     }
+  },
+
+  /**
+   * Clear cached documents for a specific coordinate
+   * @param coordinate The coordinate to clear cache for
+   */
+  clearCoordinateCache: (coordinate: string): void => {
+    // Remove coordinate-specific caches
+    const keysToRemove = Array.from(cache.byCoordinate.keys())
+      .filter(key => key.includes(`:${coordinate}:`));
+
+    keysToRemove.forEach(key => {
+      cache.byCoordinate.delete(key);
+      cache.lastFetched.delete(key);
+    });
+
+    console.log(`Cleared cache for coordinate ${coordinate}: ${keysToRemove.length} cache entries removed`);
+  },
+
+  /**
+   * Clear cached data for a specific document
+   * @param documentId The document ID to clear cache for
+   */
+  clearDocumentCache: (documentId: string): void => {
+    // Remove document from byId cache
+    const removedDoc = cache.byId.delete(documentId);
+    cache.lastFetched.delete(`doc:${documentId}`);
+
+    // Remove document ID from coordinate caches
+    for (const [key, docIds] of cache.byCoordinate.entries()) {
+      const index = docIds.indexOf(documentId);
+      if (index > -1) {
+        docIds.splice(index, 1);
+      }
+    }
+
+    if (removedDoc) {
+      console.log(`Cleared cache for document ${documentId}`);
+    }
+  },
+
+  /**
+   * Clear all caches (alias for clearCache for consistency)
+   */
+  clearAllCaches: (): void => {
+    cache.byId.clear();
+    cache.byCoordinate.clear();
+    cache.lastFetched.clear();
+    console.log('All document caches cleared');
   }
 };
 

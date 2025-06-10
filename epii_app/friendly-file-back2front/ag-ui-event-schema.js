@@ -21,6 +21,8 @@ const AGUIEventTypes = {
   STEP_STARTED: 'StepStarted',
   STEP_FINISHED: 'StepFinished',
 
+
+
   // Text Message Events
   TEXT_MESSAGE_START: 'TextMessageStart',
   TEXT_MESSAGE_CONTENT: 'TextMessageContent',
@@ -46,7 +48,16 @@ const AGUIEventTypes = {
   BIMBA_UPDATE_SUGGESTIONS: 'BimbaUpdateSuggestions',
   BIMBA_CONTEXT_UPDATE: 'BimbaContextUpdate',
   QL_STAGE_TRANSITION: 'QLStageTransition',
-  COORDINATE_CHANGE: 'CoordinateChange'
+  COORDINATE_CHANGE: 'CoordinateChange',
+
+  // Document State Management Events
+  DOCUMENT_CREATED: 'DocumentCreated',
+  DOCUMENT_UPDATED: 'DocumentUpdated',
+  DOCUMENT_DELETED: 'DocumentDeleted',
+  DOCUMENT_ANALYSIS_COMPLETED: 'DocumentAnalysisCompleted',
+  PRATIBIMBA_CREATED: 'PratibimbaCreated',
+  COORDINATE_DOCUMENTS_UPDATED: 'CoordinateDocumentsUpdated',
+  DOCUMENT_STATE_REFRESH: 'DocumentStateRefresh'
 };
 
 /**
@@ -62,7 +73,7 @@ const BimbaEventSchemas = {
     type: 'object',
     required: ['coordinate', 'nodeData', 'documentContent', 'analysisType'],
     properties: {
-      coordinate: { 
+      coordinate: {
         type: 'string',
         pattern: '^#\\d+(-\\d+)*$',
         description: 'Bimba coordinate (e.g., #5-2)'
@@ -71,7 +82,7 @@ const BimbaEventSchemas = {
         type: 'object',
         required: ['properties', 'relationships'],
         properties: {
-          properties: { 
+          properties: {
             type: 'object',
             description: 'Complete node properties from Neo4j'
           },
@@ -91,9 +102,9 @@ const BimbaEventSchemas = {
                   properties: {
                     coordinate: { type: 'string' },
                     title: { type: 'string' },
-                    labels: { 
-                      type: 'array', 
-                      items: { type: 'string' } 
+                    labels: {
+                      type: 'array',
+                      items: { type: 'string' }
                     }
                   }
                 }
@@ -102,21 +113,21 @@ const BimbaEventSchemas = {
           }
         }
       },
-      documentContent: { 
+      documentContent: {
         type: 'string',
         minLength: 1,
         description: 'Document content to analyze'
       },
-      documentType: { 
+      documentType: {
         type: 'string',
         enum: ['bimba', 'pratibimba'],
         default: 'bimba'
       },
-      documentName: { 
+      documentName: {
         type: 'string',
         description: 'Name of the document'
       },
-      analysisType: { 
+      analysisType: {
         type: 'string',
         enum: ['update-suggestions', 'relationship-analysis', 'property-validation'],
         default: 'update-suggestions'
@@ -132,27 +143,27 @@ const BimbaEventSchemas = {
     type: 'object',
     required: ['stage', 'progress'],
     properties: {
-      stage: { 
+      stage: {
         type: 'string',
         enum: ['llm-analysis', 'json-parsing', 'validation', 'completion'],
         description: 'Current analysis stage'
       },
-      progress: { 
-        type: 'number', 
-        minimum: 0, 
+      progress: {
+        type: 'number',
+        minimum: 0,
         maximum: 100,
         description: 'Progress percentage (0-100)'
       },
-      currentStep: { 
+      currentStep: {
         type: 'string',
         description: 'Current processing step'
       },
-      estimatedTimeRemaining: { 
+      estimatedTimeRemaining: {
         type: 'number',
         minimum: 0,
         description: 'Estimated time remaining in seconds'
       },
-      intermediateResults: { 
+      intermediateResults: {
         type: 'object',
         description: 'Partial results available during processing'
       }
@@ -167,7 +178,7 @@ const BimbaEventSchemas = {
     type: 'object',
     required: ['propertyUpdates', 'relationshipSuggestions'],
     properties: {
-      propertyUpdates: { 
+      propertyUpdates: {
         type: 'object',
         description: 'Suggested property updates for the node'
       },
@@ -178,41 +189,41 @@ const BimbaEventSchemas = {
           type: 'object',
           required: ['action', 'type', 'targetCoordinate'],
           properties: {
-            action: { 
+            action: {
               enum: ['create', 'update', 'delete'],
               description: 'Action to perform on relationship'
             },
-            type: { 
+            type: {
               type: 'string',
               description: 'Relationship type'
             },
-            targetCoordinate: { 
+            targetCoordinate: {
               type: 'string',
               pattern: '^#\\d+(-\\d+)*$',
               description: 'Target Bimba coordinate'
             },
-            properties: { 
+            properties: {
               type: 'object',
               description: 'Relationship properties'
             },
-            reasoning: { 
+            reasoning: {
               type: 'string',
               description: 'Explanation for the suggestion'
             },
-            confidence: { 
-              type: 'number', 
-              minimum: 0, 
+            confidence: {
+              type: 'number',
+              minimum: 0,
               maximum: 1,
               description: 'Confidence score (0-1)'
             }
           }
         }
       },
-      reasoning: { 
+      reasoning: {
         type: 'string',
         description: 'Overall reasoning for the suggestions'
       },
-      qlAlignment: { 
+      qlAlignment: {
         type: 'string',
         description: 'Quaternary Logic alignment explanation'
       },
@@ -221,7 +232,7 @@ const BimbaEventSchemas = {
         properties: {
           llmModel: { type: 'string' },
           processingTime: { type: 'number' },
-          tokenUsage: { 
+          tokenUsage: {
             type: 'object',
             properties: {
               promptTokens: { type: 'number' },
@@ -256,6 +267,90 @@ const BimbaEventSchemas = {
         description: 'Affected Bimba coordinates'
       }
     }
+  },
+
+  // Document State Management Event Schemas
+  [AGUIEventTypes.DOCUMENT_CREATED]: {
+    type: 'object',
+    required: ['documentId', 'targetCoordinate'],
+    properties: {
+      documentId: { type: 'string' },
+      documentName: { type: 'string' },
+      targetCoordinate: { type: 'string' },
+      documentType: { type: 'string', enum: ['bimba', 'pratibimba'] },
+      collection: { type: 'string' },
+      metadata: { type: 'object' }
+    }
+  },
+
+  [AGUIEventTypes.DOCUMENT_UPDATED]: {
+    type: 'object',
+    required: ['documentId'],
+    properties: {
+      documentId: { type: 'string' },
+      documentName: { type: 'string' },
+      targetCoordinate: { type: 'string' },
+      documentType: { type: 'string', enum: ['bimba', 'pratibimba'] },
+      changes: { type: 'object' },
+      metadata: { type: 'object' }
+    }
+  },
+
+  [AGUIEventTypes.DOCUMENT_DELETED]: {
+    type: 'object',
+    required: ['documentId'],
+    properties: {
+      documentId: { type: 'string' },
+      targetCoordinate: { type: 'string' },
+      documentType: { type: 'string', enum: ['bimba', 'pratibimba'] }
+    }
+  },
+
+  [AGUIEventTypes.DOCUMENT_ANALYSIS_COMPLETED]: {
+    type: 'object',
+    required: ['documentId', 'targetCoordinate'],
+    properties: {
+      documentId: { type: 'string' },
+      targetCoordinate: { type: 'string' },
+      analysisResults: { type: 'object' },
+      pratibimbaCreated: { type: 'boolean' },
+      pratibimbaId: { type: 'string' },
+      memoryIntegration: { type: 'object' }
+    }
+  },
+
+  [AGUIEventTypes.PRATIBIMBA_CREATED]: {
+    type: 'object',
+    required: ['pratibimbaId', 'sourceDocumentId', 'targetCoordinate'],
+    properties: {
+      pratibimbaId: { type: 'string' },
+      sourceDocumentId: { type: 'string' },
+      targetCoordinate: { type: 'string' },
+      pratibimbaName: { type: 'string' },
+      analysisResults: { type: 'object' }
+    }
+  },
+
+  [AGUIEventTypes.COORDINATE_DOCUMENTS_UPDATED]: {
+    type: 'object',
+    required: ['targetCoordinate'],
+    properties: {
+      targetCoordinate: { type: 'string' },
+      documentCount: { type: 'number' },
+      documentIds: { type: 'array', items: { type: 'string' } },
+      updateType: { type: 'string', enum: ['created', 'updated', 'deleted', 'analysis_completed'] }
+    }
+  },
+
+  [AGUIEventTypes.DOCUMENT_STATE_REFRESH]: {
+    type: 'object',
+    required: ['scope'],
+    properties: {
+      scope: { type: 'string', enum: ['all', 'coordinate', 'document'] },
+      targetCoordinate: { type: 'string' },
+      documentId: { type: 'string' },
+      reason: { type: 'string' }
+    }
   }
 };
 
@@ -286,7 +381,7 @@ const createAGUIEvent = (type, payload = {}, bimbaMetadata = {}) => {
   if (!event.runId && type !== AGUIEventTypes.RUN_STARTED) {
     event.runId = payload.runId || uuidv4();
   }
-  
+
   if (!event.threadId) {
     event.threadId = payload.threadId || uuidv4();
   }

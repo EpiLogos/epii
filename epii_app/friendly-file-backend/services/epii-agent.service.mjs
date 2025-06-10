@@ -147,21 +147,29 @@ class EpiiAgentService {
         func: async (args) => {
           try {
             console.log(`Calling LightRAG retrieve endpoint: ${LIGHTRAG_MCP_SERVER_URL}/retrieve`);
-            const response = await axios.post(`${LIGHTRAG_MCP_SERVER_URL}/retrieve`, {
-              query: args.query,
-              // We don't pass coordinates here; LightRAG uses its own logic for 'mix' mode
+
+            // Use direct LightRAG call for this tool (legacy support)
+            // For comprehensive context, use the epii-chat skill which handles UnifiedRAG properly
+            const response = await fetch(`${LIGHTRAG_MCP_SERVER_URL}/retrieve`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                query: args.query,
+                mode: args.mode || "global",
+                top_k: args.top_k || 15
+              })
             });
 
-            if (response.data && response.data.status === 'success') {
-              // Expecting the raw result from LightRAG's mix mode
-              const lightragContext = response.data.fused_context;
-              console.log("Received context from LightRAG:", lightragContext ? lightragContext.substring(0, 100) + '...' : 'null');
-              return lightragContext || "No context found.";
-            } else {
-              const errorMessage = response.data?.message || "Unknown error";
-              console.error("LightRAG retrieval failed:", errorMessage);
-              return `Error retrieving context: ${errorMessage}`;
+            if (!response.ok) {
+              throw new Error(`LightRAG server error: ${response.status} ${response.statusText}`);
             }
+
+            const data = await response.json();
+            console.log("Received context from LightRAG:", data ? JSON.stringify(data).substring(0, 100) + '...' : 'null');
+
+            return data?.content || data?.result || "No context found.";
           } catch (error) {
             console.error("Error calling LightRAG retrieve endpoint:", error.message);
             return `Error calling LightRAG: ${error.message}`;
@@ -678,15 +686,26 @@ class EpiiAgentService {
 
       console.log(`Received bimbaKnowing result type: ${typeof result}`);
 
-      // Handle the result based on its type
+      // Handle the result based on its type and format
       let bimbaData;
       if (!result) {
         console.warn("Empty result from bimbaKnowing");
         return "# Bimba Context\n\nNo Bimba context available.";
       }
 
+      // Check if result has the BPMCP tool format: { content: [{ type: "text", text: "..." }] }
+      if (result && result.content && Array.isArray(result.content) && result.content[0] && result.content[0].text) {
+        try {
+          // Parse the JSON from the BPMCP tool format
+          bimbaData = JSON.parse(result.content[0].text);
+          console.log(`Successfully parsed BPMCP tool result format`);
+        } catch (parseError) {
+          console.error("Error parsing BPMCP tool result:", parseError);
+          return "# Bimba Context\n\nUnable to parse Bimba context from BPMCP tool result.";
+        }
+      }
       // If it's a string, try to parse it as JSON
-      if (typeof result === 'string') {
+      else if (typeof result === 'string') {
         try {
           // Check if it looks like JSON
           if (result.trim().startsWith('{') || result.trim().startsWith('[')) {
@@ -1483,39 +1502,47 @@ class EpiiAgentService {
       } else {
         console.log('No UnifiedRAG context provided - AUTOMATICALLY CALLING UNIFIEDRAG');
 
-        // Call UnifiedRAG skill automatically
+        // Call UnifiedRAG skill for enhanced context
         try {
-          const bpMCPService = (await import('../services/bpMCPService.mjs')).default;
+          console.log(`🔍 Calling UnifiedRAG for enhanced context with query: "${message.substring(0, 50)}..."`);
 
-          const unifiedRAGResult = await bpMCPService.callTool('executeUnifiedRAG', {
+          // Import the A2A service to call UnifiedRAG
+          const a2aService = (await import('../../friendly-file-back2front/services/a2aSkillsService.js')).default;
+
+          const ragResponse = await a2aService.executeUnifiedRAG({
             query: message,
             coordinates: state.targetCoordinate ? [state.targetCoordinate] : ['#5'],
+            agentCoordinate: '#5', // Epii agent coordinate
             sources: {
-              'agent-branch': true,
               bimba: true,
+              lightrag: true,
               graphiti: true,
-              lightrag: true
+              notion: false
             },
             options: {
-              bimba: { contextDepth: 2, includeRelations: true, limit: 12 },
-              lightrag: { limit: 8, threshold: 0.7 },
-              graphiti: { limit: 10, contextDepth: 2, includeRelated: true }
-            },
-            agentCoordinate: '#5'
+              bimba: { contextDepth: 2, limit: 8 },
+              lightrag: { mode: "global", limit: 15 },
+              graphiti: { limit: 5 }
+            }
           });
 
-          if (unifiedRAGResult && unifiedRAGResult.data) {
-            console.log('✅ UnifiedRAG called successfully - populating state.ragContext');
-            state.ragContext = unifiedRAGResult.data;
-            bimbaContext = '# Bimba Context\nComprehensive context provided by UnifiedRAG (see RAG Context section below).';
+          if (ragResponse && ragResponse.success && ragResponse.data) {
+            console.log(`✅ Enhanced context retrieved via UnifiedRAG skill`);
+            state.enhancedContext = ragResponse.data.unifiedContext || ragResponse.data;
           } else {
-            console.warn('⚠️ UnifiedRAG call failed - falling back to manual Bimba retrieval');
-            bimbaContext = await this.getBimbaContext(message, state);
+            console.warn(`⚠️ UnifiedRAG skill returned unsuccessful result:`, ragResponse?.error);
           }
+
         } catch (error) {
-          console.error('❌ Error calling UnifiedRAG:', error);
-          console.log('Falling back to manual Bimba retrieval');
-          bimbaContext = await this.getBimbaContext(message, state);
+          console.error('❌ Error calling UnifiedRAG skill:', error);
+        }
+
+        if (typeof state.enhancedContext === 'string') {
+          bimbaContext = `# Enhanced Bimba Context (via epii-chat)\n${state.enhancedContext}`;
+        } else if (state.enhancedContext?.response) {
+          bimbaContext = `# Enhanced Bimba Context (via epii-chat)\n${state.enhancedContext.response}`;
+        } else {
+          bimbaContext = `# Enhanced Bimba Context (via epii-chat)\nContext retrieved but format unexpected.`;
         }
       }
 
@@ -1865,14 +1892,31 @@ Be helpful, informative, and concise in your responses. Use the tools when appro
 
       // Determine if we should use tools or UnifiedRAG mode
       let response;
+
+      // Check for enhanced creativity settings
+      let llmToUse = this.synthesisLLM;
+      if (state.creativitySettings) {
+        console.log("Using enhanced creativity settings for perspective generation");
+        // Create a temporary LLM instance with enhanced creativity settings
+        const activeModelVarName = process.env.ACTIVE_SYNTHESIS_MODEL || 'SYNTHESIS_LLM_MODEL_FREE';
+        const synthesisModelName = process.env[activeModelVarName] || 'gemini-pro';
+
+        llmToUse = new ChatGoogleGenerativeAI({
+          apiKey: process.env.GOOGLE_API_KEY,
+          model: synthesisModelName,
+          temperature: state.creativitySettings.temperature || 0.7,
+          maxOutputTokens: state.creativitySettings.maxTokens || 3072,
+        });
+      }
+
       if (state.ragContext) {
         // UnifiedRAG mode - NO TOOLS, single comprehensive response
         console.log("Sending prompt to synthesis LLM in UnifiedRAG mode (no tools)...");
-        response = await this.synthesisLLM.invoke(formattedMessages);
+        response = await llmToUse.invoke(formattedMessages);
       } else {
         // Legacy mode - use tools for retrieval
         console.log("Sending prompt to synthesis LLM with tools (legacy mode)...");
-        const llmWithTools = this.synthesisLLM.bindTools(this.tools);
+        const llmWithTools = llmToUse.bindTools(this.tools);
         response = await llmWithTools.invoke(formattedMessages);
       }
 

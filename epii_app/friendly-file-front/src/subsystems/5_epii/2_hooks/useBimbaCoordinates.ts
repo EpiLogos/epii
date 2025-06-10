@@ -97,6 +97,29 @@ export function useBimbaCoordinates(isDocumentsLoading?: boolean) {
   const [documentsByCoordinate, setDocumentsByCoordinate] = useState<Record<string, Document[]>>({});
   const [expandedCoordinates, setExpandedCoordinates] = useState<Set<string>>(new Set());
 
+  // Initialize AG-UI integration for coordinate refreshes
+  useEffect(() => {
+    const initializeAGUIIntegration = async () => {
+      try {
+        const documentStateService = (await import('../1_services/documentStateService')).default;
+
+        // Register callback for coordinate-specific refreshes
+        documentStateService.onCoordinateRefresh((coordinate: string) => {
+          console.log(`📡 AG-UI triggered coordinate refresh for ${coordinate}`);
+
+          // Force refresh documents for this coordinate
+          refreshCoordinateDocuments(coordinate);
+        });
+
+        console.log('✅ AG-UI integration initialized for useBimbaCoordinates');
+      } catch (error) {
+        console.error('❌ Failed to initialize AG-UI integration for coordinates:', error);
+      }
+    };
+
+    initializeAGUIIntegration();
+  }, []);
+
   // Transform nodes into BimbaCoordinate objects
   const coordinates = useMemo(() => {
     if (!nodes) return [];

@@ -55,11 +55,16 @@ class EpiiChatSkill {
       let ragContext = null;
 
       // Detect coordinates in message content or use explicit targetCoordinate
-      const detectedCoordinates = this._extractCoordinatesFromMessage(params.message);
+      // If disableCoordinateExtraction is set, only use the explicit targetCoordinate
+      let detectedCoordinates = [];
+      if (!params.context?.disableCoordinateExtraction) {
+        detectedCoordinates = this._extractCoordinatesFromMessage(params.message);
+      }
+
       const allCoordinates = [
         ...(params.targetCoordinate ? [params.targetCoordinate] : []),
         ...detectedCoordinates
-      ];
+      ].filter((coord, index, arr) => arr.indexOf(coord) === index); // Remove duplicates
 
       // If we have coordinates, document context, or this is a coordinate-related query, use UnifiedRAG
       if (allCoordinates.length > 0 || params.documentId || this._isCoordinateRelatedQuery(params.message)) {
@@ -75,8 +80,13 @@ class EpiiChatSkill {
             const hasDocuments = await this._checkCoordinateDocuments(allCoordinates, params.documentId);
 
             // Prepare UnifiedRAG parameters
+            // Use a focused query for analysis pipeline mode
+            const ragQuery = params.context?.fromAnalysisPipeline
+              ? `Epii perspective generation for coordinate ${params.targetCoordinate}`
+              : params.message;
+
             const ragParams = {
-              query: params.message,
+              query: ragQuery,
               coordinates: allCoordinates,
               agentCoordinate: '#5', // Epii agent coordinate
               sources: {
@@ -138,8 +148,25 @@ class EpiiChatSkill {
         console.log(`${logPrefix} General conversation`);
       }
 
+      // Use the perspective prompt from context if available (for analysis pipeline)
+      // Otherwise use the original message
+      const messageToProcess = params.context?.perspectivePrompt || params.message;
+
+      // Add enhanced creativity settings for analysis pipeline
+      if (params.context?.enhancedCreativity) {
+        enhancedContext.creativitySettings = {
+          temperature: 0.7, // Higher temperature for more creative output
+          maxTokens: 3072, // Longer output for detailed perspectives
+          perspectiveDepth: params.context.perspectiveDepth || 'profound',
+          useVividLanguage: true,
+          encourageMetaphors: true,
+          philosophicalDepth: true
+        };
+        console.log(`${logPrefix} Enhanced creativity mode enabled for perspective generation`);
+      }
+
       // Always use processChatMessage for consistency
-      response = await epiiAgentService.processChatMessage(params.message, enhancedContext);
+      response = await epiiAgentService.processChatMessage(messageToProcess, enhancedContext);
       console.log(`${logPrefix} Raw response from Epii agent:`, JSON.stringify(response, null, 2));
 
       // Normalize the response format

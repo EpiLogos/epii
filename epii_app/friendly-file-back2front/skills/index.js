@@ -6,7 +6,7 @@
  * Represents the skills module of the Siva-Shakti layer
  */
 
-const { getInstance, initializeEpiiOperationalSkills } = require('./bimba-skills-registry');
+const { getInstance } = require('./bimba-skills-registry');
 const BimbaSkillsRouter = require('./bimba-skills-router');
 const { bpMCPService } = require('./epii-skills-initializer');
 
@@ -20,17 +20,9 @@ const { bpMCPService } = require('./epii-skills-initializer');
  * @param {Object} [options.bpMCPService] The BPMCP service to use (defaults to mock)
  * @returns {Object} The initialized skills module
  */
-function initializeSkillsModule(epiiAgentService, options = {}) {
-  // Get the singleton skills registry (already has UnifiedRAG registered)
-  const skillsRegistry = getInstance();
-
-  // Use provided BPMCP service or the mock one
-  const mcpService = options.bpMCPService || bpMCPService;
-
-  // Initialize the Epii operational skills instead of domain-focused skills
-  if (epiiAgentService) {
-    initializeEpiiOperationalSkills(epiiAgentService, skillsRegistry, mcpService);
-  }
+async function initializeSkillsModule(epiiAgentService, options = {}) {
+  // Get the singleton skills registry (already has all skills registered including #5-0)
+  const skillsRegistry = await getInstance();
 
   // Create the skills router
   const skillsRouter = new BimbaSkillsRouter(skillsRegistry);
@@ -38,7 +30,7 @@ function initializeSkillsModule(epiiAgentService, options = {}) {
   return {
     skillsRegistry,
     skillsRouter,
-    bpMCPService: mcpService
+    bpMCPService: options.bpMCPService || bpMCPService
   };
 }
 
@@ -48,7 +40,6 @@ module.exports = {
   BimbaSkillsRegistry,
   BimbaSkillsRouter,
   getInstance,
-  initializeEpiiOperationalSkills,
   initializeSkillsModule,
   bpMCPService
 };
