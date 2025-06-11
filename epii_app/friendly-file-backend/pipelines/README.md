@@ -45,19 +45,54 @@ The pipeline follows the **QL (-) Analysis cycle** with enhanced semantic proces
   - `stage_minus1.mjs`: Stage -1 (Define Core Elements)
   - `stage_minus0.mjs`: Stage -0 (Synthesize Payload)
 
+## A2A Integration & AG-UI Events ✅ **IMPLEMENTED**
+
+The pipeline is integrated as **A2A Skill #5-0** with comprehensive AG-UI event emission for real-time progress tracking:
+
+### **A2A Skill Integration**
+- **Skill ID**: `#5-0` (Document Analysis Pipeline)
+- **Skill Name**: "Document Analysis Pipeline"
+- **AG-UI Events**: Real-time progress tracking throughout pipeline execution
+- **Event Types**: `BimbaAnalysisProgress`, `RunStarted`, `RunFinished`, `RunError`
+
+### **AG-UI Event Flow**
+```javascript
+// Pipeline emits AG-UI events at each stage
+Stage -5: RunStarted → Document fetching progress
+Stage -4: BimbaAnalysisProgress → Context gathering
+Stage -3: BimbaAnalysisProgress → Document chunking
+Stage -2: BimbaAnalysisProgress → Core analysis engine
+Stage -1: BimbaAnalysisProgress → Synthesis
+Stage -0: BimbaAnalysisProgress → Payload generation → RunFinished
+```
+
+### **Frontend Integration**
+- **Real-time Progress**: Frontend receives live updates via WebSocket
+- **Status Tracking**: Progress bars and stage indicators
+- **Error Handling**: Graceful error display and recovery
+
 ## Usage
 
-To use the pipeline, import the `runPipeline` function from `epii_analysis_pipeline_refactored.mjs`:
-
+### **Direct Pipeline Usage**
 ```javascript
 import { runPipeline } from '../pipelines/epii_analysis_pipeline_refactored.mjs';
 
-// Run the pipeline
+// Run the pipeline directly
 const result = await runPipeline({
   targetCoordinate: '#5-2',
   documentId: '123456789012345678901234',
   userId: 'admin',
   graphData: { nodes: [], edges: [] }
+});
+```
+
+### **A2A Skill Usage** (Recommended)
+```javascript
+// Execute via A2A server with AG-UI events
+await webSocketService.executeSkillWithAGUI('5-0', 'Document Analysis Pipeline', {
+  targetCoordinate: '#5-2',
+  documentId: '123456789012345678901234',
+  userId: 'admin'
 });
 ```
 
@@ -141,32 +176,30 @@ const result = await runPipeline({
 
 ---
 
-### Stage -2: Concept Analysis & Pattern Recognition (Mahamaya/Transformation) 🔄
-**QL Position: +3 | Archetypal Domain: Transformation | Status: 🔄 Recently Enhanced**
+### Stage -2: Concept Analysis & Pattern Recognition (Mahamaya/Transformation) ✅
+**QL Position: +3 | Archetypal Domain: Transformation | Status: ✅ Recently Enhanced**
 
 **Purpose**: The core analytical engine that transforms document chunks into structured knowledge through concept mapping, variation identification, and archetypal pattern recognition, embodying the Mahamaya principle of transformative analysis.
 
-#### **Recent Major Enhancements** *(Not Yet Fully Tested)*
+#### **Recent Major Enhancements** ✅ **IMPLEMENTED (January 2025)**
 
-**🎯 Issue 2B: Target Coordinate Prioritization**
-- **Enhanced Context Window Generation**: Prioritizes target coordinate (#1-4) from project context
-- **Updated extractRelevantBimbaContext**: Accepts and prioritizes target coordinate parameter
-- **Modified generateContextWindow**: Passes target coordinate from project context for focused analysis
-- **Enhanced QL Context Retrieval**: Prioritizes target coordinate over incidentally mentioned coordinates
+**🎯 Document-Focused Analysis Approach**
+- **Scholarly Analysis**: Transformed from self-reflective to rigorous document content extraction
+- **Temperature Optimization**: Increased to 0.4 for better content extraction specificity and creativity
+- **Token Limit Enhancement**: Increased to 6144-10240 tokens for comprehensive document analysis
+- **MEF Framework Integration**: Clear separation of analytical tools from content being analyzed
 
-**🎯 Issue 2C: Semantic Mappings Logic**
-- **Replaced Arbitrary Assignment**: Eliminated random LLM coordinate assignment with semantic mapping using bimbaKnowing
-- **Added getSemanticCoordinateContext**: Retrieves rich semantic descriptions of coordinates for accurate mapping
-- **Enhanced LLM Prompts**: Includes coordinate purposes, themes, and semantic relationships in analysis prompts
-- **Improved Mapping Accuracy**: Matches content concepts to coordinate meanings rather than just titles
-- **Added Hierarchical Awareness**: Incorporates coordinate relationship hierarchies in mapping decisions
+**🎯 Enhanced Batch Processing**
+- **Batch Analysis**: Processes concatenated chunk batches for better contextual understanding
+- **Context Window Generation**: Comprehensive context windows for concatenated content
+- **Single Unit Analysis**: `analyzeAsSingleUnit` flag for coherent batch processing
+- **Rich JSON Structure**: Enhanced analysis output with detailed document insights
 
-**🎯 Issue 3: Archetypal Anchors Pattern Inference**
-- **Pattern-Based Recognition**: Changed from literal archetypal symbol detection to pattern inference
-- **Dynamic Pattern Identification**: Looks for underlying dynamics like cyclical processes, transformative journeys, integration dynamics, threshold moments
-- **Enhanced Examples**: Updated to pattern-based examples: "Cyclical Integration", "Threshold Navigation", "Emergent Synthesis"
-- **Explicit Pattern Instruction**: Added guidance to "INFER archetypal patterns from content themes and dynamics rather than looking for literal symbolic references"
-- **Updated JSON Structure**: Reinforced pattern-based approach in response formatting
+**🎯 Improved LLM Configuration**
+- **Analysis Temperature**: 0.4 for document analysis (increased from 0.2)
+- **Single Unit Temperature**: 0.4 for batch processing
+- **Multi-chunk Temperature**: 0.4 for comprehensive analysis
+- **Token Limits**: 6144-10240 tokens depending on analysis type
 
 #### **Core Functions**:
 - **Chunk Group Processing**: Analyzes collated chunk groups rather than individual chunks for better contextual understanding
@@ -207,23 +240,32 @@ for (const chunk of documentChunks) {
 
 ---
 
-### Stage -1: Core Element Synthesis (Nara/Integration)
-**QL Position: +4 | Archetypal Domain: Integration | Status: ✅ Stable**
+### Stage -1: Core Element Synthesis (Nara/Integration) ✅
+**QL Position: +4 | Archetypal Domain: Integration | Status: ✅ Recently Enhanced**
 
 **Purpose**: Synthesizes chunk analyses into coherent core elements, embodying the Nara principle of integrated understanding.
 
-**Core Functions**:
-- **Cross-Chunk Integration**: Synthesizes analyses from all document chunks
-- **Core Element Definition**: Identifies and defines essential conceptual elements
-- **Mapping Consolidation**: Integrates mappings from all chunks into coherent structure
-- **Variation Synthesis**: Consolidates variations into meaningful patterns
-- **Tag Unification**: Creates unified tag structure from chunk-level tags
+#### **Recent Major Enhancements** ✅ **IMPLEMENTED (January 2025)**
 
-**Key Features**:
-- Intelligent deduplication of similar concepts across chunks
+**🎯 Synthesis Optimization**
+- **Temperature Enhancement**: Increased to 0.5 for enhanced creativity while maintaining analytical rigor
+- **Token Limit Optimization**: Reduced to 6144 tokens for more focused core element extraction
+- **Archetypal Anchor Requirements**: Document-based extraction with textual evidence from actual content
+- **Four-Category System**: Systematic A-B-C-D approach (Structural, Transformational, Relational, Energetic)
+
+**🎯 Enhanced Core Functions**:
+- **Batch Analysis Integration**: Synthesizes enhanced batch analyses from Stage -2
+- **Core Element Definition**: Identifies and defines essential conceptual elements with improved focus
+- **Mapping Consolidation**: Integrates mappings from all batches into coherent structure
+- **Variation Synthesis**: Consolidates variations into meaningful patterns
+- **Actionable Summary Generation**: Creates actionable summaries with key insights
+
+**🎯 Key Features**:
+- Intelligent deduplication of similar concepts across batches
 - Hierarchical organization of core elements
 - Relationship mapping between identified elements
 - Quality scoring for element importance and relevance
+- Enhanced state optimization for Stage -0
 
 **Future Enhancements** *(Placeholder)*:
 - Advanced clustering algorithms for element grouping
@@ -233,30 +275,39 @@ for (const chunk of documentChunks) {
 
 ---
 
-### Stage -0: Notion Payload Generation (Epii/Synthesis)
-**QL Position: +5 | Archetypal Domain: Synthesis | Status: ✅ Stable**
+### Stage -0: Notion Payload Generation (Epii/Synthesis) ✅
+**QL Position: +5 | Archetypal Domain: Synthesis | Status: ✅ Enhanced with Memory Integration**
 
 **Purpose**: Generates the final structured payload for Notion crystallization, embodying the Epii principle of knowledge synthesis and manifestation.
 
-**Core Functions**:
+#### **Recent Major Enhancements** ✅ **IMPLEMENTED (January 2025)**
+
+**🎯 Memory Integration**
+- **Graphiti Episode Creation**: Automatic memory onboarding with rich semantic content from analysis
+- **Epii Perspective Enhancement**: Enhanced creativity (temperature 0.7) for perspective generation
+- **Memory Context**: Coordinate-aware episode grouping and QL variant integration
+
+**🎯 Core Functions**:
 - **Notion Payload Formatting**: Creates structured NotionUpdatePayload with contentBlocks
 - **Content Block Generation**: Transforms analysis results into Notion-compatible blocks
 - **Property Mapping**: Maps analysis metadata to Notion page properties
 - **Relationship Establishment**: Creates links to related coordinates and concepts
-- **Epii Perspective Integration**: Incorporates Epii agent perspective on analyzed content
+- **Epii Perspective Integration**: Incorporates Epii agent perspective on analyzed content with enhanced creativity
 
-**Key Features**:
+**🎯 Key Features**:
 - Structured content block generation for rich Notion formatting
 - Automatic property filtering to prevent validation errors
 - Content sanitization for Notion API compliance
 - Block chunking for 2000 character limit compliance
 - Comprehensive metadata preservation
+- Graphiti memory integration for temporal knowledge graph
 
-**Recent Improvements**:
+**🎯 Recent Improvements**:
 - Enhanced content sanitization to prevent object-in-string errors
 - Property filtering to remove non-existent Notion properties
 - Improved block chunking with smart text splitting
 - Better error handling and validation
+- Graphiti episode creation with coordinate context
 
 **Future Enhancements** *(Placeholder)*:
 - Advanced formatting with rich text styling
@@ -285,14 +336,22 @@ The pipeline uses the following services:
 
 ## Testing Status and Refinement Approach
 
-### **⚠️ Current Testing Status**
+### **✅ Current Implementation Status**
 
-**Stage -2 Enhancements**: The recent improvements to Stage -2 (Target Coordinate Prioritization, Semantic Mappings Logic, and Archetypal Anchors Pattern Inference) are **not yet fully tested** in production environments. These enhancements represent significant improvements to the analytical accuracy but require real-world validation.
+**Recent Enhancements**: The major improvements to Stage -2 (Document-Focused Analysis, Temperature Optimization, Enhanced Batch Processing) and Stage -1 (Synthesis Optimization, Archetypal Anchor Requirements) have been **successfully implemented** and are operational.
 
-**Testing Priorities**:
-1. **Target Coordinate Prioritization**: Verify that analysis properly focuses on the specified target coordinate
-2. **Semantic Mapping Accuracy**: Validate that concepts are mapped to coordinates based on semantic meaning rather than arbitrary assignment
-3. **Pattern Recognition Quality**: Assess the effectiveness of pattern-based archetypal identification vs. literal symbol detection
+**✅ Implemented Features**:
+1. **Document-Focused Analysis**: Scholarly analysis approach vs. self-reflection elimination
+2. **Temperature Optimization**: Enhanced settings (0.4-0.5) for better analysis quality
+3. **Token Limit Adjustments**: Optimized limits (6144-10240) for detailed analysis
+4. **Archetypal Anchor Improvements**: Document-based extraction with textual evidence
+5. **A2A Integration**: Pipeline as skill #5-0 with AG-UI event emission
+6. **Graphiti Memory Integration**: Automatic episode creation with coordinate context
+
+**🔄 Ongoing Refinement Areas**:
+1. **Analysis Quality**: Continuous improvement of document content extraction
+2. **Archetypal Accuracy**: Refinement of document-based symbolic pattern identification
+3. **Memory Integration**: Enhancement of Graphiti episode creation and context preservation
 
 ### **Continuous Refinement Philosophy**
 

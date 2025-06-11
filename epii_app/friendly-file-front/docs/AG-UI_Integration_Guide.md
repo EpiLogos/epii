@@ -1,8 +1,26 @@
-# AG-UI Integration Guide - Frontend
+# AG-UI Integration Guide - Frontend 🔄 **PARTIALLY IMPLEMENTED**
 
 ## Overview
 
 The AG-UI (Agent-Generated User Interface) integration provides real-time communication between the frontend and A2A server, enabling skills to directly update UI components with progress reports, suggestions, and results.
+
+### **Current Implementation Status**
+
+**✅ Implemented Components:**
+- **Centralized WebSocket Service**: `webSocketService.ts` with AG-UI event handling
+- **BimbaUpdateOverlay**: Real-time suggestions and progress tracking
+- **Document Canvas**: AG-UI event integration for document operations
+- **Analysis Pipeline**: Progress visualization via AG-UI events
+
+**🔄 Partial Coverage:**
+- **Limited Component Integration**: Only specific components have AG-UI support
+- **Event Emission Patterns**: Inconsistent across different system operations
+- **Protocol Compliance**: Basic AG-UI events implemented, full protocol coverage needed
+
+**📋 Development Standards Needed:**
+- **Unified Event Patterns**: Standardize AG-UI event emission across all skills
+- **Complete Protocol Coverage**: Extend AG-UI integration to all user-facing operations
+- **Development Guidelines**: Establish consistent AG-UI/A2A integration workflows
 
 ## Architecture
 
@@ -24,32 +42,73 @@ import { webSocketService } from './subsystems/5_epii/1_services/webSocketServic
 
 ### AG-UI Event System
 
-#### Event Types
+#### Standard AG-UI Event Types (Protocol Compliant)
 ```typescript
-type AGUIEventType =
+// Standard AG-UI Protocol Events (16 types in 5 categories)
+type StandardAGUIEventType =
+  // Lifecycle Events
+  | 'RunStarted' | 'RunFinished' | 'RunError' | 'StepStarted' | 'StepFinished'
+  // Text Message Events
+  | 'TextMessageStart' | 'TextMessageContent' | 'TextMessageEnd'
+  // Tool Call Events
+  | 'ToolCallStart' | 'ToolCallArgs' | 'ToolCallEnd'
+  // State Management Events
+  | 'StateSnapshot' | 'StateDelta' | 'MessagesSnapshot'
+  // Special Events
+  | 'Raw' | 'Custom';
+
+// Bimba-Specific Custom Events (extending AG-UI protocol)
+type BimbaCustomEventType =
   | 'BimbaUpdateSuggestions'
   | 'BimbaAnalysisProgress'
   | 'BimbaContextUpdate'
-  | 'RunStarted'
-  | 'RunFinished'
-  | 'RunError'
-  | 'StepStarted'
-  | 'StepFinished';
+  | 'QLStageTransition'
+  | 'CoordinateChange';
 ```
 
-#### Event Structure
+#### Event Structure (AG-UI Protocol Compliant)
 ```typescript
+// Standard AG-UI Event Structure
 interface AGUIEvent {
-  type: AGUIEventType;
-  runId: string;
-  threadId: string;
+  type: StandardAGUIEventType | BimbaCustomEventType;
+  runId?: string;
+  threadId?: string;
   timestamp: string;
-  data: any;
+
+  // Event-specific data (varies by event type)
+  data?: any;
+
+  // Standard AG-UI metadata
   metadata?: {
-    targetCoordinate?: string;
-    skillId?: string;
     agentId?: string;
+    skillId?: string;
+
+    // Bimba-specific extensions
+    targetCoordinate?: string;
+    bimbaCoordinates?: string[];
+    qlStage?: number;
+    contextFrame?: string;
+    qlMode?: string;
   };
+}
+
+// Specific event interfaces for type safety
+interface RunStartedEvent extends AGUIEvent {
+  type: 'RunStarted';
+  runId: string;
+  threadId?: string;
+}
+
+interface TextMessageContentEvent extends AGUIEvent {
+  type: 'TextMessageContent';
+  messageId: string;
+  delta: string;
+}
+
+interface ToolCallStartEvent extends AGUIEvent {
+  type: 'ToolCallStart';
+  toolCallId: string;
+  toolCallName: string;
 }
 ```
 
@@ -386,24 +445,71 @@ export const MyComponent: React.FC<MyComponentProps> = ({ targetCoordinate }) =>
 };
 ```
 
+## AG-UI Protocol Compliance & Current Limitations
+
+### **Protocol Compliance Status**
+
+**✅ Implemented Standard Events:**
+- `RunStarted`, `RunFinished`, `RunError` - Basic lifecycle management
+- `StepStarted`, `StepFinished` - Pipeline stage tracking
+- Custom events for Bimba-specific functionality
+
+**🔄 Partially Implemented:**
+- `TextMessageStart`, `TextMessageContent`, `TextMessageEnd` - Limited streaming support
+- `ToolCallStart`, `ToolCallEnd` - Basic tool call events (missing `ToolCallArgs`)
+- `StateSnapshot`, `StateDelta` - Basic state management (needs enhancement)
+
+**📋 Not Yet Implemented:**
+- `MessagesSnapshot` - Chat history synchronization
+- `Raw` events - Direct protocol passthrough
+- Full streaming text message support across all components
+
+### **Current Limitations**
+
+1. **Incomplete Protocol Coverage**: Not all 16 standard AG-UI events are fully implemented
+2. **Component-Specific Implementation**: AG-UI integration limited to BimbaUpdateOverlay and DocumentCanvas
+3. **Event Emission Inconsistency**: Different skills emit events with varying patterns
+4. **State Synchronization Gaps**: StateDelta events not comprehensively used for state management
+
+### **Development Roadmap for Full Protocol Compliance**
+
+#### **Phase 1: Complete Standard Event Implementation**
+- Implement full `TextMessage*` event streaming for all chat components
+- Add comprehensive `ToolCallArgs` streaming for complex tool parameters
+- Enhance `StateSnapshot`/`StateDelta` for complete state synchronization
+
+#### **Phase 2: Standardize Event Emission Patterns**
+- Create unified AG-UI event emission utilities
+- Standardize metadata structure across all skills
+- Implement consistent error handling and recovery patterns
+
+#### **Phase 3: Expand Component Coverage**
+- Integrate AG-UI events into all user-facing components
+- Add real-time updates to graph visualization components
+- Implement AG-UI support for document management operations
+
 ## Future Development Standards
 
-### 1. AG-UI First Approach
-- All new skill integrations should use AG-UI patterns
-- Avoid polling or manual refresh patterns
-- Design for real-time user feedback
+### 1. AG-UI Protocol First Approach
+- **Standard Events Priority**: Use standard AG-UI events before creating custom events
+- **Protocol Compliance**: Follow AG-UI specification for event structure and timing
+- **Transport Agnostic**: Design for WebSocket, SSE, or webhook transport options
+- **Bi-directional Communication**: Support both agent-to-user and user-to-agent event flows
 
-### 2. Consistent Event Naming
-- Use descriptive, component-specific event names
-- Follow pattern: `{Component}{Action}` (e.g., 'BimbaUpdateSuggestions')
-- Include progress events for long-running operations
+### 2. Consistent Event Naming & Structure
+- **Standard Event Usage**: Prefer `RunStarted`/`RunFinished` over custom lifecycle events
+- **Custom Event Naming**: Use `Custom` event type with descriptive `data` payload for Bimba-specific functionality
+- **Metadata Standards**: Include `bimbaCoordinates`, `qlStage`, and `targetCoordinate` in metadata
+- **Event Timing**: Emit events at appropriate protocol-defined moments
 
-### 3. Metadata Standards
-- Always include `targetCoordinate` when relevant
-- Add component identification in metadata
-- Include skill execution context for debugging
+### 3. Bimba Architecture Integration
+- **Coordinate Preservation**: All events must carry Bimba coordinate context
+- **QL Stage Tracking**: Include QL stage information in event metadata
+- **Context Frame Awareness**: Preserve context frame information across event streams
+- **State Synchronization**: Use `StateDelta` events for Bimba coordinate changes
 
 ### 4. State Management Integration
-- AG-UI events should integrate with existing state patterns
-- Maintain backward compatibility with non-AG-UI workflows
-- Preserve user changes when applying automated suggestions
+- **Protocol-Compliant State**: Use `StateSnapshot`/`StateDelta` for state synchronization
+- **Backward Compatibility**: Maintain non-AG-UI workflows during transition
+- **User Change Preservation**: Protect user modifications when applying automated suggestions
+- **Conflict Resolution**: Handle state conflicts between user actions and agent updates

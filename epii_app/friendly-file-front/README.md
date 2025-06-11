@@ -557,10 +557,11 @@ POST /api/chat - Send chat messages to agents
 POST /api/epii-agent/chat - Epii-specific chat interactions
 ```
 
-#### **WebSocket Communication**
-- **Real-time chat**: Instant message delivery and typing indicators
-- **Analysis progress**: Live updates during document processing
-- **Graph updates**: Dynamic graph changes and coordinate updates
+#### **WebSocket Communication with AG-UI Integration** 🔄 **PARTIALLY IMPLEMENTED**
+- **AG-UI Events**: Real-time frontend-agent communication via centralized WebSocket service
+- **Analysis progress**: Live updates during document processing with progress tracking
+- **Bimba Updates**: Real-time property suggestions and coordinate updates
+- **Document lifecycle**: AG-UI events for document operations and state changes
 
 #### **Data Flow Architecture**
 ```
@@ -569,27 +570,47 @@ Frontend → Backend API → BPMCP Service → Memory Systems
     ←─── Crystallized Knowledge ←─── Notion Integration
 ```
 
-### **Back2Front System Integration (`friendly-file-back2front`)**
+### **Back2Front System Integration (`friendly-file-back2front`)** 🔄 **PARTIALLY IMPLEMENTED**
 
-The frontend integrates with the **Agent-to-Agent (A2A) communication framework**:
+The frontend integrates with the **Agent-to-Agent (A2A) communication framework** enhanced with **AG-UI protocol support**:
 
-#### **A2A Protocol Support**
-- **Agent Discovery**: Automatic detection of available agents (Epii, Nara, etc.)
-- **Task Routing**: Intelligent routing of requests to appropriate agent subsystems
-- **State Synchronization**: Coordinated state management across agent interactions
+#### **AG-UI Protocol Implementation**
+- **Centralized WebSocket Service**: Single connection to A2A server (`webSocketService.ts`)
+- **Event-Driven Architecture**: Real-time AG-UI events for progress tracking and updates
+- **Component Integration**: BimbaUpdateOverlay and DocumentCanvas with AG-UI support
+- **State Synchronization**: Frontend-agent consistency via AG-UI events
 
-#### **WebSocket Gateway Integration**
+#### **Current AG-UI Integration Status**
+**✅ Implemented:**
+- WebSocket service with AG-UI event handling (`src/subsystems/5_epii/1_services/webSocketService.ts`)
+- BimbaUpdateOverlay with real-time suggestions and progress tracking
+- Document Canvas with AG-UI event integration
+- Analysis pipeline progress visualization
+
+**🔄 Partial Coverage:**
+- Limited to specific components (needs broader integration)
+- Event emission patterns vary between operations
+- Some frontend operations lack AG-UI event support
+
+#### **AG-UI WebSocket Integration**
 ```typescript
-// A2A WebSocket connection
-const a2aConnection = new WebSocket('ws://localhost:3033');
+// Centralized AG-UI WebSocket service
+import { webSocketService, onAGUIEvent } from './subsystems/5_epii/1_services/webSocketService';
 
-// Agent communication patterns
-interface A2AMessage {
-  agentId: string;
-  taskType: string;
-  payload: any;
-  bimbaCoordinate?: string;
-}
+// AG-UI Event handling
+onAGUIEvent('BimbaAnalysisProgress', (event) => {
+  setAnalysisProgress({
+    stage: event.stage,
+    progress: event.progress,
+    message: event.message
+  });
+});
+
+// Skill execution with AG-UI support
+await webSocketService.executeSkillWithAGUI('5-0', 'Document Analysis Pipeline', {
+  targetCoordinate: '#1-4',
+  documentContent: content
+});
 ```
 
 ### **External System Integrations**

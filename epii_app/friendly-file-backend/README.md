@@ -18,7 +18,7 @@ The backend leverages two sophisticated MCP (Memory-Coupled Peripherals) servers
 
 ### **Bimba-Pratibimba Memory-MCP Server** (`Cline/MCP/Bimba-Pratibimba-Memory-MCP/`)
 
-A comprehensive **WebSocket-enabled MCP server** providing unified access to all memory systems with **12 specialized tools**:
+A comprehensive **WebSocket-enabled MCP server** providing unified access to all memory systems with **28+ specialized tools** including Graphiti integration:
 
 #### **Bimba Tools (Structural Memory)**
 - **`bimbaKnowing`**: Advanced semantic search and graph traversal combining vector similarity with structural understanding. Features three query modes:
@@ -39,6 +39,13 @@ A comprehensive **WebSocket-enabled MCP server** providing unified access to all
 - **`getNotionPageProperties`**: Retrieves specific page properties and metadata
 - **`appendNotionBlock`**: Adds content blocks to existing Notion pages
 - **`crystallizeToNotion`**: **Core crystallization tool** that creates/updates Notion pages linked to Bimba coordinates, establishes database relations, and manages knowledge crystallization workflows
+
+#### **Graphiti Tools (Temporal Memory)** ✅ **New Integration**
+- **`addGraphitiEpisode`**: Create episodes with coordinate-aware context and QL variant integration
+- **`searchGraphitiEntities`**: Query temporal knowledge graph for entity nodes with Bimba coordinate filtering
+- **`searchGraphitiFacts`**: Search for facts/relationships with coordinate-aware filtering
+- **`getGraphitiContext`**: Comprehensive dynamic context retrieval for Bimba coordinates
+- **`getGraphitiEpisodes`**: Retrieve episodes with temporal and coordinate-based filtering
 
 #### **Web Tools (External Integration)**
 - **`searchWeb`**: Web search capabilities for external context integration
@@ -136,13 +143,13 @@ The backend's current primary implementation focuses on the **Epii agent mode**,
 - **Bimba coordinate tagging**: Associates all chunks with appropriate coordinate mappings
 - **Context preservation**: Maintains Bimba context throughout chunking process
 
-#### **Stage -2: Core Analysis Engine** 🔄 **Recently Enhanced**
-**⚠️ Note**: This stage has undergone significant improvements that are **not yet fully tested** and represent an evolving aspect of the system.
+#### **Stage -2: Core Analysis Engine** ✅ **Recently Enhanced**
 
-**Recent Major Enhancements**:
-- **🎯 Target Coordinate Prioritization**: Enhanced context window generation to prioritize target coordinate (#1-4) from project context, ensuring analysis focuses on the specified coordinate rather than incidentally mentioned ones
-- **🎯 Semantic Mappings Logic**: Replaced arbitrary LLM coordinate assignment with semantic mapping using bimbaKnowing, including rich semantic descriptions of coordinates for accurate concept-to-coordinate matching
-- **🎯 Archetypal Anchors Pattern Inference**: Changed from literal archetypal symbol detection to pattern-based inference, identifying underlying dynamics like cyclical processes, transformative journeys, and integration dynamics
+**Recent Major Enhancements** (January 2025):
+- **🎯 Document-Focused Analysis**: Transformed from self-reflective to scholarly document analysis approach
+- **🎯 Enhanced Prompt Engineering**: Improved temperature settings (0.4) and token limits (6144-10240) for better content extraction
+- **🎯 Archetypal Anchor Extraction**: Document-based symbolic pattern identification with textual evidence requirements
+- **🎯 MEF Framework Integration**: Clear separation of analytical tools from content being analyzed
 
 **Core Functions**:
 - **Chunk group processing**: Analyzes collated chunk groups rather than individual chunks
@@ -153,15 +160,24 @@ The backend's current primary implementation focuses on the **Epii agent mode**,
 - **Relational properties generation**: Extracts epistemic essence, archetypal anchors, and semantic frameworks
 - **Variation identification**: Detects conceptual variations and analytical nuances with enhanced context awareness
 
-#### **Stage -1: Synthesis and Core Element Definition**
+#### **Stage -1: Synthesis and Core Element Definition** ✅ **Recently Enhanced**
+
+**Recent Improvements** (January 2025):
+- **🎯 Temperature Optimization**: Increased to 0.5 for enhanced creativity while maintaining analytical rigor
+- **🎯 Token Limit Optimization**: Reduced to 6144 tokens for more focused core element extraction
+- **🎯 Archetypal Anchor Requirements**: Document-based extraction with textual evidence from actual content
+- **🎯 Four-Category System**: Systematic A-B-C-D approach (Structural, Transformational, Relational, Energetic)
+
+**Core Functions**:
 - **Analysis integration**: Synthesizes chunk analyses into coherent understanding
 - **Core element extraction**: Identifies fundamental concepts and relationships
 - **Relational properties synthesis**: Consolidates QL operators and epistemic frameworks
 - **Preparation for crystallization**: Structures insights for Notion integration
 
-#### **Stage -0: Payload Generation and Epii Perspective**
+#### **Stage -0: Payload Generation and Epii Perspective** ✅ **Enhanced with Memory Integration**
 - **Notion payload formatting**: Creates structured updates for knowledge crystallization
-- **Epii perspective generation**: Leverages Epii agent for meta-reflective synthesis
+- **Epii perspective generation**: Leverages Epii agent for meta-reflective synthesis with enhanced creativity (temperature 0.7)
+- **Graphiti episode creation**: Automatic memory onboarding with rich semantic content from analysis
 - **Property generation**: Produces approximately 12 properties per analysis with balanced core elements
 - **Crystallization preparation**: Formats results for seamless Notion database integration
 
