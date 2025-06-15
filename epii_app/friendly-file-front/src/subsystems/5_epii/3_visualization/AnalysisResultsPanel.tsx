@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { AnalysisResults } from '../0_foundation/epiiTypes';
-import { formatBimbaCoordinate } from '../1_utils/epiiFormatters';
+import { formatBimbaCoordinate } from "../1_services/utils/epiiFormatters";
 
 interface AnalysisResultsPanelProps {
   analysisResults: AnalysisResults;

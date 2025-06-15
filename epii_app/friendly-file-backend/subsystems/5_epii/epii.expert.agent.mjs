@@ -1,7 +1,7 @@
 // Epii Subsystem Expert Agent (#5-4-5) Logic
 
 // Import necessary services and tools
-import bpMCPService from '../../services/bpMCPService.mjs';
+import bpMCPService from '../databases/bpmcp/bpMCP.service.mjs';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 
 /**

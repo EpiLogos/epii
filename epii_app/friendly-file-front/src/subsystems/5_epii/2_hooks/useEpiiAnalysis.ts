@@ -7,7 +7,7 @@ import { useState, useCallback } from 'react';
 import { useEpii } from '../4_context/EpiiContext';
 import { AnalysisResults } from '../0_foundation/epiiTypes';
 import { v4 as uuidv4 } from 'uuid';
-import { isValidBimbaCoordinate } from '../1_utils/epiiHelpers';
+import { isValidBimbaCoordinate } from "../1_services/utils/epiiHelpers';
 import { useGraphData } from '../../0_anuttara/2_hooks/useGraphData';
 
 /**

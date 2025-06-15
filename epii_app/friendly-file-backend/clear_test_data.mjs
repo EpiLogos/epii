@@ -1,5 +1,5 @@
-import { qdrantClient, QDRANT_COLLECTION_NAME } from './services/qdrant.service.mjs';
-import { getDb, MONGODB_DB_NAME } from './services/mongo.service.mjs'; // Removed closeDb import
+import { qdrantClient, QDRANT_COLLECTION_NAME } from './databases/lightrag/qdrant.service.mjs';
+import { getDb, MONGODB_DB_NAME } from './databases/mongodb/mongo.service.mjs'; // Removed closeDb import
 
 const MONGO_COLLECTION_TO_DROP = 'IngestedData'; // Collection used by ingestion pipeline
 

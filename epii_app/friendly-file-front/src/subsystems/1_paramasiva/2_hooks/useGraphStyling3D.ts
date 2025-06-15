@@ -5,8 +5,8 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../components/meta/metaData';
-import { calculateNodeColorAndOpacity, calculateEdgeColorAndOpacity } from '../utils/graphUtils';
+import { Node, Edge } from '../components/meta/metaData";
+import { calculateNodeColorAndOpacity, calculateEdgeColorAndOpacity } from '../subsystems/0_anuttara/1_utils/graphUtils';
 
 /**
  * Hook for styling the 3D graph nodes and edges

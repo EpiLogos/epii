@@ -6,8 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink, X, Map, CheckCircle } from 'lucide-react';
 import { AnalysisResults } from '../0_foundation/epiiTypes';
-import { formatBimbaCoordinate } from '../1_utils/epiiFormatters';
-import { isValidBimbaCoordinate } from '../1_utils/epiiHelpers';
+import { formatBimbaCoordinate } from "../1_services/utils/epiiFormatters";
+import { isValidBimbaCoordinate } from "../1_services/utils/epiiHelpers";
 import { onAGUIEvent, offAGUIEvent } from '../1_services/webSocketService';
 
 interface DocumentControlsProps {

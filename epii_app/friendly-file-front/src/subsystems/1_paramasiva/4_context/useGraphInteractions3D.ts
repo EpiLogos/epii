@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useRef, MutableRefObject } from 'react';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { InteractionState } from './useCameraControls3D';
 import { adjustPhysicsForInteraction } from '../0_foundation/physicsConfig';
 

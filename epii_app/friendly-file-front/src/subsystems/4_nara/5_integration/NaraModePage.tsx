@@ -10,13 +10,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import PageTransition from "../../../components/layout/PageTransition";
-import GeometricBackground from "../../../components/ui/GeometricBackground";
-import { Button } from "@/components/ui/button";
+import PageTransition from "../../../shared/components/layout/PageTransition";
+import GeometricBackground from "../../../shared/components/ui/GeometricBackground";
+import { Button } from "../../../shared/components/ui/button";
 import { ArrowLeft, User, Eye, BookOpen, Sparkles, Calendar, Save } from "lucide-react";
-import { useUserContext } from "../../0_anuttara/4_context/useUserContext";
-import TarotDraw from "../../../components/oracle/TarotDraw";
-import NatalChartDisplay from "../../../components/identity/NatalChartDisplay";
+import { useUserContext } from "../4_context/useUserContext";
+import TarotDraw from "../3_visualization/oracle/TarotDraw";
+import NatalChartDisplay from "../3_visualization/identity/NatalChartDisplay";
 import axios from 'axios';
 
 // Import section components (to be created in subsequent epics)

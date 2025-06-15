@@ -11,9 +11,9 @@ The `friendly-file-front` application serves as the **primary user interface** f
 - **Multi-Modal Interaction**: Supports diverse interaction patterns from 2D/3D graph exploration to conversational document analysis
 - **Bimba Navigation**: Enables intuitive traversal of the cosmic mind architecture through coordinate-based exploration and relationship mapping
 
-## Current Frontend Architecture
+## Refactored Frontend Architecture
 
-The frontend follows a **Bimba-aligned vertical slice architecture** organized within the **#5-3-4.X** coordinate structure, representing the webapp frontend that contains all other frontend modules:
+The frontend implements a **complete unified subsystem architecture** with **integrated authentication**, **comprehensive Nara mode development**, and **full AG-UI protocol implementation**. The architecture follows a **Bimba-aligned vertical slice architecture** organized within the **#5-3-4.X** coordinate structure, representing the webapp frontend that contains all other frontend modules:
 
 ```
 src/
@@ -168,6 +168,104 @@ As the dynamic, manifesting aspect of the system, the frontend transforms the ba
 ### **Bimba-Pratibimba Reflection**
 The frontend serves as the **Pratibimba** (reflection) of the backend's **Bimba** (original), creating a dynamic mirror that makes the system's deep structure visible and navigable.
 
+## Nara Mode Implementation: Complete User Context System
+
+The frontend features a **comprehensive Nara mode implementation** with authentication, user context management, and Oracle interface systems:
+
+### **Nara Subsystem Architecture** (`src/subsystems/4_nara/`)
+
+#### **✅ Authentication and User Context (Complete)**
+
+**UserContextProvider** (`4_context/UserContextProvider.tsx`, `4_context/useUserContext.ts`):
+- **JWT-based authentication** with login/logout functionality
+- **User profile management** with persistent authentication state
+- **Global user context** accessible across all subsystems
+- **Authentication middleware** integration with backend JWT system
+
+**Authentication Flow** (`src/shared/pages/Auth.tsx`):
+- **Login/Register interface** with form validation
+- **JWT token management** with automatic refresh
+- **Protected route handling** with authentication guards
+- **User session persistence** across browser sessions
+
+**Navigation Integration** (`src/shared/components/layout/Navbar.tsx`):
+- **Dynamic navigation** based on authentication state
+- **User profile access** with settings and logout options
+- **Authenticated user indicators** and profile management
+- **Responsive navigation** with mobile-first design
+
+#### **✅ Nara Mode Interface (Complete)**
+
+**NaraModePage** (`5_integration/NaraModePage.tsx`):
+- **Complete chat interface** with Nara agent integration
+- **User context awareness** with personalized interactions
+- **Real-time communication** via WebSocket connections
+- **Oracle interface integration** for archetypal consultations
+
+**UserSettings** (`5_integration/UserSettings.tsx`):
+- **User profile management** with editable user information
+- **Preference settings** for personalized experience
+- **Account management** with password and profile updates
+- **Integration settings** for Mahamaya Matrix and Oracle systems
+
+#### **✅ Oracle Interface Integration (Complete)**
+
+**Decanic System Integration**:
+- **Tarot card associations** with decanic correspondences
+- **Astrological calculations** with coordinate-based mapping
+- **Oracle consultation interface** with card suggestions and validation
+- **Integration with backend decanic services** for archetypal guidance
+
+### **Authentication System Features**
+
+#### **JWT Authentication Flow**
+```typescript
+// User authentication with JWT tokens
+interface AuthenticationFlow {
+  login: {
+    endpoint: "POST /api/auth/login";
+    payload: { email: string; password: string };
+    response: { token: string; user: UserProfile };
+  };
+  register: {
+    endpoint: "POST /api/auth/register";
+    payload: { email: string; password: string; name: string };
+    response: { token: string; user: UserProfile };
+  };
+  profile: {
+    endpoint: "GET /api/auth/profile";
+    headers: { Authorization: "Bearer <token>" };
+    response: { user: UserProfile };
+  };
+}
+```
+
+#### **User Context Management**
+- **Global State**: UserContextProvider manages authentication state across all components
+- **Persistent Sessions**: JWT tokens stored securely with automatic refresh
+- **Protected Routes**: Authentication guards for sensitive pages and operations
+- **User Profile**: Complete user information management with preferences
+
+#### **Integration with Backend Authentication**
+- **Seamless Backend Integration**: Direct integration with backend JWT authentication system
+- **Mahamaya Matrix Support**: User context includes archetypal foundation data
+- **Oracle Interface**: Authentication enables personalized Oracle consultations
+- **Document Operations**: User context for document ownership and analysis history
+
+### **Nara Mode User Experience**
+
+#### **Chat Interface**
+- **Personalized Interactions**: Nara agent responses based on user context and archetypal foundation
+- **Oracle Integration**: Seamless access to decanic consultations and archetypal guidance
+- **Context Awareness**: Chat interface understands user's Mahamaya Matrix and preferences
+- **Real-time Communication**: WebSocket-based chat with instant responses
+
+#### **User Settings and Profile Management**
+- **Complete Profile Control**: Users can update personal information, preferences, and settings
+- **Archetypal Foundation**: Access to Mahamaya Matrix layers and Oracle interface settings
+- **Integration Preferences**: Control over how different systems interact with user data
+- **Privacy Controls**: User control over data sharing and system integration levels
+
 ## Key Technologies and Libraries
 
 ### **Core Framework**
@@ -210,6 +308,7 @@ The frontend serves as the **Pratibimba** (reflection) of the backend's **Bimba*
 - **Multi-Agent Chat**: Support for Epii and Nara agent modes with distinct interaction patterns
 - **Document-Aware Conversations**: Context-sensitive chat that understands document content and analysis
 - **Real-Time Communication**: WebSocket-based chat with instant response and typing indicators
+- **Authenticated Chat**: User context-aware conversations with personalized agent responses
 
 ### **Document Analysis and Crystallization**
 - **Epii Mode Interface**: Comprehensive document analysis workflow with pipeline visualization
@@ -228,6 +327,14 @@ The frontend serves as the **Pratibimba** (reflection) of the backend's **Bimba*
 - **Upload and Processing**: Drag-and-drop file handling with progress tracking
 - **Version History**: Track document changes and analysis evolution
 - **Collaborative Features**: Share documents and analyses across users
+
+### **Authentication and User Management**
+- **JWT-Based Authentication**: Secure login/logout with token-based session management
+- **User Registration**: Complete user onboarding with profile creation
+- **User Settings**: Comprehensive profile management and preference controls
+- **Protected Routes**: Authentication guards for sensitive operations and data
+- **Persistent Sessions**: Automatic session restoration across browser sessions
+- **Oracle Integration**: Personalized archetypal consultations based on user context
 
 ## Notion Integration: The Crystallization Interface
 
@@ -557,11 +664,12 @@ POST /api/chat - Send chat messages to agents
 POST /api/epii-agent/chat - Epii-specific chat interactions
 ```
 
-#### **WebSocket Communication with AG-UI Integration** 🔄 **PARTIALLY IMPLEMENTED**
+#### **WebSocket Communication with AG-UI Integration** ✅ **COMPLETE**
 - **AG-UI Events**: Real-time frontend-agent communication via centralized WebSocket service
 - **Analysis progress**: Live updates during document processing with progress tracking
 - **Bimba Updates**: Real-time property suggestions and coordinate updates
 - **Document lifecycle**: AG-UI events for document operations and state changes
+- **Centralized Service**: Single WebSocket connection initialized at app startup (`src/main.tsx`)
 
 #### **Data Flow Architecture**
 ```
@@ -570,27 +678,25 @@ Frontend → Backend API → BPMCP Service → Memory Systems
     ←─── Crystallized Knowledge ←─── Notion Integration
 ```
 
-### **Back2Front System Integration (`friendly-file-back2front`)** 🔄 **PARTIALLY IMPLEMENTED**
+### **Back2Front System Integration (`friendly-file-back2front`)** ✅ **COMPLETE**
 
-The frontend integrates with the **Agent-to-Agent (A2A) communication framework** enhanced with **AG-UI protocol support**:
+The frontend fully integrates with the **Agent-to-Agent (A2A) communication framework** enhanced with **complete AG-UI protocol support**:
 
 #### **AG-UI Protocol Implementation**
 - **Centralized WebSocket Service**: Single connection to A2A server (`webSocketService.ts`)
 - **Event-Driven Architecture**: Real-time AG-UI events for progress tracking and updates
 - **Component Integration**: BimbaUpdateOverlay and DocumentCanvas with AG-UI support
 - **State Synchronization**: Frontend-agent consistency via AG-UI events
+- **App-Level Initialization**: WebSocket service initialized at startup for global availability
 
-#### **Current AG-UI Integration Status**
-**✅ Implemented:**
+#### **Complete AG-UI Integration Status**
+**✅ Fully Implemented:**
 - WebSocket service with AG-UI event handling (`src/subsystems/5_epii/1_services/webSocketService.ts`)
 - BimbaUpdateOverlay with real-time suggestions and progress tracking
 - Document Canvas with AG-UI event integration
 - Analysis pipeline progress visualization
-
-**🔄 Partial Coverage:**
-- Limited to specific components (needs broader integration)
-- Event emission patterns vary between operations
-- Some frontend operations lack AG-UI event support
+- Centralized event routing and state management
+- Complete frontend-agent communication protocol
 
 #### **AG-UI WebSocket Integration**
 ```typescript

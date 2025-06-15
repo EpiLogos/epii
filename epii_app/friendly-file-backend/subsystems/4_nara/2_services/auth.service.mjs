@@ -16,8 +16,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { getDb } from '../../../services/mongo.service.mjs';
-import User from '../../../models/User.model.mjs';
+import { getDb } from '../../../databases/mongodb/mongo.service.mjs';
+import User from '../../../databases/shared/models/User.model.mjs';
 import { v4 as uuidv4 } from 'uuid';
 
 // Configuration

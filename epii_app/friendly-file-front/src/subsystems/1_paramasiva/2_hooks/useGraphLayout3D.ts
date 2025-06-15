@@ -6,7 +6,7 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { calculate3DDiamondPosition } from '../1_utils/calculate3DDiamondPosition';
 
 /**

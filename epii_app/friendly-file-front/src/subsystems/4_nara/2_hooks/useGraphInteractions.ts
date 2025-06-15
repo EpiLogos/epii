@@ -7,8 +7,8 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Node, Edge } from '../components/meta/metaData';
-import { getActiveNodeData, ActiveNodeData } from '../utils/graphUtils';
+import { Node, Edge } from '../components/meta/metaData";
+import { getActiveNodeData, ActiveNodeData } from '../subsystems/0_anuttara/1_utils/graphUtils';
 
 // Debounce function to limit the rate of function calls
 function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {

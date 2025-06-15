@@ -9,7 +9,7 @@
 
 import { PHYSICS_ALPHA_DECAY, PHYSICS_VELOCITY_DECAY, PHYSICS_ALPHA_MIN } from './constants';
 import * as d3 from 'd3-force';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 
 /**
  * Configure physics for the 2D graph

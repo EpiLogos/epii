@@ -7,7 +7,7 @@
  */
 
 import authService from '../2_services/auth.service.mjs';
-import User from '../../../models/User.model.mjs';
+import User from '../../../databases/shared/models/User.model.mjs';
 
 /**
  * Authentication Controller Class

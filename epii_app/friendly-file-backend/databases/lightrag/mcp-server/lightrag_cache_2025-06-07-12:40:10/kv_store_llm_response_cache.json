@@ -1,0 +1,33 @@
+{
+  "mix": {
+    "c853891e30cb451042cf39cb825fc670": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logical systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Basic applications\", \"Expanded applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  },
+  "global": {
+    "d7bea510061af4af8e83448d2712195a": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logic systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Basic applications\", \"Expanded applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    },
+    "ec6581709705a571f39fa1b9f66c3c42": {
+      "return": "Quaternary Logic is a system of logic based on four values, but more accurately described as a six-position (mod6, 0-5) cyclical system.  It forms the fundamental architecture of the Epi-Logos system and transcends binary logic through a \"double-covering principle,\" functioning simultaneously as a geometric lattice, a dynamic process, and a recursive pattern generator.  This system integrates implicate (hidden/transcendent) and explicate (manifest/immanent) elements. The six positions represent a complete cycle: Primordial cause (Position #0), formal causes (Positions #1 and #2), and a final cause (Position #4).  Each position contains all others in embryonic form, allowing for self-similarity, infinite development, and fractal expansion.  The completion of one cycle initiates another.\n\nThe system primarily generates numerical patterns based on multiples of 6 (6, 12, 36, 72), but also incorporates 4, 8, and 64 through recursive expansion, leading to structures with 12, 36, and 72 elements (relevant to systems like the zodiac). Key principles include quaternionic rotation and the integration of ascending and descending pathways.  It integrates structure and process, being and becoming, part and whole, surpassing binary true/false logic by incorporating multiple states.  Its three-dimensional quaternary nesting produces a 4-fold, 8-fold, and 64-fold expansion, underpinned by mathematical and geometric principles based on groups of four, including double covering, recursive nesting, and parallel tracks.  As a non-Boolean system, it manifests across all domains of knowledge and experience.  The 4-fold Explicit Structure represents the manifest aspects of a cycle within this logic, focusing on positions 1-4.  The principles of Quaternary Logic are incorporated into the quaternary structure of the Vortex mathematics system.\n\nThe Epi-Logos System, whose structure is explained using Quaternary Logic, incorporates the 4-8-64 expansion and is described as having a 64-bit structure.  Quaternary Logic is the mathematical foundation of this system.  Three-Dimensional Quaternary Nesting is a method of extending Quaternary Logic, leading to a 64-fold expansion.  The relationship between Quaternary Logic and Quaternionic mathematics is also noted, suggesting a potential basis in quaternionic principles.\n\n\nReferences:\n* [KG] api_ingest  (Information about Quaternary Logic, Vortex mathematics, 4-fold Explicit Structure, Three-Dimensional Quaternary Nesting, and Epi-Logos System)\n* [KG] api_ingest (Information about the relationship between Quaternary Logic and Vortex mathematics)\n* [KG] api_ingest (Information about the relationship between 4-fold Explicit Structure and Quaternary Logic)\n* [KG] api_ingest (Information about the relationship between Quaternary Logic and Three-Dimensional Quaternary Nesting)\n* [KG] api_ingest (Information about the relationship between Epi-Logos System and Quaternal Logic)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  }
+}

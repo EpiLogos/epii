@@ -15,8 +15,8 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useMeta3D } from '../../1_paramasiva/4_context/Meta3DContainer';
-import { NodeDetailsPanel } from '../../../components/meta/NodeDetailsPanel';
-import { useNodeDetails } from '../../../hooks/bimba/useNodeDetails';
+import { NodeDetailsPanel } from "../../../shared/components/meta/NodeDetailsPanel';
+import { useNodeDetails } from "../../../shared/hooks/bimba/useNodeDetails';
 
 // Debounce function to limit the rate of function calls
 function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {

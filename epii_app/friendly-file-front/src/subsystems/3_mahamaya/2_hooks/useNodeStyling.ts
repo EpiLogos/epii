@@ -8,7 +8,7 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { calculateNodeColor, calculateNodeSize } from '../1_utils/nodeStyleUtils';
 
 /**

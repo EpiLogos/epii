@@ -7,7 +7,7 @@
  * This file contains utility functions for 2D geometry calculations.
  */
 
-import { Node, Edge } from "../../../components/meta/metaData";
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 
 /**
  * Calculates the position of a node in the hexagonal layout based on its bimbaCoordinate.

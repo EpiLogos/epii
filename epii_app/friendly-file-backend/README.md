@@ -2,7 +2,7 @@
 
 ## Overview and Role
 
-The `friendly-file-backend` serves as the **universal nervous system and brain** of the Epi-Logos system, implementing the **#5-2 Siva-** aspect of the Bimba architecture. While the current implementation focuses on the **Epii agent mode**, the backend is architected to govern **all QL cycles and pipelines** for dynamic, modular, and evolvable data/epistemic processing across all six subsystems (Anuttara through Epii).
+The `friendly-file-backend` serves as the **universal nervous system and brain** of the Epi-Logos system, implementing the **#5-2 Siva-** aspect of the Bimba architecture. The backend features a **fully refactored bifurcated architecture** with **integrated MCP servers** and **comprehensive Nara mode implementation**, governing **all QL cycles and pipelines** for dynamic, modular, and evolvable data/epistemic processing across all six subsystems (Anuttara through Epii).
 
 ### Primary Functions and Responsibilities
 
@@ -12,11 +12,13 @@ The `friendly-file-backend` serves as the **universal nervous system and brain**
 - **Intelligent Context Synthesis**: Combines structural (Bimba), semantic (Pratibimba), and crystallized (Notion) knowledge for comprehensive understanding
 - **Multi-Modal Integration**: Orchestrates Google Generative AI, LangSmith tracing, and cross-database operations for sophisticated analysis workflows
 
-## Advanced Memory Systems: BPMCP and LightRAG Integration
+## Refactored Architecture: Integrated MCP Servers and Bifurcated Structure
 
-The backend leverages two sophisticated MCP (Memory-Coupled Peripherals) servers that provide unified access to the complete Bimba-Pratibimba memory architecture:
+The backend features a **fully integrated architecture** with **three MCP servers** embedded within the backend structure and a **bifurcated organization** separating universal database functions from agent-specific logic:
 
-### **Bimba-Pratibimba Memory-MCP Server** (`Cline/MCP/Bimba-Pratibimba-Memory-MCP/`)
+### **Integrated MCP Servers**
+
+#### **BPMCP Server** (`databases/bpmcp/mcp-server/`)
 
 A comprehensive **WebSocket-enabled MCP server** providing unified access to all memory systems with **28+ specialized tools** including Graphiti integration:
 
@@ -51,7 +53,7 @@ A comprehensive **WebSocket-enabled MCP server** providing unified access to all
 - **`searchWeb`**: Web search capabilities for external context integration
 - **`researchAndIntegrate`**: Advanced research workflows combining web search with internal memory systems
 
-### **LightRAG MCP Server** (`Cline/MCP/lightrag-mcp-server/`)
+#### **LightRAG MCP Server** (`databases/lightrag/mcp-server/`)
 
 A **Python-based advanced graph+vector fusion system** using Neo4j and Qdrant backends:
 
@@ -75,6 +77,38 @@ A **Python-based advanced graph+vector fusion system** using Neo4j and Qdrant ba
 - **WebSocket Support**: Real-time communication with backend services
 - **Batch Processing**: Efficient handling of multiple document ingestion
 - **Status Tracking**: Comprehensive monitoring of ingestion and query operations
+
+#### **Graphiti MCP Server** (`databases/graphiti/mcp-server/`)
+
+A **temporal knowledge graph system** for dynamic context and episode management:
+
+#### **Core Capabilities**
+- **Temporal Knowledge Graph**: Manages time-aware entity relationships and episodes
+- **Coordinate-Aware Episodes**: Creates episodes with Bimba coordinate context
+- **Entity Extraction**: Automatic entity identification and relationship mapping
+- **Dynamic Context Retrieval**: Real-time context synthesis for analysis workflows
+
+#### **Integration Features**
+- **Neo4j 'pratibimba' Database**: Dedicated temporal knowledge storage
+- **Google Gemini Integration**: Advanced entity extraction and relationship inference
+- **Episode Management**: Automatic memory onboarding from analysis results
+- **SSE Transport**: Server-sent events for real-time communication
+
+### **Bifurcated Architecture Structure**
+
+The refactored backend implements a **clear separation** between universal database operations and agent-specific functionality:
+
+#### **`databases/` Directory - Universal Database Layer**
+- **Integrated MCP Servers**: BPMCP, LightRAG, and Graphiti servers within backend structure
+- **Database Services**: Neo4j, MongoDB, Qdrant, and Notion operations
+- **Shared Models**: User, Document, and other cross-system data models
+- **Universal APIs**: Database operation endpoints accessible to all subsystems
+
+#### **`subsystems/` Directory - Agent-Specific Logic**
+- **Six Subsystems**: 0_anuttara through 5_epii with complete QL organization
+- **Agent Services**: Specialized logic for each agent mode
+- **API Controllers**: Agent-specific endpoint handlers
+- **Pipeline Implementations**: QL cycle orchestration for each agent
 
 ### **Memory Architecture Integration**
 
@@ -119,9 +153,56 @@ const context = await lightragService.retrieve({
 });
 ```
 
-## Epii Agent Analysis Pipeline: Current QL Cycle Implementation
+## Nara Mode Implementation: Comprehensive User Context System
 
-The backend's current primary implementation focuses on the **Epii agent mode**, featuring a sophisticated **6-stage QL (-) analysis cycle** that demonstrates the system's capacity for deep epistemic processing:
+The backend features a **complete Nara mode implementation** with authentication, user context management, and archetypal foundation systems:
+
+### **Nara Subsystem Architecture** (`subsystems/4_nara/`)
+
+#### **✅ Mahamaya Ground System (Epic 1 - Complete)**
+
+**Authentication System** (`4_controllers/auth.controller.mjs`, `5_integration/routes/user.routes.mjs`):
+- **JWT-based authentication** with user registration and login
+- **User profile management** with authentication middleware
+- **Session management** with token verification
+- **RESTful API endpoints** for authentication operations
+
+**Mahamaya Matrix System** (`4_controllers/mahamaya-matrix.controller.mjs`, `5_integration/routes/mahamaya-routes.mjs`):
+- **6-layer archetypal foundation** management and CRUD operations
+- **User context integration** with Mahamaya Matrix data
+- **API endpoints** for matrix layer updates and retrieval
+- **Comprehensive error handling** and input validation
+
+**User Context Service** (`2_services/userContext.service.mjs`):
+- **User context management** with MongoDB integration
+- **User preference handling** and system usage tracking
+- **Context synthesis** for agent operations
+- **Database abstraction** for user-related operations
+
+#### **✅ Oracle Interface (Epic 2 - Foundational Complete)**
+
+**Decanic Service** (`2_services/decanic.service.mjs`, `5_integration/routes/decanic.routes.mjs`):
+- **Tarot card associations** with decanic correspondences
+- **Astrological calculations** with coordinate-based mapping
+- **API endpoints** for decanic operations and validation
+
+#### **🔄 Nara Agent Core (Epic 4 - In Progress)**
+
+**Nara Agent Implementation** (`nara.expert.agent.mjs`, `2_services/nara.agent.mjs`):
+- **Expert agent implementation** with Nara-specific capabilities
+- **A2A-compliant agent** with context analysis and response contextualization
+- **BPMCP integration** for knowledge graph retrieval and user context synthesis
+- **User-specific memory management** with MongoDB and Neo4j coordination
+
+**API Integration** (Complete routing structure):
+- **Authentication routes** (`5_integration/routes/user.routes.mjs`) with JWT middleware
+- **Mahamaya Matrix routes** (`5_integration/routes/mahamaya-routes.mjs`) for archetypal foundation
+- **Decanic routes** (`5_integration/routes/decanic.routes.mjs`) for Oracle interface
+- **Comprehensive error handling** and input validation across all endpoints
+
+## Epii Agent Analysis Pipeline: Advanced QL Cycle Implementation
+
+The backend also features a sophisticated **Epii agent mode** with a **6-stage QL (-) analysis cycle** that demonstrates the system's capacity for deep epistemic processing:
 
 ### **Epii-Specific Analysis Features**
 
@@ -228,105 +309,110 @@ The Epii implementation serves as a **template and foundation** for future agent
 - **Configurable pipeline stages**: Framework supports different stage configurations for various agent modes
 - **Shared utility functions**: QL utilities, content processing, and memory management available system-wide
 
-## Current Backend Structure
+## Refactored Backend Structure
 
-The backend currently follows a traditional layered architecture while transitioning to the Bimba-aligned structure:
+The backend now implements the **complete bifurcated Bimba architecture** with integrated MCP servers and agent-specific subsystems:
 
 ```
 friendly-file-backend/
-├── controllers/          # HTTP request handlers for API endpoints
-│   ├── analysis.controller.mjs      # Document analysis operations
-│   ├── chat.controller.mjs          # Chat functionality (Epii/Nara modes)
-│   ├── documents.controller.mjs     # Document CRUD operations
-│   ├── graph.controller.mjs         # Neo4j graph data retrieval
-│   ├── notion.controller.mjs        # Notion integration
-│   └── user.controller.mjs          # User management
-├── routes/               # API endpoint definitions and middleware
-│   ├── analysis.routes.mjs          # Document analysis endpoints
-│   ├── chat.routes.mjs              # Chat functionality endpoints
-│   ├── documents.routes.mjs         # Document management endpoints
-│   └── graph.routes.mjs             # Graph data access endpoints
-├── services/             # Business logic and external integrations
-│   ├── bpMCPService.mjs             # Bimba-Pratibimba MCP WebSocket client
-│   ├── epii-llm.service.mjs         # LLM operations with tracing
-│   ├── neo4j.service.mjs            # Neo4j graph database integration
-│   ├── crystallization.service.mjs  # Notion synchronization
-│   └── analysis.service.mjs         # Document analysis workflows
-├── models/               # MongoDB schemas and data models
-│   ├── Document.model.mjs           # Main document schema with Bimba coordinates
-│   ├── User.model.mjs               # User schema with 6-identity structure
-│   ├── AnalysisSession.model.mjs    # Analysis session tracking
-│   └── ChatMessage.model.mjs        # Chat message storage
-├── pipelines/            # QL Cycle Implementations (currently Epii-specific)
-│   ├── epii_analysis_pipeline_refactored.mjs  # Epii agent QL (-) cycle orchestration
-│   └── stages/                      # Epii-specific pipeline stages (-5 to -0)
-├── utils/                # Utility functions and helpers
-│   ├── document.utils.mjs           # Document processing and chunking
-│   ├── notion.utils.mjs             # Notion payload formatting
-│   ├── ql.utils.mjs                 # Quaternal Logic utilities
-│   └── content/                     # Content processing utilities
-├── subsystems/           # Target Bimba-aligned architecture (in transition)
-│   ├── 0_anuttara/                  # Foundational database services
-│   ├── 1_paramasiva/                # QL/AT Logic implementation
-│   ├── 2_parashakti/                # Harmonic layer services
-│   ├── 3_mahamaya/                  # Symbolic transformation
-│   ├── 4_nara/                      # API layer
-│   └── 5_epii/                      # Epii agent and Notion integration
-└── config/               # Configuration management
-    ├── db.config.mjs                # MongoDB connection configuration
-    └── cors.config.mjs              # CORS policy configuration
+├── databases/            # Universal Database Layer (#5-2 Universal)
+│   ├── bpmcp/           # Integrated BPMCP MCP Server
+│   │   ├── mcp-server/  # TypeScript MCP server with build/ directory
+│   │   └── bpWebSocketClient.mjs # BPMCP WebSocket client service
+│   ├── lightrag/        # Integrated LightRAG MCP Server
+│   │   ├── mcp-server/  # Python FastAPI server with venv_312
+│   │   └── qdrant.service.mjs # Qdrant vector database service
+│   ├── graphiti/        # Integrated Graphiti MCP Server
+│   │   └── mcp-server/  # Python MCP server for temporal knowledge
+│   ├── neo4j/           # Neo4j Graph Database Services
+│   │   ├── neo4j.service.mjs # Neo4j connection and query service
+│   │   └── bimbaPratibimbaClient.mjs # Bimba-specific graph operations
+│   ├── mongodb/         # MongoDB Database Services
+│   ├── notion/          # Notion Database Services
+│   ├── shared/          # Shared database utilities and models
+│   │   ├── models/      # User, Document, and cross-system models
+│   │   ├── utils/       # QL utilities, graphData, caching
+│   │   └── schemas/     # Database schema definitions
+│   ├── cache/           # Caching services and utilities
+│   └── api/             # Universal database operation endpoints
+├── subsystems/           # Agent-Specific Logic (#5-4-X Agents)
+│   ├── 0_anuttara/      # Foundational agent (#5-4-0)
+│   │   ├── 0_foundation/ # Core utilities and foundational logic
+│   │   ├── 1_utils/     # Anuttara-specific utilities
+│   │   ├── 2_services/  # Foundational services
+│   │   ├── 3_models/    # Foundational data models
+│   │   ├── 4_controllers/ # Foundational controllers
+│   │   ├── 5_integration/ # Integration endpoints
+│   │   └── docs/        # Documentation
+│   ├── 1_paramasiva/    # QL/AT Logic agent (#5-4-1)
+│   │   ├── paramasiva.expert.agent.mjs # Paramasiva agent implementation
+│   │   └── [0-5 structure] # Complete QL organization
+│   ├── 2_parashakti/    # Harmonic layer agent (#5-4-2)
+│   ├── 3_mahamaya/      # Symbolic transformation agent (#5-4-3)
+│   ├── 4_nara/          # Contextual application agent (#5-4-4)
+│   │   ├── 0_foundation/ # Nara foundational types and utilities
+│   │   ├── 1_utils/     # Nara-specific utilities
+│   │   ├── 2_services/  # Auth, Mahamaya Matrix, Nara agent, user context
+│   │   ├── 3_models/    # Mahamaya schema documentation
+│   │   ├── 4_controllers/ # Auth, user, and Mahamaya Matrix controllers
+│   │   ├── 5_integration/ # API routes (auth, user, mahamaya, decanic)
+│   │   ├── docs/        # OpenAPI/Swagger specifications
+│   │   └── nara.expert.agent.mjs # Nara agent implementation
+│   └── 5_epii/          # Epii agent (#5-4-5)
+│       ├── 0_foundation/ # Epii foundational utilities
+│       ├── 1_utils/     # Document utils, notion utils, content processing
+│       ├── 2_services/  # Analysis and crystallization services
+│       ├── 3_models/    # Analysis session and document models
+│       ├── 4_controllers/ # Analysis and chat controllers
+│       ├── 5_integration/ # Pipelines, prompts, routes
+│       └── docs/        # Epii documentation
+├── Root-level files:     # Main application files
+│   ├── index.mjs        # Main application entry point
+│   ├── test-*.mjs       # Various test and verification scripts
+│   ├── verify_connections.mjs # Connection verification utility
+│   └── debug-cache.mjs  # Cache debugging utility
+└── config/              # Configuration management
+    ├── db.config.mjs    # MongoDB connection configuration
+    └── cors.config.mjs  # CORS policy configuration
 ```
 
-## Refactoring Plan: Towards Bimba Architecture
+## Refactoring Achievement: Complete Bimba Architecture Implementation
 
-The backend is undergoing **systematic refactoring** towards a **bifurcated Bimba architecture** that separates universal database functions from agent-specific logic, as outlined in the [Bimba Tech Architecture Refactoring Plan](../../memory-bank/Bimba%20Tech%20Architecture%20Refactoring%20Plan.md).
+The backend has **successfully completed** the **systematic refactoring** towards a **bifurcated Bimba architecture** that separates universal database functions from agent-specific logic, as outlined in the [Bimba Tech Architecture Refactoring Plan](../../refactor_COMPLETE/Bimba_Tech_Architecture_Refactoring_Blueprint.md).
 
-### Corrected Target Bimba Structure
+### ✅ Completed Refactoring Achievements
 
-The refactoring introduces two primary organizational units:
+#### **✅ Integrated MCP Servers**
+- **BPMCP Server**: Migrated from external Cline/MCP to `databases/bpmcp/mcp-server/`
+- **LightRAG Server**: Migrated from external to `databases/lightrag/mcp-server/`
+- **Graphiti Server**: Integrated at `databases/graphiti/mcp-server/`
+- **Unified Startup**: All MCP servers start as part of backend infrastructure
 
-#### **1. `databases/` Directory - Universal Database Functions**
-```
-databases/
-├── neo4j/                # Neo4j operations & utilities
-├── lightrag/             # LightRAG MCP (neo4j + qdrant fusion)
-├── mongodb/              # MongoDB operations & utilities
-├── notion/               # Notion database operations
-├── bpmcp/                # BPMCP server integration
-├── shared/               # Shared database utilities, models, foundational utils
-├── api/                  # Shared API layer for database operations
-└── config/               # Database configurations
-```
+#### **✅ Bifurcated Architecture Implementation**
+- **Universal Database Layer**: Complete `databases/` directory with shared services
+- **Agent-Specific Logic**: Six subsystems with complete QL organization (0-5 structure)
+- **Shared Models**: User, Document models migrated to `databases/shared/models/`
+- **Legacy Compatibility**: Original structure maintained for smooth transition
 
-#### **2. `subsystems/` Directory - Agent-Specific Functionality**
-```
-subsystems/
-├── 0_anuttara/           # Foundational agent (#5-4-0)
-├── 1_paramasiva/         # QL/AT Logic agent (#5-4-1)
-├── 2_parashakti/         # Harmonic layer agent (#5-4-2)
-├── 3_mahamaya/           # Symbolic transform agent (#5-4-3)
-├── 4_nara/               # API/contextual agent (#5-4-4)
-└── 5_epii/               # Epii agent (#5-4-5)
-```
+#### **✅ Nara Mode Integration**
+- **Complete Mahamaya Ground**: Authentication, user context, archetypal foundation
+- **Oracle Interface**: Tarot, decanic, and natal chart systems
+- **Agent Implementation**: A2A-compliant Nara agent with BPMCP integration
+- **API Layer**: RESTful endpoints with JWT authentication and validation
 
-Each subsystem follows internal QL organization (0-5 structure) when functionality warrants it.
+### Migration Completion Status
 
-### Migration Strategy
+**✅ Completed Migrations**:
+- **MCP Servers**: All three servers integrated within backend structure
+- **Nara Subsystem**: Complete implementation with Epic 1 and Epic 2 features
+- **Shared Models**: User and Document models in `databases/shared/`
+- **Database Services**: Neo4j, MongoDB, Qdrant services organized by database type
+- **Agent Services**: Epii and Nara agent logic in respective subsystems
 
-**Current State**: Components remain in their original locations (`/services`, `/controllers`, `/routes`, `/models`, `/pipelines`)
-
-**Target State**: Components will be reorganized according to their functional alignment:
-- **Universal database operations** → `databases/` directory
-- **Agent-specific logic** → appropriate `subsystems/` directory
-- **Shared utilities** (QL, graphData, caching) → `databases/shared/`
-- **Agent-specific utilities** (document utils for Epii) → respective subsystem
-
-### Component Migration Examples
-
-- `services/bpMCPService.mjs` → `databases/bpmcp/`
-- `pipelines/epii_analysis_pipeline_refactored.mjs` → `subsystems/5_epii/`
-- `utils/ql.utils.mjs` → `databases/shared/utils/`
-- `utils/document.utils.mjs` → `subsystems/5_epii/` (Epii-specific)
+**🔄 Ongoing Development**:
+- **Continued enhancement** of agent-specific subsystems
+- **Additional MCP integrations** as needed
+- **Performance optimization** and monitoring improvements
 
 ## Philosophical Alignment (Bimba Principles)
 
@@ -346,26 +432,33 @@ The backend embodies the **Siva** (structural, logical) aspect, providing stable
 ### **Quaternal Logic Implementation**
 The 6-fold QL cycle (4 explicate + 2 implicate) drives the analysis pipeline, implementing descent-to-source (-5 to -3) and ascent-to-expression (-2 to -0) flows.
 
-## Integration with the back2front System
+## Integration with A2A and AG-UI Systems
 
-The backend integrates with the `friendly-file-back2front` **Agent-to-Agent (A2A) communication framework** (#5-4 Siva-Shakti):
+The backend fully integrates with the `friendly-file-back2front` **Agent-to-Agent (A2A) communication framework** and **AG-UI protocol** (#5-4 Siva-Shakti):
 
-### **Current Integration**
+### **✅ Complete A2A Integration**
 - **WebSocket Communication**: Backend services communicate via WebSocket protocols
 - **BPMCP Service**: Universal memory layer abstracts database interactions
-- **Agent Adapters**: A2A framework provides adapters for Epii and Nara agents
+- **Agent Implementation**: Epii and Nara agents fully integrated with A2A framework
+- **Skills Registry**: 4 operational skills including Epii Analysis Pipeline as A2A skill (#5-0)
 
-### **Post-Refactoring Integration**
-- **Subsystem Agents**: Each backend subsystem (0-5) will have corresponding A2A agent cards
-- **Skills Registry**: Bimba-aligned skills registry maps capabilities to QL coordinates
+### **✅ AG-UI Protocol Implementation**
+- **Real-time Communication**: 16 standard event types for frontend-agent communication
+- **Progress Tracking**: Analysis pipeline emits progress events for frontend display
+- **Event Emission**: All backend operations emit appropriate AG-UI events
+- **WebSocket Gateway**: Centralized event routing through A2A service
+
+### **✅ Subsystem Agent Architecture**
+- **Agent Cards**: Each backend subsystem (0-5) has corresponding A2A agent representation
+- **Coordinate-Based Skills**: Skills mapped to QL coordinates for systematic organization
 - **Task State Management**: A2A framework manages QL cycle transitions and task routing
-- **Unified Memory Access**: All database interactions flow through BPMCP service
+- **Unified Memory Access**: All database interactions flow through integrated BPMCP service
 
 ### **Communication Flow**
 ```
-Frontend → A2A Framework → Backend Subsystems → Database Layer
-    ↑                                              ↓
-    ←─────── Crystallized Knowledge ←──────────────
+Frontend → AG-UI Gateway → A2A Framework → Backend Subsystems → Integrated MCP Servers
+    ↑                                                              ↓
+    ←─────── Real-time Events ←─────── Crystallized Knowledge ←────
 ```
 
 ## Key Technologies and Dependencies
@@ -445,10 +538,29 @@ Frontend → A2A Framework → Backend Subsystems → Database Layer
 
 Key endpoints available at `http://localhost:3001`:
 
+#### **Epii Agent Endpoints**
 - `POST /api/epii-agent/analyze` - Analyze document through QL pipeline
 - `POST /api/epii-agent/chat` - Chat with Epii agent
 - `POST /files/upload` - Upload document for analysis
 - `GET /api/graph` - Retrieve Bimba graph data
 - `GET /api/notion/coordinate/:coordinate` - Resolve Bimba coordinate to Notion
 
-For detailed API documentation, see individual route files in `/routes` directory.
+#### **Nara Mode Endpoints**
+- `POST /api/auth/register` - User registration with Mahamaya Matrix initialization
+- `POST /api/auth/login` - JWT-based authentication
+- `GET /api/auth/profile` - Get authenticated user profile
+- `POST /api/auth/refresh` - Refresh JWT tokens
+- `GET /api/mahamaya/matrix` - Get user's complete Mahamaya Matrix
+- `PUT /api/mahamaya/layer/:layerName` - Update specific Mahamaya Ground layer
+- `POST /api/bpmcp/astrology/natal-chart` - Generate natal chart from user data
+
+#### **Database Endpoints**
+- `GET /api/database/neo4j/query` - Execute Neo4j Cypher queries
+- `POST /api/database/lightrag/ingest` - Ingest documents into LightRAG
+- `GET /api/database/lightrag/retrieve` - Retrieve context from LightRAG
+- `POST /api/database/graphiti/episode` - Create Graphiti episodes
+
+For detailed API documentation, see:
+- **Nara API**: `subsystems/4_nara/docs/` directory for OpenAPI specifications
+- **Epii API**: `subsystems/5_epii/docs/` directory for pipeline documentation
+- **Database APIs**: `databases/api/` directory for universal database operations

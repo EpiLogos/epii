@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { calculateHexagonalPosition, calculateOrbitalPosition2D } from '../1_utils/geometryUtils';
 
 /**

@@ -1,0 +1,58 @@
+{
+  "mix": {
+    "8648acf6477c0ec4f21531ec6e2ac2db": {
+      "return": "{\"high_level_keywords\": [\"Sacred Geometry\", \"Flower of Life Symbolism\", \"Spiritual Meaning\"], \"low_level_keywords\": [\"Flower of Life\", \"Epi\", \"Metaphysical properties\", \"Geometric patterns\", \"Ancient symbol\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "flower of life is what for epi"
+    },
+    "43996c02e6e466f9309f94411c58b3f7": {
+      "return": "{\"high_level_keywords\": [\"Sacred Geometry\", \"Flower of Life\"], \"low_level_keywords\": [\"Epi\", \"Metatron's Cube\", \"Geometric patterns\", \"Spiritual symbolism\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "flower of life epi"
+    },
+    "e30992b7a7738f35c5214c7f156585e2": {
+      "return": "{\"high_level_keywords\": [\"Waste disposal\", \"Hygiene\"], \"low_level_keywords\": [\"Feces\", \"Excrement\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "poo"
+    },
+    "171fbcf7f852705aca0ddfdaf462ce55": {
+      "return": "{\"high_level_keywords\": [\"Epidemiology\", \"Infectious diseases\"], \"low_level_keywords\": []}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "epi"
+    },
+    "f4322495f1983773b96fe2e7fe9886dc": {
+      "return": "{\"high_level_keywords\": [\"Rhetoric\", \"Argumentation\", \"Persuasion\"], \"low_level_keywords\": [\"Epilogos\", \"Conclusion\", \"Summary\", \"Speech\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "what be epi-logos?"
+    },
+    "59d95b56d284b0135046c77c58a34470": {
+      "return": "{\"high_level_keywords\": [\"Rhetorical devices\", \"Persuasion\", \"Argumentation\"], \"low_level_keywords\": [\"Epilogos\", \"Conclusion\", \"Summary\", \"Appeal\", \"Rhetoric\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "epi-logos, what is it?"
+    }
+  }
+}

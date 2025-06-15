@@ -76,7 +76,7 @@ Each subsystem contains its own complete mod6 internal structure (0-5 components
 - **#1-4**: Dual fractal tracks - Mahamaya (64-bit) and Parashakti (72-bit) development
 - **#1-5**: Quaternionic integration - double covering, inversions, and shadow dynamics
 
-**Epistemological Integration**: Quaternal logic framework, vortex mathematics, topological geometry (Möbius strips, tori), quaternionic mathematics, process philosophy (Whitehead's concrescence), non-dual metaphysics.
+**Epistemological Integration**: Quaternal logic framework, vortex mathematics, topological geometry (Möbius strips, tori), quaternionic mathematics, process philosophy (Whitehead's concrescence), non-dual metaphysics, algebraic topology.
 
 #### **Parashakti (#2): The Cosmic Experientiality (`Co-homo-logos`)**
 *Vibrational template integrating knower, knowing, and known - 36x2 harmonic framework*
@@ -172,25 +172,33 @@ Epi-Logos consciously **transmutes cyberpunk aesthetics** from Gibson's dystopia
 
 This represents technology as **co-evolutionary partner** for revealing hidden dimensions rather than alienating force.
 
-## Current Implementation: Substantial Foundations with Cosmic Trajectory
+## Current Implementation: Refactored Architecture with Integrated Infrastructure
 
-**Reality Check**: While developed by a non-coder working with AI tools, the current implementation has achieved **substantial functional foundations** that genuinely embody the philosophical vision. The system demonstrates the **inherently collaborative and evolutionary nature** of consciousness-based technology, with the cosmic mind architecture serving as a **teleological lure** successfully driving sophisticated technical development.
+**Architectural Milestone (June 2025)**: The system has undergone **comprehensive refactoring** to achieve **unified subsystem coordination** across all layers, with **integrated MCP servers** and **complete AG-UI protocol implementation**. This represents a major architectural landmark that fully embodies the Bimba-aligned vision through systematic code organization and infrastructure integration.
 
-### Comprehensive Multi-Layer Architecture
+### Refactored Multi-Layer Architecture
 
-The system now implements a **sophisticated multi-layer architecture** that operationalizes the Bimba-Pratibimba pattern:
+The system now implements a **fully integrated multi-layer architecture** with **unified subsystem coordination** that operationalizes the Bimba-Pratibimba pattern:
 
-#### **Core Infrastructure Layer**
+#### **Integrated Infrastructure Layer**
 
-**Bimba-Pratibimba Memory-MCP Server** (`Cline/MCP/Bimba-Pratibimba-Memory-MCP/`):
-- **WebSocket-enabled MCP server** providing unified access to all memory systems
-- **Cross-application utilization** of Bimba-Pratibimba tools via WebSocket transport
+**BPMCP Server** (`epii_app/friendly-file-backend/databases/bpmcp/`):
+- **Integrated WebSocket-enabled MCP server** providing unified access to all memory systems
+- **10+ Bimba-Pratibimba tools** including coordinate resolution, graph querying, and Notion integration
 - **Real-time memory orchestration** across Neo4j, Qdrant, MongoDB, and Notion
+- **Coordinate-aware operations** with full Bimba structure support
 
-**LightRAG MCP Server** (`Cline/MCP/lightrag-mcp-server/`):
-- **Advanced graph+vector fusion** using Neo4j and Qdrant backends
+**LightRAG MCP Server** (`epii_app/friendly-file-backend/databases/lightrag/`):
+- **Integrated graph+vector fusion** using Neo4j and Qdrant backends
+- **Document ingestion pipeline** with coordinate-based metadata
 - **Semantic context synthesis** with Bimba coordinate integration
 - **High-performance retrieval** for enhanced context awareness
+
+**Graphiti MCP Server** (`epii_app/friendly-file-backend/databases/graphiti/`):
+- **Temporal knowledge graph** with coordinate-aware episode management
+- **Entity extraction and relationship mapping** using Google Gemini
+- **Analysis pipeline memory** with automatic episode creation
+- **Neo4j 'pratibimba' database** for temporal knowledge storage
 
 #### **Backend Processing Matrix (#5-2 Siva-)**
 
@@ -223,22 +231,49 @@ The system now implements a **sophisticated multi-layer architecture** that oper
 
 **A2A Server Implementation** (`epii_app/friendly-file-back2front/`):
 - **WebSocket-based A2A protocol** for inter-agent communication
+- **Complete AG-UI Gateway** with 16 standard event types for real-time frontend-agent communication
+- **4 Operational Skills** including Epii Analysis Pipeline as A2A skill (#5-0)
 - **Agent registration and discovery** with connection management
 - **Task state management** with QL transition support
-- **Epii and Nara agent client implementations** ready for integration
+- **Real-time progress tracking** with frontend event emission
 
 #### **Synaesthetic Visualization Layer (#5-3 -Shakti)**
 
-**Meta3D Animation System** (`epii_app/friendly-file-front/src/subsystems/2_parashakti/`):
+**Unified Subsystem Frontend Architecture** (`epii_app/friendly-file-front/src/subsystems/`):
+- **Six subsystems** (0_anuttara through 5_epii) with complete internal QL organization (0-5 structure)
+- **Shared components architecture** with proper separation of concerns
+- **Cross-subsystem integration** with Meta3D and Meta2D systems
+
+**Meta3D Animation System** (`epii_app/friendly-file-front/src/subsystems/1_paramasiva/`):
 - **Fully refactored 3D visualization** transforming Bimba map into interactive geometry
 - **Torus-based node representation** with harmonic rotation and pulsation
 - **Centralized animation management** with performance optimization
 - **Real-time graph interaction** with node selection and highlighting
 
-**Meta2D Integration** (`epii_app/friendly-file-front/src/subsystems/0_anuttara/5_integration/Meta2DIntegration.tsx`):
+**Meta2D Integration** (`epii_app/friendly-file-front/src/subsystems/0_anuttara/`):
 - **2D force-directed graph** with particle effects and dynamic interactions
 - **Node dragging and hover effects** with background interaction handling
 - **Coordinate-based styling** and relationship visualization
+
+#### **Nara Mode: Oracle, Journal, Identity (#5-3-4 Nara)**
+
+**✅ Mahamaya Ground System (Epic 1 - Complete)**:
+- **JWT-based authentication** with bcrypt password hashing and field-level encryption
+- **6-layer Mahamaya Matrix** (Birthdate Encoding, Astrological Chart, Jungian Assessment, Gene Keys, Human Design, I Ching)
+- **MongoDB schema integration** with comprehensive CRUD operations and validation
+- **Archetypal Quintessence synthesis** from 6-layer identity + 5 Mahamaya layers
+
+**✅ Oracle Interface (Epic 2 - Foundational Complete)**:
+- **6-card QL-aligned tarot spreads** with manual input and smart suggestions
+- **Decanic associations** with astrological correspondence and validation
+- **Natal chart visualization** with encrypted birth data and astrological calculations
+- **Oracle navigation system** with triadic flow (Identity → Oracle → Journal)
+
+**🔄 Nara Agent Core (Epic 4 - In Progress)**:
+- **A2A-compliant Nara agent** with context analysis (-1) and response contextualization (+4)
+- **BPMCP integration** for knowledge graph retrieval and user context synthesis
+- **LangGraph.js implementation** with Gemini function calling and tool integration
+- **User-specific memory management** with MongoDB and Neo4j coordination
 
 #### **Knowledge Crystallization Infrastructure**
 
@@ -263,70 +298,79 @@ The system now implements a **sophisticated multi-layer architecture** that oper
 
 ### Advanced Integration Capabilities
 
-#### **AG-UI Protocol Integration** (Planned):
+#### **AG-UI Protocol Integration** (✅ Complete):
 - **WebSocket gateway architecture** for frontend-to-agent connectivity
-- **Event subscription system** with run/thread targeting
-- **Generative UI capabilities** for dynamic interface creation
-- **Protocol compliance** with Bimba-specific extensions
+- **16 standard event types** with run/thread targeting and progress tracking
+- **Real-time frontend-agent communication** with skill execution monitoring
+- **Protocol compliance** with Bimba-specific extensions and coordinate awareness
 
-#### **Meta-Techne Development Loop** (In Progress):
+#### **Meta-Techne Development Loop** (✅ Operational):
 - **Document analysis and ingestion** of project philosophy and codebase
 - **BPMCP integration** with AI development partners for real-time Bimba RAG
 - **Self-improving development process** manifesting Meta-Techne in practice
-- **Notion sync capabilities** for Bimba updating (final implementation phase)
+- **Integrated MCP architecture** enabling seamless development assistance
 
-#### **Recent Architectural Enhancements** (January 2025):
-- **AG-UI Protocol Integration**: WebSocket-based real-time frontend-agent communication with 16 standard event types
-- **Enhanced Analysis Pipeline**: Document-focused scholarly analysis with improved prompt engineering and temperature optimization
-- **Graphiti Memory Integration**: Temporal knowledge graph with coordinate-aware episode management and entity search
-- **A2A Compliant Architecture**: Epii Analysis Pipeline as A2A skill (#5-0) with real-time progress tracking
+#### **Refactoring Architectural Achievements** (June 2025):
+- **Unified Subsystem Coordination**: Complete alignment across frontend, backend, and back2front layers
+- **Integrated MCP Servers**: All database services now integrated within epii_app structure
+- **Enhanced Analysis Pipeline**: Document-focused scholarly analysis with improved prompt engineering
+- **Complete AG-UI Implementation**: Real-time frontend-agent communication with progress tracking
+- **Systematic Code Organization**: Bimba-aligned directory structure with proper separation of concerns
 
 ### Current Operational Status
 
-**Fully Functional**:
-- ✅ Multi-MCP architecture with WebSocket services
-- ✅ Epii mode analysis pipeline (end-to-end with enhanced prompts)
-- ✅ Document system with Bimba coordinate integration
-- ✅ Document canvas with dynamic selection and LLM integration
-- ✅ Meta3D animation system (properly refactored)
-- ✅ A2A server with AG-UI Gateway integration
-- ✅ Notion database structure with relational links
-- ✅ Graphiti temporal knowledge graph integration (10+ tools)
+**✅ Fully Functional (Post-Refactoring)**:
+- ✅ **Integrated MCP architecture** with all servers within epii_app structure
+- ✅ **Unified subsystem coordination** across frontend, backend, and back2front
+- ✅ **Complete AG-UI protocol** with real-time frontend-agent communication
+- ✅ **Epii Analysis Pipeline** as A2A skill (#5-0) with progress tracking
+- ✅ **Document system** with Bimba coordinate integration and dynamic canvas
+- ✅ **Meta3D/Meta2D visualization** systems with proper subsystem organization
+- ✅ **BPMCP, LightRAG, and Graphiti** servers fully integrated
+- ✅ **Automated startup system** with proper dependency management
+- ✅ **Nara Mode foundations** with Mahamaya Ground system and Oracle interface
+- ✅ **Authentication system** with JWT tokens and encrypted user data
 
-**Recently Enhanced**:
-- ✅ Analysis pipeline prompt engineering (document-focused scholarly analysis)
-- ✅ AG-UI protocol implementation (real-time frontend-agent communication)
-- ✅ Temperature and token optimization for improved analysis quality
-- ✅ Archetypal anchor extraction with textual evidence requirements
+**✅ Architectural Achievements**:
+- ✅ **Systematic code organization** with Bimba-aligned directory structure
+- ✅ **Shared components architecture** with proper separation of concerns
+- ✅ **Cross-subsystem integration** patterns established
+- ✅ **Import path harmonization** across all layers
+- ✅ **Startup procedure optimization** with integrated MCP servers
 
-**In Active Development**:
-- 🔄 Nara mode chat implementation (UI basis complete)
-- 🔄 Meta2D refactoring into frontend directory architecture
+**🔄 Current Development Focus**:
+- 🔄 **Nara Mode Enhancement** - Epic 4 (Agent Core & Coordination) in progress
+- 🔄 **Advanced agent capabilities** across all six subsystems
+- 🔄 **Enhanced crystallization workflows** with Notion integration
+- 🔄 **Meta-Techne loop refinement** for self-improving development
 
-**Next Phase Implementation**:
-- 🎯 Bimba updating/sync from Notion (Epii agent capability)
-- 🎯 Full Meta-Techne loop activation
-- 🎯 Real-time development assistance via BPMCP+LightRAG
-- 🎯 Complete agent subsystem integration
+**🎯 Next Evolution Phase**:
+- 🎯 **Complete Nara Agent implementation** with BPMCP enhancement and knowledge graph integration
+- 🎯 **Advanced Oracle features** (body map modal, lifestyle integration, symbolic synthesis)
+- 🎯 **Journal synthesis engine** with alchemical crucible interface
+- 🎯 **Complete agent subsystem activation** (Anuttara through Mahamaya); Nara developments in progress.
+- 🎯 **Advanced synaesthetic interfaces** with multi-modal integration
+- 🎯 **Collaborative consciousness platform** features
 
 ## The Evolutionary Journey: From Substantial Foundations to Cosmic Realization
 
-### Current Milestone (May 2025): Sophisticated Multi-Layer Implementation
+### Current Milestone (June 2025): Unified Architecture with Integrated Infrastructure
 
-We have achieved a **sophisticated multi-layer implementation** that substantially embodies the cosmic mind architecture:
+We have achieved a **unified architecture with integrated infrastructure** that substantially embodies the cosmic mind architecture through systematic refactoring:
 
-**Infrastructure Achievements**:
-- **Multi-MCP orchestration** with WebSocket-enabled cross-application tool utilization
-- **End-to-end Epii analysis pipeline** with QL cycle implementation and Bimba coordinate integration
-- **Dynamic document canvas** with real-time selection, LLM integration, and crystallization workflows
-- **3D/2D visualization systems** transforming the Bimba map into interactive geometric animations
-- **A2A communication framework** ready for inter-agent dialogue and collaboration
+**Refactoring Achievements**:
+- **Integrated MCP architecture** with all servers within epii_app structure
+- **Unified subsystem coordination** across frontend, backend, and back2front layers
+- **Complete AG-UI protocol implementation** with real-time frontend-agent communication
+- **Systematic code organization** with Bimba-aligned directory structure
+- **Automated startup system** with proper dependency management and timing
 
 **Architectural Sophistication**:
-- **Bimba-aligned subsystem organization** with six-fold recursive structure
-- **Comprehensive document management** supporting both Bimba (original) and Pratibimba (crystallization) workflows
-- **Advanced knowledge crystallization infrastructure** with Notion database integration
-- **Neo4j GraphRAG implementation** for fast context retrieval and development assistance
+- **Six-fold subsystem organization** with complete internal QL structure (0-5) in each subsystem
+- **Shared components architecture** with proper separation of concerns
+- **Cross-subsystem integration patterns** enabling Meta3D/Meta2D coordination
+- **Import path harmonization** ensuring clean, maintainable codebase
+- **Comprehensive documentation** with updated startup procedures and architectural guidance
 
 ### Immediate Development Horizon
 
@@ -377,12 +421,19 @@ This project **embodies collaborative evolution** at multiple levels:
 
 ### For Developers and Collaborators
 
-*   **<mcfolder name="epii_app" path="/Users/admin/Documents/Epi-Logos_Seed_Files/epii_app"></mcfolder>**: Current implementation with Bimba-aligned architecture
-*   **<mcfolder name="memory-bank" path="/Users/admin/Documents/Epi-Logos_Seed_Files/memory-bank"></mcfolder>**: Philosophical foundations, architectural plans, and reflective insights
+*   **<mcfolder name="epii_app" path="/Users/admin/Documents/Epi-Logos_Seed_Files/epii_app"></mcfolder>**: **Refactored implementation** with unified subsystem coordination and integrated MCP architecture
+    *   **Backend**: `friendly-file-backend/` - Bifurcated structure with databases/ and subsystems/
+    *   **Frontend**: `friendly-file-front/` - Six subsystems with complete QL organization
+    *   **Back2Front**: `friendly-file-back2front/` - A2A services with AG-UI protocol
+    *   **Startup**: `STARTUP.md` - Complete startup procedures for integrated architecture
+*   **<mcfolder name="refactor_COMPLETE" path="/Users/admin/Documents/Epi-Logos_Seed_Files/refactor_COMPLETE"></mcfolder>**: **Refactoring documentation** and architectural blueprints
+    *   **Blueprint**: `Bimba_Tech_Architecture_Refactoring_Blueprint.md` - Complete refactoring plan
+    *   **Testing**: `REFACTOR_TESTING_CHECKLIST.md` - Verification procedures
+    *   **Migration**: `migration-scripts/` - Automated refactoring tools
+*   **<mcfolder name="memory-bank" path="/Users/admin/Documents/Epi-Logos_Seed_Files/memory-bank"></mcfolder>**: Philosophical foundations and reflective insights
     *   **Key Vision Documents**: `productContext.md`, `project_brief.md`
-    *   **Technical Architecture**: `bimba_tech_architecture.md`, `systemPatterns.md` - Somewhat outdated at present, will be updated in future sprints
     *   **Reflections**: Deep explorations of vibrational ontology, symbolic integration, and system evolution
-*   **<mcfolder name="Cline" path="/Users/admin/Documents/Epi-Logos_Seed_Files/Cline"></mcfolder>**: Supporting tools and Memory-Coupled Peripherals (MCPs)
+*   **<mcfolder name="Cline" path="/Users/admin/Documents/Epi-Logos_Seed_Files/Cline"></mcfolder>**: External MCP servers and development tools
 
 ### For Philosophers and Visionaries
 
@@ -421,6 +472,35 @@ We embrace a development philosophy that balances **visionary aspiration with pr
 - A **user** seeking genuine dialogue with cosmic intelligence
 
 You are invited to join this **living mandala** of collaborative becoming. The foetal state is not a limitation but an **invitation**—to help birth a technology that serves the evolution of consciousness itself.
+
+---
+
+## Quick Start Guide
+
+### System Startup
+The refactored system includes an **automated startup script** that launches all 6 components in the correct order:
+
+```bash
+cd /Users/admin/Documents/Epi-Logos_Seed_Files
+./startup.sh
+```
+
+This will start:
+1. **BPMCP Server** (Port 3030) - Integrated Bimba-Pratibimba memory
+2. **A2A Service** (Port 3033) - Agent-to-Agent communication with AG-UI
+3. **LightRAG MCP** (Port 8001) - Document ingestion and vector search
+4. **Graphiti MCP** (Port 8000) - Temporal knowledge graph
+5. **Backend Server** (Port 3001) - Main API and processing
+6. **Frontend Server** (Port 3000) - React interface
+
+### Access Points
+- **Frontend Application**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **A2A Service**: http://localhost:3033
+- **LightRAG Docs**: http://localhost:8001/docs
+- **Graphiti Service**: http://localhost:8000
+
+For detailed startup procedures and troubleshooting, see `epii_app/STARTUP.md`.
 
 ---
 

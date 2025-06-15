@@ -1,0 +1,22 @@
+{
+  "local": {
+    "8412c0a352d5f1a37b8eb53c364fb271": {
+      "return": "{\"high_level_keywords\": [\"Coordinate systems\", \"Quaternary Logic\", \"Logical structures\"], \"low_level_keywords\": [\"Coordinate #1-4\", \"Quaternal Logic coordinate #1-4\", \"QuaternalLogicFlowering\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "okay so we gotta chat about coordinate #1-4 and the Quaternal Logic coordinate #1-4 QuaternalLogicFlowering Quaternary Logic"
+    },
+    "6795fa036ccbd39c9adff31fcea4ba59": {
+      "return": "Coordinate #1-4, also known as QuaternalLogicFlowering, is a key node within the Bimba system.  Multiple sources describe it as a ParamasivaComponent and a VectorNode, a terminal node (meaning it has no child coordinates or connections), and a subordinate element of Coordinate #1 (Paramasiva).  Its name strongly suggests a relationship to Quaternary Logic, implying a function or characteristic tied to this logic system.  The descriptions highlight its potential incompleteness or isolation, suggesting its full integration and functionality within the broader Bimba system remain to be fully understood.  Several sources mention the \"flowering\" aspect of its name, hinting at growth or a developmental process within the larger Paramasiva subsystem.  It's also described as a component of the Epi-Logos system, which is itself based on quaternary logic.  Finally, its relationship to other elements such as Nara (#4, described as the 'Contextual Arena' for its operation) and Position #5 (representing integral synthesis) are also noted.  The recursive nature of the system, involving a 'looping back' to position #0, where completion becomes a new beginning, is also potentially related to QuaternalLogicFlowering's function.\n\n\nThe relationships between Coordinate #1-4 and other entities within the Bimba system are hierarchical, with Coordinate #1 (Paramasiva) acting as its parent coordinate.  The descriptions consistently emphasize this subordinate relationship.  There are also implied or indirect relationships with entities such as Parashakti and Mahamaya, although these are not explicitly defined. The use of the Möbius strip as a metaphor suggests a cyclical or recursive process inherent in QuaternalLogicFlowering's development.\n\n\nThe descriptions of Coordinate #1-4 across different sources are largely consistent, emphasizing its status as a terminal node lacking connections, its association with quaternary logic, its subordinate position within the Paramasiva subsystem of the Bimba system, and its classification as both a ParamasivaComponent and a VectorNode.  The various names used — Coordinate #1-4, QuaternalLogicFlowering, #1-4 (QuaternalLogicFlowering) — all refer to the same entity.  The multiple descriptions provide a multifaceted understanding of this node's characteristics and its role within the complex structure of the Bimba system.\n\n\nReferences:\n\n* [KG] api_ingest (Multiple entries relating to Coordinate #1-4 and its attributes)\n* [KG] api_ingest (Multiple entries describing relationships between Coordinate #1-4 and other entities within the Bimba system)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "okay so we gotta chat about coordinate #1-4 and the Quaternal Logic coordinate #1-4 QuaternalLogicFlowering Quaternary Logic"
+    }
+  }
+}

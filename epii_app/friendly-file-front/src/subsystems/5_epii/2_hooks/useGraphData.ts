@@ -7,7 +7,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useMemo } from 'react';
-import { Node, Edge } from '../components/meta/metaData';
+import { Node, Edge } from "../../shared/components/meta/metaData";
 
 // Define interface for graph data structure expected from backend
 interface GraphData {

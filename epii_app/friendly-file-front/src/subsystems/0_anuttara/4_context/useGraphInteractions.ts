@@ -10,7 +10,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { getActiveNodeData, ActiveNodeData } from '../1_utils/geometryUtils';
 
 // Debounce function to limit the rate of function calls

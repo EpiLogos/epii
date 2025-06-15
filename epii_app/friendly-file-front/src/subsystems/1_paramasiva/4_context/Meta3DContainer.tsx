@@ -11,8 +11,8 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
 import { Loader2, AlertTriangle, Info } from 'lucide-react';
-import GeometricBackground from '../../../components/ui/GeometricBackground';
-import { Node, Edge } from '../../../components/meta/metaData';
+import GeometricBackground from '../../../shared/components/ui/GeometricBackground';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 
 // Define the context interface
 interface Meta3DContextType {

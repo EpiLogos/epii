@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { parseCoordinate as parseBimbaCoordinate, inferParentCoordinate as inferBimbaParentCoordinate, initializeQLProperties as initializeBimbaQLProperties } from '../../../utils/bimbaUtils';
-import { fetchSuggestedRelationshipTypeAPI, createNodeInGraphAPI } from '@/services/bimbaApi';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../shared/components/ui/dialog";
+import { Button } from "../../../shared/components/ui/button";
+import { parseCoordinate as parseBimbaCoordinate, inferParentCoordinate as inferBimbaParentCoordinate, initializeQLProperties as initializeBimbaQLProperties } from '../../0_anuttara/1_utils/bimbaUtils';
+import { fetchSuggestedRelationshipTypeAPI, createNodeInGraphAPI } from '../../../shared/services/bimbaApi';
+import { Input } from "../../../shared/components/ui/input";
+import { Label } from "../../../shared/components/ui/label";
 import { AlertTriangle, Plus, CheckCircle, Loader2 } from 'lucide-react';
 
 interface CreateNodeModalProps {

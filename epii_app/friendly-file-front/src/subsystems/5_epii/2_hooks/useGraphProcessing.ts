@@ -6,8 +6,8 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../components/meta/metaData';
-import { buildParentChildMap, calculateVirtualDepths } from '../utils/graphUtils';
+import { Node, Edge } from '../components/meta/metaData";
+import { buildParentChildMap, calculateVirtualDepths } from '../subsystems/0_anuttara/1_utils/graphUtils';
 
 /**
  * Hook for processing graph data

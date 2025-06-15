@@ -14,12 +14,12 @@
 import React, { useEffect } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import * as d3 from 'd3';
-import { useMeta2D } from '../../../components/meta/Meta2DContainer';
-import { Node } from '../../../components/meta/metaData';
+import { useMeta2D } from "../../../shared/components/meta/Meta2DContainer';
+import { Node } from "../../../shared/components/meta/metaData";
 import { calculateHexagonalPosition } from '../1_utils/geometryUtils';
 import { configurePhysics2D, addOrbitalForce } from '../0_foundation/physicsConfig';
 import { useGraphRendering, useLinkPulse } from '../../../hooks';
-import { applyPulseToLinkColor } from '../../../hooks/useLinkPulse';
+import { applyPulseToLinkColor } from "../../../shared/hooks/useLinkPulse';
 
 export const Meta2DFoundation: React.FC = () => {
   const {

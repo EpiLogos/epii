@@ -18,8 +18,8 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { getDb } from '../../../services/mongo.service.mjs';
-import User from '../../../models/User.model.mjs';
+import { getDb } from '../../../databases/mongodb/mongo.service.mjs';
+import User from '../../../databases/shared/models/User.model.mjs';
 
 // Encryption configuration
 const ENCRYPTION_KEY = process.env.MAHAMAYA_ENCRYPTION_KEY

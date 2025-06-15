@@ -1,0 +1,22 @@
+{
+  "global": {
+    "d7bea510061af4af8e83448d2712195a": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logic systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Basic applications\", \"Expanded applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    },
+    "ec6581709705a571f39fa1b9f66c3c42": {
+      "return": "## Quaternary Logic: Foundations and Applications\n\nQuaternary Logic, a core component of the Epi-Logos system, is a six-position (mod 6, 0-5) cyclical system—not a four-valued system as the name might suggest.  It transcends binary logic via a \"double-covering principle,\" functioning simultaneously as a geometric lattice, a dynamic process, and a recursive pattern generator.  The six positions represent a complete cycle integrating implicate and explicate elements: Primordial cause (Position #0), formal causes (Positions #1 and #2), a final cause (Position #4), and Positions 3 and 5, which complete the cycle. Each position contains all others in embryonic form, enabling self-similarity, infinite development, and fractal expansion.  The system generates numerical patterns based on multiples of 6 (6, 12, 36, 72), but also incorporates 4, 8, and 64 through recursive expansion.\n\nKey principles include quaternionic rotation and the integration of ascending and descending pathways.  Its three-dimensional quaternary nesting produces a 4-fold, 8-fold, and 64-fold expansion, underpinned by mathematical and geometric principles based on groups of four, including double covering, recursive nesting, and parallel tracks.  As a non-Boolean system, it integrates structure and process, being and becoming, part and whole, surpassing binary true/false logic by incorporating multiple states.  It includes implicit themes, latent potential, and manifest operations.  The 4-fold Explicit Structure represents the manifest aspects of a cycle, focusing on positions 1-4.  The system's influence extends to the structure of subsystems such as Mahamaya within the larger Epi-Logos System.  The principles of Quaternary Logic are also incorporated into Vortex mathematics.  Quaternary Logic's relationship to Quaternionic mathematics is also noted, suggesting a potential foundation in quaternionic principles.\n\n\n## The Epi-Logos System\n\nThe Epi-Logos System is a complex framework whose structure is explained using Quaternary Logic.  It incorporates the 4-8-64 expansion and is described as having a 64-bit structure.  It transcends binary thinking, maintaining mathematical precision while functioning as a geometric lattice, dynamic process, and recursive pattern generator operating across multiple scales and domains.  It incorporates both implicate and explicate dimensions, exhibiting self-oscillatory dynamics and fractal expansion.  Its symbolic representation integrates various symbols, creating a unified symbolic architecture bridging reality and consciousness.  The system is presented as both a conceptual model and a living architecture manifesting across all domains of knowledge and experience.\n\n\n## References\n\n* [KG] api_ingest:  Description of Quaternary Logic (Entity ID: 0)\n* [KG] api_ingest: Description of Epi-Logos System (Entity ID: 4)\n* [KG] api_ingest: Description of 4-fold Explicit Structure (Entity ID: 2)\n* [KG] api_ingest: Relationship between Quaternary Logic and Vortex mathematics (Relationship ID: 0)\n* [KG] api_ingest: Relationship between Quaternary Logic and Three-Dimensional Quaternary Nesting (Relationship ID: 2)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  }
+}

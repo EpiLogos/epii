@@ -7,7 +7,7 @@
  */
 
 import * as THREE from 'three';
-import { Node } from '../../../components/meta/metaData';
+import { Node } from "../../../shared/components/meta/metaData";
 import { calculate3DDiamondPosition } from './calculate3DDiamondPosition';
 import { getTorusGeometry } from './torusGeometryCache';
 

@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import { AnalysisResults, AnalysisMapping, AnalysisVariation } from '../0_foundation/epiiTypes';
-import { formatBimbaCoordinate } from '../1_utils/epiiFormatters';
+import { formatBimbaCoordinate } from "../1_services/utils/epiiFormatters';
 
 interface AnalysisVisualizerProps {
   results: AnalysisResults;

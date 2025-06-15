@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { ChatMessage } from '../0_foundation/epiiTypes';
-import { formatDate } from '../1_utils/epiiFormatters';
+import { formatDate } from "../1_services/utils/epiiFormatters';
 
 interface DocumentChatProps {
   messages: ChatMessage[];

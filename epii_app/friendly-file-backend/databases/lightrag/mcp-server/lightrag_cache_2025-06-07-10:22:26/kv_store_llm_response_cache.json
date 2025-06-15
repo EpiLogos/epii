@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "8f5214b2486c77e222d1034c490e97ac": {
+      "return": "{\"high_level_keywords\": [\"Coordinate systems\", \"Quaternary Logic\", \"Quaternal Logic\"], \"low_level_keywords\": [\"Coordinate #1-4\", \"Quaternal Logic coordinate #1-4\", \"QuaternalLogicFlowering\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "okay so we gotta chat about coordinate #1-4 and the Quaternal Logic coordinate #1-4 QuaternalLogicFlowering Quaternary Logic"
+    }
+  }
+}

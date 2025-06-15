@@ -40,7 +40,7 @@ import { InteractionState } from '../4_context/useCameraControls3D';
 import { ForceGraph3DInstance } from 'react-force-graph';
 import { MutableRefObject } from 'react';
 import * as THREE from 'three';
-import { Node } from '../../../components/meta/metaData';
+import { Node } from "../../../shared/components/meta/metaData";
 import {
   getAnimationManager,
   AnimationSubsystem,

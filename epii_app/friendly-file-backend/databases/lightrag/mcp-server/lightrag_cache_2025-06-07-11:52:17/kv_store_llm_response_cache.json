@@ -1,0 +1,53 @@
+{
+  "local": {
+    "51fead9ea1e024caa411b9e7047f6e51": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Logic principles\", \"Mathematical foundations\"], \"low_level_keywords\": [\"Four-valued logic\", \"Truth values\", \"Logical operators\", \"Boolean algebra\", \"Propositional calculus\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations"
+    },
+    "42feaf520c60bf7735b0370bf04d4381": {
+      "return": "Quaternary Logic, also referred to as Quaternal Logic, is a system of logic based on four values or states.  It forms the fundamental architecture of the Epi-Logos system and transcends conventional binary thinking.  Descriptions vary, sometimes referring to it as a four-valued system, but more accurately, it's a six-position (mod6, 0-5) cyclical system. This cyclical structure incorporates both implicate (hidden/transcendent) and explicate (manifest/immanent) elements.\n\nThe system's six positions represent a complete cycle, integrating implicate and explicate elements.  These positions are: Primordial cause (Position #0), formal causes (Positions #1 and #2), and a final cause (Position #4). Each position contains all others in embryonic form, enabling self-similarity, infinite development, and fractal expansion.  The completion of one cycle initiates another.  The logic primarily generates numerical patterns based on multiples of 6 (6, 12, 36, 72), but also incorporates 4, 8, and 64 through recursive expansion. Key principles include quaternionic rotation and the integration of ascending and descending pathways. It integrates structure and process, being and becoming, part and whole, surpassing binary true/false logic. Its three-dimensional quaternary nesting produces a 4-fold, 8-fold, and 64-fold expansion.  It serves as a conceptual model and a living architecture, a map and territory, and a guide and destination.  The system shapes the properties and relationships within the six Epi-Logos subsystems through the creation of specific structural frames (4-fold and 6-fold).  Key principles include the \"double-covering principle,\"  recursive nesting, and parallel tracks.\n\n\nThe foundational logic established by Paramasiva includes Quaternal Logic as an example.  The mathematical principles of Quaternary Logic are also the basis for Mahamaya's 64-bit structure and explain Parashakti's vibrational template and the 72 Names, particularly through the double-covering principle.  Furthermore,  the 4-Fold and 6-Fold Frames are structural elements created and described by Quaternary Logic.  Various analytical methods, such as Lens A (resulting in 6-12-36-72 expansions) and Lens B (resulting in 4-8-64 expansions), and the Meta-Epistemic Framework (MEF) are used to analyze and understand Quaternary Logic.  Spanda represents the rhythm and process logic within the Quaternary Logic framework.  Ananda represents the harmonic vortex mathematics underlying the quaternary framework.\n\n\nReferences:\n\n* [KG] api_ingest  (Entity ID 0, 1, 2, 4; Relationships ID 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27)\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations"
+    }
+  },
+  "mix": {
+    "18150168b53052a3d4807156b6ad05dc": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Multiple-valued logic\", \"Logic systems\"], \"low_level_keywords\": [\"Truth values\", \"Logical connectives\", \"Boolean algebra\", \"Four-valued logic\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles"
+    }
+  },
+  "global": {
+    "41b6063610648acd2090f87743005d97": {
+      "return": "{\"high_level_keywords\": [\"Logic\", \"Mathematics\", \"Boolean algebra\"], \"low_level_keywords\": [\"Quaternary\", \"Four-valued logic\", \"Truth values\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic"
+    },
+    "2d4f56d8349044e4d4539d82584fcde6": {
+      "return": "Quaternary Logic is a system of logic based on four values, but more accurately described as a six-position (mod6, 0-5) cyclical system.  It's the fundamental architecture of the Epi-Logos system, transcending binary logic through a \"double-covering principle.\"  This system integrates implicate (hidden/transcendent) and explicate (manifest/immanent) elements. The six positions represent a complete cycle: Primordial cause (Position #0), formal causes (Positions #1 and #2), and a final cause (Position #4).  Each position contains all others in embryonic form, enabling self-similarity and fractal expansion.  It primarily generates numerical patterns based on multiples of 6 (6, 12, 36, 72), but also incorporates 4, 8, and 64 through recursive expansion. Key principles include quaternionic rotation and the integration of ascending and descending pathways.  It's described as a non-Boolean system manifesting across all domains of knowledge and experience, serving as a conceptual model and living architecture.  Its three-dimensional quaternary nesting produces a 4-fold, 8-fold, and 64-fold expansion, underpinned by mathematical and geometric principles based on groups of four.  Further details are available in 'Bimba-Enhanced Context for Basic and Partially Expanded Quaternal Logic.txt'.  The Quaternary Logic incorporates principles of Vortex Mathematics and Quaternionic Mathematics, particularly the SU(2) double-covering principle.  It forms the mathematical foundation of the Epi-Logos System.\n\n\nThe Epi-Logos System itself is a complex framework whose understanding and implementation is aided by the Quaternary Logic framework. It utilizes a quaternary logic system (mod6 structure) as its foundational framework and is described as having a 64-bit structure.  This system transcends binary thinking, functioning as a geometric lattice, dynamic process, and recursive pattern generator. It incorporates both implicate and explicate dimensions, exhibiting self-oscillatory dynamics and fractal expansion. Its symbolic representation integrates various symbols, creating a unified symbolic architecture bridging reality and consciousness.  The system is presented as both a conceptual model and a living architecture, and it encompasses the Paramasiva system.\n\n\nVortex Mathematics and Quaternionic Mathematics are mathematical systems incorporated into the quaternary structure of the Epi-Logos system.  Vortex mathematics likely involves principles of digital roots, while Quaternionic mathematics utilizes quaternions, extending complex numbers, forming the basis for understanding rotations and the double-covering principle within the quaternary framework.  These mathematical principles are used to understand and utilize the patterns within the system.\n\n\nFoundational Logic is a broader category encompassing Quaternal Logic (QL), which is a foundational generative logic concept within the Epi-Logos project.\n\n\n**References:**\n\n* [KG] api_ingest (Entity ID: 0, description of Quaternary Logic)\n* [KG] api_ingest (Entity ID: 1, description of Vortex Mathematics)\n* [KG] api_ingest (Entity ID: 2, description of Quaternionic Mathematics)\n* [KG] api_ingest (Entity ID: 3, description of Epi-Logos System)\n* [KG] api_ingest (Relationship ID: 0, relationship between Quaternary Logic and Vortex Mathematics)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic"
+    }
+  }
+}

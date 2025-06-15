@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import PageTransition from "../../../components/layout/PageTransition";
-import GeometricBackground from "../../../components/ui/GeometricBackground";
-import { Button } from "@/components/ui/button";
+import PageTransition from "../../../shared/components/layout/PageTransition";
+import GeometricBackground from "../../../shared/components/ui/GeometricBackground";
+import { Button } from "../../../shared/components/ui/button";
 import { CheckCircle, AlertTriangle, Info, Menu, X } from "lucide-react";
 import DocumentCanvas from '../3_visualization/DocumentCanvas';
 import EpiiSidebar from '../3_visualization/EpiiSidebar';

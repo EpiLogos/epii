@@ -8,7 +8,7 @@
  */
 
 import { useCallback } from 'react';
-import { Node } from '../../../components/meta/metaData';
+import { Node } from "../../../shared/components/meta/metaData";
 
 // Define subsystem colors
 const subsystemColors: { [key: string]: string } = {

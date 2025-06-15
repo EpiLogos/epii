@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "14dbd708707614b8ff05384478a524f2": {
+      "return": "{\"high_level_keywords\": [\"Quaternary logic\", \"Epii perspective\", \"Bimba coordinate system\"], \"low_level_keywords\": [\"Bimba coordinate #1-4\", \"Logic systems\", \"Coordinate systems\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Epii perspective on quaternary logic and Bimba coordinate #1-4"
+    }
+  }
+}

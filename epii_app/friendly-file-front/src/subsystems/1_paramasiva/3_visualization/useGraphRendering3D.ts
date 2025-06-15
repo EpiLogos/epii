@@ -9,7 +9,7 @@
 
 import { useRef, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import { usePulsationAnimation } from '../../2_parashakti/2_hooks/usePulsationAnimation';
 
 /**

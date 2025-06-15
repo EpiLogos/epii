@@ -11,7 +11,7 @@
 
 import { useRef, useEffect, useCallback, MutableRefObject } from 'react';
 import * as THREE from 'three';
-import { Node } from '../../../components/meta/metaData';
+import { Node } from "../../../shared/components/meta/metaData";
 
 /**
  * Hook for initializing wireframes in the 3D visualization

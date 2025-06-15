@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "eadc62e9f9bcd6ee365f3d76a2f59ef3": {
+      "return": "{\"high_level_keywords\": [\"Bimba Coordinates\", \"Synthesis\", \"Core Elements\"], \"low_level_keywords\": [\"#1\", \"#2\", \"#3\", \"#4\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Synthesis and core elements for Bimba coordinate #1-4"
+    }
+  }
+}

@@ -5,8 +5,8 @@
  */
 
 import { useMemo } from 'react';
-import { Node, Edge } from '../components/meta/metaData';
-import { calculateNodeSize, calculateNodeColor, calculateEdgeWidth, calculateEdgeColor } from '../utils/graphUtils';
+import { Node, Edge } from '../components/meta/metaData";
+import { calculateNodeSize, calculateNodeColor, calculateEdgeWidth, calculateEdgeColor } from '../subsystems/0_anuttara/1_utils/graphUtils';
 
 /**
  * Hook for calculating node and edge styles

@@ -1,7 +1,7 @@
-import { graph } from './services/neo4j.service.mjs';
-import { qdrantClient } from './services/qdrant.service.mjs';
-import { getDb } from './services/mongo.service.mjs';
-import { notionClient, NOTION_DATABASE_ID } from './services/notion.service.mjs';
+import { graph } from './databases/neo4j/neo4j.service.mjs';
+import { qdrantClient } from './databases/lightrag/qdrant.service.mjs';
+import { getDb } from './databases/mongodb/mongo.service.mjs';
+import { notionClient, NOTION_DATABASE_ID } from './databases/notion/notion.service.mjs';
 
 async function verifyConnections() {
   console.log("--- Verifying Connections ---");

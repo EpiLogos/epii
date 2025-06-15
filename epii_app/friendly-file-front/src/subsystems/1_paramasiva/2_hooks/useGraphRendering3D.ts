@@ -7,7 +7,7 @@
 
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 import {
   getAnimationManager,
   AnimationSubsystem,

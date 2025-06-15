@@ -1,28 +1,29 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors'; // Add missing cors import
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Import database connection and configurations
-import connectDB from './config/db.config.mjs';
-import corsOptions from './config/cors.config.mjs';
+import connectDB from './databases/shared/data/config/db.config.mjs';
+import corsOptions from './databases/shared/data/config/cors.config.mjs';
 
 // Import routes
-import chatRoutes from './routes/chat.routes.mjs';
-import filesRoutes from './routes/files.routes.mjs';
-import agentRoutes from './routes/agent.routes.mjs';
-import notionRoutes from './routes/notion.routes.mjs'; // Import Notion routes
-import graphRoutes from './routes/graph.routes.mjs'; // Import Graph routes
-import nodeDetailsRoutes from './routes/nodeDetails.routes.mjs'; // Import Node Details routes
-import epiiAgentRoutes from './routes/epii-agent.routes.mjs'; // Import Epii Agent routes
-import documentsRoutes from './routes/documents.routes.mjs'; // Import Documents routes
-import bpmcpRoutes from './routes/bpmcp.routes.mjs'; // Import BPMCP routes
-import userRoutes from './routes/user.routes.mjs'; // Import User routes
-import analysisRoutes from './routes/analysis.routes.mjs'; // Import Analysis routes
-import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
-import decanicRoutes from './subsystems/4_nara/1_routes/decanic.routes.mjs'; // Import Decanic routes for Epic 2
-import skillsRoutes from './routes/skills.routes.mjs'; // Import A2A Skills routes
+import chatRoutes from './databases/api/routes/chat.routes.mjs';
+import filesRoutes from './databases/api/routes/files.routes.mjs';
+import agentRoutes from './databases/api/routes/agent.routes.mjs';
+import notionRoutes from './databases/api/routes/notion.routes.mjs'; // Import Notion routes
+import graphRoutes from './databases/api/routes/graph.routes.mjs'; // Import Graph routes
+import nodeDetailsRoutes from './databases/api/routes/nodeDetails.routes.mjs'; // Import Node Details routes
+import epiiAgentRoutes from './subsystems/5_epii/5_integration/routes/epii-agent.routes.mjs'; // Import Epii Agent routes
+import documentsRoutes from './databases/api/routes/documents.routes.mjs'; // Import Documents routes
+import bpmcpRoutes from './databases/api/routes/bpmcp.routes.mjs'; // Import BPMCP routes
+import userRoutes from './subsystems/4_nara/5_integration/routes/user.routes.mjs'; // Import User routes
+import analysisRoutes from './subsystems/5_epii/5_integration/routes/analysis.routes.mjs'; // Import Analysis routes
+import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/routes/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
+import decanicRoutes from './subsystems/4_nara/5_integration/routes/decanic.routes.mjs'; // Import Decanic routes for Epic 2
+import skillsRoutes from './databases/api/routes/skills.routes.mjs'; // Import A2A Skills routes
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 console.log('Starting Friendly File Backend Server...');
+console.log('MONGODB_URI loaded:', process.env.MONGODB_URI ? 'YES' : 'NO');
 console.log('Environment Variables:', process.env);
 
 const app = express();

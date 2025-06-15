@@ -7,7 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useEpii } from '../4_context/EpiiContext';
 import { Document } from '../0_foundation/epiiTypes';
 import { v4 as uuidv4 } from 'uuid';
-import { getLanguageForSyntaxHighlighting } from '../1_utils/epiiHelpers';
+import { getLanguageForSyntaxHighlighting } from "../1_services/utils/epiiHelpers";
 import { useGraphData } from '../../0_anuttara/2_hooks/useGraphData';
 import '../1_services/webSocketService'; // Import to ensure WebSocket connection is established
 

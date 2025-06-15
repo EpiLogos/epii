@@ -7,7 +7,7 @@
  * This file contains utility functions for calculating node depths in the Bimba structure.
  */
 
-import { Node, Edge } from "../../../components/meta/metaData";
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 
 /**
  * Calculates the depth of a node based on its bimbaCoordinate.

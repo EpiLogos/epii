@@ -11,9 +11,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ForceGraph3D from 'react-force-graph-3d';
-import { NodeDetailsPanel } from '../../../components/meta/NodeDetailsPanel';
-import { GraphControls } from '../../../components/meta/GraphControls';
-import { Node, Edge } from '../../../components/meta/metaData';
+import { NodeDetailsPanel } from "../../../shared/components/meta/NodeDetailsPanel";
+import { GraphControls } from "../../../shared/components/meta/GraphControls";
+import { Node, Edge } from "../../../shared/components/meta/metaData";
 // Import the useMeta3D hook from the correct Meta3DContainer
 // This ensures we're using the context from the Paramasiva subsystem
 import { useMeta3D } from '../4_context/Meta3DContainer';
@@ -27,7 +27,7 @@ import { RelationVisualizer } from '../../2_parashakti/3_visualization/RelationV
 // This is now the single source of truth for all node and link styling
 // It uses a unified approach based on virtual depth for all nodes
 import { useGraphStylingFunctions } from '../../3_mahamaya/2_hooks/useGraphStylingFunctions';
-import { useNodeDetails } from '../../../hooks/bimba/useNodeDetails';
+import { useNodeDetails } from "../../../shared/hooks/bimba/useNodeDetails";
 import { getAnimationManager } from '../../2_parashakti/1_utils/AnimationManager';
 
 interface Meta3DVisualizationProps {

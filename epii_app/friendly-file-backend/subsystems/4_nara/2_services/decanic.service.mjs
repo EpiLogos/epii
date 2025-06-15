@@ -12,7 +12,7 @@
  * - Caching for performance optimization
  */
 
-import bpMCPService from '../../../services/bpMCPService.mjs';
+import bpMCPService from '../../../databases/bpmcp/bpMCP.service.mjs';
 
 class DecanicService {
   constructor() {

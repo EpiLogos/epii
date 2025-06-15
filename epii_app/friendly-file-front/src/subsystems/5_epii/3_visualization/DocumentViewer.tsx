@@ -6,8 +6,8 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { getLanguageForSyntaxHighlighting } from '../1_utils/epiiHelpers';
-import { debounce } from '../1_utils/debounce';
+import { getLanguageForSyntaxHighlighting } from "../1_services/utils/epiiHelpers";
+import { debounce } from "../1_services/utils/debounce";
 import { Search, Sparkles, Save } from 'lucide-react';
 import { useEpii } from '../4_context/EpiiContext';
 import { TextSelection } from '../0_foundation/epiiTypes';

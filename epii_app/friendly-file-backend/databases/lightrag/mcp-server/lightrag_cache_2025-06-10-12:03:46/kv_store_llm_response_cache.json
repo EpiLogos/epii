@@ -1,0 +1,13 @@
+{
+  "mix": {
+    "47b54ea2d221c13995e6e8fe55c36378": {
+      "return": "{\"high_level_keywords\": [\"Epii perspective\", \"Synthesis\", \"Core elements\", \"Bimba coordinate system\"], \"low_level_keywords\": [\"Bimba coordinate #1\", \"Bimba coordinate #2\", \"Bimba coordinate #3\", \"Bimba coordinate #4\", \"Synthesis methodology\", \"Key features\", \"Component analysis\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Epii perspective on synthesis and core elements for Bimba coordinate #1-4"
+    }
+  }
+}

@@ -2,10 +2,10 @@
   "name": "siva-shakti-a2a",
   "version": "0.1.0",
   "description": "Agent-to-Agent (A2A) communication framework for the Epi-Logos system",
-  "main": "a2a-server.js",
+  "main": "shared/a2a/a2a-server.js",
   "scripts": {
-    "start": "node a2a-service.js",
-    "start:server": "node a2a-server.js",
+    "start": "node shared/services/a2a-service.js",
+    "start:server": "node shared/a2a/a2a-server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:client": "node examples/test-client.js"
   },

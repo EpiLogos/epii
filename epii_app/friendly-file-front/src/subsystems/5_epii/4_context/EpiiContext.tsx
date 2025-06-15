@@ -27,8 +27,8 @@ import {
   getAnalysisSessions,
   getChatMessages
 } from '../0_foundation/epiiDocStore';
-import { cleanDocumentId } from '../1_utils/epiiHelpers';
-import { useUserContext } from '../../0_anuttara/4_context/useUserContext';
+import { cleanDocumentId } from "../1_services/utils/epiiHelpers";
+import { useUserContext } from '../../4_nara/4_context/useUserContext';
 
 // Initial state
 const initialState: EpiiState = {
