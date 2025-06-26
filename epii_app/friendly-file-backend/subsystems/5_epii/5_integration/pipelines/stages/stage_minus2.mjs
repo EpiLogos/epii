@@ -207,6 +207,15 @@ export async function runStageMinus2(state) {
 
             // Generate a single comprehensive context window for the entire batch
             console.log(`Generating comprehensive context window for batch ${batchIndex + 1}...`);
+
+            // Debug: Check what we're passing to context window generation
+            console.log(`🔍 Context window generation inputs:
+- fullBimbaMap nodes: ${state.fullBimbaMap?.nodes?.length || 0}
+- bimbaEnhancedContext length: ${state.bimbaEnhancedContext?.length || 0}
+- projectContext keys: ${Object.keys(state.projectContext || {}).join(', ')}
+- targetCoordinate: ${sourceMetadata.targetCoordinate}
+- bimbaMapSummary length: ${state.bimbaMapSummary?.length || 0}`);
+
             const batchContextWindow = await generateContextWindow(
                 concatenatedBatchContent,
                 state.documentContent,
@@ -220,6 +229,14 @@ export async function runStageMinus2(state) {
                 { forAnalysis: true } // Crucial flag for comprehensive context
             );
 
+            // Debug: Check what we got back from context window generation
+            console.log(`✅ Generated context window with:
+- bimbaContext.directlyRelevantNodes: ${batchContextWindow.bimbaContext?.directlyRelevantNodes?.length || 0}
+- bimbaContext.parentNodes: ${batchContextWindow.bimbaContext?.parentNodes?.length || 0}
+- bimbaContext.siblingNodes: ${batchContextWindow.bimbaContext?.siblingNodes?.length || 0}
+- qlContext available: ${!!batchContextWindow.qlContext}
+- contextText length: ${batchContextWindow.contextText?.length || 0}`);
+
             const batchContextWindows = [batchContextWindow]; // Single context window for the batch
 
             // The concept of "assignedCoordinates" might also change.
@@ -232,7 +249,7 @@ export async function runStageMinus2(state) {
 
             let singleBatchAnalysisResult; // This will be the rich JSON object
             try {
-                const { analyzeChunkGroup } = await import('../../utils/content/analysis.mjs');
+                const { analyzeChunkGroup } = await import('../../../1_utils/content/analysis.mjs');
                 singleBatchAnalysisResult = await analyzeChunkGroup(
                     batchChunkTexts,
                     sourceMetadata,

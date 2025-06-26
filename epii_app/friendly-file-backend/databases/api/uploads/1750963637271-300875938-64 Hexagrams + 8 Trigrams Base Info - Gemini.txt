@@ -1,0 +1,1840 @@
+The Eight Trigrams (Bagua / 八卦)[1][2][3][4][5]
+
+Note on Binary Representation: The binary code uses the convention: Top line = Most Significant Bit (MSB), Bottom line = Least Significant Bit (LSB). Yang = 1, Yin = 0.
+Note on Directions: The "Later Heaven" (Hòutiān Bāguà / 後天八卦) directions are most commonly used for cycles, seasons, Feng Shui, and I Ching hexagram dynamics. The "Earlier Heaven" (Xiāntiān Bāguà / 先天八卦) directions represent a primordial, balanced state and are often used in deeper cosmological or internal alchemy contexts.
+
+1. Qián (乾)[3][6]
+
+Symbol: ☰ (Three solid lines)
+
+Binary: 111
+
+English Name: The Creative, Heaven
+
+Core Meaning/Attribute: Strength, Creativity, Power, Initiative, Endurance, Masculinity, Origin, Spirit, Unceasing Movement
+
+Element: Heaven / Strong Yang Metal
+
+Direction (Later Heaven): Northwest (NW)
+
+Direction (Earlier Heaven): South (S)
+
+Season (Later Heaven Cycle): Late Autumn / Early Winter (approx. Oct/Nov to Winter Solstice)
+
+Family/Social Role: Father, Ruler, Leader, Authority Figure, Elderly Man[7]
+
+Body Part/Organ: Head, Brain, Bones, Lungs, Large Intestine (Metal association)[8]
+
+Animal: Horse (strong, noble, dragon-horse), Dragon
+
+Virtue/Quality: Strength, Vigor, Persistence, Benevolence (when ruling well)[8][9]
+
+Other Key Imagery & Concepts: Sky, Heaven, Circle, Ruler, Jade, Gold, Ice, Bright/Light Colors, Sharp Taste, Evening Time
+
+2. Kūn (坤)
+
+Symbol: ☷ (Three broken lines)
+
+Binary: 000
+
+English Name: The Receptive, Earth[10][11]
+
+Core Meaning/Attribute: Receptivity, Yielding, Nurturing, Devotion, Support, Capacity, Groundedness, Form, Substance[7][8]
+
+Element: Earth (Strong Yin Earth)
+
+Direction (Later Heaven): Southwest (SW)
+
+Direction (Earlier Heaven): North (N)
+
+Season (Later Heaven Cycle): Late Summer / Early Autumn (approx. Aug to Autumn Equinox)[12]
+
+Family/Social Role: Mother, Matriarch, The People, Servant, Follower, Elderly Woman
+
+Body Part/Organ: Abdomen, Stomach, Spleen, Flesh, Womb, Skin[8]
+
+Animal: Cow / Ox, Mare
+
+Virtue/Quality: Docility, Gentleness, Endurance, Patience, Supportiveness[8][9]
+
+Other Key Imagery & Concepts: Earth, Field, Vessel, Cloth, Multitude, Black Soil, Belly, Darkness (as potential), Square, Black Color, Sweet Taste, Early Afternoon Time
+
+3. Zhèn (震)
+
+Symbol: ☳ (Solid line below two broken lines)
+
+Binary: 100
+
+English Name: The Arousing, Thunder
+
+Core Meaning/Attribute: Movement, Initiative, Shock, Arousing, Growth, Decision, Excitement, Taking Action
+
+Element: Wood (Yang Wood)
+
+Direction (Later Heaven): East (E)
+
+Direction (Earlier Heaven): Northeast (NE)
+
+Season (Later Heaven Cycle): Spring (approx. Spring Equinox to May)
+
+Family/Social Role: Eldest Son
+
+Body Part/Organ: Feet, Legs (movement), Liver, Throat, Nerves[8]
+
+Animal: Dragon (emerging), Swift Horse
+
+Virtue/Quality: Action, Decisiveness, Vitality, Movement from below
+
+Other Key Imagery & Concepts: Thunder, Sprouts, Green Bamboo, Road, Movement from Below, Earthquake, Shaking, Green Color, Sour Taste, Early Morning Time
+
+4. Xùn (巽)[3]
+
+Symbol: ☴ (Broken line below two solid lines)
+
+Binary: 011
+
+English Name: The Gentle, Wind (sometimes Wood)[10][13]
+
+Core Meaning/Attribute: Gentleness, Penetration, Flexibility, Adaptability, Following, Subtle Influence, Dispersal
+
+Element: Wood (Yin Wood)
+
+Direction (Later Heaven): Southeast (SE)
+
+Direction (Earlier Heaven): Southwest (SW)
+
+Season (Later Heaven Cycle): Late Spring / Early Summer (approx. May to Summer Solstice)
+
+Family/Social Role: Eldest Daughter
+
+Body Part/Organ: Thighs, Hips, Buttocks, Gall Bladder, Respiratory System (wind/breath)[8]
+
+Animal: Rooster / Fowl
+
+Virtue/Quality: Adaptability, Subtlety, Persistence, Compliance (in a gentle way)[8][9]
+
+Other Key Imagery & Concepts: Wind, Wood, Grass, Ropes, Long objects, Gentle Breeze, Penetrating Influence, Instructions, White Color (associated w/ wood purity in some systems), Sour Taste, Mid-morning Time
+
+5. Kǎn (坎)[3]
+
+Symbol: ☵ (Solid line between two broken lines)
+
+Binary: 010
+
+English Name: The Abysmal, Water
+
+Core Meaning/Attribute: Danger, Depth, The Unconscious, Flowing, Sincerity (within danger), Entrapment, Toil, Darkness, Moon
+
+Element: Water
+
+Direction (Later Heaven): North (N)
+
+Direction (Earlier Heaven): West (W)
+
+Season (Later Heaven Cycle): Winter (approx. Winter Solstice to Feb)[12]
+
+Family/Social Role: Middle Son
+
+Body Part/Organ: Ears, Kidneys, Bladder, Blood, Bodily Fluids, Sexual Organs[8]
+
+Animal: Pig, Boar[7][8]
+
+Virtue/Quality: Sincerity, Adaptability (like water), Facing Danger, Deep Wisdom
+
+Other Key Imagery & Concepts: Water, Gorge, Ravine, Pit, Clouds, Rain, Moon, Bow, Wheels, Anxiety, Heartache, Holes, Traps, Black or Dark Blue Color, Salty Taste, Midnight Time
+
+6. Lí (離)
+
+Symbol: ☲ (Broken line between two solid lines)
+
+Binary: 101
+
+English Name: The Clinging, Fire
+
+Core Meaning/Attribute: Brightness, Clarity, Intelligence, Attachment, Dependence, Radiance, Illumination, Heat, Sun[8]
+
+Element: Fire
+
+Direction (Later Heaven): South (S)
+
+Direction (Earlier Heaven): East (E)
+
+Season (Later Heaven Cycle): Summer (approx. Summer Solstice to Aug)
+
+Family/Social Role: Middle Daughter
+
+Body Part/Organ: Eyes, Heart, Small Intestine, Blood Circulation (related to heart)[7][8]
+
+Animal: Pheasant, Peacock, Turtle (sometimes associated with fire patterns)
+
+Virtue/Quality: Clarity, Intelligence, Awareness, Beauty, Adherence[8]
+
+Other Key Imagery & Concepts: Fire, Sun, Light, Lightning, Weapons, Armor, Brightness, Heat, Vision, Consciousness, Red or Purple Color, Bitter Taste, Noon Time
+
+7. Gèn (艮)[3]
+
+Symbol: ☶ (Broken line above two solid lines - Correction: Solid line above two broken lines)
+
+Binary: 100 - Correction: Binary for ☶ (Solid top, broken middle, broken bottom) is 100.[8] Let me re-verify this. Gèn is Yang line over two Yin lines. ☰ Qián 111, ☷ Kūn 000, ☳ Zhèn 100, ☴ Xùn 011, ☵ Kǎn 010, ☲ Lí 101, ☶ Gèn 100, ☱ Dui 110.[8] Ah, Gèn (Mountain) symbol is ☶, which is Yang on top, Yin below, Yin below that. Binary (Top=MSB): 100. Zhèn (Thunder) is ☳, which is Yin on top, Yin middle, Yang bottom.[13] Binary (Top=MSB): 001. My previous binary for Zhèn (Thunder) was incorrect in the prior message's Hexagram 3 entry (I had 100 there). Let's correct Zhen here and Gen below.
+
+Correction for Zhèn (Thunder) above: Symbol ☳. Binary 001.
+
+Now for Gèn: Symbol ☶. Binary 100.
+
+English Name: Keeping Still, Mountain
+
+Core Meaning/Attribute: Stillness, Stopping, Steadfastness, Contemplation, Boundaries, Completion/Beginnings, Immobility, Solidity
+
+Element: Earth (Yang Earth)
+
+Direction (Later Heaven): Northeast (NE)
+
+Direction (Earlier Heaven): Northwest (NW)
+
+Season (Later Heaven Cycle): Late Winter / Early Spring (approx. Feb to Spring Equinox)
+
+Family/Social Role: Youngest Son
+
+Body Part/Organ: Hands, Fingers, Back, Nose, Joints, Bones (solidity)[8]
+
+Animal: Dog
+
+Virtue/Quality: Restfulness, Contemplation, Stability, Integrity (immovable)
+
+Other Key Imagery & Concepts: Mountain, Path, Gate, Door, Stones, Threshold, Resting, Stopping, Meditation, Yellow or Brown Color, Sweet Taste, Late Night/Early Morning Time
+
+8. Duì (兌)
+
+Symbol: ☱ (Solid line above a solid line, with a broken line top - Correction: Broken line above two solid lines)
+
+Binary: 110 - Correction: Dui symbol is ☱, which is Yin on top, Yang middle, Yang bottom. Binary (Top=MSB): 011. Let me re-verify Xùn (Wind) from above. Xùn symbol is ☴, Yang top, Yang middle, Yin bottom. Binary (Top=MSB): 110. Okay, I seem to have swapped Xùn and Duì binary codes previously.
+
+Correction for Xùn (Wind) above: Symbol ☴. Binary 110.
+
+Now for Duì: Symbol ☱. Binary 011.
+
+English Name: The Joyous, Lake (or Marsh)
+
+Core Meaning/Attribute: Joy, Pleasure, Openness, Satisfaction, Communication (Speech), Attraction, Excess (sometimes)[7]
+
+Element: Metal (Yin Metal)
+
+Direction (Later Heaven): West (W)
+
+Direction (Earlier Heaven): Southeast (SE)
+
+Season (Later Heaven Cycle): Autumn (approx. Autumn Equinox to Oct/Nov)
+
+Family/Social Role: Youngest Daughter, Concubine, Sorceress, Performer[14]
+
+Body Part/Organ: Mouth, Tongue, Teeth, Saliva, Lungs, Chest[8]
+
+Animal: Sheep / Goat[8]
+
+Virtue/Quality: Joyfulness, Friendliness, Eloquence, Openness[7][8]
+
+Other Key Imagery & Concepts: Lake, Marsh, Openings, Mouth (speaking, eating), Reflection (on water), Harvest, Celebration, Metal (refined), White or Metallic Colors, Pungent/Spicy Taste, Evening Time
+
+
+1. Qián (乾) - The Creative
+
+Hexagram Image: ䷀ (Heaven over Heaven)
+
+Binary Representation: 111111 (Top line MSB, Bottom line LSB)
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: This hexagram embodies pure, unadulterated Yang energy – the primal power that initiates all creation. It represents strength, dynamic action, persistence, divine influence, leadership, and beginnings. Its energy is like the ceaseless, powerful movement of the heavens. Success is indicated, especially through unwavering perseverance aligned with high principles and timing. It's associated with the highest forms of authority, potential, and spiritual drive.
+
+Overall Symbolic Associations:
+
+Elements: Pure Heaven/Strong Yang Metal. Represents potential, structure, and the initiating force.
+
+Direction (Later Heaven): Northwest (NW) - The place of the Father/Leader.
+
+Season (Later Heaven): Late Autumn / Early Winter - Culmination of Yang power before the turn to Yin. Also represents timelessness or the origin.
+
+Body: Head, brain, bones (structural strength), lungs.
+
+Social Role: Father, Ruler, Leader, Authority, Pioneer, Initiator.
+
+Key Imagery/Keywords: Dragon (adaptable spiritual power), Horse (endurance, nobility), Sky, Light, Power, Potential, Initiative, Endurance, Time, Masculinity, Origin, Spirit, Unceasing Movement, Vigor.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 44. Gòu (姤) - Coming to Meet
+
+Line 2 changes to Yin: → Hexagram 13. Tóng Rén (同人) - Fellowship
+
+Line 3 changes to Yin: → Hexagram 10. Lǚ (履) - Treading (Conduct)
+
+Line 4 changes to Yin: → Hexagram 9. Xiǎo Chù (小畜) - Taming Power of the Small
+
+Line 5 changes to Yin: → Hexagram 14. Dà Yǒu (大有) - Possession in Great Measure
+
+Line 6 changes to Yin: → Hexagram 43. Guài (夬) - Break-through (Resoluteness)
+
+2. Kūn (坤) - The Receptive
+
+Hexagram Image: ䷁ (Earth over Earth)
+
+Binary Representation: 000000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: This hexagram embodies pure, undiluted Yin energy – the receptive, nurturing, and yielding power that complements the Creative (Qián). It signifies devotion, responsiveness, capacity, motherhood, the earth itself, and the potential to bring things into form and sustain them. Like the vast earth supporting all, success comes through adapting, supporting, and following the correct initiative or time. It represents groundedness, patience, practical application, and the quiet strength of endurance.
+
+Overall Symbolic Associations:
+
+Elements: Pure Earth (Strong Yin Earth). Represents manifest reality, form, substance, nourishment, and stability.
+
+Direction (Later Heaven): Southwest (SW) - The place of the Mother/Nurturer.
+
+Season (Later Heaven): Late Summer / Early Autumn - Time of harvest, fullness, maternal nourishment.
+
+Body: Abdomen, stomach, spleen (digestion/nourishment), flesh, womb (gestation), skin.
+
+Social Role: Mother, Wife, Follower, Servant, The Masses, Steward, Caretaker, Assistant.
+
+Key Imagery/Keywords: Mare (gentle endurance), Cow/Ox (docility, service), Earth, Field, Valley, Vessel, Space, Capacity, Yielding, Nourishment, Patience, Endurance, Form, Substance, Darkness (as potential), Practicality, Foundation.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 24. Fù (復) - Return (The Turning Point)
+
+Line 2 changes to Yang: → Hexagram 19. Lín (臨) - Approach
+
+Line 3 changes to Yang: → Hexagram 11. Tài (泰) - Peace
+
+Line 4 changes to Yang: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 5 changes to Yang: → Hexagram 8. Bǐ (比) - Holding Together (Union)
+
+Line 6 changes to Yang: → Hexagram 23. Bō (剝) - Splitting Apart
+
+3. Zhūn (屯) - Difficulty at the Beginning
+
+Hexagram Image: ䷂ (Water over Thunder)
+
+Binary Representation: 010001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Kǎn (Water)
+
+Symbolic Description: Represents the difficult, obstructed, and potentially chaotic situation encountered right at the beginning of a new undertaking. It's like a tender sprout (Thunder: movement, initiative from below) trying to push through resistant soil or navigate a storm (Water: danger, the abyss above). There is inherent potential and energy for growth, but it faces immediate obstacles and requires careful navigation, patience, and the seeking of capable helpers or guidance. Reckless pushing leads to failure; establishing order and finding support are crucial.
+
+Overall Symbolic Associations:
+
+Elements: Water over Wood. The initiating growth/movement (Wood/Thunder) is met with danger/difficulty/obscurity (Water/Kan). Potential growth facing significant challenge.
+
+Direction (Later Heaven): The North (Water/danger) looms over the East (Thunder/initiative). A struggle emerging from darkness towards the light of dawn.
+
+Season (Later Heaven): Deep Winter conditions (Water) meeting Early Spring impulse (Thunder). The hardship of transition where new life struggles against harshness.
+
+Body: Potential stress on Kidneys/Ears (Water/fear, hidden depths) and Liver/Feet (Wood/movement, frustration). Feeling bogged down (Water) while attempting action (Thunder).
+
+Social Role: A new venture facing start-up problems, a difficult birth process, a period of initial chaos needing organization, the Eldest Son (initiative) encountering the domain of the Middle Son (danger).
+
+Key Imagery/Keywords: Sprouting Seed, Birth Pangs, Initial Chaos, Obstacles, Potential, Need for Helpers, Patience, Ordering the Chaos, Tangled Growth, Rainstorm, Confusion before Clarity, Hoarding (difficulty letting go).
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 29. Kǎn (坎) - The Abysmal (Water)
+
+Line 2 changes to Yang: → Hexagram 60. Jié (節) - Limitation
+
+Line 3 changes to Yang: → Hexagram 63. Jì Jì (既濟) - After Completion
+
+Line 4 changes to Yang: → Hexagram 17. Suí (隨) - Following
+
+Line 5 changes to Yang: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 6 changes to Yang: → Hexagram 42. Yì (益) - Increase
+
+4. Méng (蒙) - Youthful Folly / Enveloping
+
+Hexagram Image: ䷃ (Mountain over Water)
+
+Binary Representation: 100010
+
+Lower Trigram: Kǎn (Water)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Represents ignorance, inexperience, and the potential for learning, symbolized by a spring (Water: obscurity, potential, the unknown) emerging at the foot of a mountain (Mountain: stillness, stopping, obstruction). The mountain blocks clear view or easy progress, while the water below is obscure and potentially perilous due to lack of understanding. This hexagram often describes the relationship between student and teacher. Folly itself isn't negative but requires guidance. The teacher should be patient and clear; the student sincere, persistent, and respectful (not asking the same thing repeatedly once answered properly). It points to the need to dispel ignorance through proper education.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Water. Stillness/stopping/solidity (Mountain/Earth) sits atop depth/danger/obscurity/flow (Water). Suggests potential blocked by ignorance, lack of clarity, or immaturity. Also implies a hidden source (spring) needing guidance to emerge constructively.
+
+Direction (Later Heaven): The Northeast (Mountain/stillness, gate) affects or covers the North (Water/depth, obscurity). A state of being stopped or enclosed before fully emerging from the unknown.
+
+Season (Later Heaven): Late Winter / Early Spring transition. The time when potential (Water) exists but is held back, covered, or not yet ready (Mountain), needing the right conditions or guidance (teaching) to proceed.
+
+Body: Potential issues related to Kidneys/Ears (Water/hidden problems, lack of hearing/understanding) and Back/Hands/Joints (Mountain/blockages, inability to act or grasp). Mental fog, lack of clarity, stubbornness (Mountain) combined with hidden anxieties (Water).
+
+Social Role: Student/Teacher dynamic, Apprentice, Beginner, Child needing instruction, someone facing the unknown, feeling confused or unenlightened. The Youngest Son (stillness, contemplation) encountering the domain of the Middle Son (hidden depths, danger).
+
+Key Imagery/Keywords: Ignorance, Inexperience, Education, Guidance Needed, Obscurity, Hidden Spring, Fog, Mist, Teacher, Student, Need for Clarity, Patience (from teacher), Sincerity (from student), Covering, Enveloping Darkness, Immaturity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 2 changes to Yin: → Hexagram 23. Bō (剝) - Splitting Apart
+
+Line 3 changes to Yang: → Hexagram 18. Gǔ (蠱) - Work on What Has Been Spoiled
+
+Line 4 changes to Yang: → Hexagram 64. Wèi Jì (未濟) - Before Completion
+
+Line 5 changes to Yang: → Hexagram 59. Huàn (渙) - Dispersion (Dissolution)
+
+Line 6 changes to Yin: → Hexagram 7. Shī (師) - The Army
+
+5. Xū (需) - Waiting (Nourishment)
+
+Hexagram Image: ䷄ (Water over Heaven)
+
+Binary Representation: 010111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Kǎn (Water)
+
+Symbolic Description: This hexagram signifies a time of necessary waiting or pause. Strength and potential (Heaven below) are present, but face an obstacle or danger ahead (Water above), like clouds gathering before rain. Rushing forward would be perilous. The appropriate action is to wait with patience, sincerity, and inner strength. During this pause, one should focus on nourishment – both literal (eating, resting) and metaphorical (building inner resources, consolidating strength). Confidence that the waiting period will eventually end successfully is key.
+
+Overall Symbolic Associations:
+
+Elements: Water over Heaven (Metal). Water's danger or obscurity temporarily halts or challenges the strong, creative force of Heaven. Potential is held back.
+
+Direction (Later Heaven): The North (Water/danger) lies ahead of the Northwest (Heaven/strength). A situation where forward movement encounters obstacles.
+
+Season (Later Heaven): Winter conditions (Water) over the Late Autumn potential (Heaven). Energy is consolidating but must wait for the right time to emerge.
+
+Body: Potential issues with Kidneys/Ears (Water/fear, hidden problems) above the Head/Lungs/Bones (Heaven/strength, vitality). Holding back energy.
+
+Social Role: The Middle Son (danger, waiting) influencing the Father (strength, initiative). A leader needing to pause before action, or potential being held in check by circumstances.
+
+Key Imagery/Keywords: Clouds over Heaven, Waiting for Rain, Patience, Biding Time, Inner Strength, Potential Danger Ahead, Holding Back Action, Nourishment, Feasting, Confidence during Delay, Certainty of Future Success.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 60. Jié (節) - Limitation
+
+Line 2 changes to Yin: → Hexagram 8. Bǐ (比) - Holding Together (Union)
+
+Line 3 changes to Yin: → Hexagram 63. Jì Jì (既濟) - After Completion
+
+Line 4 changes to Yang: → Hexagram 43. Guài (夬) - Break-through (Resoluteness)
+
+Line 5 changes to Yin: → Hexagram 11. Tài (泰) - Peace
+
+Line 6 changes to Yang: → Hexagram 9. Xiǎo Chù (小畜) - Taming Power of the Small
+
+6. Sòng (訟) - Conflict
+
+Hexagram Image: ䷅ (Heaven over Water)
+
+Binary Representation: 111010
+
+Lower Trigram: Kǎn (Water)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents contention, disputes, litigation, and conflict. The outward-striving, strong nature (Heaven above) clashes with the dangerous, hidden, or inwardly directed nature (Water below). There's a fundamental opposition of forces or intentions. The hexagram strongly advises caution: avoid initiating or escalating conflict. Seeking impartial arbitration or wise counsel ('the great man') is recommended. Persisting in conflict leads to misfortune, even if one feels initially justified. Finding a middle ground or withdrawing is often the wiser course.
+
+Overall Symbolic Associations:
+
+Elements: Heaven (Metal) over Water. Assertive strength (Heaven) tries to dominate or move against hidden danger, depth, or contention (Water). A dynamic of opposition.
+
+Direction (Later Heaven): Northwest (Heaven/authority) asserting itself over the North (Water/danger, hidden motives). Conflict between overt power and underlying issues.
+
+Season (Later Heaven): Late Autumn (Heaven/consolidation) clashes with Winter (Water/stagnation, depth). A time of potential strife and opposition.
+
+Body: Head/Lungs (Heaven/assertion) potentially stressed by issues related to Kidneys/Ears (Water/fear, hidden problems, hearing counsel). Mental conflict.
+
+Social Role: The Father (authority) in conflict with the Middle Son (danger, contention). Disputes involving authority, differing perspectives leading to argument, legal challenges.
+
+Key Imagery/Keywords: Opposing Forces, Lawsuit, Argument, Debate, Tension, Strife, Need for Arbitration, Danger of Persistence, Misunderstanding, Seeking Impartial Judge, Compromise Advised.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 10. Lǚ (履) - Treading (Conduct)
+
+Line 2 changes to Yin: → Hexagram 12. Pǐ (否) - Standstill (Stagnation)
+
+Line 3 changes to Yang: → Hexagram 44. Gòu (姤) - Coming to Meet
+
+Line 4 changes to Yin: → Hexagram 59. Huàn (渙) - Dispersion (Dissolution)
+
+Line 5 changes to Yin: → Hexagram 47. Kùn (困) - Oppression (Exhaustion)
+
+Line 6 changes to Yin: → Hexagram 50. Dǐng (鼎) - The Cauldron
+
+7. Shī (師) - The Army
+
+Hexagram Image: ䷆ (Earth over Water)
+
+Binary Representation: 000010
+
+Lower Trigram: Kǎn (Water)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Represents disciplined organization, collective action, and leadership, symbolized by an army. Water (danger, hidden potential, the masses needing direction) is contained and structured within Earth (receptivity, obedience, the ground). Success requires strong, experienced, and virtuous leadership (represented by the single Yang line, ideally in the second place) trusted by the masses (Yin lines). Discipline, a clear and legitimate purpose, and careful strategy are essential. It relates to any situation requiring organized collective effort to overcome a challenge or achieve a shared goal.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Water. The stability and receptivity of Earth contain, organize, and give structure to the potentially dangerous or chaotic flow of Water. Discipline imposed on potential.
+
+Direction (Later Heaven): Southwest (Earth/the masses) over the North (Water/danger, the hidden). Organizing the populace or resources to deal with a threat or challenge.
+
+Season (Later Heaven): Late Summer (Earth/maturity, abundance) providing structure for Winter's potential (Water). Mobilizing resources.
+
+Body: Abdomen/Spleen (Earth/nourishment, grounding) providing structure or dealing with issues related to Kidneys/Ears (Water/fear, hidden potential). Collective body health, public health measures.
+
+Social Role: The Mother (Earth/nurturing the collective) organizing or directing the Middle Son (Water/danger, hidden potential). Leadership of the masses, community organization, military strategy, managing large groups or resources.
+
+Key Imagery/Keywords: Water Hidden Underground, Disciplined Multitude, Leadership (especially experienced), Organization, Collective Strength, Strategy, Burden of Command, Responsibility, Legitimate Cause, Order, Discipline.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 2 changes to Yin: → Hexagram 2. Kūn (坤) - The Receptive
+
+Line 3 changes to Yang: → Hexagram 46. Shēng (升) - Pushing Upward
+
+Line 4 changes to Yang: → Hexagram 40. Xiè (解) - Deliverance
+
+Line 5 changes to Yang: → Hexagram 4. Méng (蒙) - Youthful Folly
+
+Line 6 changes to Yang: → Hexagram 29. Kǎn (坎) - The Abysmal (Water)
+
+8. Bǐ (比) - Holding Together (Union)
+
+Hexagram Image: ䷇ (Water over Earth)
+
+Binary Representation: 010000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Kǎn (Water)
+
+Symbolic Description: Represents union, alliance, seeking support, and holding together. Water (flowing, adapting, seeking the path of least resistance) flows over Earth (receptive, supportive, providing form). Like water naturally finding its place on the land, union should arise organically and be centered around a worthy, capable, and central figure (represented by the single Yang line, ideally in the fifth place). Sincerity, mutual support, and self-reflection (checking one's own suitability for union) are vital. Those who hesitate or come late to the union may find themselves excluded.
+
+Overall Symbolic Associations:
+
+Elements: Water over Earth. The adapting, flowing nature of Water finds support, form, and place upon the receptive Earth. A natural relationship of support and belonging.
+
+Direction (Later Heaven): North (Water/flow, community) over Southwest (Earth/support, the masses). Water finding its place on land, social cohesion.
+
+Season (Later Heaven): Winter's flow (Water) over Late Summer's receptive ground (Earth). Finding connections and support.
+
+Body: Kidneys/Ears (Water/flow, social connection) finding support from the Abdomen/Spleen (Earth/grounding, nourishment). Sense of belonging, community health.
+
+Social Role: The Middle Son (Water/seeking connection) interacting with the Mother (Earth/providing support). Seeking mentorship, joining groups, finding one's place in a community or family, loyalty.
+
+Key Imagery/Keywords: Water on the Earth, Natural Flow finding Form, Alliance, Community, Support, Seeking Union, Central Leadership Figure, Loyalty, Mutual Benefit, Belonging, Closeness, Affinity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 3. Zhūn (屯) - Difficulty at the Beginning
+
+Line 2 changes to Yang: → Hexagram 7. Shī (師) - The Army
+
+Line 3 changes to Yang: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 4 changes to Yang: → Hexagram 2. Kūn (坤) - The Receptive
+
+Line 5 changes to Yin: → Hexagram 29. Kǎn (坎) - The Abysmal (Water)
+
+Line 6 changes to Yang: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+9. Xiǎo Chù (小畜) - The Taming Power of the Small / Small Accumulation
+
+Hexagram Image: ䷈ (Wind over Heaven)
+
+Binary Representation: 110111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Xùn (Wind)
+
+Symbolic Description: This hexagram signifies gentle restraint or influence yielding small, gradual successes. The gentle, penetrating Wind blows over the powerful Heaven, representing a subtle force holding back or guiding a stronger one. It suggests accumulating progress bit by bit, like dense clouds gathering potential but not yet bringing rain. Direct confrontation is avoided; instead, subtle persuasion, patience, and minor adjustments tame the situation. Focus on small details and cultivate virtue.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Wind) over Metal (Heaven). The influence is gentle (Wood is overcome by Metal), indicating taming or shaping rather than forceful blockage. Subtle influence on strong potential.
+
+Direction (Later Heaven): Southeast (Wind/gentle influence) interacting with Northwest (Heaven/strong power). Persuasion or subtle guidance directed towards authority.
+
+Season (Later Heaven): Late Spring/Early Summer (Wind/growth, influence) meets Late Autumn (Heaven/consolidated power). Gentle growth encountering established force, needing careful handling.
+
+Body: Thighs/Hips/Respiratory system (Wind) subtly influencing Head/Lungs/Bones (Heaven). Suggests careful breathing, subtle persuasion (breath/speech), managing restless energy.
+
+Social Role: The Eldest Daughter (gentle, penetrating) interacting with the Father (strong, creative). Using diplomacy, making small suggestions, achieving incremental progress, gentle guidance of power.
+
+Key Imagery/Keywords: Wind over Sky, Dense Clouds (potential held back), Gentle Restraint, Small Savings, Minor Obstacles, Patience, Cultivation, Accumulating Virtue or Small Successes, Taming, Restraining through Gentleness, Waiting for the Right Conditions.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 61. Zhōng Fú (中孚) - Inner Truth
+
+Line 2 changes to Yin: → Hexagram 37. Jiā Rén (家人) - The Family (The Clan)
+
+Line 3 changes to Yin: → Hexagram 57. Xùn (巽) - The Gentle (The Penetrating, Wind)
+
+Line 4 changes to Yin: → Hexagram 26. Dà Chù (大畜) - The Taming Power of the Great
+
+Line 5 changes to Yin: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+Line 6 changes to Yin: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+10. Lǚ (履) - Treading (Conduct)
+
+Hexagram Image: ䷉ (Heaven over Lake)
+
+Binary Representation: 111011
+
+Lower Trigram: Duì (Lake)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents correct conduct, propriety, and navigating potentially delicate or dangerous situations. Heaven (strength, authority) is above the Lake (joy, openness, vulnerability). It depicts the powerful interacting with the potentially fragile or unpredictable. The image is often "treading on the tail of the tiger," implying the need for caution, awareness, and adherence to correct social forms and etiquette. Success comes from careful steps, respecting hierarchy, and managing interactions appropriately.
+
+Overall Symbolic Associations:
+
+Elements: Metal (Heaven) over Metal (Lake). Strong Yang Metal (authority) over Yin Metal (joy, openness). Indicates the need for structure and rules when dealing with pleasure, communication, or potentially volatile situations.
+
+Direction (Later Heaven): Northwest (Heaven/authority) positioned over West (Lake/joy, communication). Authority guiding or setting boundaries for expression and social interaction.
+
+Season (Later Heaven): Late Autumn (Heaven/consolidation) influencing Autumn (Lake/harvest, expression). Bringing order or structure to expressive or social activities.
+
+Body: Head/Lungs/Bones (Heaven/authority, structure) managing the Mouth/Teeth/Chest (Lake/speech, pleasure). Careful speech, conscious conduct, managing emotional expression.
+
+Social Role: The Father (authority) interacting with the Youngest Daughter (joy, openness, sensitivity). Setting appropriate boundaries, correct social interactions, managing power dynamics with care and propriety.
+
+Key Imagery/Keywords: Treading Carefully (like on a tiger's tail), Correct Etiquette, Social Propriety, Following Rules, Careful Steps, Conduct, Managing Power and Pleasure, Hierarchy, Delicate Situations, Foresight.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 6. Sòng (訟) - Conflict
+
+Line 2 changes to Yin: → Hexagram 34. Dà Zhuàng (大壯) - The Power of the Great
+
+Line 3 changes to Yang: → Hexagram 1. Qián (乾) - The Creative
+
+Line 4 changes to Yin: → Hexagram 61. Zhōng Fú (中孚) - Inner Truth
+
+Line 5 changes to Yin: → Hexagram 38. Kuí (睽) - Opposition
+
+Line 6 changes to Yin: → Hexagram 58. Duì (兌) - The Joyous, Lake
+
+11. Tài (泰) - Peace
+
+Hexagram Image: ䷊ (Earth over Heaven)
+
+Binary Representation: 000111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Represents harmony, peace, prosperity, and a time of smooth, successful flow. Heaven (creative Yang energy) is below, tending upward, while Earth (receptive Yin energy) is above, tending downward. This natural interaction and communication between the primal forces brings balance and flourishing. High and low connect, leading to understanding and mutual benefit. It's a highly auspicious time, indicating success stemming from the harmonious union of opposites.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Metal (Heaven). Earth provides the receptive ground for Heaven's creative energy to ascend and interact. Yin descends, Yang ascends, creating a harmonious and productive exchange.
+
+Direction (Later Heaven): Southwest (Earth/receptive) and Northwest (Heaven/creative) are in harmonious interaction. Society and leadership are well-aligned.
+
+Season (Later Heaven): Late Summer (Earth/fruition) influenced beneficially by the rising potential of Late Autumn (Heaven). A time of stable prosperity and well-being.
+
+Body: Abdomen/Spleen (Earth/nourishment, grounding) in harmonious communication with Head/Lungs (Heaven/spirit, breath). Bodily harmony, free flow of Qi, good health.
+
+Social Role: The Mother (receptive, nurturing) and Father (creative, leading) are in harmonious relationship. Smooth communication between different social levels, community well-being, successful partnerships.
+
+Key Imagery/Keywords: Heaven within Earth, Yang Ascending, Yin Descending, Free Flow, Harmony, Prosperity, Good Fortune, Balance, Union of Opposites, Springtime Growth (metaphorically), Success, Communication, Concord.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 46. Shēng (升) - Pushing Upward
+
+Line 2 changes to Yin: → Hexagram 18. Gǔ (蠱) - Work on What Has Been Spoiled
+
+Line 3 changes to Yin: → Hexagram 19. Lín (臨) - Approach
+
+Line 4 changes to Yang: → Hexagram 34. Dà Zhuàng (大壯) - The Power of the Great
+
+Line 5 changes to Yang: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+Line 6 changes to Yang: → Hexagram 26. Dà Chù (大畜) - The Taming Power of the Great
+
+12. Pǐ (否) - Standstill (Stagnation)
+
+Hexagram Image: ䷋ (Heaven over Earth)
+
+Binary Representation: 111000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents stagnation, obstruction, decline, and lack of communication. Heaven is above and tends upward; Earth is below and tends downward. Unlike in Peace (Tai), the forces move away from each other, severing connection. Communication between high and low is blocked, energy does not flow harmoniously. This signifies a time of discord, where inferior elements may seem to gain influence. The wise person avoids entanglement in base affairs, withdraws, preserves integrity, and waits for conditions to change.
+
+Overall Symbolic Associations:
+
+Elements: Metal (Heaven) over Earth. Heaven (Yang) moves up and away, Earth (Yin) moves down and away. They separate, leading to a lack of productive interaction and stagnation.
+
+Direction (Later Heaven): Northwest (Heaven/authority) separates from Southwest (Earth/the masses, foundation). Disconnection, lack of understanding between leadership and populace.
+
+Season (Later Heaven): Late Autumn (Heaven/potential) is disconnected from Late Summer (Earth/nourishment). Potential cannot be actualized; resources don't reach where needed.
+
+Body: Head/Lungs (Heaven/spirit, breath) disconnected from Abdomen/Spleen (Earth/nourishment, grounding). Poor circulation of Qi, feeling blocked, stifled, lack of vitality.
+
+Social Role: Father (authority) is separate and distant from the Mother (receptive foundation, the people). Lack of communication, misunderstanding, stagnation in society or partnerships, bureaucratic blockage.
+
+Key Imagery/Keywords: Heaven Above, Earth Below (moving apart), Blocked Communication, Stagnation, Decline, Discord, Obstruction, Estrangement, Inferior Elements Ascendant, Superior Elements Retreat, Waiting Out Bad Times, Holding to Principles in Adversity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 25. Wú Wàng (無妄) - Innocence (The Unexpected)
+
+Line 2 changes to Yang: → Hexagram 6. Sòng (訟) - Conflict
+
+Line 3 changes to Yang: → Hexagram 33. Dùn (遯) - Retreat
+
+Line 4 changes to Yin: → Hexagram 20. Guān (觀) - Contemplation (View)
+
+Line 5 changes to Yin: → Hexagram 35. Jìn (晉) - Progress
+
+Line 6 changes to Yin: → Hexagram 45. Cuì (萃) - Gathering Together (Massing)
+
+13. Tóng Rén (同人) - Fellowship / Fellowship with Men
+
+Hexagram Image: ䷌ (Heaven over Fire)
+
+Binary Representation: 111101
+
+Lower Trigram: Lí (Fire)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents community, partnership, and gathering people together in the open under clear, strong principles. Fire below illuminates and warms, while Heaven above provides strength and overarching direction. Success comes from shared goals, public transparency, and overcoming selfish or hidden biases. It emphasizes universal fellowship rather than exclusive cliques. Strong, clear leadership (Heaven) uniting people with clarity and shared purpose (Fire) is key.
+
+Overall Symbolic Associations:
+
+Elements: Heaven (Metal) over Fire. Fire illuminates or shapes Metal. Suggests that clarity, community, and shared vision (Fire) give form or purpose to strength and potential (Heaven). Also, the strength of Heaven supports the brightness of Fire.
+
+Direction (Later Heaven): Northwest (Heaven/authority) guiding the South (Fire/clarity, community). Strong leadership fosters open association.
+
+Season (Later Heaven): Late Autumn (Heaven/structure) providing context for Summer's brilliance (Fire/expression). Combining enduring principles with active community.
+
+Body: Head/Lungs/Bones (Heaven/structure, authority) working with Eyes/Heart (Fire/vision, passion). Higher purpose guiding clear perception and shared feeling.
+
+Social Role: The Father (Heaven/leader) interacting harmoniously with the Middle Daughter (Fire/clarity, community). Leadership fostering open communication and shared endeavors.
+
+Key Imagery/Keywords: Fire under the open Sky, Gathering in the Open, Community, Shared Goals, Partnership, Universality, Openness, Clarity, Overcoming Prejudice, Public Sphere, Harmony, Organization.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 30. Lí (離) - The Clinging, Fire
+
+Line 2 changes to Yin: → Hexagram 1. Qián (乾) - The Creative
+
+Line 3 changes to Yang: → Hexagram 38. Kuí (睽) - Opposition
+
+Line 4 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 5 changes to Yang: → Hexagram 25. Wú Wàng (無妄) - Innocence (The Unexpected)
+
+Line 6 changes to Yin: → Hexagram 33. Dùn (遯) - Retreat
+
+14. Dà Yǒu (大有) - Possession in Great Measure / Great Having
+
+Hexagram Image: ䷍ (Fire over Heaven)
+
+Binary Representation: 101111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Lí (Fire)
+
+Symbolic Description: Signifies abundance, great possessions, wealth, and success. Fire (clarity, brilliance) is high above Heaven (strength, substance), like the sun illuminating everything below. This indicates a time of peak achievement and influence. Crucially, the hexagram often emphasizes the importance of humility, modesty, and fairness in managing this abundance (symbolized by the single Yin line, ideally in the ruling 5th place). Acting in accordance with divine principles and avoiding arrogance ensures continued fortune.
+
+Overall Symbolic Associations:
+
+Elements: Fire over Heaven (Metal). Fire illuminates or refines Metal. Clarity and intelligence (Fire) directing or managing great strength and resources (Heaven).
+
+Direction (Later Heaven): South (Fire/clarity, peak) positioned over Northwest (Heaven/strength, resources). Vision and brilliance guiding power.
+
+Season (Later Heaven): Summer's peak (Fire) illuminating the potential of Late Autumn (Heaven). A time of maximum visibility and fruition of efforts.
+
+Body: Eyes/Heart (Fire/vision, consciousness) guiding the Head/Lungs (Heaven/action, capacity). Clear awareness directing great potential.
+
+Social Role: The Middle Daughter (Fire/clarity, intelligence) influencing or directing the Father (Heaven/power, resources). Often interpreted as a wise, perhaps humble or receptive leader (Yin line) successfully managing vast holdings or power.
+
+Key Imagery/Keywords: Sun High in the Sky, Great Abundance, Wealth, Success, Harvest, Peak Achievement, Clarity in Leadership, Need for Modesty and Humility, Acting Righteously, Divine Favor, Influence.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 50. Dǐng (鼎) - The Cauldron
+
+Line 2 changes to Yin: → Hexagram 38. Kuí (睽) - Opposition
+
+Line 3 changes to Yang: → Hexagram 64. Wèi Jì (未濟) - Before Completion
+
+Line 4 changes to Yang: → Hexagram 26. Dà Chù (大畜) - The Taming Power of the Great
+
+Line 5 changes to Yin: → Hexagram 1. Qián (乾) - The Creative
+
+Line 6 changes to Yin: → Hexagram 34. Dà Zhuàng (大壯) - The Power of the Great
+
+15. Qiān (謙) - Modesty
+
+Hexagram Image: ䷎ (Earth over Mountain)
+
+Binary Representation: 000100
+
+Lower Trigram: Gèn (Mountain)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Represents humility, modesty, and the principle of achieving balance by bringing down the high and elevating the low. The Mountain (normally high and imposing) places itself beneath the receptive Earth (normally lower or foundational). This voluntary self-decrease creates equilibrium and allows for smooth functioning and success. Modesty is shown not as weakness, but as a source of strength and sustainability, recognized and rewarded by cosmic law.
+
+Overall Symbolic Associations:
+
+Elements: Earth (Yin) over Earth (Yang/Mountain). A doubling of Earth suggests stability, but the key dynamic is the receptive Yin Earth above the usually prominent Yang Earth (Mountain), symbolizing the leveling principle.
+
+Direction (Later Heaven): Southwest (Earth/receptive, broad) positioned over Northeast (Mountain/still, defined). Broad receptivity encompassing defined stillness, creating balance.
+
+Season (Later Heaven): Late Summer (Earth/fruition) providing context for Late Winter (Mountain/stillness). Balancing abundance with inner quietude.
+
+Body: Abdomen/Spleen (Earth/receptive, nourishing) over Back/Hands/Joints (Mountain/structure, stillness). Groundedness and flexibility tempering rigidity or pride.
+
+Social Role: The Mother (Earth/receptive) interacting with the Youngest Son (Mountain/contemplative, perhaps stubborn). Experience and receptivity guiding or balancing youthful assertion or withdrawal. Represents fairness and social balance.
+
+Key Imagery/Keywords: Mountain Hidden within the Earth, Humility, Modesty, Equilibrium, Balance, Reducing the High, Elevating the Low, Fairness, Effortless Success (due to balance), Inner Strength through Yielding, Self-Correction.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 7. Shī (師) - The Army
+
+Line 2 changes to Yang: → Hexagram 24. Fù (復) - Return (The Turning Point)
+
+Line 3 changes to Yin: → Hexagram 2. Kūn (坤) - The Receptive
+
+Line 4 changes to Yang: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 5 changes to Yang: → Hexagram 39. Jiǎn (蹇) - Obstruction
+
+Line 6 changes to Yang: → Hexagram 52. Gèn (艮) - Keeping Still, Mountain
+
+16. Yù (豫) - Enthusiasm / Providing For
+
+Hexagram Image: ䷏ (Thunder over Earth)
+
+Binary Representation: 001000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Zhèn (Thunder)
+
+Symbolic Description: Signifies enthusiasm, movement, excitement, and mobilizing energy. Thunder (movement, initiative) bursts forth from the receptive Earth (masses, foundation). This often follows a period of humility (Hex 15) and represents a time for inspiring action, setting things in motion, and potentially celebration (associated with music). The single Yang line (ideally 4th place) leads the receptive Yin lines. Foresight is needed to ensure enthusiasm is well-directed and doesn't devolve into aimless pleasure or recklessness. It implies preparing for the future and inspiring collective participation.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Thunder) over Earth. Wood emerges from and draws energy from Earth. Dynamic action springs from a supportive, receptive base.
+
+Direction (Later Heaven): East (Thunder/initiative) arising from the Southwest (Earth/masses, foundation). New movement beginning from a grounded position.
+
+Season (Later Heaven): Spring (Thunder/new growth) bursting forth from Late Summer's potential (Earth/stored energy). A surge of new energy.
+
+Body: Feet/Liver (Thunder/movement, drive) being supported or activated by the Abdomen/Spleen (Earth/nourishment, grounding). Action fueled by resources.
+
+Social Role: The Eldest Son (Thunder/initiative) rousing or leading the Mother (Earth/the collective). Leadership inspiring participation, mobilizing resources, creating excitement.
+
+Key Imagery/Keywords: Thunder Emerging from Earth, Music, Dance, Celebration, Mobilization, Anticipation, Preparation, Foresight, Inspiring Action, Shared Joy, Setting Things in Motion, Warning against complacency.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 8. Bǐ (比) - Holding Together (Union)
+
+Line 2 changes to Yang: → Hexagram 40. Xiè (解) - Deliverance
+
+Line 3 changes to Yang: → Hexagram 15. Qiān (謙) - Modesty
+
+Line 4 changes to Yin: → Hexagram 2. Kūn (坤) - The Receptive
+
+Line 5 changes to Yang: → Hexagram 45. Cuì (萃) - Gathering Together (Massing)
+
+Line 6 changes to Yang: → Hexagram 35. Jìn (晉) - Progress
+
+17. Suí (隨) - Following
+
+Hexagram Image: ䷐ (Lake over Thunder)
+
+Binary Representation: 011001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Duì (Lake)
+
+Symbolic Description: Represents following, adapting, and moving in response to leadership or changing conditions. Thunder (arousing movement) is below, initiating action, while the Lake (joy, openness) is above, responding pleasurably. This suggests willingly following a worthy cause or leader, or adapting joyfully to the flow of events. Success depends on the sincerity of the follower and the worthiness of what is followed. It cautions against blindly following or adhering rigidly; adaptability is key. A time for action motivated by joyful accord.
+
+Overall Symbolic Associations:
+
+Elements: Metal (Lake) over Wood (Thunder). Metal (joy/speech) guides or responds to Wood (action/initiative). Suggests expressing joy or providing guidance in response to movement.
+
+Direction (Later Heaven): West (Lake/joy, openness) influenced by East (Thunder/initiative). Joyful response follows action.
+
+Season (Later Heaven): Autumn (Lake/harvest, pleasure) follows Spring (Thunder/new growth). The pleasure of results following initial effort.
+
+Body: Mouth/Chest (Lake/speech, joy) responding to Feet/Liver (Thunder/movement, drive). Expressing enthusiasm for action, speech following impulse.
+
+Social Role: The Youngest Daughter (Lake/joyful persuasion) guides or follows the Eldest Son (Thunder/action). Persuasion leading to action, or joyful adaptation to initiative.
+
+Key Imagery/Keywords: Joyful Movement, Adapting, Going With the Flow, Influence, Attracting Followers, Responsiveness, Flexibility, Sincerity in Following, Choosing Wisely Whom to Follow, Leadership through Attraction.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 49. Gé (革) - Revolution (Molting)
+
+Line 2 changes to Yin: → Hexagram 3. Zhūn (屯) - Difficulty at the Beginning
+
+Line 3 changes to Yin: → Hexagram 45. Cuì (萃) - Gathering Together (Massing)
+
+Line 4 changes to Yin: → Hexagram 25. Wú Wàng (無妄) - Innocence (The Unexpected)
+
+Line 5 changes to Yin: → Hexagram 51. Zhèn (震) - The Arousing (Shock, Thunder)
+
+Line 6 changes to Yin: → Hexagram 58. Duì (兌) - The Joyous, Lake
+
+18. Gǔ (蠱) - Work on What Has Been Spoiled / Decay
+
+Hexagram Image: ䷑ (Mountain over Wind)
+
+Binary Representation: 100110
+
+Lower Trigram: Xùn (Wind)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Represents decay, stagnation, and the need to repair what has been damaged, often stemming from neglect or complacency (Wind below creates conditions for rot, which is then arrested or becomes apparent by Mountain's stillness above). It signifies correcting errors, often those inherited from the past (sometimes specifically parental failings). This requires decisive action, effort, and careful consideration ("crossing the great water"). It's a time for mending, reforming, and taking responsibility for fixing problems.
+
+Overall Symbolic Associations:
+
+Elements: Earth (Mountain) over Wood (Wind). Earth smothers or arrests the gentle penetration of Wood/Wind. Stillness imposed upon gentle influence can lead to stagnation or reveal existing decay. Effort is needed to overcome this blockage.
+
+Direction (Later Heaven): Northeast (Mountain/stillness, stopping) imposes upon Southeast (Wind/gentle penetration, passivity). Stagnation resulting from lack of decisive action or gentle influences being blocked.
+
+Season (Later Heaven): Late Winter (Mountain/endings) meets Late Spring (Wind/gentle growth). A blockage or corruption halting natural development.
+
+Body: Back/Hands/Joints (Mountain/stillness, blockage) affecting Thighs/Hips/Respiratory system (Wind/gentle flow, breath). Stiffness, blockage, corruption requiring cleansing or repair.
+
+Social Role: The Youngest Son (Mountain/stopping, contemplating) dealing with issues caused by the Eldest Daughter (Wind/passivity, indecision). Addressing problems arising from neglect or inherited flaws.
+
+Key Imagery/Keywords: Stagnation, Corruption, Decay (like worms in a bowl), Repairing Damage, Fixing Mistakes, Correcting Past Errors (especially parental), Need for Effort and Decision, Renewal after Decay, Taking Responsibility, House Cleaning.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 4. Méng (蒙) - Youthful Folly
+
+Line 2 changes to Yang: → Hexagram 57. Xùn (巽) - The Gentle (The Penetrating, Wind)
+
+Line 3 changes to Yin: → Hexagram 11. Tài (泰) - Peace
+
+Line 4 changes to Yang: → Hexagram 50. Dǐng (鼎) - The Cauldron
+
+Line 5 changes to Yang: → Hexagram 32. Héng (恆) - Duration
+
+Line 6 changes to Yang: → Hexagram 52. Gèn (艮) - Keeping Still, Mountain
+
+19. Lín (臨) - Approach
+
+Hexagram Image: ䷒ (Earth over Lake)
+
+Binary Representation: 000011
+
+Lower Trigram: Duì (Lake)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Signifies approach, arrival, overseeing, and the beneficial influence of a superior presence drawing near to those below. Earth (receptive, nurturing) is above the Lake (joyful, open), depicting benevolent authority or positive conditions nearing the people or situation. This is generally an auspicious time of growth and good fortune, but it carries a warning: this favorable period is temporary (like the waxing phase of the year) and will decline ("Approach of the eighth month brings misfortune"). Enjoy the positive trend but remain mindful and prepared for future changes.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Metal (Lake). Earth nurtures and supports Metal. Receptivity and care foster joy and openness.
+
+Direction (Later Heaven): Southwest (Earth/masses, nurturing) interacts beneficially with West (Lake/joy, community). The collective supporting joyful expression or benevolent leadership reaching the people.
+
+Season (Later Heaven): Late Summer (Earth/maturity) provides context for Autumn's expression (Lake/joy, harvest). A time of benevolent oversight and shared benefit. Corresponds to the growing Yang phase after Winter Solstice.
+
+Body: Abdomen/Spleen (Earth/nourishment, support) interacting well with Mouth/Chest (Lake/joy, expression). Feeling supported, able to express joy.
+
+Social Role: The Mother (Earth/nurturing, overseeing) approaches the Youngest Daughter (Lake/joyful, receptive). Benign authority, teaching, mentorship, positive influence drawing near.
+
+Key Imagery/Keywords: Approaching Presence, Overseeing, Inspecting, Good Fortune (potentially temporary), Growth Phase, Benevolent Leadership, Teaching, Increased Influence, Encouragement, Warning of Future Decline.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 60. Jié (節) - Limitation
+
+Line 2 changes to Yang: → Hexagram 61. Zhōng Fú (中孚) - Inner Truth
+
+Line 3 changes to Yang: → Hexagram 11. Tài (泰) - Peace
+
+Line 4 changes to Yang: → Hexagram 54. Guī Mèi (歸妹) - The Marrying Maiden
+
+Line 5 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 6 changes to Yang: → Hexagram 2. Kūn (坤) - The Receptive
+
+20. Guān (觀) - Contemplation (View)
+
+Hexagram Image: ䷓ (Wind over Earth)
+
+Binary Representation: 110000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Xùn (Wind)
+
+Symbolic Description: Represents contemplation, viewing from a higher perspective, observing patterns, and being observed as an example. Wind (gentle influence, penetration) moves over the Earth (receptive masses, the broad view), suggesting a vantage point from which to understand things or influence subtly through presence. It implies looking and being looked at. Often associated with sacred rituals (ablution before sacrifice) or the leader setting a model for the people. Understanding comes through detached observation rather than direct action.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Wind) over Earth. Wood grows from or influences Earth gently. Subtle influence penetrating the receptive ground. Understanding gained through broad observation.
+
+Direction (Later Heaven): Southeast (Wind/gentle influence, perspective) positioned over Southwest (Earth/the masses, the foundation). Gaining perspective on the collective, or influencing gently from above.
+
+Season (Later Heaven): Late Spring (Wind/subtle growth) influencing Late Summer (Earth/receptive field). Understanding emerging from observing the patterns of growth and fruition. Corresponds to the waning Yang / growing Yin phase after Summer Solstice.
+
+Body: Thighs/Hips/Respiratory system (Wind/breath, subtle movement) influencing Abdomen/Spleen (Earth/grounding, receptivity). Calm observation affecting one's core state.
+
+Social Role: The Eldest Daughter (Wind/gentle influence, understanding) observing or influencing the Mother (Earth/the collective). Gaining wisdom through observation, setting an example, influencing through subtle presence rather than command.
+
+Key Imagery/Keywords: Wind Tower, Overview, Perspective, Observation, Being Observed, Setting an Example, Ritual Purity, Understanding Patterns, Insight, Influence through Demeanor, Detachment.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 12. Pǐ (否) - Standstill (Stagnation)
+
+Line 2 changes to Yang: → Hexagram 42. Yì (益) - Increase
+
+Line 3 changes to Yang: → Hexagram 53. Jiàn (漸) - Development (Gradual Progress)
+
+Line 4 changes to Yang: → Hexagram 59. Huàn (渙) - Dispersion (Dissolution)
+
+Line 5 changes to Yin: → Hexagram 57. Xùn (巽) - The Gentle (The Penetrating, Wind)
+
+Line 6 changes to Yin: → Hexagram 23. Bō (剝) - Splitting Apart
+
+
+21. Shì Kè (噬嗑) - Biting Through
+
+Hexagram Image: ䷔ (Fire over Thunder)
+
+Binary Representation: 101001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Lí (Fire)
+
+Symbolic Description: Represents forcefully removing an obstruction, like biting through something tough that's stuck between the teeth. It signifies the need for decisive action, often in the context of administering justice, overcoming obstacles, or uniting things that have been separated. Clarity (Fire) combines with energetic movement (Thunder) to cut through difficulties. This requires firmness and fairness, like a clear legal judgment followed by enforcement.
+
+Overall Symbolic Associations:
+
+Elements: Fire over Wood (Thunder). Fire consumes or directs Wood's energy. Clarity and brightness guide decisive action. The active nature of both trigrams suggests forceful resolution.
+
+Direction (Later Heaven): South (Fire/clarity) over East (Thunder/action). Clarity illuminates the path for decisive movement.
+
+Season (Later Heaven): Summer (Fire/peak intensity) meeting Spring (Thunder/initiative). A time of energetic and decisive action.
+
+Body: Eyes/Heart (Fire/clarity, judgment) directing Feet/Liver (Thunder/action, force). Clear vision guiding forceful steps. Also associated with the mouth/jaws (biting through).
+
+Social Role: The Middle Daughter (Fire/clarity, judgment) guiding the Eldest Son (Thunder/action, implementation). Legal proceedings, overcoming obstacles through clear decisions and firm action, enforcing rules.
+
+Key Imagery/Keywords: Biting, Chewing, Obstacle Removal, Justice, Punishment, Legal Processes, Decisiveness, Uniting what is Separate, Cutting Through, Firmness, Clarity in Action.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 35. Jìn (晉) - Progress
+
+Line 2 changes to Yin: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 3 changes to Yang: → Hexagram 51. Zhèn (震) - The Arousing (Shock, Thunder)
+
+Line 4 changes to Yin: → Hexagram 42. Yì (益) - Increase
+
+Line 5 changes to Yang: → Hexagram 30. Lí (離) - The Clinging, Fire
+
+Line 6 changes to Yin: → Hexagram 27. Yí (頤) - Nourishment (Corners of the Mouth)
+
+22. Bì (賁) - Grace / Adorning
+
+Hexagram Image: ䷕ (Mountain over Fire)
+
+Binary Representation: 100101
+
+Lower Trigram: Lí (Fire)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Represents beauty, grace, adornment, and attention to form. Fire (brightness, beauty) at the foot of the Mountain (stillness, substance) illuminates and beautifies its base. It signifies the importance of aesthetics and presentation, but warns against mistaking superficial form for true substance. Grace is appropriate for minor matters or adding beauty to underlying strength, but fundamental issues require substance, not just appearance.
+
+Overall Symbolic Associations:
+
+Elements: Earth (Mountain) over Fire. Earth contains or provides a backdrop for Fire. The stillness of the Mountain allows the beauty of the Fire to be appreciated. Focus on outer form.
+
+Direction (Later Heaven): Northeast (Mountain/stillness, form) over South (Fire/brightness, beauty). Stillness providing a frame for beauty.
+
+Season (Later Heaven): Late Winter (Mountain/contemplation) meeting Summer (Fire/expression). Appreciating form and beauty.
+
+Body: Back/Hands (Mountain/structure, poise) complemented by Eyes/Heart (Fire/aesthetics, perception). Attention to appearance, posture, artistic sense.
+
+Social Role: The Youngest Son (Mountain/stillness, appreciation) interacting with the Middle Daughter (Fire/beauty, artistry). Aesthetics, decoration, ceremony, diplomacy where form matters, appreciating art.
+
+Key Imagery/Keywords: Fire Illuminating a Mountain Base, Adornment, Beauty, Form, Aesthetics, Grace, Superficiality (potential danger), Ceremony, Presentation, Art, Culture, Decoration, Polishing.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 52. Gèn (艮) - Keeping Still, Mountain
+
+Line 2 changes to Yin: → Hexagram 26. Dà Chù (大畜) - The Taming Power of the Great
+
+Line 3 changes to Yang: → Hexagram 27. Yí (頤) - Nourishment (Corners of the Mouth)
+
+Line 4 changes to Yang: → Hexagram 37. Jiā Rén (家人) - The Family (The Clan)
+
+Line 5 changes to Yang: → Hexagram 30. Lí (離) - The Clinging, Fire
+
+Line 6 changes to Yin: → Hexagram 23. Bō (剝) - Splitting Apart
+
+23. Bō (剝) - Splitting Apart / Stripping
+
+Hexagram Image: ䷖ (Mountain over Earth)
+
+Binary Representation: 100000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Signifies disintegration, erosion, decline, and stripping away. The image is of a house or structure collapsing, represented by five Yin lines undermining the single remaining Yang line at the top (Mountain resting precariously on eroding Earth). It indicates a time when inferior forces are ascendant, and the foundation is crumbling. The advice for the superior person is not to act forcefully against the trend but to adapt, protect what is essential, and wait for the cycle to turn (leading to Hexagram 24, Return). It's a time for letting go, conserving energy, and yielding to unfavorable circumstances.
+
+Overall Symbolic Associations:
+
+Elements: Earth (Mountain) over Earth (Kūn). The Yang Earth (structure) is being undermined by the Yin Earth (dissolution, receptivity to decay). Overwhelming Yin eroding Yang.
+
+Direction (Later Heaven): Northeast (Mountain/structure) losing its foundation to the Southwest (Earth/dissolution). Structure collapsing.
+
+Season (Later Heaven): Late Winter (Mountain/endings) meets Late Summer (Earth/full receptivity, beginning of decline). The peak of Yin influence eroding the last Yang.
+
+Body: Back/Hands/Bones (Mountain/structure) weakened by issues in the Abdomen/Flesh (Earth/foundation). Degeneration, loss of support, physical decline.
+
+Social Role: The Youngest Son (Mountain/holding on) being overwhelmed by the influence of the Mother (Earth/dissolving force). Collapse of established structures, loss of leadership influence, decline, necessity of retreat.
+
+Key Imagery/Keywords: House Collapsing, Bed Eroding from Below, Stripping Away Layers, Disintegration, Decline, Loss, Letting Go, Inferior Forces Ascendant, Need for Adaptation and Retreat, Conserving Energy, Endings.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 4. Méng (蒙) - Youthful Folly
+
+Line 2 changes to Yang: → Hexagram 27. Yí (頤) - Nourishment (Corners of the Mouth)
+
+Line 3 changes to Yang: → Hexagram 22. Bì (賁) - Grace / Adorning
+
+Line 4 changes to Yang: → Hexagram 20. Guān (觀) - Contemplation (View)
+
+Line 5 changes to Yang: → Hexagram 35. Jìn (晉) - Progress
+
+Line 6 changes to Yang: → Hexagram 2. Kūn (坤) - The Receptive
+
+24. Fù (復) - Return (The Turning Point)
+
+Hexagram Image: ䷗ (Earth over Thunder)
+
+Binary Representation: 000001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Represents the turning point after extreme decline (Bō), signifying the return of light, hope, and positive energy. Thunder (Yang initiative) stirs beneath the receptive Earth (Yin), marking the beginning of a new cycle, like the Winter Solstice when daylight begins to increase. It's a time of natural, spontaneous return to goodness and strength. The advice is to recognize this subtle beginning, nurture it gently, and allow things to recover naturally without forcing them. Friends return, movement resumes.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Wood (Thunder). Earth provides the receptive ground from which new Wood energy can emerge. The beginning of action within receptivity.
+
+Direction (Later Heaven): Southwest (Earth/receptive potential) gives rise to East (Thunder/new initiative). Movement beginning again from the depths.
+
+Season (Later Heaven): Corresponds strongly to the Winter Solstice. Late Summer (Earth) provides the ground for Spring's first impulse (Thunder). The moment darkness turns to light.
+
+Body: Abdomen/Spleen (Earth/receptive core) supporting Feet/Liver (Thunder/initial movement). Stirrings of new energy, recovery of vitality.
+
+Social Role: The Mother (Earth/receptive) nurturing the nascent energy of the Eldest Son (Thunder/initiative). Recovery, new beginnings, return of positive forces, nurturing growth gently.
+
+Key Imagery/Keywords: Thunder Beneath the Earth, Winter Solstice, Turning Point, Return of Light, New Beginnings, Spontaneous Recovery, Hope, Nurturing Gently, Friends Returning, Natural Cycles.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 2. Kūn (坤) - The Receptive
+
+Line 2 changes to Yin: → Hexagram 15. Qiān (謙) - Modesty
+
+Line 3 changes to Yin: → Hexagram 36. Míng Yí (明夷) - Darkening of the Light
+
+Line 4 changes to Yang: → Hexagram 51. Zhèn (震) - The Arousing (Shock, Thunder)
+
+Line 5 changes to Yang: → Hexagram 3. Zhūn (屯) - Difficulty at the Beginning
+
+Line 6 changes to Yang: → Hexagram 27. Yí (頤) - Nourishment (Corners of the Mouth)
+
+25. Wú Wàng (無妄) - Innocence (The Unexpected)
+
+Hexagram Image: ䷘ (Heaven over Thunder)
+
+Binary Representation: 111001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents innocence, naturalness, acting without ulterior motives, and unexpected outcomes. Heaven (strength, nature's law) is above Thunder (movement, impulse). This suggests action that springs naturally from inherent correctness, aligned with the way of Heaven. It advises acting spontaneously and correctly according to the time, without calculating gain. However, it also warns that acting incorrectly, even without malice, or encountering unexpected external events can lead to misfortune. True innocence brings success if aligned with natural law.
+
+Overall Symbolic Associations:
+
+Elements: Heaven (Metal) over Wood (Thunder). Heaven provides the overarching principle or structure for Thunder's spontaneous action. Action aligned with higher principles.
+
+Direction (Later Heaven): Northwest (Heaven/principle) guiding East (Thunder/action). Following natural impulse under the guidance of higher law.
+
+Season (Later Heaven): Late Autumn (Heaven/structure) influencing Spring (Thunder/initiative). Acting spontaneously within a framework of natural order.
+
+Body: Head/Lungs (Heaven/higher awareness) guiding Feet/Liver (Thunder/impulse, movement). Acting from inner truth or natural instinct.
+
+Social Role: The Father (Heaven/principle) guiding the Eldest Son (Thunder/action). Acting naturally, spontaneously, and correctly without expectation of reward. Also suggests vulnerability to unexpected misfortune if actions are incorrect or ill-timed.
+
+Key Imagery/Keywords: Acting Naturally, Spontaneity, Inner Truth, Alignment with Heaven, Unexpected Events (good or bad), Freedom from Ulterior Motives, Correctness, Integrity, Potential for Unexpected Misfortune if careless.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 12. Pǐ (否) - Standstill (Stagnation)
+
+Line 2 changes to Yin: → Hexagram 17. Suí (隨) - Following
+
+Line 3 changes to Yin: → Hexagram 13. Tóng Rén (同人) - Fellowship
+
+Line 4 changes to Yang: → Hexagram 42. Yì (益) - Increase
+
+Line 5 changes to Yang: → Hexagram 21. Shì Kè (噬嗑) - Biting Through
+
+Line 6 changes to Yin: → Hexagram 10. Lǚ (履) - Treading (Conduct)
+
+26. Dà Chù (大畜) - The Taming Power of the Great / Great Accumulation
+
+Hexagram Image: ䷙ (Mountain over Heaven)
+
+Binary Representation: 100111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Signifies restraining great power, accumulating large resources, and holding potential in check. Mountain (firm stillness) above Heaven (great strength) indicates the containment and cultivation of powerful energy. Unlike "Small Accumulation" (Hex 9), this involves controlling substantial forces. It suggests not just holding back, but actively cultivating strength, character, and knowledge ("storing up the sayings and deeds of the past"). Success comes from firmness, building inner reserves, and waiting for the right time to release potential constructively ("Not eating at home brings good fortune" - implies drawing on wider resources or serving the public good).
+
+Overall Symbolic Associations:
+
+Elements: Earth (Mountain) over Metal (Heaven). Earth contains or provides boundaries for Metal. Stillness and solidity restrain and cultivate great power.
+
+Direction (Later Heaven): Northeast (Mountain/stopping, storing) influences Northwest (Heaven/strength, potential). Holding back and cultivating great power.
+
+Season (Later Heaven): Late Winter (Mountain/stillness, storage) meets Late Autumn (Heaven/consolidated power). A time for accumulating and refining potential before action.
+
+Body: Back/Hands (Mountain/restraint, structure) managing Head/Lungs (Heaven/power, vitality). Building inner strength, self-control, accumulating knowledge or energy.
+
+Social Role: The Youngest Son (Mountain/contemplation, restraint) guiding or managing the Father (Heaven/power, resources). Wise containment of great potential, building character, education, accumulating resources for later use.
+
+Key Imagery/Keywords: Holding Back Great Strength, Accumulating Potential, Storing Resources (material or intellectual), Self-Cultivation, Character Building, Firm Restraint, Strong Boundaries, Waiting for the Right Time, Education, Large Savings.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 22. Bì (賁) - Grace / Adorning
+
+Line 2 changes to Yin: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 3 changes to Yang: → Hexagram 14. Dà Yǒu (大有) - Possession in Great Measure
+
+Line 4 changes to Yin: → Hexagram 9. Xiǎo Chù (小畜) - Taming Power of the Small
+
+Line 5 changes to Yin: → Hexagram 11. Tài (泰) - Peace
+
+Line 6 changes to Yin: → Hexagram 33. Dùn (遯) - Retreat
+
+27. Yí (頤) - Nourishment / Corners of the Mouth (Jaws)
+
+Hexagram Image: ䷚ (Mountain over Thunder)
+
+Binary Representation: 100001
+
+Lower Trigram: Zhèn (Thunder)
+
+Upper Trigram: Gèn (Mountain)
+
+Symbolic Description: Represents nourishment, both physical (food) and mental/spiritual (words, self-cultivation). The image is likened to an open mouth, with firm lines (jaws) above and below, and receptive space between. Mountain (stillness) above and Thunder (movement) below suggest the necessary balance of rest and action in seeking or providing nourishment. It emphasizes being mindful of what one consumes (food, information, influences) and what one produces (words, actions). Seeking proper nourishment and speaking thoughtfully are key.
+
+Overall Symbolic Associations:
+
+Elements: Earth (Mountain) over Wood (Thunder). Earth contains or directs Wood's movement. Suggests mindful containment or direction of energy related to nourishment or speech.
+
+Direction (Later Heaven): Northeast (Mountain/stillness, contemplation) influences East (Thunder/action, speech). Thinking before speaking or acting; mindful consumption.
+
+Season (Later Heaven): Late Winter (Mountain/rest) meets Spring (Thunder/activity). Balancing rest and activity for proper nourishment and growth.
+
+Body: Back/Hands (Mountain/stillness) and Feet/Liver (Thunder/movement) frame the Mouth/Jaws (nourishment, speech). Also related to digestion and overall self-care.
+
+Social Role: The Youngest Son (Mountain/contemplation) interacts with the Eldest Son (Thunder/action, speech). Careful consideration of words and actions, providing for oneself and others, self-cultivation.
+
+Key Imagery/Keywords: Open Mouth, Jaws, Seeking Food, Providing Nourishment, Careful Speech, Self-Cultivation, Diet, Mindfulness of Consumption (physical and mental), Responsibility for oneself.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 23. Bō (剝) - Splitting Apart
+
+Line 2 changes to Yang: → Hexagram 24. Fù (復) - Return (The Turning Point)
+
+Line 3 changes to Yang: → Hexagram 22. Bì (賁) - Grace / Adorning
+
+Line 4 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 5 changes to Yang: → Hexagram 42. Yì (益) - Increase
+
+Line 6 changes to Yin: → Hexagram 21. Shì Kè (噬嗑) - Biting Through
+
+28. Dà Guò (大過) - Preponderance of the Great / Great Exceeding
+
+Hexagram Image: ䷛ (Lake over Wind)
+
+Binary Representation: 011110
+
+Lower Trigram: Xùn (Wind)
+
+Upper Trigram: Duì (Lake)
+
+Symbolic Description: Represents an extraordinary situation where the strong elements (Yang lines in the middle) are excessive, overpowering the weaker elements (Yin lines at the beginning and end). It's like a beam that is thick in the middle but weak at the ends, on the verge of collapse. This signifies pressure, stress, imbalance, and the need for exceptional measures. It calls for careful handling of a critical situation, finding support, and possibly taking unusual action ("It furthers one to have somewhere to go"). Success requires addressing the fundamental imbalance.
+
+Overall Symbolic Associations:
+
+Elements: Metal (Lake) over Wood (Wind). Suggests excessive openness or pressure (Lake) on a potentially yielding foundation (Wind). Also, the solid core (Yang lines) outweighs the yielding exterior (Yin lines).
+
+Direction (Later Heaven): West (Lake/openness, pressure) over Southeast (Wind/gentle foundation). The structure is overburdened.
+
+Season (Later Heaven):: Autumn (Lake/maturity) meets Late Spring (Wind/flexibility). The weight of maturity or results strains the foundation.
+
+Body: Mouth/Chest (Lake/pressure) over Thighs/Hips (Wind/support). Feeling overburdened, structural stress, potential collapse.
+
+Social Role: The Youngest Daughter (Lake/expression, pressure) interacting with the Eldest Daughter (Wind/yielding support). A situation where the core is too strong or active for the supporting structures. Requires careful management of pressure.
+
+Key Imagery/Keywords: Overheavy Beam, Weak Supports, Pressure, Stress, Extraordinary Situation, Imbalance, Need for Exceptional Action, Crisis, Potential Collapse, Overburdened, Seeking Support, Critical Moment.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 43. Guài (夬) - Break-through (Resoluteness)
+
+Line 2 changes to Yin: → Hexagram 31. Xián (咸) - Influence (Wooing)
+
+Line 3 changes to Yin: → Hexagram 47. Kùn (困) - Oppression (Exhaustion)
+
+Line 4 changes to Yin: → Hexagram 48. Jǐng (井) - The Well
+
+Line 5 changes to Yin: → Hexagram 32. Héng (恆) - Duration
+
+Line 6 changes to Yang: → Hexagram 44. Gòu (姤) - Coming to Meet
+
+29. Kǎn (坎) - The Abysmal (Water)
+
+Hexagram Image: ䷜ (Water over Water)
+
+Binary Representation: 010010
+
+Lower Trigram: Kǎn (Water)
+
+Upper Trigram: Kǎn (Water)
+
+Symbolic Description: Represents danger doubled, immersion in difficulties, pitfalls, and the abyss. Water is repeated, signifying compounded risk or being deep within a challenging situation. However, it also points to the potential for learning through practice and maintaining sincerity (the solid Yang line within each trigram) even amidst peril. Like water flowing onward despite obstacles, one must adapt, remain true to oneself, and persist to navigate the danger successfully. It emphasizes learning through repeated exposure and mastery gained through facing challenges.
+
+Overall Symbolic Associations:
+
+Elements: Pure Water. Signifies deep immersion, flow, danger, the unconscious, hidden depths, and adaptability.
+
+Direction (Later Heaven): North (N) - The place of maximum Yin, darkness, and potential danger.
+
+Season (Later Heaven): Winter - The time of darkness, cold, and inward focus; potential hardship.
+
+Body: Kidneys, ears, blood, bodily fluids. Potential for fear, anxiety, issues related to fluid balance or hidden ailments.
+
+Social Role: The Middle Son doubled. Represents facing challenges, dealing with hidden issues, navigating risky situations, the need for inner sincerity amidst external difficulty.
+
+Key Imagery/Keywords: Repeated Danger, Gorge, Pitfall, Abyss, Flowing Water, Sincerity within Danger, Practice, Repetition, Learning through Hardship, Facing Fear, Immersion, Blood, Heartache (emotional depth/pain).
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 3. Zhūn (屯) - Difficulty at the Beginning
+
+Line 2 changes to Yin: → Hexagram 4. Méng (蒙) - Youthful Folly
+
+Line 3 changes to Yang: → Hexagram 7. Shī (師) - The Army
+
+Line 4 changes to Yang: → Hexagram 8. Bǐ (比) - Holding Together (Union)
+
+Line 5 changes to Yin: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+Line 6 changes to Yang: → Hexagram 47. Kùn (困) - Oppression (Exhaustion)
+
+30. Lí (離) - The Clinging, Fire
+
+Hexagram Image: ䷝ (Fire over Fire)
+
+Binary Representation: 101101
+
+Lower Trigram: Lí (Fire)
+
+Upper Trigram: Lí (Fire)
+
+Symbolic Description: Represents brightness, clarity, consciousness, and attachment. Fire is repeated, signifying intense illumination and awareness, but also dependence, like fire needing fuel to burn. It highlights intellectual clarity, beauty, and visibility. Success comes from recognizing one's dependence (on correct principles, on nourishment) and cultivating inner docility and acceptance (like the gentle cow), allowing continuous illumination. It points to the power of awareness but also the potential danger of burning out or clinging too strongly.
+
+Overall Symbolic Associations:
+
+Elements: Pure Fire. Signifies clarity, brightness, intelligence, awareness, heat, passion, and dependence.
+
+Direction (Later Heaven): South (S) - The place of maximum Yang, brightness, and visibility.
+
+Season (Later Heaven): Summer - The time of greatest light, heat, and outward expression.
+
+Body: Eyes, heart, small intestine. Potential for issues related to vision, circulation, over-excitement, or burnout.
+
+Social Role: The Middle Daughter doubled. Represents clarity, intelligence, beauty, communication, dependence, and the need for grounding.
+
+Key Imagery/Keywords: Repeated Fire, Sun, Light, Lightning, Brightness, Clarity, Consciousness, Awareness, Dependence, Attachment, Beauty, Intelligence, Docility (like a cow, for endurance), Illumination.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 13. Tóng Rén (同人) - Fellowship
+
+Line 2 changes to Yin: → Hexagram 22. Bì (賁) - Grace / Adorning
+
+Line 3 changes to Yang: → Hexagram 21. Shì Kè (噬嗑) - Biting Through
+
+Line 4 changes to Yang: → Hexagram 14. Dà Yǒu (大有) - Possession in Great Measure
+
+Line 5 changes to Yang: → Hexagram 56. Lǚ (旅) - The Wanderer
+
+Line 6 changes to Yin: → Hexagram 55. Fēng (豐) - Abundance (Fullness)
+
+31. Xián (咸) - Influence (Wooing)
+
+Hexagram Image: ䷞ (Lake over Mountain)
+
+Binary Representation: 011100
+
+Lower Trigram: Gèn (Mountain)
+
+Upper Trigram: Duì (Lake)
+
+Symbolic Description: Represents mutual attraction, influence, stimulation, and courtship, particularly the interaction between opposites. The receptive, open Lake (youngest daughter) is above the firm, still Mountain (youngest son). This signifies a natural attraction and responsiveness, often without conscious intent initially. The Mountain's stillness provides the foundation for the Lake's joyful response. Success comes from remaining open and receptive (the empty space within the mountain) and allowing influence to occur naturally. It's the beginning phase of attraction.
+
+Overall Symbolic Associations:
+
+Elements: Metal (Lake) over Earth (Mountain). Metal is produced from Earth; joy and openness arise from stillness and solidity. A productive and responsive relationship.
+
+Direction (Later Heaven): West (Lake/joy, openness) responds to Northeast (Mountain/stillness, foundation). Attraction emerging from stability.
+
+Season (Later Heaven): Autumn (Lake/pleasure) interacting with Late Winter (Mountain/potential). The awakening of connection.
+
+Body: Mouth/Chest (Lake/expression, feeling) responding to Back/Hands/Joints (Mountain/stillness, grounding). Physical attraction, sensitivity, responsive feelings.
+
+Social Role: The Youngest Daughter (Lake/joyful, receptive) interacts with the Youngest Son (Mountain/still, strong). Courtship, mutual influence, responsiveness, the start of a relationship, sensitivity.
+
+Key Imagery/Keywords: Lake on the Mountain, Mutual Attraction, Wooing, Courtship, Stimulation, Responsiveness, Sensitivity, Openness, Natural Influence, Beginnings of Connection.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 52. Gèn (艮) - Keeping Still, Mountain
+
+Line 2 changes to Yang: → Hexagram 28. Dà Guò (大過) - Preponderance of the Great
+
+Line 3 changes to Yin: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 4 changes to Yin: → Hexagram 62. Xiǎo Guò (小過) - Preponderance of the Small
+
+Line 5 changes to Yin: → Hexagram 49. Gé (革) - Revolution (Molting)
+
+Line 6 changes to Yang: → Hexagram 58. Duì (兌) - The Joyous, Lake
+
+32. Héng (恆) - Duration
+
+Hexagram Image: ䷟ (Thunder over Wind)
+
+Binary Representation: 001110
+
+Lower Trigram: Xùn (Wind)
+
+Upper Trigram: Zhèn (Thunder)
+
+Symbolic Description: Represents permanence, continuity, endurance, and long-lasting relationships or situations, like a stable marriage. Thunder (movement, initiative) above Wind (gentle penetration, consistency) signifies dynamic action grounded in steady influence. This is the hexagram of established patterns, enduring principles, and commitment. Success comes from maintaining constancy in one's path and character, adapting movement to underlying principles. It follows Influence (Xian) as the establishment of an enduring state after initial attraction.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Thunder) over Wood (Wind). Yang Wood (action) complemented by Yin Wood (gentle persistence). A dynamic yet stable combination ensuring continuity.
+
+Direction (Later Heaven): East (Thunder/action) arises from Southeast (Wind/foundation, continuity). Ongoing movement based on established patterns.
+
+Season (Later Heaven): Spring (Thunder/growth) sustained by Late Spring (Wind/persistent development). Continuous, enduring growth.
+
+Body: Feet/Liver (Thunder/action) supported by Thighs/Hips/Respiratory system (Wind/steady support, breath). Sustained effort, endurance, stability in movement.
+
+Social Role: The Eldest Son (Thunder/initiative) and Eldest Daughter (Wind/gentle management) in relationship. Marriage, long-term partnerships, established institutions, enduring commitments, tradition.
+
+Key Imagery/Keywords: Thunder and Wind Together, Endurance, Permanence, Constancy, Long Duration, Marriage, Established Roles, Tradition, Commitment, Steady Movement, Unwavering Character.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 46. Shēng (升) - Pushing Upward
+
+Line 2 changes to Yin: → Hexagram 18. Gǔ (蠱) - Work on What Has Been Spoiled
+
+Line 3 changes to Yin: → Hexagram 28. Dà Guò (大過) - Preponderance of the Great
+
+Line 4 changes to Yin: → Hexagram 48. Jǐng (井) - The Well
+
+Line 5 changes to Yin: → Hexagram 50. Dǐng (鼎) - The Cauldron
+
+Line 6 changes to Yang: → Hexagram 57. Xùn (巽) - The Gentle (The Penetrating, Wind)
+
+ranche 9: Hexagrams 33 - 36
+
+33. Dùn (遯) - Retreat
+
+Hexagram Image: ䷠ (Heaven over Mountain)
+
+Binary Representation: 111100
+
+Lower Trigram: Gèn (Mountain)
+
+Upper Trigram: Qián (Heaven)
+
+Symbolic Description: Represents timely and strategic withdrawal, not out of weakness, but to preserve strength. Heaven (strong, advancing) is above, while Mountain (stillness, stopping) is below. The image suggests Heaven moving away, pulling back from entanglement with inferior or obstructive forces represented by the growing Yin lines below (especially compared to Hex 12, Standstill, where Heaven is also above but over receptive Earth). It's a voluntary retreat to avoid damage and maintain integrity. Keeping distance, especially from negativity or 'small people', allows the superior person to remain unharmed and prepare for a better time.
+
+Overall Symbolic Associations:
+
+Elements: Heaven (Metal) over Earth (Mountain). Strong Heaven withdraws from the stopping influence of the Mountain or the growing Yin it represents. Preserving strength by pulling back.
+
+Direction (Later Heaven): Northwest (Heaven/power) pulling away from Northeast (Mountain/obstacle, stillness). Voluntary withdrawal from blockage.
+
+Season (Later Heaven): Late Autumn (Heaven/consolidation) separating from Late Winter (Mountain/stopping). Pulling back energy before encountering full resistance.
+
+Body: Head/Lungs (Heaven/strength) withdrawing from influence related to Back/Hands/Joints (Mountain/stillness, blockage). Conserving energy, avoiding strain or confrontation.
+
+Social Role: The Father (Heaven/authority) withdrawing from the Youngest Son (Mountain/stubbornness, stopping). Strategic withdrawal, avoiding petty conflicts, maintaining dignity by distance, temporary retirement.
+
+Key Imagery/Keywords: Voluntary Withdrawal, Strategic Retreat, Avoiding Conflict, Preserving Strength, Keeping Distance (from negativity), Disengagement, Prudence, Timing, Letting Go (temporarily), Maintaining Integrity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 12. Pǐ (否) - Standstill (Stagnation)
+
+Line 2 changes to Yang: → Hexagram 13. Tóng Rén (同人) - Fellowship
+
+Line 3 changes to Yin: → Hexagram 62. Xiǎo Guò (小過) - Preponderance of the Small
+
+Line 4 changes to Yin: → Hexagram 53. Jiàn (漸) - Development (Gradual Progress)
+
+Line 5 changes to Yin: → Hexagram 56. Lǚ (旅) - The Wanderer
+
+Line 6 changes to Yin: → Hexagram 26. Dà Chù (大畜) - The Taming Power of the Great
+
+34. Dà Zhuàng (大壯) - The Power of the Great
+
+Hexagram Image: ䷡ (Thunder over Heaven)
+
+Binary Representation: 001111
+
+Lower Trigram: Qián (Heaven)
+
+Upper Trigram: Zhèn (Thunder)
+
+Symbolic Description: Represents great power, strength, and vigorous advance, but warns against its misuse. Thunder (powerful movement) is energized by Heaven (great strength) below. This indicates a peak of Yang energy and momentum. However, this power must be used correctly and aligned with justice and propriety. Reckless force or bullying leads to trouble. Strength should be tempered with awareness and consideration, avoiding arrogance or pushing beyond appropriate limits. The image is sometimes likened to a ram butting against a hedge - power needing direction.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Thunder) over Metal (Heaven). Wood's action is fueled by Heaven's strength. Suggests powerful, potentially impulsive movement derived from solid potential. Need for control as Wood is normally overcome by Metal (potential for self-damage if uncontrolled).
+
+Direction (Later Heaven): East (Thunder/action) empowered by Northwest (Heaven/strength). Forceful initiative backed by great power.
+
+Season (Later Heaven): Spring (Thunder/initiative) drawing on the power of Late Autumn (Heaven/consolidation). A potent surge of directed energy.
+
+Body: Feet/Liver (Thunder/movement, drive) powered by Head/Lungs/Bones (Heaven/strength, structure). Great physical power, but potential for impulsive action or aggression if not managed by higher awareness.
+
+Social Role: The Eldest Son (Thunder/action) empowered by the Father (Heaven/strength). Great potential for action, leadership asserting itself, but needs guidance and restraint to avoid recklessness.
+
+Key Imagery/Keywords: Great Strength, Power, Vigorous Advance, Momentum, Need for Correctness and Restraint, Danger of Arrogance or Recklessness, Potential (for good or bad), Controlled Force, Determination.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 10. Lǚ (履) - Treading (Conduct)
+
+Line 2 changes to Yin: → Hexagram 11. Tài (泰) - Peace
+
+Line 3 changes to Yin: → Hexagram 55. Fēng (豐) - Abundance (Fullness)
+
+Line 4 changes to Yin: → Hexagram 14. Dà Yǒu (大有) - Possession in Great Measure
+
+Line 5 changes to Yin: → Hexagram 43. Guài (夬) - Break-through (Resoluteness)
+
+Line 6 changes to Yang: → Hexagram 51. Zhèn (震) - The Arousing (Shock, Thunder)
+
+35. Jìn (晉) - Progress
+
+Hexagram Image: ䷢ (Fire over Earth)
+
+Binary Representation: 101000
+
+Lower Trigram: Kūn (Earth)
+
+Upper Trigram: Lí (Fire)
+
+Symbolic Description: Represents progress, promotion, and rapid, easy advance, like the sun rising over the earth. Fire (brightness, clarity) ascends above the receptive Earth (support, broadness). This indicates growing influence, recognition, and expansion favored by circumstances. Often depicts a loyal subordinate or leader gaining favor and advancing under a higher authority. Progress is smooth and unopposed, but should be grounded in virtue and generosity to be sustainable.
+
+Overall Symbolic Associations:
+
+Elements: Fire over Earth. Fire illuminates Earth, drawing its potential upward. Clarity and brightness expanding over a receptive foundation.
+
+Direction (Later Heaven): South (Fire/clarity, expansion) arising from Southwest (Earth/receptivity, support). Growing influence and recognition.
+
+Season (Later Heaven): Summer (Fire/peak brightness) drawing upon Late Summer (Earth/fruition). A time of visible advancement and reward.
+
+Body: Eyes/Heart (Fire/clarity, vision) expanding influence over Abdomen/Spleen (Earth/support, nourishment). Growing awareness, vitality, and influence.
+
+Social Role: The Middle Daughter (Fire/clarity, intelligence) advancing with the support of the Mother (Earth/receptive base, the people). Promotion, gaining favor, expanding influence, smooth advancement, recognition from superiors.
+
+Key Imagery/Keywords: Sun Rising over Earth, Rapid Advance, Promotion, Increasing Influence, Clarity, Recognition, Expansion, Smooth Progress, Being Received by Authority, Flourishing.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 21. Shì Kè (噬嗑) - Biting Through
+
+Line 2 changes to Yang: → Hexagram 23. Bō (剝) - Splitting Apart
+
+Line 3 changes to Yang: → Hexagram 12. Pǐ (否) - Standstill (Stagnation)
+
+Line 4 changes to Yang: → Hexagram 64. Wèi Jì (未濟) - Before Completion
+
+Line 5 changes to Yin: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 6 changes to Yin: → Hexagram 56. Lǚ (旅) - The Wanderer
+
+36. Míng Yí (明夷) - Darkening of the Light / Brightness Injured
+
+Hexagram Image: ䷣ (Earth over Fire)
+
+Binary Representation: 000101
+
+Lower Trigram: Lí (Fire)
+
+Upper Trigram: Kūn (Earth)
+
+Symbolic Description: Represents the injury or concealment of brightness, intelligence being suppressed, and persecution during dark times. Fire (light, clarity) is beneath the Earth (darkness, obstruction), signifying wisdom forced underground or intelligence hidden due to hostile circumstances. It portrays a situation where it is dangerous to display one's talents or virtue openly. The advice is to conceal one's light, endure adversity with perseverance, maintain inner clarity while adapting outwardly to darkness, and protect oneself.
+
+Overall Symbolic Associations:
+
+Elements: Earth over Fire. Earth smothers or conceals Fire. Darkness suppresses light; receptivity obstructs clarity.
+
+Direction (Later Heaven): Southwest (Earth/receptivity, the masses) obscures South (Fire/clarity, brilliance). The light is hidden or oppressed.
+
+Season (Later Heaven): Late Summer (Earth/receptivity) covers Summer's brightness (Fire). A time when clarity is obscured or goes unrecognized.
+
+Body: Abdomen/Spleen (Earth/grounding, perhaps dullness) over Eyes/Heart (Fire/clarity, spirit). Inner light suppressed, vision obscured, potential for depression or hidden injury.
+
+Social Role: The Mother (Earth/receptive, perhaps ignorant or oppressive force) suppressing the Middle Daughter (Fire/intelligence, clarity). Persecution of the wise, hiding one's talents, adversity, difficult political climate, inner perseverance needed.
+
+Key Imagery/Keywords: Sun Setting or Hidden Below Earth, Injured Brightness, Hidden Intelligence, Persecution, Adversity, Need for Caution and Concealment, Protecting Inner Light, Enduring Dark Times, Maintaining Integrity Secretly.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 24. Fù (復) - Return (The Turning Point)
+
+Line 2 changes to Yang: → Hexagram 63. Jì Jì (既濟) - After Completion
+
+Line 3 changes to Yin: → Hexagram 54. Guī Mèi (歸妹) - The Marrying Maiden
+
+Line 4 changes to Yang: → Hexagram 55. Fēng (豐) - Abundance (Fullness)
+
+Line 5 changes to Yang: → Hexagram 15. Qiān (謙) - Modesty
+
+Line 6 changes to Yang: → Hexagram 30. Lí (離) - The Clinging, Fire
+
+37. Jiā Rén (家人) - The Family (The Clan)
+
+Hexagram Image: ䷤ (Wind over Fire)
+
+Binary Representation: 110101
+
+Lower Trigram: Lí (Fire)
+
+Upper Trigram: Xùn (Wind)
+
+Symbolic Description: Represents the structure, roles, and proper functioning within a family or any close-knit group. Wind (gentle influence, external order) arises from Fire (clarity, inner light) below. This suggests that effective outward conduct and influence stem from inner clarity and correct relationships within the core unit. Emphasis is placed on distinct roles (father, mother, children; leader, members), loyalty, consistency, and the power of sincere words and conduct to maintain harmony. The woman's role (associated with the inner Fire) is often highlighted as central to the family's well-being.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Wind) over Fire. Wood fuels Fire; gentle external influence is supported by inner clarity and warmth. Orderly conduct stems from inner light.
+
+Direction (Later Heaven): Southeast (Wind/gentle order) arising from South (Fire/inner clarity, warmth). Structured relationships based on inner understanding.
+
+Season (Later Heaven): Late Spring (Wind/structuring growth) developing from Summer's core (Fire/clarity). Establishing enduring structures based on clear principles.
+
+Body: Thighs/Hips/Respiratory system (Wind/outer structure, influence) connected to Eyes/Heart (Fire/inner clarity, affection). Proper external roles supported by inner feeling and understanding.
+
+Social Role: The Eldest Daughter (Wind/managing influence) interacts with the Middle Daughter (Fire/inner clarity, brightness). Order within the household, clearly defined roles, importance of inner relationships for outer stability, community structure.
+
+Key Imagery/Keywords: Household Order, Family Structure, Defined Roles, Inner Clarity supporting Outer Conduct, Loyalty, Consistency, Influence of Words, Women's Role (often emphasized), Community Harmony, Belonging.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 53. Jiàn (漸) - Development (Gradual Progress)
+
+Line 2 changes to Yin: → Hexagram 9. Xiǎo Chù (小畜) - Taming Power of the Small
+
+Line 3 changes to Yang: → Hexagram 22. Bì (賁) - Grace / Adorning
+
+Line 4 changes to Yang: → Hexagram 63. Jì Jì (既濟) - After Completion
+
+Line 5 changes to Yin: → Hexagram 42. Yì (益) - Increase
+
+Line 6 changes to Yin: → Hexagram 57. Xùn (巽) - The Gentle (The Penetrating, Wind)
+
+38. Kuí (睽) - Opposition / Estrangement
+
+Hexagram Image: ䷥ (Fire over Lake)
+
+Binary Representation: 101011
+
+Lower Trigram: Duì (Lake)
+
+Upper Trigram: Lí (Fire)
+
+Symbolic Description: Represents fundamental opposition, divergence, misunderstanding, and alienation. Fire (rising upward) is above the Lake (seeping downward); their natures move in opposite directions. This signifies conflict arising from differing goals or perspectives, like two sisters living together but belonging to different men (different loyalties). While major union is difficult, the hexagram suggests that in small matters, finding common ground or temporary agreement might still be possible. It highlights diversity and the challenge of bridging fundamental gaps.
+
+Overall Symbolic Associations:
+
+Elements: Fire over Metal (Lake). Fire melts or controls Metal. Suggests inherent tension or conflict between clarity/passion (Fire) and joy/expression/materiality (Lake).
+
+Direction (Later Heaven): South (Fire/upward moving, clarity) opposes West (Lake/downward flowing, pleasure). Divergent paths.
+
+Season (Later Heaven): Summer (Fire/expansion) contrasts with Autumn (Lake/contraction, gathering). Opposing phases of a cycle.
+
+Body: Eyes/Heart (Fire/vision, passion) in opposition to Mouth/Chest (Lake/expression, pleasure). Conflicting desires or perspectives.
+
+Social Role: The Middle Daughter (Fire/clarity, perhaps sharpness) clashes with the Youngest Daughter (Lake/joy, sensitivity). Sibling rivalry, differing viewpoints, misunderstandings within close relationships, polarization.
+
+Key Imagery/Keywords: Divergence, Estrangement, Misunderstanding, Polarity, Conflict, Opposing Forces, Alienation, Small Matters may succeed, Difficulty in Union, Differences, Diversity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yin: → Hexagram 14. Dà Yǒu (大有) - Possession in Great Measure
+
+Line 2 changes to Yin: → Hexagram 10. Lǚ (履) - Treading (Conduct)
+
+Line 3 changes to Yang: → Hexagram 13. Tóng Rén (同人) - Fellowship
+
+Line 4 changes to Yang: → Hexagram 61. Zhōng Fú (中孚) - Inner Truth
+
+Line 5 changes to Yang: → Hexagram 41. Sǔn (損) - Decrease
+
+Line 6 changes to Yin: → Hexagram 64. Wèi Jì (未濟) - Before Completion
+
+39. Jiǎn (蹇) - Obstruction / Limping
+
+Hexagram Image: ䷦ (Water over Mountain)
+
+Binary Representation: 010100
+
+Lower Trigram: Gèn (Mountain)
+
+Upper Trigram: Kǎn (Water)
+
+Symbolic Description: Represents obstruction, hindrance, and difficulty in movement, like trying to walk with a limp or facing insurmountable obstacles. Danger (Water) lies ahead, while stillness or stopping (Mountain) is behind or below. Progress is blocked. The wise course is not to force ahead but to recognize the impediment, turn back or stop, seek virtuous allies ('see the great man'), correct oneself, and find alternative ways to overcome the difficulty. Perseverance through withdrawal and finding support is key.
+
+Overall Symbolic Associations:
+
+Elements: Water over Earth (Mountain). Water encounters the blockage of Earth. Flow is stopped or hindered by solidity.
+
+Direction (Later Heaven): North (Water/danger) lies ahead of the Northeast (Mountain/stopping). Movement is blocked by peril.
+
+Season (Later Heaven): Winter (Water/danger, stagnation) meets Late Winter (Mountain/stillness). A time of maximum hindrance and blockage.
+
+Body: Kidneys/Ears (Water/fear, hidden danger) encountering Back/Hands/Joints (Mountain/blockage, immobility). Difficulty moving, physical limitations, being stuck.
+
+Social Role: The Middle Son (Water/danger) encounters the Youngest Son (Mountain/stopping). Facing obstacles, needing to pause and reassess, seeking help from wiser counsel or allies.
+
+Key Imagery/Keywords: Limping, Obstacles, Hindrance, Blockage, Difficulty, Danger Ahead, Stopping, Seeking Allies, Turning Back, Finding Alternatives, Perseverance through Stillness.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 15. Qiān (謙) - Modesty
+
+Line 2 changes to Yang: → Hexagram 53. Jiàn (漸) - Development (Gradual Progress)
+
+Line 3 changes to Yin: → Hexagram 63. Jì Jì (既濟) - After Completion
+
+Line 4 changes to Yin: → Hexagram 48. Jǐng (井) - The Well
+
+Line 5 changes to Yin: → Hexagram 5. Xū (需) - Waiting (Nourishment)
+
+Line 6 changes to Yang: → Hexagram 52. Gèn (艮) - Keeping Still, Mountain
+
+40. Xiè (解) - Deliverance / Release
+
+Hexagram Image: ䷧ (Thunder over Water)
+
+Binary Representation: 001010
+
+Lower Trigram: Kǎn (Water)
+
+Upper Trigram: Zhèn (Thunder)
+
+Symbolic Description: Represents release from tension, dissolution of difficulties, liberation, and relief. Thunder (movement, spring) emerges from Water (danger, winter), like spring rains dissolving ice and freeing stagnant energy. This signifies the clearing away of obstacles (following Jian, Obstruction). It's a time for prompt action to consolidate the release, forgive past wrongs, let go of burdens, and return to normalcy. Simplicity and shedding complexities aid the process.
+
+Overall Symbolic Associations:
+
+Elements: Wood (Thunder) over Water. Wood absorbs or emerges from Water. Action and growth overcome danger or stagnation.
+
+Direction (Later Heaven): East (Thunder/action) emerges from North (Water/danger). Movement breaking free from restriction.
+
+Season (Later Heaven): Spring (Thunder/new growth, release) follows Winter (Water/stagnation). The thawing process, release of tension.
+
+Body: Feet/Liver (Thunder/movement) freeing itself from issues related to Kidneys/Ears (Water/fear, stagnation). Release of stress, improved flow, recovery.
+
+Social Role: The Eldest Son (Thunder/action) freeing himself or others from the domain of the Middle Son (Water/danger). Problem-solving, resolving conflicts, liberation, forgiveness, simplifying matters.
+
+Key Imagery/Keywords: Spring Rain Dissolving Ice, Release, Liberation, Solution, Untying Knots, Forgiveness, Relief, Easing of Tension, Prompt Action to Clear Obstacles, Return to Simplicity.
+
+Line Transformations (Yao Bian / 爻變):
+
+Line 1 changes to Yang: → Hexagram 7. Shī (師) - The Army
+
+Line 2 changes to Yang: → Hexagram 16. Yù (豫) - Enthusiasm
+
+Line 3 changes to Yin: → Hexagram 3. Zhūn (屯) - Difficulty at the Beginning
+
+Line 4 changes to Yin: → Hexagram 54. Guī Mèi (歸妹) - The Marrying Maiden
+
+Line 5 changes to Yin: → Hexagram 51. Zhèn (震) - The Arousing (Shock, Thunder)
+
+Line 6 changes to Yin: → Hexagram 47. Kùn (困) - Oppression (Exhaustion)

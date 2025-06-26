@@ -98,7 +98,7 @@ export async function runStageMinus1(state) {
         console.log(`Combining mappings, variations, and tags from ${batchAnalyses.length} batches...`);
 
         // Import the consolidation utilities
-        const { consolidateMappingsEnhanced } = await import('../../utils/content/processing.mjs');
+        const { consolidateMappingsEnhanced } = await import('../../../1_utils/content/processing.mjs');
 
         // Generate a deterministic ID generator function with a prefix for traceability
         const idGenerator = (prefix = 'map') => {
@@ -142,7 +142,7 @@ export async function runStageMinus1(state) {
         );
 
         // Import the synthesizeAnalysis function
-        const { synthesizeAnalysis } = await import('../../utils/content/synthesis.mjs');
+        const { synthesizeAnalysis } = await import('../../../1_utils/content/synthesis.mjs');
 
         // Synthesize the analysis using batchAnalyses
         let synthesis;
@@ -190,7 +190,7 @@ export async function runStageMinus1(state) {
         );
 
         // Import the generateCoreElements function
-        const { generateCoreElements } = await import('../../utils/content/synthesis.mjs');
+        const { generateCoreElements } = await import('../../../1_utils/content/synthesis.mjs');
 
         // Generate core elements and relational properties
         let coreElementsResult;

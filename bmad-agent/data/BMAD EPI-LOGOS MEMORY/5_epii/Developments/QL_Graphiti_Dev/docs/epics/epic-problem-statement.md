@@ -1,0 +1,3 @@
+# Problem Statement
+
+The current agent memory architecture, while effective at storing and retrieving factual data (entities, relations, document chunks), lacks the capacity to represent or understand the *synthesis* of these elements into a coherent, meaningful whole. It sees the trees but not the forest. This limitation prevents the agent from grasping the deeper conceptual structures latent within its knowledge base, forcing it to re-derive complex relationships from scratch in every session. This is inefficient and inhibits the development of true systemic understanding.

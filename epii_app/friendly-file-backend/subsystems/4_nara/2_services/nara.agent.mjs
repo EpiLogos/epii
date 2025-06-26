@@ -137,7 +137,7 @@ const tools = [searchPersonalContextTool, searchUniversalContextTool];
 // --- LangChain Model Instantiation & Binding ---
 // Ensure GOOGLE_API_KEY and GEMINI_MODEL_1 are set in .env
 const activeModelVarName = process.env.ACTIVE_SYNTHESIS_MODEL || 'SYNTHESIS_LLM_MODEL_FREE';
-const synthesisModelName = process.env[activeModelVarName] || 'gemini-2.5-pro-exp-03-25';
+const synthesisModelName = process.env[activeModelVarName] || 'gemini-2.5-pro';
 
 const llm = new ChatGoogleGenerativeAI({
     model: synthesisModelName,

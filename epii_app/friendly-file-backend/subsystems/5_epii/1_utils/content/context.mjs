@@ -189,52 +189,62 @@ export async function extractRelevantBimbaContext(chunkContent, fullBimbaMap, ta
                 console.warn(`BimbaKnowing returned no nodes for coordinate ${focusCoordinate}`);
             }
 
-            // Process nodes from bimbaKnowing
+            // Process nodes from bimbaKnowing - FIX: Use correct property paths
             nodes.forEach(node => {
-                // Normalize coordinate format (replace dots with dashes)
-                const normalizedCoordinate = node.coordinate ? node.coordinate.replace(/\./g, '-') : null;
+                // Extract coordinate from the correct property path
+                let coordinate = null;
+                if (node.properties && node.properties.bimbaCoordinate) {
+                    coordinate = node.properties.bimbaCoordinate;
+                } else if (node.properties && node.properties.coordinate) {
+                    coordinate = node.properties.coordinate;
+                } else if (node.coordinate) {
+                    coordinate = node.coordinate;
+                }
 
                 // Skip nodes without coordinates
-                if (!normalizedCoordinate) return;
+                if (!coordinate) {
+                    console.warn(`Skipping node without coordinate:`, node);
+                    return;
+                }
+
+                // Normalize coordinate format (replace dots with dashes and ensure # prefix)
+                let normalizedCoordinate = coordinate.toString();
+                if (!normalizedCoordinate.startsWith('#')) {
+                    normalizedCoordinate = '#' + normalizedCoordinate;
+                }
+                normalizedCoordinate = normalizedCoordinate.replace(/\./g, '-');
 
                 // Create a processed node with essential information
                 const processedNode = {
                     coordinate: normalizedCoordinate,
-                    name: node.name || 'Unnamed Node',
-                    description: node.description || '',
-                    type: node.type || 'unknown',
-                    level: normalizedCoordinate.split('-').length - 1
+                    name: node.properties?.name || node.name || 'Unnamed Node',
+                    description: node.properties?.description || node.description || '',
+                    type: node.properties?.type || node.type || 'unknown',
+                    level: normalizedCoordinate.replace('#', '').split('-').length - 1,
+                    relevanceType: node.relevanceType || 'unknown'
                 };
+
+                console.log(`Processing node: ${normalizedCoordinate} (${processedNode.name}) - relevanceType: ${processedNode.relevanceType}`);
 
                 // Add to all nodes with coordinates
                 allNodesWithCoordinates.push(processedNode);
 
-                // Check if this is a directly relevant node (mentioned in the chunk)
-                if (mentionedCoordinates.includes(normalizedCoordinate)) {
+                // Categorize nodes based on relevanceType from QueryBimbaGraph
+                if (node.relevanceType === 'target' || normalizedCoordinate === focusCoordinate) {
+                    directlyRelevantNodes.push(processedNode);
+                } else if (node.relevanceType === 'parent') {
+                    parentNodes.push(processedNode);
+                } else if (node.relevanceType === 'sibling') {
+                    siblingNodes.push(processedNode);
+                } else if (node.relevanceType === 'child') {
+                    // Add children to directly relevant nodes for now
                     directlyRelevantNodes.push(processedNode);
                 }
 
-                // Check if this is a parent node of a mentioned coordinate
-                for (const mentionedCoord of mentionedCoordinates) {
-                    if (mentionedCoord.startsWith(normalizedCoordinate + '-')) {
-                        parentNodes.push(processedNode);
-                        break;
-                    }
-                }
-
-                // Check if this is a sibling node of a mentioned coordinate
-                for (const mentionedCoord of mentionedCoordinates) {
-                    const mentionedParts = mentionedCoord.split('-');
-                    if (mentionedParts.length > 1) {
-                        const mentionedParent = mentionedParts.slice(0, -1).join('-');
-                        const nodeParts = normalizedCoordinate.split('-');
-                        if (nodeParts.length > 1) {
-                            const nodeParent = nodeParts.slice(0, -1).join('-');
-                            if (mentionedParent === nodeParent && normalizedCoordinate !== mentionedCoord) {
-                                siblingNodes.push(processedNode);
-                                break;
-                            }
-                        }
+                // Also check if this is a directly relevant node (mentioned in the chunk)
+                if (mentionedCoordinates.includes(normalizedCoordinate)) {
+                    if (!directlyRelevantNodes.some(n => n.coordinate === normalizedCoordinate)) {
+                        directlyRelevantNodes.push(processedNode);
                     }
                 }
             });
@@ -496,19 +506,24 @@ export async function generateContextWindow(
         if (!forAnalysis) {
             console.log("Generating lightweight context window for RAG (stage -3)");
 
+            // DEBUG: Log the actual structure of inputs
+            console.log(`🔍 CONTEXT WINDOW DEBUG:`);
+            console.log(`- projectContext keys:`, Object.keys(projectContext || {}));
+            console.log(`- projectContext:`, JSON.stringify(projectContext, null, 2));
+            console.log(`- bimbaContextStr length:`, bimbaContextStr?.length || 0);
+            console.log(`- bimbaMapSummary:`, bimbaMapSummary ? 'available' : 'null');
+
             // Create a lightweight context window with minimal but informative structure
             const lightContextWindow = {
                 // Structured data for programmatic access
                 chunkContext,
                 documentContext: bimbaContextStr,
                 projectContext: {
-                    projectName: projectContext.projectName,
-                    projectDescription: projectContext.projectDescription,
-                    rootNode: projectContext.rootNode ? {
-                        name: projectContext.rootNode.name,
-                        coordinate: projectContext.rootNode.coordinate
-                    } : null,
-                    topLevelNodes: projectContext.topLevelNodes || [] // Include top-level nodes for minimal hierarchy
+                    projectName: projectContext?.projectName || projectContext?.name || 'Epi-Logos Project',
+                    projectDescription: projectContext?.projectDescription || projectContext?.description || 'Advanced consciousness framework',
+                    rootNode: projectContext?.rootNode || null,
+                    topLevelNodes: projectContext?.topLevelNodes || [],
+                    targetCoordinate: projectContext?.targetCoordinate
                 },
                 bimbaMapSummary: bimbaMapSummary ? {
                     rootNodeDescription: bimbaMapSummary.rootNodeDescription,
@@ -526,12 +541,13 @@ Position: ${chunkContext.position.description} (${chunkContext.position.percenta
 ${bimbaContextStr ? smartTruncateText(bimbaContextStr, 300) : 'No document context available.'}
 
 ## PROJECT CONTEXT
-Project: ${projectContext.projectName || 'Unnamed Project'}
-${projectContext.projectDescription ? `Description: ${projectContext.projectDescription}` : 'No project description available.'}
+Project: ${projectContext?.projectName || projectContext?.name || 'Epi-Logos Project'}
+Description: ${projectContext?.projectDescription || projectContext?.description || 'Advanced consciousness and knowledge framework'}
+
+Subsystems: ${projectContext?.subsystems ? (Array.isArray(projectContext.subsystems) ? projectContext.subsystems.join(', ') : projectContext.subsystems) : 'Anuttara, Paramasiva, Parashakti, Mahamaya, Nara, epii'}
 
 ## BIMBA MAP SUMMARY (Overall Project Structure)
-${bimbaMapSummary && bimbaMapSummary.rootNodeDescription ? bimbaMapSummary.rootNodeDescription :
-  (bimbaMapSummary && bimbaMapSummary.totalNodes ? `Total Bimba Nodes: ${bimbaMapSummary.totalNodes}` : 'No Bimba map summary available.')}
+${bimbaMapSummary ? (bimbaMapSummary.rootNodeDescription || `Total Nodes: ${bimbaMapSummary.totalNodes || 'Unknown'}`) : 'Bimba coordinate system with quaternary logic structure mapping consciousness and knowledge architecture.'}
 `
             };
 

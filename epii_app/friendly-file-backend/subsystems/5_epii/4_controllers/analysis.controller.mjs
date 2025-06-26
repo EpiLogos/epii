@@ -377,7 +377,7 @@ export const createCrystallizationFromAnalysis = async (req, res) => {
 
     // Get the notionUpdatePayload directly from the document cache
     console.log(`Getting notionUpdatePayload from document cache for document ${documentId}`);
-    const { getAnalysisResultsFromCache } = await import('../utils/documentCache.utils.mjs');
+    const { getAnalysisResultsFromCache } = await import('../../../databases/shared/utils/documentCache.utils.mjs');
     let cachedResults = await getAnalysisResultsFromCache(documentId);
 
     // DEBUGGING: Log the exact structure of what we found
@@ -402,7 +402,7 @@ export const createCrystallizationFromAnalysis = async (req, res) => {
     if (!cachedResults) {
       console.log(`No analysis results found in document cache, checking old cache...`);
       try {
-        const { migrateAnalysisResults } = await import('../utils/cacheTransition.utils.mjs');
+        const { migrateAnalysisResults } = await import('../1_utils/cacheTransition.utils.mjs');
         const migrated = await migrateAnalysisResults(documentId);
 
         if (migrated) {
@@ -764,7 +764,7 @@ export const getNotionUpdatePayload = async (req, res) => {
     console.log(`Getting notionUpdatePayload from document cache for document ${documentId}`);
 
     // Import the document cache utility
-    const { getAnalysisResultsFromCache } = await import('../utils/documentCache.utils.mjs');
+    const { getAnalysisResultsFromCache } = await import('../../../databases/shared/utils/documentCache.utils.mjs');
 
     // Get analysis results from cache
     let cachedResults = await getAnalysisResultsFromCache(documentId);
@@ -773,7 +773,7 @@ export const getNotionUpdatePayload = async (req, res) => {
     if (!cachedResults) {
       console.log(`No analysis results found in document cache, checking old cache...`);
       try {
-        const { migrateAnalysisResults } = await import('../utils/cacheTransition.utils.mjs');
+        const { migrateAnalysisResults } = await import('../1_utils/cacheTransition.utils.mjs');
         const migrated = await migrateAnalysisResults(documentId);
 
         if (migrated) {

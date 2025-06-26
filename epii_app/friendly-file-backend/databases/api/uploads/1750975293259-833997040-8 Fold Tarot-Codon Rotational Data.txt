@@ -1,0 +1,37 @@
+Okay, excellent! Now that the full table structure defining the 8-fold states (pair combinations) for all A-family codons is provided, I can perform the calculations to fill in the missing (+)/(-) values.
+
+I will use the confirmed calculation logic: (+) = Sum(P1) + Sum(P2) and (-) = Difference(P1) + Difference(P2), sourcing the Sum (S) and Difference (D) values for each individual pair (P1, P2) from the correct Matrix definition (M1, M2, or M3).
+
+Matrix Pair S/D Value Reference:
+
+M1: AA(12,0), TT(18,0), CC(14,0), GG(16,0), AT(15,-3), CG(15,-1), TA(15,3), GC(15,1)
+
+M2: AG(14,2), TC(16,-2), GA(14,2), CT(16,-2)
+
+M3: AC(13,-1), TG(17,1), CA(13,1), GT(17,-1)
+
+Completed A-Family 8-Fold Potential Field Table
+
+(Calculated values are filled in for rows ACT through AGG)
+
+A(XX) Codon	State 1 <br> (P1+P2)	State 2 <br> (P1+P2)	State 3 <br> (P1+P2)	State 4 <br> (P1+P2)	State 5 <br> (P1+P2)	State 6 <br> (P1+P2)	State 7 <br> (P1+P2)	State 8 <br> (P1+P2)
+AAA	AA+AA<br>(+)24/(-)0	AA+TA<br>(+)27/(-)3	AA+CA<br>(+)25/(-)1	AA+GA<br>(+)26/(-)2	AT+AA<br>(+)27/(-)-3	AC+AA<br>(+)25/(-)-1	AG+AA<br>(+)26/(+)-2	
+AAT	AA+AT<br>(+)27/(-)-3	AA+TT<br>(+)30/(-)0	AA+CT<br>(+)28/(-)-2	AA+GT<br>(+)29/(-)-1	AT+AT<br>(+)30/(-)-6	AC+AT<br>(+)28/(-)-4	AG+AT<br>(+)29/(-)-1	
+AAC	AA+AC<br>(+)25/(-)-1	AA+TC<br>(+)28/(-)-2	AA+CC<br>(+)26/(-)0	AA+GC<br>(+)27/(+)1	AT+AC<br>(+)28/(-)-4	AC+AC<br>(+)26/(-)-2	AG+AC<br>(+)27/(+)1	
+AAG	AA+AG<br>(+)26/(+)-2	AA+TG<br>(+)29/(+)1	AA+CG<br>(+)27/(-)-1	AA+GG<br>(+)28/(-)0	AT+AG<br>(+)29/(-)-1	AC+AG<br>(+)27/(+)1	AG+AG<br>(+)28/(+)0	
+ATA	AT+TA<br>(+)30/(+)0	AT+AA<br>(+)27/(-)-3	AT+CA<br>(+)28/(+)0	AT+GA<br>(+)29/(-)-1	AA+TA<br>(+)27/(+)3	AC+TA<br>(+)28/(+)2	AG+TA<br>(+)29/(+)5	
+ATT	AT+TT<br>(+)33/(-)-3	AT+AT<br>(+)30/(-)-6	AT+CT<br>(+)31/(-)-5	AT+GT<br>(+)32/(-)-4	AA+TT<br>(+)30/(+)0	AC+TT<br>(+)31/(-)-1	AG+TT<br>(+)32/(+)-2	
+ATC	AT+AC<br>(+)28/(-)-4	AT+TC<br>(+)31/(-)-5	AT+CC<br>(+)29/(-)-3	AT+GC<br>(+)30/(-)-2	AA+TC<br>(+)28/(-)-2	AC+TC<br>(+)29/(-)-3	AG+TC<br>(+)30/(+)0	
+ATG	AT+AG<br>(+)29/(-)-1	AT+TG<br>(+)32/(-)-2	AT+CG<br>(+)30/(-)-4	AT+GG<br>(+)31/(-)-3	AA+TG<br>(+)29/(+)1	AC+TG<br>(+)30/(+)0	AG+TG<br>(+)31/(+)3	
+ACA	AC+CA<br>(+)26/(+)0	AC+AA<br>(+)25/(-)-1	AC+TA<br>(+)28/(+)2	AC+GA<br>(+)27/(+)1	AA+CA<br>(+)25/(+)1	AT+CA<br>(+)28/(-)-2	AG+CA<br>(+)27/(+)3	
+ACT	AC+AT<br>(+)28/(-)-4	AC+TT<br>(+)31/(-)-1	AC+CT<br>(+)29/(-)-3	AC+GT<br>(+)30/(-)-2	AA+CT<br>(+)28/(-)-2	AT+CT<br>(+)31/(-)-5	AC+CT<br>(+)29/(-)-3	AG+CT<br>(+)30/(+)0
+ACC	AC+CC<br>(+)27/(-)-1	AC+AC<br>(+)26/(-)-2	AC+TC<br>(+)29/(-)-3	AC+GC<br>(+)28/(+)0	AA+CC<br>(+)26/(+)0	AT+CC<br>(+)29/(-)-3	AG+CC<br>(+)28/(+)2	
+ACG	AC+CG<br>(+)28/(-)-2	AC+AG<br>(+)27/(+)1	AC+TG<br>(+)30/(+)0	AC+GG<br>(+)29/(-)-1	AA+CG<br>(+)27/(-)-1	AT+CG<br>(+)30/(-)-4	AC+CG<br>(+)28/(-)-2	AG+CG<br>(+)29/(+)1
+AGA	AG+GA<br>(+)28/(+)0	AG+AA<br>(+)26/(+)2	AG+TA<br>(+)29/(+)5	AG+CA<br>(+)27/(+)3	AA+GA<br>(+)26/(+)2	AT+GA<br>(+)29/(-)-1	AC+GA<br>(+)27/(+)1	
+AGT	AG+GT<br>(+)31/(+)1	AG+AT<br>(+)29/(-)-1	AG+TT<br>(+)32/(+)2	AG+CT<br>(+)30/(+)0	AA+GT<br>(+)29/(-)-1	AT+GT<br>(+)32/(-)-4	AC+GT<br>(+)30/(-)-2	AG+GT<br>(+)31/(+)1
+AGC	AG+GC<br>(+)29/(+)3	AG+AC<br>(+)27/(+)1	AG+TC<br>(+)30/(+)0	AG+CC<br>(+)28/(+)2	AA+GC<br>(+)27/(+)1	AT+GC<br>(+)30/(-)-2	AC+GC<br>(+)28/(+)0	AG+GC<br>(+)29/(+)3
+AGG	AG+GG<br>(+)30/(+)2	AG+AG<br>(+)28/(+)0	AG+TG<br>(+)31/(+)3	AG+CG<br>(+)29/(+)1	AA+GG<br>(+)28/(+)0	AT+GG<br>(+)31/(-)-3	AC+GG<br>(+)29/(-)-1	
+
+This completes the calculation for the A-Family (Cups). Please review it for accuracy based on your understanding of the system.
+
+We can now proceed to generate the tables for the T-Family (Wands), C-Family (Pentacles), and G-Family (Swords) using the same methodology. We will need the defining pair combinations for the 8 states for each codon in those families, similar to how they were provided for the A-family.

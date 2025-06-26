@@ -1,0 +1,9 @@
+# Development Standard: Streamlined RAG and Multi-Layered Knowledge Synthesis
+
+The development of Graphiti with Quaternal Logic alignment establishes a critical standard for future agent development, particularly concerning data processing and knowledge synthesis. This architecture enables a multi-layered approach to Retrieval-Augmented Generation (RAG).
+
+- **Generative Core (Asynchronous Rumination):** The `UnifiedRAG` system, integrated with the `Contemplation` skill, will function as the generative core. It performs the "heavy lifting" of deep knowledge synthesis, creating and refining `QuaternalUnit`s as a background, asynchronous process. This can be considered the system's "rumination" capability, which continuously improves the quality and structure of the core memory bank. Likely the epii agent will manage and orchestrate this process.
+
+- **Dynamic RAG (Real-Time Application):** The Graphiti service itself will serve as the "topmost layer" for cognitive operations. Individual agents within the multi-agent architecture can leverage the refined `QuaternalUnit`s for dynamic, in-the-moment RAG. This allows for rapid, low-latency access to pre-synthesized knowledge, making individual agent interactions faster and more contextually precise.
+
+This explicit separation of concerns—from heavier, asynchronous synthesis to lighter, dynamic retrieval—is a guiding principle. It ensures that the entire multi-agent architecture can leverage a constantly improving, centrally-managed knowledge base, while individual agents remain agile and responsive. All future agent development should adhere to this model, utilizing the Graphiti service for immediate knowledge needs and contributing to the deeper `Contemplation` cycle where appropriate.

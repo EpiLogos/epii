@@ -638,7 +638,7 @@ export async function sendChunksToLightRAG(chunks, sourceMetadata, bpMCPService)
                 // Call the LightRAG server's /ingest endpoint
                 const response = await axios.post(LIGHTRAG_INGEST_URL, payload, {
                     headers: { 'Content-Type': 'application/json' },
-                    timeout: 60000 // 1 minute timeout
+                    timeout: 120000 // 2 minute timeout - doubled from 60000ms
                 });
 
                 const result = {

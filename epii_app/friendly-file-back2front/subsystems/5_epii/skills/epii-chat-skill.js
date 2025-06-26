@@ -112,6 +112,9 @@ class EpiiChatSkill {
 
             if (ragResult.success) {
               ragContext = ragResult.data;
+              if (params.documentContent) {
+                ragContext.fullDocument = params.documentContent;
+              }
               console.log(`${logPrefix} UnifiedRAG context retrieved:`, {
                 sources: ragContext.sourcesQueried,
                 coordinates: ragContext.coordinatesCovered,
@@ -274,7 +277,7 @@ class EpiiChatSkill {
       }
 
       // Fallback: create new instance
-      const UnifiedRAGSkill = require('./unifiedRAG');
+      const UnifiedRAGSkill = require('../../shared/services/unifiedRAG');
       return new UnifiedRAGSkill();
     } catch (error) {
       console.warn('[EpiiChat] Could not get UnifiedRAG skill:', error);

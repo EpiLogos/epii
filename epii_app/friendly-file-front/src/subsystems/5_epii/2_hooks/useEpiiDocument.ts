@@ -340,7 +340,8 @@ export const useDocumentAnalysis = () => {
     const checkExistingAnalysisResults = async () => {
       try {
         // Import document service
-        const { documentService } = await import('../1_services/documentService');
+        const documentServiceModule = await import('../1_services/documentService');
+        const documentService = documentServiceModule.default;
 
         // Get document using document service (which uses cache)
         const document = await documentService.getDocument(currentDocumentId);

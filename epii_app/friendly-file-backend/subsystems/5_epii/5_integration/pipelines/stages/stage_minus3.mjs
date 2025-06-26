@@ -38,7 +38,7 @@ export async function runStageMinus3(state) {
         let bpMCPService = state.bpMCPService;
         if (!bpMCPService) {
             console.log("bpMCPService not found in state, importing it directly");
-            bpMCPService = (await import('../../services/bpMCPService.mjs')).default;
+            bpMCPService = (await import('../../../../../databases/bpmcp/bpMCP.service.mjs')).default;
         }
 
         // Flag to track if we should skip LightRAG ingestion

@@ -115,7 +115,7 @@ export async function runStageMinus0(state) {
         }
 
         // Import the generateNotionUpdatePayload function
-        const { generateNotionUpdatePayload } = await import('../../utils/notion.utils.mjs');
+        const { generateNotionUpdatePayload } = await import('../../../1_utils/notion.utils.mjs');
 
         // Generate the main Notion update payload
         let notionUpdatePayload;
@@ -199,7 +199,7 @@ export async function runStageMinus0(state) {
         }
 
         // Import the generateEpiiPerspective function
-        const { generateEpiiPerspective } = await import('../../utils/content/synthesis.mjs');
+        const { generateEpiiPerspective } = await import('../../../1_utils/content/synthesis.mjs');
 
         // Generate the Epii perspective
         let epiiPerspective;
@@ -224,7 +224,7 @@ export async function runStageMinus0(state) {
             // CREATE GRAPHITI EPISODE with the structured analysis results
             console.log(`Creating Graphiti episode for analysis results...`);
             try {
-                const { createGraphitiEpisodeFromAnalysis } = await import('../../utils/content/synthesis.mjs');
+                const { createGraphitiEpisodeFromAnalysis } = await import('../../../1_utils/content/synthesis.mjs');
                 await createGraphitiEpisodeFromAnalysis(
                     synthesis,
                     coreElements,
@@ -322,7 +322,7 @@ export async function runStageMinus0(state) {
 
             try {
                 // Import the FileMetadata model
-                const { default: FileMetadata } = await import('../../models/FileMetadata.mjs');
+                const { default: FileMetadata } = await import('../../../3_models/FileMetadata.mjs');
 
                 // Find and update the file metadata
                 const fileMetadata = await FileMetadata.findById(fileId);
@@ -451,7 +451,7 @@ export async function runStageMinus0(state) {
 
         try {
             // Import the document cache utility
-            const { storeAnalysisResultsInCache } = await import('../../utils/documentCache.utils.mjs');
+            const { storeAnalysisResultsInCache } = await import('../../../../../databases/shared/utils/documentCache.utils.mjs');
 
             // Create a properly structured object with notionUpdatePayload at the top level
             // This ensures the frontend can find it directly
@@ -582,7 +582,7 @@ export async function runStageMinus0(state) {
         // If this was a file upload, update the file's analysis status
         if (fileId) {
             try {
-                const { default: FileMetadata } = await import('../../models/FileMetadata.mjs');
+                const { default: FileMetadata } = await import('../../../3_models/FileMetadata.mjs');
                 const fileMetadata = await FileMetadata.findById(fileId);
                 if (fileMetadata) {
                     // Update only minimal metadata

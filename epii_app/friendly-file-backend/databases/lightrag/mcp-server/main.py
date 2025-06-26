@@ -80,7 +80,7 @@ logger.info(f"Setting QDRANT_URL environment variable to: {qdrant_url}")
 # Load API keys and endpoints from .env
 GEMINI_API_KEY = os.getenv("LLM_BINDING_API_KEY")
 GEMINI_ENDPOINT = os.getenv("LLM_BINDING_HOST")
-GEMINI_LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-pro-preview-03-25")
+GEMINI_LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.0-flash")
 GEMINI_EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-004")
 EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", 768))
 
@@ -93,27 +93,55 @@ if not GEMINI_API_KEY or "your_google_ai_studio_api_key_here" in GEMINI_API_KEY:
 
 # --- Define Wrapper Functions ---
 async def wrapped_llm_func(prompt: str, **kwargs):
-    """Wrapper to ensure correct arguments are passed to openai_complete_if_cache."""
+    """Wrapper to ensure correct arguments are passed to openai_complete_if_cache with infinite retry for quota limits."""
+    import asyncio
+    from httpx import HTTPStatusError
+
     # Extract history_messages if present in kwargs, otherwise default to None or []
     history_messages = kwargs.pop('history_messages', None)
     system_prompt = kwargs.pop('system_prompt', None)
     # Add any other specific args openai_complete_if_cache might need from kwargs
 
     logger.debug(f"wrapped_llm_func called with prompt length: {len(prompt)}, kwargs: {kwargs.keys()}")
-    try:
-        # Call the underlying function with arguments in the correct order
-        return await openai_complete_if_cache(
-            model=GEMINI_LLM_MODEL, # Explicitly pass model name first
-            prompt=prompt,          # Pass the received prompt second
-            system_prompt=system_prompt,
-            history_messages=history_messages,
-            api_key=GEMINI_API_KEY,
-            base_url=GEMINI_ENDPOINT,
-            **kwargs # Pass remaining kwargs
-        )
-    except Exception as e:
-        logger.error(f"Error in wrapped_llm_func: {e}", exc_info=True)
-        raise # Re-raise the exception
+
+    retry_count = 0
+    max_retries = float('inf')  # Infinite retries for quota limits
+    base_delay = 60  # Start with 60 seconds for quota limits
+
+    while retry_count < max_retries:
+        try:
+            # Call the underlying function with arguments in the correct order
+            return await openai_complete_if_cache(
+                model=GEMINI_LLM_MODEL, # Explicitly pass model name first
+                prompt=prompt,          # Pass the received prompt second
+                system_prompt=system_prompt,
+                history_messages=history_messages,
+                api_key=GEMINI_API_KEY,
+                base_url=GEMINI_ENDPOINT,
+                **kwargs # Pass remaining kwargs
+            )
+        except HTTPStatusError as e:
+            if e.response.status_code == 429:  # Rate limit error
+                retry_count += 1
+                # Exponential backoff with jitter for quota limits
+                delay = base_delay * (2 ** min(retry_count - 1, 5)) + (retry_count * 10)  # Cap exponential growth
+                logger.warning(f"Rate limit hit (429). Retry {retry_count}. Waiting {delay} seconds before retry...")
+                await asyncio.sleep(delay)
+                continue
+            else:
+                logger.error(f"HTTP error in wrapped_llm_func: {e}", exc_info=True)
+                raise
+        except Exception as e:
+            # For non-quota errors, fail after a few retries
+            if retry_count < 3:
+                retry_count += 1
+                delay = 5 * retry_count  # Short delay for other errors
+                logger.warning(f"Error in wrapped_llm_func (attempt {retry_count}): {e}. Retrying in {delay} seconds...")
+                await asyncio.sleep(delay)
+                continue
+            else:
+                logger.error(f"Error in wrapped_llm_func after {retry_count} retries: {e}", exc_info=True)
+                raise
 
 async def wrapped_embedding_func(texts: list[str], **kwargs):
     """Wrapper to ensure correct arguments are passed to openai_embed."""

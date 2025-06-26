@@ -335,6 +335,32 @@ async function initializeA2AServer(epiiAgentService, port = 3033) {
           return;
         }
 
+        // Handle AG-UI event emissions from frontend
+        if (data.type === 'ag-ui-event') {
+          console.log(`Client ${clientId} emitting AG-UI event: ${data.eventType}`);
+
+          // Process the AG-UI event through the gateway
+          const aguiEvent = {
+            type: data.eventType,
+            runId: data.data?.runId || uuidv4(),
+            threadId: data.data?.threadId || uuidv4(),
+            ...data.data,
+            timestamp: new Date().toISOString()
+          };
+
+          // Emit through AG-UI Gateway
+          aguiGateway.emitAGUIEvent(aguiEvent, data.data?.metadata || {});
+
+          // Send acknowledgment
+          ws.send(JSON.stringify({
+            type: 'ag-ui-event-ack',
+            eventType: data.eventType,
+            timestamp: new Date().toISOString()
+          }));
+
+          return;
+        }
+
         // Handle skill execution requests
         if (data.type === 'skill-execution' || (data.jsonrpc === '2.0' && data.method === 'executeSkill')) {
           console.log(`✅ Received skill execution request: ${data.params?.skillId || data.skillId}`);

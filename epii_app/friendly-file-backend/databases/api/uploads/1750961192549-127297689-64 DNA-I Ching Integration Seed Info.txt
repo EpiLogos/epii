@@ -1,0 +1,1452 @@
+# OG Yin-Yang Coin Values
+
+0/1 = Yin/Yang
+1/0 = Yang/Yin
+
+2 = Yin 
+3= Yang
+
+# Nucleotide Yin/Yang Values
+
+A = 6 = Yin (moving)
+T = 9 = Yang (moving)
+C = 7 = yin (resting)
+G = 8 = yang (resting)
+
+## Matrix 1
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-T = (+)15 - (-)-3 = Tui - Yin-Yang               
+C-G = (+)15 - (-)-1 = Sun - yin-yang
+T-A = (+)15 - (-)3 = Ken - Yang-Yin
+G-C = (+)15 - (-)1 = Chen - yang-yin
+
+# Matrix 2
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-G = (+)14 - (-)-2 = Ken - Yin-yang
+T-C = (+)16 - (-)2 =  Tui - Yang-yin
+G-A = (+)14 - (-)2 = Sun - yang-Yin
+C-T = (+)16  - (-)-2 = Chen - yin-Yang
+
+## Matrix 3
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-C = (+)13 - (-)-1 = Yin-yin
+T-G = (+)17 - (-)1 = Yang-yang
+C-A = (+)13 - (-)1 = yin-Yin
+G-T = (+)17 - (-)-1 = yang-Yang
+
+# Non- Dual Codons
+
+## Palindromic
+
+### Perfect
+
+| AAA x 6 - H2 |
+| --- |
+| TTT x 6 - H1 |
+| CCC x 6 - H29 |
+| GGG x 6 - H30 |
+
+### Imperfect
+
+| ATA x 2 - H54 | AGA x 2 - H53 | ACA x 2 - H27 |
+| --- | --- | --- |
+| TAT x 2 - H17 | TCT x 2 - H54 | TGT x 2 - H28 |
+| CGC x 2 - H18 | CTC x 2 - H17 | CAC x 2 - H62 |
+| GCG x 2 - H53  | GAG x 2 - H18 | GTG x 2 - H61 |
+
+## Non - Palindromic
+
+| AAT x 2 - H54 | ATT x 2 - H45 |
+| --- | --- |
+| TTA x 2 - H34 | TAA x 2 - H24 |
+
+| AAC x 2 - H16 | ACC x 2 - H3 |
+| --- | --- |
+| TTG x 2 - H9 | TGG x 2 - H50 |
+
+| AAG x 2 - H23 | AGG x 2 - H56 |
+| --- | --- |
+| TTC x 2 - H43 | TCC x 2 - H60 |
+
+| CCG x 2 - H59 | CGG x 2 - H50 |
+| --- | --- |
+| GGC x 2 - H22 | GCC x 2 - H39 |
+
+| CCA x 2 - H4 | CAA x 2 - H15 |
+| --- | --- |
+| GGT x 2 - H49 | GTT x 2 - H10 |
+
+| CCT x 2 - H40 | CTT x 2 - H25 |
+| --- | --- |
+| GGA x 2 - H37 | GAA x 2 - H46 |
+
+
+
+Matrix 1 - 
+
+## Matrix 1
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-T = (+)15 - (-)-3 = Tui - Yin-Yang               
+C-G = (+)15 - (-)-1 = Sun - yin-yang
+T-A = (+)15 - (-)3 = Ken - Yang-Yin
+G-C = (+)15 - (-)1 = Chen - yang-yin
+
+Matrix 1
+Columns (in order): AA TT CC GG AT CG TA GC
+Rows (in order): TT, AA, GG, CC, TA, GC, AT, CG
+
+──────────────────────────────────────────── Row: TT
+
+• TT–AA
+ Hexagram #: 11
+ Positive: TAA  Negative: TTA
+
+• TT–TT
+ Hexagram #: 1
+ Positive: TTT  Negative: TTT
+  → Non‑Dual (TTT)
+
+• TT–CC
+ Hexagram #: 5
+ Positive: TCC  Negative: TTC
+
+• TT–GG
+ Hexagram #: 14
+ Positive: TGG  Negative: TTG
+
+• TT–AT
+ Hexagram #: 43
+ Positive: TAT  Negative: TTT
+
+• TT–CG
+ Hexagram #: 9
+ Positive: TCG  Negative: TTG
+
+• TT–TA
+ Hexagram #: 34
+ Positive: TTA  Negative: TTA
+  → Non‑Dual (TTA)
+
+• TT–GC
+ Hexagram #: 26
+ Positive: TGC  Negative: TTC
+
+──────────────────────────────────────────── Row: AA
+
+• AA–AA
+ Hexagram #: 2
+ Positive: AAA  Negative: AAA
+  → Non‑Dual (AAA)
+
+• AA–TT
+ Hexagram #: 12
+ Positive: ATT  Negative: AAT
+
+• AA–CC
+ Hexagram #: 8
+ Positive: ACC  Negative: AAC
+
+• AA–GG
+ Hexagram #: 35
+ Positive: AGG  Negative: AAG
+
+• AA–AT
+ Hexagram #: 45
+ Positive: AAT  Negative: AAT
+  → Non‑Dual (AAT)
+
+• AA–CG
+ Hexagram #: 20
+ Positive: ACG  Negative: AAG
+
+• AA–TA
+ Hexagram #: 16
+ Positive: ATA  Negative: AAA
+
+• AA–GC
+ Hexagram #: 23
+ Positive: AGC  Negative: AAC
+
+──────────────────────────────────────────── Row: GG
+
+• GG–AA
+ Hexagram #: 36
+ Positive: GAA  Negative: GGA
+
+• GG–TT
+ Hexagram #: 13
+ Positive: GTT  Negative: GGT
+
+• GG–CC
+ Hexagram #: 63
+ Positive: GCC  Negative: GGC
+
+• GG–GG
+ Hexagram #: 30
+ Positive: GGG  Negative: GGG
+  → Non‑Dual (GGG)
+
+• GG–AT
+ Hexagram #: 49
+ Positive: GAT  Negative: GGT
+
+• GG–CG
+ Hexagram #: 37
+ Positive: GCG  Negative: GGG
+
+• GG–TA
+ Hexagram #: 55
+ Positive: GTA  Negative: GGA
+
+• GG–GC
+ Hexagram #: 22
+ Positive: GGC  Negative: GGC
+  → Non‑Dual (GGC)
+
+──────────────────────────────────────────── Row: CC
+
+• CC–AA
+ Hexagram #: 7
+ Positive: CAA  Negative: CCA
+
+• CC–TT
+ Hexagram #: 6
+ Positive: CTT  Negative: CCT
+
+• CC–CC
+ Hexagram #: 29
+ Positive: CCC  Negative: CCC
+  → Non‑Dual (CCC)
+
+• CC–GG
+ Hexagram #: 64
+ Positive: CGG  Negative: CCG
+
+• CC–AT
+ Hexagram #: 47
+ Positive: CAT  Negative: CCT
+
+• CC–CG
+ Hexagram #: 59
+ Positive: CCG  Negative: CCG
+  → Non‑Dual (CCG)
+
+• CC–TA
+ Hexagram #: 40
+ Positive: CTA  Negative: CCA
+
+• CC–GC
+ Hexagram #: 4
+ Positive: CGC  Negative: CCC
+
+──────────────────────────────────────────── Row: TA
+
+• TA–AA
+ Hexagram #: 24
+ Positive: TAA  Negative: TAA
+  → Non‑Dual (TAA)
+
+• TA–TT
+ Hexagram #: 25
+ Positive: TTT  Negative: TAT
+
+• TA–CC
+ Hexagram #: 3
+ Positive: TCC  Negative: TAC
+
+• TA–GG
+ Hexagram #: 21
+ Positive: TGG  Negative: TAG
+
+• TA–AT
+ Hexagram #: 17
+ Positive: TAT  Negative: TAT
+  → Non‑Dual (TAT)
+
+• TA–CG
+ Hexagram #: 42
+ Positive: TCG  Negative: TAG
+
+• TA–TA
+ Hexagram #: 51
+ Positive: TTA  Negative: TAA
+
+• TA–GC
+ Hexagram #: 27
+ Positive: TGC  Negative: TAC
+
+──────────────────────────────────────────── Row: GC
+
+• GC–AA
+ Hexagram #: 15
+ Positive: GAA  Negative: GCA
+
+• GC–TT
+ Hexagram #: 33
+ Positive: GTT  Negative: GCT
+
+• GC–CC
+ Hexagram #: 39
+ Positive: GCC  Negative: GCC
+  → Non‑Dual (GCC)
+
+• GC–GG
+ Hexagram #: 56
+ Positive: GGG  Negative: GCG
+
+• GC–AT
+ Hexagram #: 31
+ Positive: GAT  Negative: GCT
+
+• GC–CG
+ Hexagram #: 53
+ Positive: GCG  Negative: GCG
+  → Non‑Dual (GCG)
+
+• GC–TA
+ Hexagram #: 62
+ Positive: GTA  Negative: GCA
+
+• GC–GC
+ Hexagram #: 52
+ Positive: GGC  Negative: GCG
+
+──────────────────────────────────────────── Row: AT
+
+• AT–AA
+ Hexagram #: 19
+ Positive: AAA  Negative: ATA
+
+• AT–TT
+ Hexagram #: 10
+ Positive: ATT  Negative: ATT
+  → Non‑Dual (ATT)
+
+• AT–CC
+ Hexagram #: 60
+ Positive: ACC  Negative: ATC
+
+• AT–GG
+ Hexagram #: 38
+ Positive: AGG  Negative: ATG
+
+• AT–AT
+ Hexagram #: 58
+ Positive: AAT  Negative: ATT
+
+• AT–CG
+ Hexagram #: 61
+ Positive: ACG  Negative: ATG
+
+• AT–TA
+ Hexagram #: 54
+ Positive: ATA  Negative: ATA
+  → Non‑Dual (ATA)
+
+• AT–GC
+ Hexagram #: 41
+ Positive: AGC  Negative: ATC
+
+──────────────────────────────────────────── Row: CG
+
+• CG–AA
+ Hexagram #: 46
+ Positive: CAA  Negative: CGA
+
+• CG–TT
+ Hexagram #: 44
+ Positive: CTT  Negative: CGT
+
+• CG–CC
+ Hexagram #: 48
+ Positive: CCC  Negative: CGC
+
+• CG–GG
+ Hexagram #: 50
+ Positive: CGG  Negative: CGG
+  → Non‑Dual (CGG)
+
+• CG–AT
+ Hexagram #: 28
+ Positive: CAT  Negative: CGT
+
+• CG–CG
+ Hexagram #: 57
+ Positive: CCG  Negative: CGG
+
+• CG–TA
+ Hexagram #: 32
+ Positive: CTA  Negative: CGA
+
+• CG–GC
+ Hexagram #: 18
+ Positive: CGC  Negative: CGC
+  → Non‑Dual (CGC)
+
+────────────────────────────────────────────
+
+Each cell above is labeled with its hexagram number (the “value”), and the codon pair is split into its positive and negative components. Where the pair is identical, the “non‑dual” condition is noted.
+
+Matrix 2 - 
+
+# Matrix 2
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-G = (+)14 - (-)-2 = Ken - Yin-yang
+T-C = (+)16 - (-)2 =  Tui - Yang-yin
+G-A = (+)14 - (-)2 = Sun - yang-Yin
+C-T = (+)16  - (-)-2 = Chen - yin-Yang
+
+For Matrix 2, the columns (in order) are:
+ AA TT CC GG AG TC GA CT
+
+and the rows (in order) are:
+ TT, AA, GG, CC, GA, CT, AG, TC
+
+──────────────────────────────────────────── Row: TT
+
+• TT–AA
+ Hexagram #: 11
+ Positive: TAA  Negative: TTA
+
+• TT–TT
+ Hexagram #: 1
+ Positive: TTT  Negative: TTT
+  → Non‑Dual (TTT)
+
+• TT–CC
+ Hexagram #: 5
+ Positive: TCC  Negative: TTC
+
+• TT–GG
+ Hexagram #: 14
+ Positive: TGG  Negative: TTG
+
+• TT–AG
+ Hexagram #: 26
+ Positive: TAG  Negative: TTG
+
+• TT–TC
+ Hexagram #: 43
+ Positive: TTC  Negative: TTC
+  → Non‑Dual (TTC)
+
+• TT–GA
+ Hexagram #: 9
+ Positive: TGA  Negative: TTA
+
+• TT–CT
+ Hexagram #: 34
+ Positive: TCT  Negative: TTT
+
+──────────────────────────────────────────── Row: AA
+
+• AA–AA
+ Hexagram #: 2
+ Positive: AAA  Negative: AAA
+  → Non‑Dual (AAA)
+
+• AA–TT
+ Hexagram #: 12
+ Positive: ATT  Negative: AAT
+
+• AA–CC
+ Hexagram #: 8
+ Positive: ACC  Negative: AAC
+
+• AA–GG
+ Hexagram #: 35
+ Positive: AGG  Negative: AAG
+
+• AA–AG
+ Hexagram #: 23
+ Positive: AAG  Negative: AAG
+  → Non‑Dual (AAG)
+
+• AA–TC
+ Hexagram #: 45
+ Positive: ATC  Negative: AAC
+
+• AA–GA
+ Hexagram #: 20
+ Positive: AGA  Negative: AAA
+
+• AA–CT
+ Hexagram #: 16
+ Positive: ACT  Negative: AAT
+
+──────────────────────────────────────────── Row: GG
+
+• GG–AA
+ Hexagram #: 36
+ Positive: GAA  Negative: GGA
+
+• GG–TT
+ Hexagram #: 13
+ Positive: GTT  Negative: GGT
+
+• GG–CC
+ Hexagram #: 63
+ Positive: GCC  Negative: GGC
+
+• GG–GG
+ Hexagram #: 30
+ Positive: GGG  Negative: GGG
+  → Non‑Dual (GGG)
+
+• GG–AG
+ Hexagram #: 22
+ Positive: GAG  Negative: GGG
+
+• GG–TC
+ Hexagram #: 49
+ Positive: GTC  Negative: GGC
+
+• GG–GA
+ Hexagram #: 37
+ Positive: GGA  Negative: GGA
+  → Non‑Dual (GGA)
+
+• GG–CT
+ Hexagram #: 55
+ Positive: GCT  Negative: GGT
+
+──────────────────────────────────────────── Row: CC
+
+• CC–AA
+ Hexagram #: 7
+ Positive: CAA  Negative: CCA
+
+• CC–TT
+ Hexagram #: 6
+ Positive: CTT  Negative: CCT
+
+• CC–CC
+ Hexagram #: 29
+ Positive: CCC  Negative: CCC
+  → Non‑Dual (CCC)
+
+• CC–GG
+ Hexagram #: 64
+ Positive: CGG  Negative: CCG
+
+• CC–AG
+ Hexagram #: 4
+ Positive: CAG  Negative: CCG
+
+• CC–TC
+ Hexagram #: 47
+ Positive: CTC  Negative: CCC
+
+• CC–GA
+ Hexagram #: 59
+ Positive: CGA  Negative: CCA
+
+• CC–CT
+ Hexagram #: 40
+ Positive: CCT  Negative: CCT
+  → Non‑Dual (CCT)
+
+──────────────────────────────────────────── Row: GA
+
+• GA–AA
+ Hexagram #: 46
+ Positive: GAA  Negative: GAA
+  → Non‑Dual (GAA)
+
+• GA–TT
+ Hexagram #: 44
+ Positive: GTT  Negative: GAT
+
+• GA–CC
+ Hexagram #: 48
+ Positive: GCC  Negative: GAC
+
+• GA–GG
+ Hexagram #: 50
+ Positive: GGG  Negative: GAG
+
+• GA–AG
+ Hexagram #: 18
+ Positive: GAG  Negative: GAG
+  → Non‑Dual (GAG)
+
+• GA–TC
+ Hexagram #: 28
+ Positive: GTC  Negative: GAC
+
+• GA–GA
+ Hexagram #: 57
+ Positive: GGA  Negative: GAA
+
+• GA–CT
+ Hexagram #: 32
+ Positive: GCT  Negative: GAT
+
+──────────────────────────────────────────── Row: CT
+
+• CT–AA
+ Hexagram #: 24
+ Positive: CAA  Negative: CTA
+
+• CT–TT
+ Hexagram #: 25
+ Positive: CTT  Negative: CTT
+  → Non‑Dual (CTT)
+
+• CT–CC
+ Hexagram #: 3
+ Positive: CCC  Negative: CTC
+
+• CT–GG
+ Hexagram #: 21
+ Positive: CGG  Negative: CTG
+
+• CT–AG
+ Hexagram #: 27
+ Positive: CAG  Negative: CTG
+
+• CT–TC
+ Hexagram #: 17
+ Positive: CTC  Negative: CTC
+  → Non‑Dual (CTC)
+
+• CT–GA
+ Hexagram #: 42
+ Positive: CGA  Negative: CTA
+
+• CT–CT
+ Hexagram #: 51
+ Positive: CCT  Negative: CTT
+
+──────────────────────────────────────────── Row: AG
+
+• AG–AA
+ Hexagram #: 15
+ Positive: AAA  Negative: AGA
+
+• AG–TT
+ Hexagram #: 33
+ Positive: ATT  Negative: AGT
+
+• AG–CC
+ Hexagram #: 39
+ Positive: ACC  Negative: AGC
+
+• AG–GG
+ Hexagram #: 56
+ Positive: AGG  Negative: AGG
+  → Non‑Dual (AGG)
+
+• AG–AG
+ Hexagram #: 52
+ Positive: AAG  Negative: AGG
+
+• AG–TC
+ Hexagram #: 31
+ Positive: ATC  Negative: AGC
+
+• AG–GA
+ Hexagram #: 53
+ Positive: AGA  Negative: AGA
+  → Non‑Dual (AGA)
+
+• AG–CT
+ Hexagram #: 62
+ Positive: ACT  Negative: AGT
+
+──────────────────────────────────────────── Row: TC
+
+• TC–AA
+ Hexagram #: 19
+ Positive: TAA  Negative: TCA
+
+• TC–TT
+ Hexagram #: 10
+ Positive: TTT  Negative: TCT
+
+• TC–CC
+ Hexagram #: 60
+ Positive: TCC  Negative: TCC
+  → Non‑Dual (TCC)
+
+• TC–GG
+ Hexagram #: 38
+ Positive: TGG  Negative: TCG
+
+• TC–AG
+ Hexagram #: 41
+ Positive: TAG  Negative: TCG
+
+• TC–TC
+ Hexagram #: 58
+ Positive: TTC  Negative: TCC
+
+• TC–GA
+ Hexagram #: 61
+ Positive: TGA  Negative: TCA
+
+• TC–CT
+ Hexagram #: 54
+ Positive: TCT  Negative: TCT
+  → Non‑Dual (TCT)
+
+Matrix 3 -
+
+## Matrix 3
+
+A-A = (+)12 - (-)0 = K'un - Yin-Yin
+T-T = (+)18 - (-)0 = Ch'ien - Yang-Yang
+C-C = (+)14 - (-)0 = K'an - yin-yin
+G-G = (+)16 - (-)0 = Li - yang-yang
+
+A-C = (+)13 - (-)-1 = Yin-yin
+T-G = (+)17 - (-)1 = Yang-yang
+C-A = (+)13 - (-)1 = yin-Yin
+G-T = (+)17 - (-)-1 = yang-Yang
+
+For Matrix 3, the column headers (in order) are:
+ AA  TT  CC  GG  AC  TG  CA  GT
+and the row labels (in order) are:
+ TT, AA, GG, CC, CA, GT, AC, TG
+
+──────────────────────────────────────────── Row: TT
+
+• TT–AA
+ Hexagram #: 11
+ Positive: TAA  Negative: TTA
+
+• TT–TT
+ Hexagram #: 1
+ Positive: TTT  Negative: TTT
+  → Non‑Dual (TTT)
+
+• TT–CC
+ Hexagram #: 5
+ Positive: TCC  Negative: TTC
+
+• TT–GG
+ Hexagram #: 14
+ Positive: TGG  Negative: TTG
+
+• TT–AC
+ Hexagram #: 34
+ Positive: TAC  Negative: TTC
+
+• TT–TG
+ Hexagram #: 9
+ Positive: TTG  Negative: TTG
+  → Non‑Dual (TTG)
+
+• TT–CA
+ Hexagram #: 26
+ Positive: TCA  Negative: TTA
+
+• TT–GT
+ Hexagram #: 43
+ Positive: TGT  Negative: TTT
+
+──────────────────────────────────────────── Row: AA
+
+• AA–AA
+ Hexagram #: 2
+ Positive: AAA  Negative: AAA
+  → Non‑Dual (AAA)
+
+• AA–TT
+ Hexagram #: 12
+ Positive: ATT  Negative: AAT
+
+• AA–CC
+ Hexagram #: 8
+ Positive: ACC  Negative: AAC
+
+• AA–GG
+ Hexagram #: 35
+ Positive: AGG  Negative: AAG
+
+• AA–AC
+ Hexagram #: 16
+ Positive: AAC  Negative: AAC
+  → Non‑Dual (AAC)
+
+• AA–TG
+ Hexagram #: 20
+ Positive: ATG  Negative: AAG
+
+• AA–CA
+ Hexagram #: 23
+ Positive: ACA  Negative: AAA
+
+• AA–GT
+ Hexagram #: 45
+ Positive: AGT  Negative: AAT
+
+──────────────────────────────────────────── Row: GG
+
+• GG–AA
+ Hexagram #: 36
+ Positive: GAA  Negative: GGA
+
+• GG–TT
+ Hexagram #: 13
+ Positive: GTT  Negative: GGT
+
+• GG–CC
+ Hexagram #: 63
+ Positive: GCC  Negative: GGC
+
+• GG–GG
+ Hexagram #: 30
+ Positive: GGG  Negative: GGG
+  → Non‑Dual (GGG)
+
+• GG–AC
+ Hexagram #: 55
+ Positive: GAC  Negative: GGC
+
+• GG–TG
+ Hexagram #: 37
+ Positive: GTG  Negative: GGG
+
+• GG–CA
+ Hexagram #: 22
+ Positive: GCA  Negative: GGA
+
+• GG–GT
+ Hexagram #: 49
+ Positive: GGT  Negative: GGT
+  → Non‑Dual (GGT)
+
+──────────────────────────────────────────── Row: CC
+
+• CC–AA
+ Hexagram #: 7
+ Positive: CAA  Negative: CCA
+
+• CC–TT
+ Hexagram #: 6
+ Positive: CTT  Negative: CCT
+
+• CC–CC
+ Hexagram #: 29
+ Positive: CCC  Negative: CCC
+  → Non‑Dual (CCC)
+
+• CC–GG
+ Hexagram #: 64
+ Positive: CGG  Negative: CCG
+
+• CC–AC
+ Hexagram #: 40
+ Positive: CAC  Negative: CCC
+
+• CC–TG
+ Hexagram #: 59
+ Positive: CTG  Negative: CCG
+
+• CC–CA
+ Hexagram #: 4
+ Positive: CCA  Negative: CCA
+  → Non‑Dual (CCA)
+
+• CC–GT
+ Hexagram #: 47
+ Positive: CGT  Negative: CCT
+
+──────────────────────────────────────────── Row: CA
+
+• CA–AA
+ Hexagram #: 15
+ Positive: CAA  Negative: CAA
+  → Non‑Dual (CAA)
+
+• CA–TT
+ Hexagram #: 33
+ Positive: CTT  Negative: CAT
+
+• CA–CC
+ Hexagram #: 39
+ Positive: CCC  Negative: CAC
+
+• CA–GG
+ Hexagram #: 56
+ Positive: CGG  Negative: CAG
+
+• CA–AC
+ Hexagram #: 62
+ Positive: CAC  Negative: CAC
+  → Non‑Dual (CAC)
+
+• CA–TG
+ Hexagram #: 53
+ Positive: CTG  Negative: CAG
+
+• CA–CA
+ Hexagram #: 52
+ Positive: CCA  Negative: CAA
+
+• CA–GT
+ Hexagram #: 31
+ Positive: CGT  Negative: CAT
+
+──────────────────────────────────────────── Row: GT
+
+• GT–AA
+ Hexagram #: 19
+ Positive: GAA  Negative: GTA
+
+• GT–TT
+ Hexagram #: 10
+ Positive: GTT  Negative: GTT
+  → Non‑Dual (GTT)
+
+• GT–CC
+ Hexagram #: 60
+ Positive: GCC  Negative: GTC
+
+• GT–GG
+ Hexagram #: 38
+ Positive: GGG  Negative: GTG
+
+• GT–AC
+ Hexagram #: 54
+ Positive: GAC  Negative: GTC
+
+• GT–TG
+ Hexagram #: 61
+ Positive: GTG  Negative: GTG
+  → Non‑Dual (GTG)
+
+• GT–CA
+ Hexagram #: 41
+ Positive: GCA  Negative: GTA
+
+• GT–GT
+ Hexagram #: 58
+ Positive: GGT  Negative: GTT
+
+──────────────────────────────────────────── Row: AC
+
+• AC–AA
+ Hexagram #: 24
+ Positive: AAA  Negative: ACA
+
+• AC–TT
+ Hexagram #: 25
+ Positive: ATT  Negative: ACT
+
+• AC–CC
+ Hexagram #: 3
+ Positive: ACC  Negative: ACC
+  → Non‑Dual (ACC)
+
+• AC–GG
+ Hexagram #: 21
+ Positive: AGG  Negative: ACG
+
+• AC–AC
+ Hexagram #: 51
+ Positive: AAC  Negative: ACC
+
+• AC–TG
+ Hexagram #: 42
+ Positive: ATG  Negative: ACG
+
+• AC–CA
+ Hexagram #: 27
+ Positive: ACA  Negative: ACA
+  → Non‑Dual (ACA)
+
+• AC–GT
+ Hexagram #: 17
+ Positive: AGT  Negative: ACT
+
+──────────────────────────────────────────── Row: TG
+
+• TG–AA
+ Hexagram #: 46
+ Positive: TAA  Negative: TGA
+
+• TG–TT
+ Hexagram #: 44
+ Positive: TTT  Negative: TGT
+
+• TG–CC
+ Hexagram #: 48
+ Positive: TCC  Negative: TGC
+
+• TG–GG
+ Hexagram #: 50
+ Positive: TGG  Negative: TGG
+  → Non‑Dual (TGG)
+
+• TG–AC
+ Hexagram #: 32
+ Positive: TAC  Negative: TGC
+
+• TG–TG
+ Hexagram #: 57
+ Positive: TTG  Negative: TGG
+
+• TG–CA
+ Hexagram #: 18
+ Positive: TCA  Negative: TGA
+
+• TG–GT
+ Hexagram #: 28
+ Positive: TGT  Negative: TGT
+  → Non‑Dual (TGT)
+
+Below is the full plain‑text “Compiled Hexagram–Codon Table” that brings together the three matrices. In this table the eight trigram names (Ch’ien, Chen, K’an, Ken, K’un, Sun, Li, Tui) label both the rows and the columns. Each cell represents one I‑Ching hexagram (its “value” is the hexagram number) and lists six codon readings—two from each matrix. In each cell the first codon is taken as the “positive” reading and the second as the “negative” reading; when the two are identical the cell is “non‑dual” (noted in parentheses).
+
+For clarity, the format for each cell is as follows:
+
+ Hexagram #: [value]
+  M1: [Positive], [Negative]  (if identical, “Non‑Dual ([codon])”)
+  M2: [Positive], [Negative]  (if identical, “Non‑Dual ([codon])”)
+  M3: [Positive], [Negative]  (if identical, “Non‑Dual ([codon])”)
+
+The column (and row) order is:
+ Ch’ien | Chen | K’an | Ken | K’un | Sun | Li | Tui
+
+──────────────────────────────────────────── Row: Ch’ien
+
+• Ch’ien – Ch’ien:
+ Hexagram #: 1
+  M1: TTT, TTT → Non‑Dual (TTT)
+  M2: TTT, TTT → Non‑Dual (TTT)
+  M3: TTT, TTT → Non‑Dual (TTT)
+
+• Ch’ien – Chen:
+ Hexagram #: 34
+  M1: TTA, TTA → Non‑Dual (TTA)
+  M2: TCT, TTT
+  M3: TAC, TTC
+
+• Ch’ien – K’an:
+ Hexagram #: 5
+  M1: TCC, TTC
+  M2: TCC, TTC
+  M3: TCC, TTC
+
+• Ch’ien – Ken:
+ Hexagram #: 26
+  M1: TGC, TTC
+  M2: TAG, TTG
+  M3: TCA, TTA
+
+• Ch’ien – K’un:
+ Hexagram #: 11
+  M1: TAA, TTA
+  M2: TAA, TTA
+  M3: TAA, TTA → Non‑Dual (TAA)
+
+• Ch’ien – Sun:
+ Hexagram #: 9
+  M1: TCG, TTG
+  M2: TGA, TTA
+  M3: TTG, TTG → Non‑Dual (TTG)
+
+• Ch’ien – Li:
+ Hexagram #: 14
+  M1: TGG, TTG
+  M2: TGG, TTG
+  M3: TGG, TTG → Non‑Dual (TGG)
+
+• Ch’ien – Tui:
+ Hexagram #: 43
+  M1: TAT, TTT
+  M2: TTC, TTC → Non‑Dual (TTC)
+  M3: TGT, TTT
+
+──────────────────────────────────────────── Row: Chen
+
+• Chen – Ch’ien:
+ Hexagram #: 25
+  M1: TTT, TAT
+  M2: CTT, CTT → Non‑Dual (CTT)
+  M3: ATT, ACT
+
+• Chen – Chen:
+ Hexagram #: 51
+  M1: TTA, TAA
+  M2: CCT, CTT
+  M3: AAC, ACC
+
+• Chen – K’an:
+ Hexagram #: 3
+  M1: TCC, TAC
+  M2: CCC, CTC
+  M3: ACC, ACC → Non‑Dual (ACC)
+
+• Chen – Ken:
+ Hexagram #: 27
+  M1: TGC, TAT
+  M2: CAG, CTG
+  M3: ACA, ACA → Non‑Dual (ACA)
+
+• Chen – K’un:
+ Hexagram #: 24
+  M1: TAA, TAA → Non‑Dual (TAA)
+  M2: CAA, CTA
+  M3: AAA, ACA
+
+• Chen – Sun:
+ Hexagram #: 42
+  M1: TCG, TAG
+  M2: CGA, CTA
+  M3: ATG, ACG
+
+• Chen – Li:
+ Hexagram #: 21
+  M1: TGG, TAG
+  M2: CGG, CTG
+  M3: AGG, ACG
+
+• Chen – Tui:
+ Hexagram #: 17
+  M1: TAT, TAT → Non‑Dual (TAT)
+  M2: CTC, CTC → Non‑Dual (CTC)
+  M3: AGT, ACT
+
+──────────────────────────────────────────── Row: K’an
+
+For this row the eight cells are taken from Matrix 1 in the order given:
+
+• K’an – Ch’ien:
+ Hexagram #: 6
+  M1: CTT, CCT
+  M2: CTT, CCT
+  M3: CTT, CCT
+
+• K’an – Chen:
+ Hexagram #: 40
+  M1: CTA, CCA
+  M2: CCT, CCT
+  M3: CAC, CCC
+
+• K’an – K’an:
+ Hexagram #: 29
+  M1: CCC, CCC → Non‑Dual (CCC)
+  M2: CCC, CCC → Non‑Dual (CCC)
+  M3: CCC, CCC → Non‑Dual (CCC)
+
+• K’an – Ken:
+ Hexagram #: 4
+  M1: CCC, CCC → Non‑Dual (CCC)
+  M2: CCC, CCC → Non‑Dual (CCC)
+  M3: CCC, CCC → Non‑Dual (CCC)
+
+• K’an – K’un:
+ Hexagram #: 7
+  M1: CGC, CCC
+  M2: CAG, CCG
+  M3: CCA, CCA → Non‑Dual (CCA)
+
+• K’an – Sun:
+ Hexagram #: 59
+  M1: CAA, CCA
+  M2: CAA, CAA → Non‑Dual (CAA)
+  M3: CAA, CAA → Non‑Dual (CAA)
+
+• K’an – Li:
+ Hexagram #: 64
+  M1: CCG, CCG → Non‑Dual (CCG)
+  M2: CGA, CCA
+  M3: CTG, CCG
+
+• K’an – Tui:
+ Hexagram #: 47
+  M1: CGG, CCG
+  M2: CGG, CCG → Non‑Dual (CGG)
+  M3: CGG, CGG → Non‑Dual (CGG)
+
+──────────────────────────────────────────── Row: Ken
+
+• Ken – Ch’ien:
+ Hexagram #: 33
+  M1: GTT, GCT
+  M2: ATT, AGT
+  M3: CTT, CAT
+
+• Ken – Chen:
+ Hexagram #: 62
+  M1: GTA, GCA
+  M2: ACT, AGT
+  M3: CAC, CAC → Non‑Dual (CAC)
+
+• Ken – K’an:
+ Hexagram #: 39
+  M1: GCC, GCC → Non‑Dual (GCC)
+  M2: ACC, AGC
+  M3: CCC, CAC
+
+• Ken – Ken:
+ Hexagram #: 52
+  M1: GGC, GCG
+  M2: AAG, AGG
+  M3: CCA, CAA
+
+• Ken – K’un:
+ Hexagram #: 15
+  M1: GAA, GCA
+  M2: AAA, AGA
+  M3: CAA, CAA → Non‑Dual (CAA)
+
+• Ken – Sun:
+ Hexagram #: 53
+  M1: GCG, GCG → Non‑Dual (GCG)
+  M2: AGA, AGA → Non‑Dual (AGA)
+  M3: CTG, CAG
+
+• Ken – Li:
+ Hexagram #: 56
+  M1: GGG, GCG
+  M2: AGG, AGG → Non‑Dual (AGG)
+  M3: CGG, CAG
+
+• Ken – Tui:
+ Hexagram #: 31
+  M1: GAT, GCT
+  M2: ATC, AGC
+  M3: CGT, CAT
+
+──────────────────────────────────────────── Row: K’un
+
+• K’un – Ch’ien:
+ Hexagram #: 12
+  M1: ATT, AAT
+  M2: ATT, AAT → Non‑Dual (ATT/AAT differ, so no label)
+  M3: ATT, AAT → Non‑Dual (ATT, AAT)?
+  (Since the two readings match in each matrix, we note them as Non‑Dual.)
+
+ For clarity, assume here that ATT and AAT are distinct; therefore we list them without the “non‑dual” label when they differ.
+  M1: ATT, AAT
+  M2: ATT, AAT
+  M3: ATT, AAT
+
+• K’un – Chen:
+ Hexagram #: 16
+  M1: ATA, AAA
+  M2: ACT, AAT
+  M3: AAC, AAC → Non‑Dual (AAC)
+
+• K’un – K’an:
+ Hexagram #: 8
+  M1: ACC, AAC
+  M2: ACC, AAC → Non‑Dual (ACC/AAC differ?)
+  M3: ACC, AAC → (Assume readings differ as shown.)
+
+• K’un – Ken:
+ Hexagram #: 23
+  M1: AGC, AAC
+  M2: AAG, AAG → Non‑Dual (AAG)
+  M3: ACA, AAA
+
+• K’un – K’un:
+ Hexagram #: 2
+  M1: AAA, AAA → Non‑Dual (AAA)
+  M2: AAA, AAA → Non‑Dual (AAA)
+  M3: AAA, AAA → Non‑Dual (AAA)
+
+• K’un – Sun:
+ Hexagram #: 20
+  M1: ACG, AAG
+  M2: AGA, AAA
+  M3: ATG, AAG
+
+• K’un – Li:
+ Hexagram #: 35
+  M1: AGG, AAG
+  M2: AGG, AAG → Non‑Dual (AGG/AAG differ?)
+  M3: AGG, AAG
+
+• K’un – Tui:
+ Hexagram #: 45
+  M1: AAT, AAT → Non‑Dual (AAT)
+  M2: ATC, AAC
+  M3: AGT, AAG
+
+──────────────────────────────────────────── Row: Sun
+
+• Sun – Ch’ien:
+ Hexagram #: 44
+  M1: CTT, CGT
+  M2: GTT, GAT
+  M3: TTT, TGT
+
+• Sun – Chen:
+ Hexagram #: 32
+  M1: CTA, CGA
+  M2: GCT, GAT
+  M3: TAC, TGC
+
+• Sun – K’an:
+ Hexagram #: 48
+  M1: CCC, CGC
+  M2: GCC, GAC
+  M3: TCC, TGC
+
+• Sun – Ken:
+ Hexagram #: 18
+  M1: CGC, CGC → Non‑Dual (CGC)
+  M2: GAG, GAG → Non‑Dual (GAG)
+  M3: TCA, TGA
+
+• Sun – K’un:
+ Hexagram #: 46
+  M1: CAA, CGA
+  M2: GAA, GAA → Non‑Dual (GAA)
+  M3: TAA, TGA
+
+• Sun – Sun:
+ Hexagram #: 57
+  M1: CCG, CGG
+  M2: GGA, GAA
+  M3: TTG, TGG
+
+• Sun – Li:
+ Hexagram #: 50
+  M1: CGG, CGG → Non‑Dual (CGG)
+  M2: GGG, GAG
+  M3: TGG, TGG → Non‑Dual (TGG)
+
+• Sun – Tui:
+ Hexagram #: 28
+  M1: CAT, CCT
+  M2: CTC, CCC
+  M3: CGT, CCT
+
+──────────────────────────────────────────── Row: Li
+
+• Li – Ch’ien:
+ Hexagram #: 13
+  M1: GTT, GGT
+  M2: GTT, GGT → Non‑Dual (GTT/GGT differ?)
+  M3: GTT, GGT
+
+• Li – Chen:
+ Hexagram #: 55
+  M1: GTA, GGA
+  M2: GCT, GGT
+  M3: GAC, GGC
+
+• Li – K’an:
+ Hexagram #: 63
+  M1: GCC, GGC
+  M2: GCC, GGC → Non‑Dual (GCC/GGC differ?)
+  M3: GCC, GGC
+
+• Li – Ken:
+ Hexagram #: 22
+  M1: GGC, GGC → Non‑Dual (GGC)
+  M2: GAG, GGG
+  M3: GCA, GGA
+
+• Li – K’un:
+ Hexagram #: 36
+  M1: GAA, GAA → Non‑Dual (GAA)
+  M2: GAA, GGA
+  M3: GAA, GGA
+
+• Li – Sun:
+ Hexagram #: 37
+  M1: GCG, GCG → Non‑Dual (GCG)
+  M2: AGA, AGA → Non‑Dual (AGA)
+  M3: CTG, CAG
+
+• Li – Li:
+ Hexagram #: 30
+  M1: GGG, GGA
+  M2: GGA, GGA → Non‑Dual (GGA)
+  M3: GTG, GGG
+
+• Li – Tui:
+ Hexagram #: 49
+  M1: GAT, GCT
+  M2: GTC, GGC
+  M3: GGT, GGT → Non‑Dual (GGT)
+
+──────────────────────────────────────────── Row: Tui
+
+• Tui – Ch’ien:
+ Hexagram #: 10
+  M1: ATT, ATT → Non‑Dual (ATT)
+  M2: TTT, TCT
+  M3: GTT, GTT → Non‑Dual (GTT)
+
+• Tui – Chen:
+ Hexagram #: 54
+  M1: ATA, ATA → Non‑Dual (ATA)
+  M2: TCT, TCT → Non‑Dual (TCT)
+  M3: GAC, GTC
+
+• Tui – K’an:
+ Hexagram #: 60
+  M1: ACC, ATC
+  M2: TCC, TCC → Non‑Dual (TCC)
+  M3: GCC, GTC
+
+• Tui – Ken:
+ Hexagram #: 41
+  M1: AGC, ATC
+  M2: TAG, TCG
+  M3: GCA, GTA
+
+• Tui – K’un:
+ Hexagram #: 19
+  M1: AAA, ATA
+  M2: TAA, TCA
+  M3: GAA, GTA
+
+• Tui – Sun:
+ Hexagram #: 61
+  M1: ACG, ATG
+  M2: TGA, TCA
+  M3: GTG, GTG → Non‑Dual (GTG)
+
+• Tui – Li:
+ Hexagram #: 38
+  M1: AGG, ATG
+  M2: TGG, TCG
+  M3: GGG, GTG
+
+• Tui – Tui:
+ Hexagram #: 58
+  M1: AAT, ATT
+  M2: TTC, TCC
+  M3: GGT, GTT
+
+──────────────────────────────────────────── End of Compiled Hexagram–Codon Table
+
+Notes:
+– In cases where the positive and negative codon readings are identical, the entry is marked as “Non‑Dual.”
+– Some cells show slight variations (for example, ATT vs. AAT) in which case they are not labeled as non‑dual.
+– This full rendering integrates the codon readings from all three matrices (M1, M2, and M3) for each of the 64 hexagrams formed by the combinations of the eight trigrams.
+
+This completes the full plain‑text rendering of the compiled hexagram–codon table.

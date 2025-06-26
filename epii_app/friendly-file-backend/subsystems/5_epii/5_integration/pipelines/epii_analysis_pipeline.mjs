@@ -64,7 +64,7 @@ export async function runPipeline(initialState = {}) {
         if (!initialState.bpMCPService) {
             try {
                 // Import it if not provided
-                initialState.bpMCPService = (await import('../services/bpMCPService.mjs')).default;
+                initialState.bpMCPService = (await import('../../../../databases/bpmcp/bpMCP.service.mjs')).default;
                 console.log("Imported bpMCPService for pipeline");
             } catch (importError) {
                 throw new Error(`Failed to import bpMCPService: ${importError.message}`);
@@ -253,7 +253,7 @@ export async function runPipeline(initialState = {}) {
                     // Update document status for critical failures only
                     if (initialState.documentId) {
                         try {
-                            const { updateDocumentInCache } = await import('../utils/documentCache.utils.mjs');
+                            const { updateDocumentInCache } = await import('../../../../databases/shared/utils/documentCache.utils.mjs');
                             await updateDocumentInCache(initialState.documentId, {
                                 'analysisStatus': 'failed',
                                 'metadata.analysisStatus': 'failed',

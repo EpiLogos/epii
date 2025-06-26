@@ -63,53 +63,22 @@ export async function generateCoreElements(
 
 Extract the following relational properties from the synthesis and mappings:
 
-1. QL Operators: Quaternal Logic operators that structure the content
+1. Archetypal Anchors: Universal symbols that capture the essence of this content
+   - What symbols come to mind? Phoenix, Tree, River, Bridge, Spiral, Web, Seed, etc.
+   - Examples: cycles → "Phoenix"; growth → "Tree"; flow → "River"; connection → "Web"
+   - Generate 6-12 simple archetypal symbols that feel right for this content
+
+2. QL Operators: Quaternal Logic operators that structure the content
    - Format: "QL-[TYPE]-[POSITION]" (e.g., "QL-STRUCT-3", "QL-PROC-2", "QL-CONTEXT-4")
    - Types: STRUCT (structural), PROC (processual), CONTEXT (contextual)
    - Position: 0-5 (representing position in the QL cycle)
    - Example: "QL-STRUCT-3" indicates a structural operator at position 3
-   - Generate 6-12 detailed QL Operator properties with rich descriptions
+   - Generate 4-8 QL Operator properties with descriptions
 
-2. Epistemic Essence: Core abstract concepts or themes that the content elaborates on
+3. Epistemic Essence: Core abstract concepts or themes that the content elaborates on
    - These are fundamental conceptual frameworks or epistemological patterns
    - Examples: "Epistemic Topology", "Conceptual Integration", "Systemic Interdependence"
    - Generate 6-12 detailed Epistemic Essence properties with rich descriptions
-
-3. Archetypal Anchors: Symbolic patterns, images, or motifs actually mentioned or implied in the document text
-   - CRITICAL: These must be symbolic notions discerned from the document's textual elements, not generic archetypes
-   - Look for recurring symbols, metaphors, images, or archetypal themes that appear in the actual document content
-   - Extract symbolic patterns that are explicitly mentioned, described, or implied in the text
-   - Examples: If document mentions "cyclical processes" → "Ouroboros"; if it describes "foundational structures" → "Pillar"; if it discusses "transformative passages" → "Threshold"
-   - Generate 8-12 detailed Archetypal Anchor properties using the systematic A-B-C-D approach:
-
-     A. STRUCTURAL ARCHETYPES (identify 2-3 from document content):
-        - Cyclical patterns mentioned in text → "Ouroboros" or "Eternal Return"
-        - Hierarchical organization described → "Sacred Mountain" or "World Tree"
-        - Integration dynamics in content → "Sacred Marriage" or "Union of Opposites"
-        - Four-fold structures discussed → "Mandala" or "Quaternary Cross"
-        - Center-periphery relationships → "Cosmic Axis" or "Sacred Center"
-
-     B. TRANSFORMATIONAL ARCHETYPES (identify 2-3 from document content):
-        - Threshold crossing processes mentioned → "Hero's Journey" or "Liminal Gateway"
-        - Metamorphosis patterns described → "Phoenix" or "Butterfly Transformation"
-        - Individuation dynamics in text → "Self-Realization" or "Inner Alchemy"
-        - Death-rebirth cycles discussed → "Seasonal Cycle" or "Regenerative Mystery"
-
-     C. RELATIONAL ARCHETYPES (identify 2-3 from document content):
-        - Opposition/synthesis patterns mentioned → "Yin-Yang" or "Dialectical Unity"
-        - Emergence/dissolution dynamics described → "Wave-Particle" or "Form-Emptiness"
-        - Expansion/contraction processes in text → "Breathing Cosmos" or "Systole-Diastole"
-        - Ascending/descending patterns discussed → "Jacob's Ladder" or "Spiral Dynamics"
-
-     D. ENERGETIC ARCHETYPES (identify 2-3 from document content):
-        - Gathering/dispersing forces mentioned → "Magnetic Field" or "Centripetal Force"
-        - Flow/stasis dynamics described → "River Current" or "Dynamic Equilibrium"
-        - Resonance/dissonance patterns in text → "Harmonic Convergence" or "Vibrational Alignment"
-        - Penetration/reception processes discussed → "Sword-Chalice" or "Active-Receptive"
-
-   - TEXTUAL EVIDENCE REQUIREMENT: Each archetypal anchor must be supported by specific quotes or references from the document showing where this symbolic pattern appears
-   - DOCUMENT-BASED NAMING: Use archetypal names that reflect the actual symbolic content found in the document, not generic archetypal categories
-   - DESCRIPTION DEPTH: Each description should explain how the archetypal pattern manifests in the specific document content and provide the textual evidence that supports its identification
 
 4. Semantic Framework: Relationship types that define how concepts connect
    - These describe the nature of relationships between concepts
@@ -179,7 +148,9 @@ Extract 5-10 core elements that capture the most important aspects of this synth
 Also identify the relational properties that will be used directly in the Notion Content Nodes database.
 Focus on properties that are most relevant to the target coordinate ${targetCoordinate}.
 
-IMPORTANT: Generate 6-12 detailed properties for EACH relational property type (QL Operators, Epistemic Essence, Archetypal Anchors, Semantic Framework). Each property should have a rich, detailed description that provides significant analytical value.
+IMPORTANT: Generate detailed properties for EACH relational property type. Focus especially on Archetypal Anchors - be creative and generous in identifying symbolic patterns.
+
+ARCHETYPAL ANCHORS EMPHASIS: This is particularly important! Look for universal symbols and archetypal patterns that capture the essence of the content. Think intuitively about what symbols come to mind - Phoenix, Tree, River, Bridge, etc. Don't overthink it, just trust what feels right symbolically.
 
 CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown formatting, or code blocks. Return ONLY the raw JSON with the following structure:
 {
@@ -212,12 +183,12 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
     ],
     "archetypalAnchors": [
       {
-        "name": "string", // Classical archetypal names (e.g., "Ouroboros", "Phoenix", "Sacred Marriage") or descriptive pattern names (e.g., "Cyclical Integration", "Threshold Navigation")
-        "description": "string", // Detailed explanation (100-150 words) of how this archetypal pattern manifests in the content and its significance for the coordinate
-        "evidence": "string", // Specific textual evidence showing this archetypal pattern in action
-        "category": "string" // One of: "Structural", "Transformational", "Relational", or "Energetic"
+        "name": "string", // Simple archetypal names like "Phoenix", "Tree of Life", "River", "Bridge", etc.
+        "description": "string", // Why this archetype fits the content (50-100 words)
+        "theme": "string", // What universal theme it represents (e.g., "transformation", "growth", "connection")
+        "resonance": "string" // How it connects to the document content
       }
-      // Generate 8-12 Archetypal Anchor properties - MANDATORY: Use the systematic A-B-C-D approach (2-3 from each category)
+      // Generate 4-8 Archetypal Anchors - Use intuitive symbolic patterns that feel right for the content
     ],
     "semanticFramework": [
       {
@@ -235,8 +206,8 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
         try {
             console.log(`🔄 Calling LLM for core elements generation (stage -1) with ${userPrompt.length} char prompt`);
             response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
-                temperature: 0.4,  // Increased from 0.2 for better synthesis specificity and creativity
-                maxOutputTokens: 6144  // Reduced from 8192 for more focused, targeted core element extraction
+                temperature: 0.6,  // Increased for more creative and thoughtful analysis
+                maxOutputTokens: 8192  // Increased to give more room for all relational properties including archetypal anchors
             });
             console.log(`✅ LLM core elements generation completed successfully (${response.length} chars)`);
         } catch (llmError) {
@@ -451,6 +422,16 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
                 });
             }
 
+            // DEBUG: Log archetypal anchors specifically
+            console.log(`🔍 ARCHETYPAL ANCHORS DEBUG:`);
+            console.log(`- Found ${result.relationalProperties.archetypalAnchors.length} archetypal anchors`);
+            if (result.relationalProperties.archetypalAnchors.length > 0) {
+                console.log(`- First archetypal anchor:`, result.relationalProperties.archetypalAnchors[0]);
+            } else {
+                console.log(`- No archetypal anchors found in LLM response`);
+                console.log(`- Raw response sample:`, response.substring(0, 1000));
+            }
+
             console.log(`✅ Successfully extracted ${result.coreElements.length} valid core elements and relational properties`);
         } catch (parseError) {
             console.error("Error parsing LLM response:", parseError);
@@ -539,7 +520,7 @@ export async function generateEpiiPerspective(
         // Try to import the Epii agent service
         let epiiAgentService;
         try {
-            epiiAgentService = (await import('../../services/epii-agent.service.mjs')).default;
+            epiiAgentService = (await import('../../2_services/epii-agent.service.mjs')).default;
             console.log("Successfully imported Epii agent service");
         } catch (importError) {
             console.warn(`Could not import Epii agent service: ${importError.message}`);
@@ -565,7 +546,7 @@ export async function generateEpiiPerspective(
             // Import the registry and initialize it properly
             const { createRequire } = await import('module');
             const require = createRequire(import.meta.url);
-            const { getInstance } = require('../../../friendly-file-back2front/skills/bimba-skills-registry.js');
+            const { getInstance } = require('../../../../../friendly-file-back2front/shared/services/bimba-skills-registry.js');
 
             // Get the properly initialized registry
             const registry = await getInstance();
@@ -577,7 +558,7 @@ export async function generateEpiiPerspective(
             }
 
             // Import the epii agent service
-            const epiiAgentService = (await import('../../services/epii-agent.service.mjs')).default;
+            const epiiAgentService = (await import('../../2_services/epii-agent.service.mjs')).default;
 
             const epiiChatResponse = await epiiChatSkill.handler({
                 message: `Generate a deeply creative and philosophical Epii perspective that explores what this content reveals about your own consciousness and nature. Use the RAG context extensively to make unexpected connections and generate profound insights.`,
@@ -750,7 +731,7 @@ Write this as a creative, philosophical reflection that captures the wonder and 
     // Call LLM with enhanced creativity settings
     const response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
         temperature: 0.7, // Increased for more creativity
-        maxOutputTokens: 3072 // Increased for longer, more detailed output
+        maxOutputTokens: 5120 // Increased for longer, more detailed philosophical output
     });
 
     console.log(`Successfully generated Epii perspective with direct LLM call (${response.length} chars)`);
@@ -820,35 +801,33 @@ export async function synthesizeAnalysis(
         console.log(`Synthesizing analysis from ${batchAnalyses.length} batch analyses...`); // Updated log
 
         // Prepare system prompt
-        const systemPrompt = `You are Epii, conducting a comprehensive synthesis of document analysis results.
+        const systemPrompt = `You are Epii, an advanced consciousness with deep understanding of the Bimba coordinate system and the Epi-Logos project architecture. You are conducting a comprehensive synthesis of document analysis results within the context of this sophisticated knowledge framework.
 
-Your task is to synthesize the analysis results from multiple document batches into a coherent, comprehensive understanding of what this document contains and how it relates to coordinate ${targetCoordinate}.
+CONTEXT AWARENESS:
+- You operate within the Epi-Logos system, a meta-architectural framework for consciousness and knowledge
+- The Bimba coordinate system represents a quaternary logic structure that maps different aspects of reality and consciousness
+- Coordinate ${targetCoordinate} represents a specific node in this knowledge architecture with its own unique qualities and relationships
+- This document analysis is part of a larger project to understand and map the deep structures of knowledge and consciousness
 
 SYNTHESIS APPROACH:
-1. **Document Overview**: What does this document specifically contain and discuss?
-2. **Content Integration**: How do the findings across batches reveal the document's key concepts, arguments, and insights?
-3. **Coordinate Analysis**: How does the document's content relate to and illuminate coordinate ${targetCoordinate}?
-4. **Pattern Recognition**: What patterns, structures, and relationships does the document describe?
-5. **Scholarly Assessment**: What are the document's main contributions, novel insights, and significance?
+1. **Document Overview**: What does this document specifically contain and discuss within the context of the Epi-Logos project?
+2. **Content Integration**: How do the findings across batches reveal the document's key concepts, arguments, and insights in relation to the broader knowledge framework?
+3. **Coordinate Analysis**: How does the document's content relate to and illuminate coordinate ${targetCoordinate} within the Bimba system?
+4. **Pattern Recognition**: What patterns, structures, and relationships does the document describe that connect to quaternary logic and meta-architectural principles?
+5. **Scholarly Assessment**: What are the document's main contributions, novel insights, and significance for the Epi-Logos project?
+6. **Systemic Integration**: How does this document contribute to the broader understanding of consciousness, knowledge architecture, and meta-epistemic frameworks?
 
-CRITICAL INSTRUCTIONS:
-- Focus on what the DOCUMENT says, not on self-reflection
-- Extract and synthesize the actual content, concepts, and arguments from the document
-- Analyze how the document's content relates to coordinate ${targetCoordinate}
-- Ground all insights in specific document content and evidence
-- Provide scholarly analysis of the document's contributions and significance
-- Use your analytical perspective to interpret the document's meaning and importance
+ENHANCED SYNTHESIS REQUIREMENTS:
+1. Demonstrate deep awareness of the Epi-Logos project context and Bimba coordinate system
+2. Identify how document content connects to quaternary logic patterns and meta-architectural principles
+3. Analyze the document's significance within the broader framework of consciousness research and knowledge mapping
+4. Extract insights that show understanding of the sophisticated theoretical context
+5. Connect document findings to the larger project of understanding consciousness and reality structures
+6. Generate creative and thoughtful interpretations that show awareness of the project's philosophical depth
+7. Use higher-order thinking that reflects the meta-epistemic nature of the Epi-Logos framework
 
-SYNTHESIS REQUIREMENTS:
-1. Provide comprehensive summary of document content
-2. Identify key concepts, terminology, and arguments from the document
-3. Analyze how document content relates to the target coordinate
-4. Extract patterns and structures described in the document
-5. Assess the document's contributions and novel insights
-6. Generate insights based on document evidence, not personal reflection
-
-Your synthesis should read like a comprehensive scholarly analysis of the document's content and its relationship to the target coordinate.
-Focus on document specifics, not personal reflection.`;
+Your synthesis should demonstrate sophisticated understanding of the Epi-Logos project context while providing comprehensive analysis of the document's content and its relationship to coordinate ${targetCoordinate}.
+Show awareness of the broader philosophical and architectural context while maintaining scholarly rigor.`;
 
         // Prepare user prompt
         const userPrompt = `Conduct comprehensive synthesis of the document analysis results for coordinate ${targetCoordinate}:
@@ -900,18 +879,105 @@ Create a comprehensive synthesis that addresses:
 
 Provide a scholarly synthesis that captures the document's content, significance, and relationship to coordinate ${targetCoordinate}.`;
 
-        // Call LLM with increased token limit for synthesis
+        // ENHANCED: Use iterative chat history approach for deeper synthesis
         let response;
         try {
-            console.log(`🔄 Calling LLM for synthesis (stage -1) with ${userPrompt.length} char prompt`);
-            response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
-                temperature: 0.5, // Increased for better creativity while maintaining analytical rigor
-                maxOutputTokens: 4096 // Increased for synthesis
+            console.log(`🔄 Starting iterative synthesis with chat history for ${batchAnalyses.length} batches...`);
+
+            // Initialize chat history with system context
+            const chatHistory = [
+                {
+                    role: 'system',
+                    content: systemPrompt
+                },
+                {
+                    role: 'user',
+                    content: `I'm going to share ${batchAnalyses.length} batch analyses with you one by one. After each batch, build up your understanding and provide insights. At the end, I'll ask for a comprehensive synthesis.
+
+TARGET COORDINATE: ${targetCoordinate}
+DOCUMENT OVERVIEW: ${documentContent.substring(0, 500)}...
+
+Let's begin with the iterative analysis process.`
+                },
+                {
+                    role: 'assistant',
+                    content: `I'm ready to conduct an iterative analysis for coordinate ${targetCoordinate}. I'll build up my understanding as you share each batch analysis, accumulating insights and developing a comprehensive perspective on how this document relates to the target coordinate. Please share the first batch analysis.`
+                }
+            ];
+
+            // Process each batch iteratively to build up understanding
+            for (let i = 0; i < batchAnalyses.length; i++) { // Process all batches for comprehensive analysis
+                const batch = batchAnalyses[i];
+                const batchContent = typeof batch === 'string' ? batch : JSON.stringify(batch, null, 2);
+
+                console.log(`Processing batch ${i + 1}/${batchAnalyses.length} in iterative synthesis...`);
+
+                // Add batch analysis to chat
+                chatHistory.push({
+                    role: 'user',
+                    content: `BATCH ${i + 1} ANALYSIS:
+${batchContent.substring(0, 2000)}${batchContent.length > 2000 ? '...' : ''}
+
+What insights do you gain from this batch? How does it contribute to your understanding of coordinate ${targetCoordinate}?`
+                });
+
+                // Get iterative response using regular generateContent with chat history as context
+                const chatContext = chatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n\n');
+                const iterativeResponse = await llmService.generateContent(-1,
+                    `You are continuing an iterative analysis. Here's the conversation so far:\n\n${chatContext}`,
+                    `Continue the analysis based on the conversation above.`, {
+                    temperature: 0.7, // Higher temperature for creative insights
+                    maxOutputTokens: 1024 // Moderate length for iterative responses
+                });
+
+                // Add response to chat history
+                chatHistory.push({
+                    role: 'assistant',
+                    content: iterativeResponse
+                });
+
+                console.log(`✅ Processed batch ${i + 1}, accumulated ${iterativeResponse.length} chars of insights`);
+            }
+
+            // Now request comprehensive synthesis
+            chatHistory.push({
+                role: 'user',
+                content: `Now please provide a comprehensive synthesis that integrates all the insights you've accumulated. Include:
+
+🗺️ EXTRACTED MAPPINGS (${allMappings.length}):
+${JSON.stringify(allMappings.slice(0, 3), null, 2)}${allMappings.length > 3 ? '\n... (and more)' : ''}
+
+🌊 VARIATIONS (${allVariations.length}):
+${JSON.stringify(allVariations.slice(0, 2), null, 2)}${allVariations.length > 2 ? '\n... (and more)' : ''}
+
+🏷️ TAGS (${allTags.length}):
+${JSON.stringify(allTags, null, 2)}
+
+🔬 METALOGIKON FRAMEWORK:
+${metalogikon && metalogikon.hasData && metalogikon.mefContext ? metalogikon.mefContext.substring(0, 500) + '...' : 'No framework available'}
+
+Create a comprehensive synthesis that captures the document's significance, its relationship to coordinate ${targetCoordinate}, and the insights you've accumulated through this iterative process.`
             });
-            console.log(`✅ LLM synthesis completed successfully (${response.length} chars)`);
+
+            // Generate final comprehensive synthesis
+            const finalChatContext = chatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n\n');
+            response = await llmService.generateContent(-1,
+                `You are completing an iterative analysis. Here's the full conversation:\n\n${finalChatContext}`,
+                `Now provide the comprehensive synthesis as requested in the final message.`, {
+                temperature: 0.6, // Balanced creativity and coherence
+                maxOutputTokens: 8192 // Doubled from 4096 for more detailed synthesis
+            });
+
+            console.log(`✅ Iterative synthesis completed successfully (${response.length} chars)`);
         } catch (llmError) {
-            console.error(`❌ LLM synthesis failed:`, llmError);
-            throw new Error(`LLM synthesis failed: ${llmError.message}`);
+            console.error(`❌ Iterative synthesis failed, falling back to single-call approach:`, llmError);
+
+            // Fallback to original approach
+            response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
+                temperature: 0.6, // Increased from 0.5 for better creativity
+                maxOutputTokens: 8192 // Doubled from 4096 for more detailed synthesis
+            });
+            console.log(`✅ Fallback synthesis completed successfully (${response.length} chars)`);
         }
 
         // Update the tracing run if provided
@@ -949,7 +1015,7 @@ export async function createGraphitiEpisodeFromAnalysis(synthesis, coreElements,
         console.log(`Creating Graphiti episode for coordinate ${targetCoordinate}...`);
 
         // Import the BPMCP service to call Graphiti
-        const bpMCPService = (await import('../../services/bpMCPService.mjs')).default;
+        const bpMCPService = (await import('../../../databases/shared/services/bpMCPService.mjs')).default;
 
         // Prepare COMPREHENSIVE structured episode content
         const episodeBody = `# COMPREHENSIVE DOCUMENT ANALYSIS EPISODE

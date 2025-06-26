@@ -43,7 +43,7 @@ async function getDocumentFromBPMCP(documentId, state = null) {
     // Ensure bpMCPService is available
     if (!state.bpMCPService) {
         console.log(`Importing bpMCPService for document retrieval...`);
-        state.bpMCPService = (await import('../../services/bpMCPService.mjs')).default;
+        state.bpMCPService = (await import('../../../../../databases/bpmcp/bpMCP.service.mjs')).default;
     }
 
     try {
@@ -139,7 +139,7 @@ export async function runStageMinus5(initialState) {
             } else {
                 // Extract text from the file if textContent is not available
                 console.log(`Extracting text from file: ${fileMetadata.filePath}`);
-                const fileService = await import('../../services/file.service.mjs');
+                const fileService = await import('../../../2_services/file.service.mjs');
                 documentContent = await fileService.extractTextFromFile(fileMetadata.filePath, fileMetadata.mimeType);
 
                 // Update the file metadata with the extracted text using standardized property name

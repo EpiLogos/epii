@@ -394,26 +394,51 @@ const documentServiceImpl = {
           // Verify the update by retrieving the document
           try {
             console.log(`Verifying document ${documentId} after update...`);
-            // Note: We can't verify from cache since we just updated MongoDB
-            // This is a special case where we need to fetch directly from MongoDB
-            // We'll implement this differently in the future
-            const verifyResult = null; // Can't verify without MongoDB access
 
-            if (verifyResult && verifyResult._id) {
-              // This is the document itself
-              const docContent = verifyResult.textContent || verifyResult.content || '';
+            // Try to fetch the document to verify the update
+            const verifyResponse = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                toolName: 'getDocumentById',
+                args: { documentId: cleanedId, collection }
+              })
+            });
 
-              if (docContent) {
-                console.log(`Verified document ${documentId} exists with content length: ${docContent.length}`);
-                console.log(`Verified content preview: "${docContent.substring(0, 50)}..."`);
+            if (verifyResponse.ok) {
+              const verifyResult = await verifyResponse.json();
 
-                // Cache the verified document
-                documentCacheService.cacheDocument(verifyResult);
+              // Parse the document from the result
+              let verifiedDoc = null;
+              if (typeof verifyResult === 'object' && verifyResult !== null) {
+                verifiedDoc = verifyResult;
+              } else if (verifyResult && verifyResult.content && Array.isArray(verifyResult.content)) {
+                try {
+                  const contentText = verifyResult.content.find(item => item.type === 'text')?.text;
+                  if (contentText) {
+                    verifiedDoc = JSON.parse(contentText);
+                  }
+                } catch (e) {
+                  console.warn('Error parsing verification response:', e);
+                }
+              }
+
+              if (verifiedDoc && verifiedDoc._id) {
+                const docContent = verifiedDoc.textContent || verifiedDoc.content || '';
+                if (docContent) {
+                  console.log(`Verified document ${documentId} exists with content length: ${docContent.length}`);
+                  console.log(`Verified content preview: "${docContent.substring(0, 50)}..."`);
+
+                  // Cache the verified document
+                  documentCacheService.cacheDocument(verifiedDoc);
+                } else {
+                  console.warn(`Verification found document ${documentId} but it has no content!`);
+                }
               } else {
-                console.warn(`Verification found document ${documentId} but it has no content!`);
+                console.warn(`Verification could not find document ${documentId} after update!`);
               }
             } else {
-              console.warn(`Verification could not find document ${documentId} after update!`);
+              console.warn(`Verification request failed: ${verifyResponse.statusText}`);
             }
           } catch (verifyError) {
             console.warn(`Error verifying document update: ${verifyError.message}`);

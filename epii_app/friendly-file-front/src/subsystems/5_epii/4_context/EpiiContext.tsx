@@ -194,7 +194,7 @@ function epiiReducer(state: EpiiState, action: EpiiAction): EpiiState {
           try {
             // Import documentService
             const module = await import('../1_services/documentService');
-            const documentService = module.documentService;
+            const documentService = module.default;
 
             // Clean the document ID to ensure it's in a format that MongoDB can handle
             const cleanedId = cleanDocumentId(updatedDoc.id);
@@ -1145,7 +1145,7 @@ export const EpiiProvider: React.FC<{ children: React.ReactNode }> = ({ children
         import('../1_services/documentCacheService')
       ]);
 
-      const documentService = moduleService.documentService;
+      const documentService = moduleService.default;
       const documentCacheService = moduleCacheService.default;
 
       // Load bimba documents first - no cache check, just load directly

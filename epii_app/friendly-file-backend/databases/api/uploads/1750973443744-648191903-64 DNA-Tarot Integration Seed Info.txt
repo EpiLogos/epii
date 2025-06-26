@@ -1,0 +1,553 @@
+Family (Cups)
+
+• Suit: Cups (A = Yin)
+• Least Beneficial Letter: C (yin)
+• 7 Codons with C: AAC, ACA, ACC, ACG, AGC, ATC, ACT
+
+──────────────────────────────────────────── Court Card Assignments
+
+Each tarot court card is assigned one or more codons along with a brief rationale.
+
+────────────────────────────────────────────
+
+Tarot Card	Codon(s)	Rationale
+4 of Cups	ACC	Portal card (balanced yin stability).
+Queen of Cups	AAC	Pure Yin resonance (A-A-C).
+Princess of Cups	ACA	Grounded yin intuition (A-C-A).
+King of Cups	ATC + ACT	Paired to balance Yang (T) intrusion.
+Prince of Cups	ACG + AGC	Paired to balance yang (G) exploration.
+────────────────────────────────────────────		
+──────────────────────────────────────────── Ace‑10 Cards
+
+Each codon is mapped to a corresponding tarot card, reflecting its symbolic meaning.
+
+────────────────────────────────────────────
+
+Codon	Tarot Card	Symbolic Meaning
+AAA	Ace of Cups	New emotional beginnings.
+AAG	2 of Cups	Harmonious partnership.
+AAT	3 of Cups	Joyful celebration.
+ATG	5 of Cups	Loss and renewal.
+AGA	6 of Cups	Nostalgic harmony.
+AGT	7 of Cups	Ambiguous choices.
+AGG	8 of Cups	Spiritual journey.
+ATT	9 of Cups	Emotional fulfillment.
+ATA	10 of Cups	Familial completion.
+────────────────────────────────────────────		
+──────────────────────────────────────────── A‑Family Groups and 3‑Letter Values
+
+Below are the 3‑letter “A Family” groupings. For each cell the codon is shown along with four numerical evaluations:  (+,+) → positive–positive
+ (–,–) → negative–negative
+ (–,+) → negative–positive
+ (+,–) → positive–negative
+
+────────────────────────────────────────────
+
+Group	Codon(s) & Evaluations
+AA(X)	AAA: (+,+)=18  (–,–)=-6  (–,+)=6  (+,–)=6
+AAT: (+,+)=21  (–,–)=-9  (–,+)=9  (+,–)=3
+AAC: (+,+)=19  (–,–)=-7  (–,+)=7  (+,–)=5
+AAG: (+,+)=20  (–,–)=-8  (–,+)=8  (+,–)=4
+AT(X)	ATA: (+,+)=21  (–,–)=-9  (–,+)=3  (+,–)=9
+ATT: (+,+)=24  (–,–)=-12 (–,+)=6  (+,–)=6
+ATC: (+,+)=22  (–,–)=-10 (–,+)=4  (+,–)=8
+ATG: (+,+)=23  (–,–)=-11 (–,+)=5  (+,–)=7
+AC(X)	ACA: (+,+)=19  (–,–)=-7  (–,+)=5  (+,–)=7
+ACT: (+,+)=22  (–,–)=-10 (–,+)=8  (+,–)=4
+ACC: (+,+)=20  (–,–)=-8  (–,+)=6  (+,–)=6
+ACG: (+,+)=21  (–,–)=-9  (–,+)=7  (+,–)=5
+AG(X)	AGA: (+,+)=20  (–,–)=-8  (–,+)=8  (+,–)=4
+AGT: (+,+)=23  (–,–)=-11 (–,+)=7  (+,–)=5
+AGC: (+,+)=21  (–,–)=-9  (–,+)=5  (+,–)=7
+AGG: (+,+)=22  (–,–)=-10 (–,+)=6  (+,–)=6
+────────────────────────────────────────────	
+──────────────────────────────────────────── A‑Family Complimentary Pairs – Prime and Non‑Prime Attractors / Rotational Patterning
+
+This section shows how the A‑Family codons pair in different complementary (symmetry) arrangements.
+
+──────────────────────────────────────────── 1. Middle Letter Complements – Horizontal Symmetry
+
+Each cell shows a pair of codons and their evaluations.
+
+────────────────────────────────────────────
+
+Pairing (Middle Letter Complement)	Evaluations: (+,+)	(–,–)	(–,+)	(+,–)
+AAA + ATA	39	-15	9	15
+AAT + ATT	45	-21	15	9
+AAC + ATC	41	-17	11	13
+AAG + ATG	43	-19	13	11
+ACA + AGA	39	-15	9	15
+ACT + AGT	45	-21	15	9
+ACC + AGC	41	-17	11	13
+ACG + AGG	43	-19	13	11
+────────────────────────────────────────────				
+──────────────────────────────────────────── 2. Last Letter Complements – Vertical Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Last Letter Complement)	Evaluations: (+,+)	(–,–)	(–,+)	(+,–)
+AAA + AAT	39	-15	15	9
+ATA + ATT	45	-21	9	15
+ACA + ACT	41	-17	13	11
+AGA + AGT	43	-19	11	13
+AAC + AAG	39	-15	15	9
+ATC + ATG	45	-21	9	15
+ACC + ACG	41	-17	13	11
+AGC + AGG	43	-19	11	13
+────────────────────────────────────────────				
+──────────────────────────────────────────── 3. 2‑Letter Reflections – Diagonal Symmetries
+
+────────────────────────────────────────────
+
+Pairing (2‑Letter Reflection)	Evaluations: (+,+)	(–,–)	(–,+)	(+,–)
+AAA + ATT	42	-18	12	12
+ACC + AGG	42	-18	12	12
+AAC + ATG	42	-18	12	12
+ATA + AGC	42	-18	8	16
+AAT + ACG	42	-18	16	8
+ACA + AGT	42	-18	12	12
+AAG + AGA	40	-16	12	12
+ATA + AAT	42	-18	12	12
+ATG + AGT	46	-22	12	12
+AAC + ACA	38	-14	12	12
+ATC + ACT	44	-20	12	12
+ACG + AGC	42	-18	12	12
+────────────────────────────────────────────				
+──────────────────────────────────────────── 4. 4‑Part Integral Suit Symmetries
+
+This section shows the combined symmetries across the entire suit. The groupings are provided for horizontal, vertical, and diagonal arrangements.
+
+──────────────────────────────────────────── Horizontals:
+ (AAA + ATA + ACT + AGT) – (ACA + AGA + AAT + ATT) – (AAC + ATC + ACG + AGG) – (ACC + AGC + AAG + ATG)
+
+Verticals:
+ (AAA + AAT + ATC + ATG) – (AAC + AAG + ATA + ATT) – (ACA + ACT + AGC + AGG) – (ACC + ACG + AGA + AGT)
+
+Diagonals:
+ (AAA + ATT + ACC + AGG)
+ (AAC + ATG + ACA + AGT) – (ATA + AGC + AAT + ACG)
+ (AAG + AGA + ATC + ACT) – (AAC + ACA + ATG + AGT) – (ATA + AAT + ACG + AGC)
+
+Overall Evaluations for the 4‑Part Integral Suit:
+ (+,+) = 84  (–,–) = -36  (–,+) = 24  (+,–) = 24 ────────────────────────────────────────────
+
+Notes:
+– The evaluations (e.g., (+,+), (–,–), etc.) reflect numerical values assigned to each codon pairing based on their “positive” and “negative” components.
+– The symmetry tables show how codons complement one another horizontally (middle letter), vertically (last letter), diagonally (2‑letter reflections), and in an integrated 4‑part suit structure.
+
+Family (Wands)
+
+Suit: Wands (T = Yang)
+Least Beneficial Letter: G (yang)
+7 Codons with G: TTG, TGT, TGG, TCG, TGC, TAG, TGA
+──────────────────────────────────────────── Assignments
+
+Each tarot court card is assigned one or more codons along with a brief rationale.
+
+────────────────────────────────────────────
+
+Tarot Card	Codon(s)	Rationale
+4 of Wands	TGG	Portal card (balanced yang stability).
+King of Wands	TTG	Pure Yang authority (T-T-G).
+Prince of Wands	TGT	Strategic yang action (T-G-T).
+Queen of Wands	TCG + TGC	Paired to balance Yin (C) harmony.
+Princess of Wands	TAG + TGA	Paired to balance yin (A) receptivity.
+────────────────────────────────────────────		
+──────────────────────────────────────────── Ace‑10 Cards
+
+Each codon is associated with a tarot card and its symbolic meaning.
+
+────────────────────────────────────────────
+
+Codon	Tarot Card	Symbolic Meaning
+TTT	Ace of Wands	Creative ignition.
+TTA	2 of Wands	Bold vision.
+TTC	3 of Wands	Expansion and growth.
+TAC	5 of Wands	Healthy competition.
+TCA	6 of Wands	Victory and recognition.
+TCC	7 of Wands	Perseverance against odds.
+TAA	8 of Wands	Swift action and momentum.
+TCT	9 of Wands	Resilience and endurance.
+TAT	10 of Wands	Burdens and responsibility.
+────────────────────────────────────────────		
+──────────────────────────────────────────── T Family Groups and Values
+
+Each “group” (labeled by a 2‑letter prefix with variable third letter) is given with its codon(s) and four numerical evaluations. The evaluations represent:
+ (+,+) → positive–positive
+ (–,–) → negative–negative
+ (–,+) → negative–positive
+ (+,–) → positive–negative
+
+────────────────────────────────────────────
+
+Group	Codon & Evaluations
+TA(X)	TAA: (+,+)=21  (–,–)=-3  (–,+)=9  (+,–)=9
+TAT: (+,+)=24  (–,–)=-6  (–,+)=12 (+,–)=6
+TAC:	(+,+)=22  (–,–)=-4  (–,+)=10 (+,–)=8
+TT(X)	TTA: (+,+)=24  (–,–)=-6  (–,+)=6  (+,–)=12
+TTT: (+,+)=27  (–,–)=-9  (–,+)=9  (+,–)=9
+TTC: (+,+)=25  (–,–)=-7  (–,+)=7  (+,–)=11
+TTG: (+,+)=26  (–,–)=-8  (–,+)=8  (+,–)=10
+TC(X)	TCA: (+,+)=22  (–,–)=-4  (–,+)=8  (+,–)=10
+TCT: (+,+)=25  (–,–)=-7  (–,+)=11 (+,–)=7
+TCC: (+,+)=23  (–,–)=-5  (–,+)=9  (+,–)=9
+TGC: (+,+)=24  (–,–)=-6  (–,+)=8  (+,–)=10
+TG(X)	TAG: (+,+)=23  (–,–)=-5  (–,+)=11 (+,–)=7
+TTG: (+,+)=26  (–,–)=-8  (–,+)=8  (+,–)=10
+TCG: (+,+)=24  (–,–)=-6  (–,+)=10 (+,–)=8
+TGG: (+,+)=25  (–,–)=-7  (–,+)=9  (+,–)=9
+────────────────────────────────────────────	
+──────────────────────────────────────────── T‑Family Complimentary Pairs – Prime and Non‑Prime Attractors / Rotational Patterning
+
+The following sections show complementary pairings of T‑Family codons arranged by symmetry.
+The evaluations indicate the same four measures as above.
+
+──────────────────────────────────────────── 1. Middle Letter Complements – Horizontal Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Horizontal)	(+,+)	(–,–)	(–,+)	(+,–)
+TAA + TTA	45	-9	15	21
+TAT + TTT	51	-15	21	15
+TAC + TTC	47	-11	17	19
+TAG + TTG	49	-13	19	17
+TCA + TGA	45	-9	15	21
+TCT + TGT	51	-15	21	15
+TCC + TGC	47	-11	17	19
+TCG + TGG	49	-13	19	17
+────────────────────────────────────────────				
+──────────────────────────────────────────── 2. 2‑Letter Reflections – Diagonal Symmetries
+
+────────────────────────────────────────────
+
+Pairing (Diagonal)	(+,+)	(–,–)	(–,+)	(+,–)
+TAA + TTT	48	-12	18	18
+TCC + TGG	48	-12	18	18
+TAC + TTG	48	-12	18	18
+TTA + TGC	48	-12	14	22
+TAT + TCG	48	-12	22	14
+TCA + TGT	48	-12	18	18
+────────────────────────────────────────────				
+──────────────────────────────────────────── 3. Last Letter Complements – Vertical Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Vertical)	(+,+)	(–,–)	(–,+)	(+,–)
+TAA + TAT	45	-9	21	15
+TTA + TTT	51	-15	15	21
+TCA + TCT	47	-11	19	17
+TGA + TGT	49	-13	17	19
+TAC + TAG	45	-9	21	15
+TTC + TTG	51	-15	15	21
+TCC + TCG	47	-11	19	17
+TGC + TGG	49	-13	17	19
+TAG + TGA	46	-10	18	18
+TTA + TAT	48	-12	18	18
+TTG + TGT	52	-16	18	18
+TAC + TCA	44	-8	18	18
+TTC + TCT	50	-14	18	18
+TCG + TGC	48	-12	18	18
+────────────────────────────────────────────				
+──────────────────────────────────────────── 4. 4‑Part Integral Suit Symmetries
+
+This section combines the full suit groupings across multiple symmetry axes. The arrangements are given as group formulas for Horizontals, Verticals, and Diagonals.
+
+──────────────────────────────────────────── Horizontals:
+ (TAA + TTA + TCT + TGT) – (TCA + TGA + TAT + TTT) – (TAC + TTC + TCG + [TGG]) – (TCC + TGC + TAG + TTG)
+
+Verticals:
+ (TAA + TAT + TTC + TTG) – (TAC + TAG + TTA + TTT) – (TCA + TCT + TGC + TGG) – (TCC + TCG + TGA + TGT)
+
+Diagonals:
+ (TAA + TTT + TCC + TGG)
+ (TAC + TTG + TCA + TGT) – (TTA + TGC + TAT + TCG)
+ (TAG + TGA + TTC + TCT) – (TAC + TCA + TTG + TGT) – (TTA + TAT + TCG + TGC)
+
+Overall Evaluations for the 4‑Part Integral Suit:
+ (+,+) = 96  (–,–) = -24  (–,+) = 36  (+,–) = 36 ────────────────────────────────────────────
+
+Family (Pentacles)
+
+Suit: Pentacles (C = yin)
+Least Beneficial Letter: A (Yin)
+7 Codons with A: CAA, CAC, CAG, CAT, CGA, CTA, CCA
+──────────────────────────────────────────── Assignments
+
+Each tarot court card is assigned one or more codons along with a brief rationale.
+
+────────────────────────────────────────────
+
+Tarot Card	Codon(s)	Rationale
+4 of Pentacles	CAA	Portal card (balanced yin stability).
+Queen of Pentacles	CAC	Nurturing material wisdom (C-A-C).
+Princess of Pentacles	CCA	Grounded growth (C-A-G).
+King of Pentacles	CAT + CTA	Paired to balance Yang (T) authority.
+Prince of Pentacles	CGA + CAG	Paired to balance yang (G/A) pragmatism.
+────────────────────────────────────────────		
+──────────────────────────────────────────── Ace‑10 Cards
+
+Each codon is associated with a tarot card and its symbolic meaning.
+
+────────────────────────────────────────────
+
+Codon	Tarot Card	Symbolic Meaning
+CCC	Ace of Pentacles	Material foundation.
+CCG	2 of Pentacles	Financial balance.
+CCT	3 of Pentacles	Collaboration and craftsmanship.
+CGC	5 of Pentacles	Hardship and resilience.
+CGG	6 of Pentacles	Generosity and sharing.
+CGT	7 of Pentacles	Long-term investment.
+CTG	8 of Pentacles	Mastery and diligence.
+CTT	9 of Pentacles	Abundance and luxury.
+CTA	10 of Pentacles	Legacy and inheritance.
+────────────────────────────────────────────		
+──────────────────────────────────────────── C Family Groups and Values
+
+Each “group” is labeled by a 2‑letter prefix (CA, CT, CC, CG) with variable third letters. For each codon the evaluations are given as:
+ (+,+) → positive–positive
+ (–,–) → negative–negative
+ (–,+) → negative–positive
+ (+,–) → positive–negative
+
+────────────────────────────────────────────
+
+Group	Codon & Evaluations
+CA(X)	CAA: (+,+)=19  (–,–)=-5  (–,+)=7  (+,–)=7
+CAT: (+,+)=22  (–,–)=-8  (–,+)=10 (+,–)=4
+CAC: (+,+)=20  (–,–)=-6  (–,+)=8  (+,–)=6
+CAG: (+,+)=21  (–,–)=-7  (–,+)=9  (+,–)=5
+CT(X)	CTA: (+,+)=22  (–,–)=-8  (–,+)=4  (+,–)=10
+CTT: (+,+)=25  (–,–)=-11 (–,+)=7  (+,–)=7
+CC(X)	CCA: (+,+)=20  (–,–)=-6  (–,+)=6  (+,–)=8
+CCT: (+,+)=23  (–,–)=-9  (–,+)=9  (+,–)=5
+CG(X)	CGA: (+,+)=21  (–,–)=-7  (–,+)=5  (+,–)=9
+CGT: (+,+)=24  (–,–)=-10 (–,+)=8  (+,–)=6
+CTC: (+,+)=23  (–,–)=-9  (–,+)=5  (+,–)=9
+CCC: (+,+)=21  (–,–)=-7  (–,+)=7  (+,–)=7
+CGC: (+,+)=22  (–,–)=-8  (–,+)=6  (+,–)=8
+CGG: (+,+)=23  (–,–)=-9  (–,+)=7  (+,–)=7
+────────────────────────────────────────────	
+Note: “Unique Per Matrix” counts (4 + 4 + 8 + 8 = 16) and “(Non)-Pairs Per Matrix” equals 32.	
+──────────────────────────────────────────── C‑Family Complimentary Pairs – Prime and Non‑Prime Attractors / Rotational Patterning – Sums Only
+
+The following sections show complementary pairings of C‑Family codons. In each pairing the evaluations (sums) are given as:
+ (+,+), (–,–), (–,+), and (+,–).
+
+──────────────────────────────────────────── 1. Middle Letter Complements – Horizontal Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Horizontal)	(+,+)	(–,–)	(–,+)	(+,–)
+CAA + CTA	41	-13	11	17
+CAT + CTT	47	-19	17	11
+CAC + CTC	43	-15	13	15
+CAG + CTG	45	-17	15	13
+CCA + CGA	41	-13	11	17
+CCT + CGT	47	-19	17	11
+CCC + CGC	43	-15	13	15
+CCG + CGG	45	-17	15	13
+────────────────────────────────────────────				
+──────────────────────────────────────────── 2. Last Letter Complements – Vertical Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Vertical)	(+,+)	(–,–)	(–,+)	(+,–)
+CAA + CAT	41	-13	17	11
+CTA + CTT	47	-19	11	17
+CCA + CCT	43	-15	15	13
+CGA + CGT	45	-17	13	15
+CAC + TAG	41	-13	17	11
+CTC + CTG	47	-19	11	17
+CCC + CCG	43	-15	15	13
+CGC + CGG	45	-17	13	15
+────────────────────────────────────────────				
+──────────────────────────────────────────── 3. 2‑Letter Reflections – Diagonal Symmetries
+
+────────────────────────────────────────────
+
+Pairing (Diagonal)	(+,+)	(–,–)	(–,+)	(+,–)
+CAA + CTT	44	-16	14	14
+CCC + CGG	44	-16	14	14
+CAC + CTG	44	-16	14	14
+CTA + CGC	44	-16	10	18
+CAT + CCG	44	-16	18	10
+CCA + CGT	44	-16	14	14
+CAG + CGA	42	-14	14	14
+CTA + CAT	44	-16	14	14
+CTG + CGT	48	-20	14	14
+CAC + CCA	40	-12	14	14
+CTC + CCT	46	-18	14	14
+CCG + CGC	44	-16	14	14
+────────────────────────────────────────────				
+──────────────────────────────────────────── 4. 4‑Part Integral Suit Symmetries
+
+This section presents integrated groupings for the entire suit. The groupings are given as formulas for Horizontals, Verticals, and Diagonals:
+
+Horizontals:
+  (CAA + CTA + CCT + CGT) – (CCA + CGA + CAT + CTT) – (CAC + CTC + CCG + CGG) – (CCC + CGC + CAG + CTG)
+
+Verticals:
+  (CAA + CAT + CTC + CTG) – (CAC + CAG + CTA + CTT) – (CCA + CCT + CGC + CGG) – (CCC + CCG + CGA + CGT)
+
+Diagonals:
+  (CAA + CTT + CCC + CGG)
+  (CAC + CTG + CCA + CGT) – (CTA + CGC + CAT + CCG)
+  (CAG + CGA + CTC + CCT) – (CAC + CCA + CTG + CGT) – (CTA + CAT + CCG + CGC)
+
+Overall Evaluations for the 4‑Part Integral Suit:
+ (+,+) = 88  (–,–) = -32  (–,+) = 28  (+,–) = 28
+
+Family (Swords)
+
+Suit: Swords (G = yang)
+Least Beneficial Letter: T (Yang)
+7 Codons with T: GTT, GTG, GGT, GAT, GTA, GCT, GTC
+──────────────────────────────────────────── Assignments
+
+Each tarot court card is assigned one or more codons with a brief rationale.
+
+────────────────────────────────────────────
+
+Tarot Card	Codon(s)	Rationale
+4 of Swords	GTT	Portal card (balanced yang stability).
+King of Swords	GTG	Intellectual clarity (G-T-G).
+Prince of Swords	GGT	Strategic analysis (G-G-T).
+Queen of Swords	GAT + GTA	Paired to balance Yin (A) intuition.
+Princess of Swords	GCT + GTC	Paired to balance yin (C) discernment.
+────────────────────────────────────────────		
+──────────────────────────────────────────── Ace‑10 Cards
+
+Each codon is mapped to a tarot card along with its symbolic meaning.
+
+────────────────────────────────────────────
+
+Codon	Tarot Card	Symbolic Meaning
+GGG	Ace of Swords	Mental clarity and truth.
+GGA	2 of Swords	Stalemate and difficult choices.
+GGC	3 of Swords	Heartbreak and betrayal.
+GAC	5 of Swords	Conflict and pyrrhic victory.
+GAG	6 of Swords	Transition and healing.
+GCA	7 of Swords	Deception and strategy.
+GCC	8 of Swords	Restriction and self‑imposed limits.
+GAA	9 of Swords	Anxiety and nightmares.
+GCT	10 of Swords	Crisis and painful endings.
+────────────────────────────────────────────		
+──────────────────────────────────────────── G Family Groups and Values
+
+Each group is labeled by a 2‑letter prefix (GA, GT, GC, GG) with variable third letters. For each codon the four numerical evaluations are given as follows:  (+,+) → positive–positive
+ (–,–) → negative–negative
+ (–,+) → negative–positive
+ (+,–) → positive–negative
+
+────────────────────────────────────────────
+
+Group	Codon & Evaluations
+GA(X)	GAA: (+,+)=20  (–,–)=-4  (–,+)=8  (+,–)=8
+GAT: (+,+)=23  (–,–)=-7  (–,+)=11 (+,–)=5
+G T(X)	GTA: (+,+)=23  (–,–)=-7  (–,+)=5  (+,–)=11
+GTT: (+,+)=26  (–,–)=-10 (–,+)=8  (+,–)=8
+GC(X)	GCA: (+,+)=21  (–,–)=-5  (–,+)=7  (+,–)=9
+GCT: (+,+)=24  (–,–)=-8  (–,+)=10 (+,–)=6
+GG(X)	GGA: (+,+)=22  (–,–)=-6  (–,+)=6  (+,–)=10
+GGT: (+,+)=25  (–,–)=-9  (–,+)=9  (+,–)=7
+(Also:)	GAC: (+,+)=21  (–,–)=-5  (–,+)=9  (+,–)=7
+GTC: (+,+)=24  (–,–)=-8  (–,+)=6  (+,–)=10
+GCC: (+,+)=22  (–,–)=-6  (–,+)=8  (+,–)=8
+GGC: (+,+)=23  (–,–)=-7  (–,+)=7  (+,–)=9
+GAG: (+,+)=22  (–,–)=-6  (–,+)=10 (+,–)=6
+────────────────────────────────────────────	
+Note: The groups are organized so that the codons (by their three-letter value) are assigned these attractor values.	
+──────────────────────────────────────────── G‑Family Complimentary Pairs – Prime and Non‑Prime Attractors / Rotational Patterning – Sums Only
+
+The following sections show how G‑Family codons pair, with the sum evaluations given for each pairing.
+
+──────────────────────────────────────────── 1. Middle Letter Complements – Horizontal Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Horizontal)	(+,+)	(–,–)	(–,+)	(+,–)
+GAA + GTA	43	-11	13	19
+GAT + GTT	49	-17	19	13
+GAC + GTC	45	-13	15	17
+GAG + GTG	47	-15	17	15
+GCA + GGA	43	-11	13	19
+GCT + GGT	49	-17	19	13
+GCC + GGC	45	-13	15	17
+GCG + GGG	47	-15	17	15
+────────────────────────────────────────────				
+──────────────────────────────────────────── 2. Last Letter Complements – Vertical Symmetry
+
+────────────────────────────────────────────
+
+Pairing (Vertical)	(+,+)	(–,–)	(–,+)	(+,–)
+GAA + GAT	43	-11	19	13
+GTA + GTT	49	-17	13	19
+GCA + GCT	45	-13	17	15
+GGA + GGT	47	-15	15	17
+GAC + GAG	43	-11	19	13
+GTC + GTG	49	-17	13	19
+GCC + GCG	45	-13	17	15
+GGC + GGG	47	-15	15	17
+────────────────────────────────────────────				
+──────────────────────────────────────────── 3. 2‑Letter Reflections – Diagonal Symmetries
+
+────────────────────────────────────────────
+
+Pairing (Diagonal)	(+,+)	(–,–)	(–,+)	(+,–)
+GAA + GTT	46	-14	16	16
+GCC + GGG	46	-14	16	16
+GAC + GTG	46	-14	16	16
+GTA + GGC	46	-14	12	20
+GAT + GCG	46	-14	20	12
+GCA + GGT	46	-14	16	16
+GAG + GGA	44	-12	16	16
+GTA + GAT	46	-14	16	16
+GTG + GGT	50	-18	16	16
+GAC + GCA	42	-10	16	16
+GTC + GCT	48	-16	16	16
+GCG + GGC	46	-14	16	16
+────────────────────────────────────────────				
+──────────────────────────────────────────── 4. 4‑Part Integral Suit Symmetries
+
+Combined groupings for the entire suit are given by these formulas:
+
+Horizontals:
+  (GAA + GTA + GCT + GGT) – (GCA + GGA + GAT + GTT) – (GAC + GTC + GCG + GGG) – (GCC + GGC + GAG + GTG)
+
+Verticals:
+  (GAA + GAT + GTC + GTG) – (GAC + GAG + GTA + GTT) – (GCA + GCT + GGC + GGG) – (GCC + GCG + GGA + GGT)
+
+Diagonals:
+  (GAA + GTT + GCC + GGG)
+  (GAC + GTG + GCA + GGT) – (GTA + GGC + GAT + GCG)
+  (GAG + GGA + GTC + GCT) – (GAC + GCA + GTG + GGT) – (GTA + GAT + GCG + GGC)
+
+Overall Evaluations for the 4‑Part Integral Suit:
+ (+,+) = 92  (–,–) = -28  (–,+) = 32  (+,–) = 32
+
+────────────── Total Integral Symmetrical Value
+
+A Suit:  (+,+) = 84
+ (-,-) = -36
+ (-,+) = 24
+ (+,-) = 24
+
+T Suit:  (+,+) = 96
+ (-,-) = -24
+ (-,+) = 36
+ (+,-) = 36
+
+C Suit:  (+,+) = 88
+ (-,-) = -32
+ (-,+) = 28
+ (+,-) = 28
+
+G Suit:  (+,+) = 92
+ (-,-) = -28
+ (-,+) = 32
+ (+,-) = 32
+
+Integral Totals:  (+,+) = 360
+ (-,-) = -120
+ (-,+) = 120
+ (+,-) = 120				
