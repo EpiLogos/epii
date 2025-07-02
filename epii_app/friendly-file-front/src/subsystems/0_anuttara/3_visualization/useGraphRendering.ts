@@ -81,14 +81,14 @@ export function useGraphRendering() {
     // Use the node's pre-calculated size
     const nodeSize = node.val || 1.0;
 
-    // Use the correct nodeRelSize multiplier
-    const nodeRelSize = 7.5; // Must match the nodeRelSize prop in ForceGraph2D (reduced to 0.25x)
+    // Use the correct nodeRelSize multiplier - reduced for smaller nodes
+    const nodeRelSize = 3.0; // Must match the nodeRelSize prop in ForceGraph2D (reduced for smaller nodes)
 
     // Calculate radius based on node size and a fixed scale factor
     // This prevents the hexagon from growing too large when zooming in
     // and ensures consistent sizing regardless of zoom level
     const baseRadius = nodeSize * nodeRelSize;
-    const fixedScale = 0.2; // Fixed scale factor for consistent sizing
+    const fixedScale = 0.1; // Reduced scale factor for smaller, depth-appropriate sizing
     const radius = baseRadius * fixedScale;
 
     // Determine node color

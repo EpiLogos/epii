@@ -14,7 +14,7 @@
 import React, { useEffect } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import * as d3 from 'd3';
-import { useMeta2D } from "../../../shared/components/meta/Meta2DContainer';
+import { useMeta2D } from "../4_context/Meta2DContainer";
 import { Node } from "../../../shared/components/meta/metaData";
 import { calculateHexagonalPosition } from '../1_utils/geometryUtils';
 import { configurePhysics2D, addOrbitalForce } from '../0_foundation/physicsConfig';
@@ -38,21 +38,11 @@ export const Meta2DFoundation: React.FC = () => {
   // Get custom rendering functions
   const { drawHexagon } = useGraphRendering();
 
-  // Set up link pulse animation
+  // Set up link pulse animation with direct canvas approach
   const pulseFactorRef = useLinkPulse((_pulseFactor) => {
-    // Force a visual refresh without resetting physics
-    if (graphRef.current && graphRef.current.getContext) {
-      try {
-        const ctx = graphRef.current.getContext();
-        if (ctx) {
-          // Request a redraw of the canvas
-          graphRef.current._rerender();
-        }
-      } catch (e) {
-        // Silent error handling
-        console.debug('Error updating canvas:', e);
-      }
-    }
+    // Skip refresh - rely on ForceGraph2D's built-in animation loop
+    // Removing _rerender() call that causes physics resets
+    // The graph will update automatically on the next animation frame
   }, 150); // Reduced frequency for better performance
 
   // Prepare graph data
@@ -63,29 +53,12 @@ export const Meta2DFoundation: React.FC = () => {
 
 
 
-  // Configure physics forces
-  useEffect(() => {
-    // Skip if loading, error, or no graph ref
-    if (isLoading || error || !graphRef.current) return;
+  // REMOVED: Competing physics configuration that was causing conflicts
+  // Physics is now handled centrally in Meta2DIntegration to avoid multiple
+  // systems trying to control the same simulation
 
-    // Get the force simulation
-    const simulation = graphRef.current.d3Force();
-    if (!simulation) return;
-
-    // Configure physics using the centralized configuration
-    configurePhysics2D(simulation, nodes, edges);
-
-
-
-    // Add custom orbital force for unmapped nodes
-    simulation.on('tick', () => {
-      // Use the centralized orbital force function
-      addOrbitalForce(nodes);
-    });
-
-    // Restart the simulation
-    simulation.alpha(1).restart();
-  }, [graphRef, nodes, edges, isLoading, error]);
+  // The Foundation component now focuses on its core responsibility:
+  // providing the base geometric structure without interfering with physics
 
   // Fix positions for mapped nodes
   useEffect(() => {
@@ -110,67 +83,18 @@ export const Meta2DFoundation: React.FC = () => {
       }
     });
 
-    // Force a visual refresh without resetting physics
-    if (graphRef.current._rerender) {
-      graphRef.current._rerender();
-    }
+    // Skip visual refresh - ForceGraph2D will handle updates automatically
+    // Removing _rerender() call that causes physics resets
   }, [graphRef, nodes, isLoading, error]);
 
   // Skip rendering if loading or error
   if (isLoading || error) return null;
 
-  return (
-    <ForceGraph2D
-      ref={graphRef}
-      graphData={graphData}
-      width={width}
-      height={height}
-      backgroundColor="rgba(0,0,0,0)"
-      // Physics engine configuration
-      cooldownTicks={Infinity} // Keep physics simulation running indefinitely
-      warmupTicks={100}
-      d3AlphaDecay={0.005} // Extremely slow decay for very stable behavior
-      d3VelocityDecay={0.1} // Significantly reduced for much more fluid movement
-      d3AlphaMin={0.0005} // Lower minimum to allow simulation to run longer
-      // Node styling
-      nodeRelSize={7.5} // Reduced to 0.25x the original size (was 30)
-      nodeVal={node => node.val} // Use pre-calculated size
-      nodeColor={node => node.color} // Use pre-calculated color from useGraphStyling
-      // Custom node rendering
-      nodeCanvasObject={(node, ctx, globalScale) => {
-        drawHexagon(node, ctx, globalScale, highlightedNodes, activeNode);
-      }}
-      // Link styling
-      linkWidth={link => {
-        const id = link.id || `${typeof link.source === 'object' ? link.source.id : link.source}-${typeof link.target === 'object' ? link.target.id : link.target}`;
-        return highlightedLinks.has(id) ? 2 : link.width || 0.5;
-      }}
-      linkColor={link => {
-        // Get link ID
-        const id = link.id || `${typeof link.source === 'object' ? link.source.id : link.source}-${typeof link.target === 'object' ? link.target.id : link.target}`;
+  // REMOVED: ForceGraph2D component - now handled by Meta2DVisualization
+  // This component now focuses on its core responsibility: providing foundational geometry
+  // The actual graph rendering is handled by Meta2DVisualization following the Meta3D pattern
 
-        // Check if link is highlighted
-        const isHighlighted = highlightedLinks.has(id);
-
-        // Get base color
-        const baseColor = link.color || 'rgba(180, 180, 180, 0.3)';
-
-        // Apply pulse to the link color
-        return applyPulseToLinkColor(baseColor, pulseFactorRef.current, isHighlighted);
-      }}
-      linkDirectionalParticles={link => {
-        const id = link.id || `${typeof link.source === 'object' ? link.source.id : link.source}-${typeof link.target === 'object' ? link.target.id : link.target}`;
-        return highlightedLinks.has(id) ? 4 : 1;
-      }}
-      linkDirectionalParticleWidth={3} // Larger particles
-      linkDirectionalParticleSpeed={0.01} // Faster particles for more noticeable motion
-      // Node and link identification
-      nodeId="id"
-      nodeLabel="name" // Show name on hover
-      linkSource="source"
-      linkTarget="target"
-    />
-  );
+  return null;
 };
 
 export default Meta2DFoundation;

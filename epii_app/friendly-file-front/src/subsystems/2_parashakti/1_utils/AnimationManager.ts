@@ -145,6 +145,24 @@ class AnimationManager {
     callback: AnimationCallback,
     options: AnimationOptions
   ): AnimationId {
+    // Ensure AnimationManager is in a valid state
+    if (!this.animations) {
+      console.error('[AnimationManager] animations Map is undefined, reinitializing...');
+      this.animations = new Map();
+    }
+    if (!this.performanceMetrics || !this.performanceMetrics.animationTimes) {
+      console.error('[AnimationManager] performanceMetrics is invalid, reinitializing...');
+      this.performanceMetrics = {
+        frameRates: [],
+        frameTimes: [],
+        animationTimes: new Map(),
+        averageFrameRate: 60,
+        averageFrameTime: 16.67,
+        lastFpsUpdateTime: 0,
+        displayFps: 60
+      };
+    }
+
     // Generate a unique ID
     const id = `${options.subsystem}-${options.category}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
@@ -280,7 +298,30 @@ class AnimationManager {
    */
   setDebugMode(enabled: boolean): void {
     this.debugMode = enabled;
-    console.log(`[AnimationManager] ${enabled ? 'Enabled' : 'Disabled'} debug mode`);
+  }
+
+  /**
+   * Get the current display FPS
+   * @returns Current FPS
+   */
+  getDisplayFps(): number {
+    return this.performanceMetrics.displayFps;
+  }
+
+  /**
+   * Get the average frame time
+   * @returns Average frame time in milliseconds
+   */
+  getAverageFrameTime(): number {
+    return this.performanceMetrics.averageFrameTime;
+  }
+
+  /**
+   * Get the number of registered animations
+   * @returns Number of animations
+   */
+  getAnimationCount(): number {
+    return this.animations.size;
   }
 
   /**
@@ -317,6 +358,44 @@ class AnimationManager {
   }
 
   /**
+   * Reset the animation manager to a clean state
+   * Useful when switching between components to prevent state pollution
+   */
+  reset(): void {
+    console.log('[AnimationManager] Resetting to clean state');
+
+    // Stop the animation loop
+    this.stop();
+
+    // Clear all animations
+    this.animations.clear();
+    this.cachedAnimations = [];
+
+    // Invalidate the animations cache
+    this.animationsCacheValid = false;
+
+    // Reset performance metrics
+    this.performanceMetrics = {
+      frameRates: [],
+      frameTimes: [],
+      animationTimes: new Map(),
+      averageFrameRate: 60,
+      averageFrameTime: 16.67,
+      lastFpsUpdateTime: 0,
+      displayFps: 60
+    };
+
+    // Reset frame tracking
+    this.frameCount = 0;
+    this.lastFrameTime = 0;
+
+    // Reset scene reference
+    this.scene = null;
+
+    console.log('[AnimationManager] Reset complete');
+  }
+
+  /**
    * Get performance metrics
    * @returns Current performance metrics
    */
@@ -330,6 +409,14 @@ class AnimationManager {
    */
   getFPS(): number {
     return this.performanceMetrics.displayFps;
+  }
+
+  /**
+   * Check if the AnimationManager is in a valid state
+   * @returns True if the instance is valid
+   */
+  isValid(): boolean {
+    return !!(this.animations && this.performanceMetrics && this.performanceMetrics.animationTimes);
   }
 
   /**
@@ -521,5 +608,22 @@ export function getAnimationManager(): AnimationManager {
     console.log('[AnimationManager] Creating singleton instance');
     instance = new AnimationManager();
   }
+
+  // Safety check: ensure the instance is in a valid state
+  if (!instance.isValid()) {
+    console.warn('[AnimationManager] Instance has invalid state, recreating...');
+    instance = new AnimationManager();
+  }
+
   return instance;
+}
+
+/**
+ * Reset the singleton instance (useful for testing or complete cleanup)
+ */
+export function resetAnimationManagerSingleton(): void {
+  if (instance) {
+    instance.reset();
+    instance = null;
+  }
 }

@@ -10,7 +10,7 @@ import React from 'react';
 import Meta2DIntegration from './Meta2DIntegration';
 import PageTransition from '../../../shared/components/layout/PageTransition';
 import GeometricBackground from '../../../shared/components/ui/GeometricBackground';
-import ModuleNavigation from '../../../shared/components/layout/ModuleNavigation';
+
 import { Info } from 'lucide-react';
 
 const Meta2D: React.FC = () => {
@@ -28,8 +28,7 @@ const Meta2D: React.FC = () => {
               at the heart of Epi-Logos, where epistemology, form, and function interconnect.
             </p>
 
-            {/* Module Navigation */}
-            <ModuleNavigation currentModule="0000" />
+
           </div>
 
           {/* Meta2D Integration */}

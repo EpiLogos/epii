@@ -25,8 +25,8 @@ const pulseState: LinkPulseState = {
   active: false,
   startTime: 0,
   cycleDuration: 2500,      // 2.5 seconds for a complete cycle (was 5 seconds)
-  minPulseFactor: 0.3,      // Minimum opacity factor
-  maxPulseFactor: 3.0,      // Increased maximum opacity factor (was 2.5)
+  minPulseFactor: 0.1,      // Very low minimum opacity factor for subtle base state
+  maxPulseFactor: 0.5,      // Much reduced maximum opacity factor for subtle pulse effect
   pulseSpeed: 0.2,          // Adjusted pulse speed (was 0.15)
   currentPulseFactor: 1.0   // Default pulse factor
 };
@@ -52,6 +52,43 @@ export function stopLinkPulse(): void {
  */
 export function setLinkPulseSpeed(speed: number): void {
   pulseState.pulseSpeed = Math.max(0.1, Math.min(2.0, speed));
+}
+
+/**
+ * Get current link pulse parameters
+ * @returns Current pulse state parameters
+ */
+export function getLinkPulseParameters() {
+  return {
+    cycleDuration: pulseState.cycleDuration,
+    minPulseFactor: pulseState.minPulseFactor,
+    maxPulseFactor: pulseState.maxPulseFactor,
+    pulseSpeed: pulseState.pulseSpeed
+  };
+}
+
+/**
+ * Set link pulse parameters
+ * @param params - Object containing pulse parameters to update
+ */
+export function setLinkPulseParameters(params: Partial<{
+  cycleDuration: number;
+  minPulseFactor: number;
+  maxPulseFactor: number;
+  pulseSpeed: number;
+}>) {
+  if (params.cycleDuration !== undefined) {
+    pulseState.cycleDuration = Math.max(500, Math.min(20000, params.cycleDuration));
+  }
+  if (params.minPulseFactor !== undefined) {
+    pulseState.minPulseFactor = Math.max(0, Math.min(1, params.minPulseFactor));
+  }
+  if (params.maxPulseFactor !== undefined) {
+    pulseState.maxPulseFactor = Math.max(0, Math.min(2, params.maxPulseFactor));
+  }
+  if (params.pulseSpeed !== undefined) {
+    pulseState.pulseSpeed = Math.max(0.05, Math.min(2, params.pulseSpeed));
+  }
 }
 
 /**

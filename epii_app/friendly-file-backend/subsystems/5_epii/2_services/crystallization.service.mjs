@@ -673,10 +673,11 @@ export const getCrystallizationsForDocument = async (originalDocumentId) => {
     }
 
     // Find all crystallizations for the original document
+    // Added limit to avoid potential 32MB sort memory limit for documents with many crystallizations
     const crystallizations = await Document.find({
       'metadata.originalDocumentId': originalDocumentId,
       documentType: 'pratibimba' // Use 'pratibimba' instead of 'crystallization'
-    }).sort({ 'metadata.crystallizationDate': -1 });
+    }).sort({ 'metadata.crystallizationDate': -1 }).limit(100);
 
     return crystallizations;
   } catch (error) {

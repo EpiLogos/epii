@@ -12,7 +12,7 @@
  */
 
 import React, { createContext, useContext, useState, useRef, ReactNode } from 'react';
-import { Loader2, AlertTriangle, Info } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import GeometricBackground from '../ui/GeometricBackground';
 import { Node, Edge } from './metaData";
 
@@ -151,20 +151,7 @@ export const Meta3DContainer: React.FC<Meta3DContainerProps> = ({
           {!isLoading && !error && children}
         </div>
 
-        {/* Philosophical Framework Note */}
-        <div className="mt-8 bg-epii-dark/40 neo-glow rounded-lg p-6">
-          <div className="flex items-start gap-3">
-            <Info className="text-epii-neon mt-1 h-5 w-5" />
-            <div>
-              <h3 className="text-lg text-epii-neon mb-2">About the Meta Structure</h3>
-              <p className="text-foreground/70 text-sm">
-                This 3D visualization represents the ontology of isomorphism at the heart of Epi-Logos - where epistemology,
-                form, and function interconnect. The core principles of Anuttara (foundational void), Paramasiva (quaternary logic),
-                Parashakti (vibrational templates), and more are embodied in this dynamic knowledge architecture.
-              </p>
-            </div>
-          </div>
-        </div>
+
       </div>
     </Meta3DContext.Provider>
   );

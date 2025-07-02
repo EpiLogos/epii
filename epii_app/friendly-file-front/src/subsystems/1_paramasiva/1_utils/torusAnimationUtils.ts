@@ -63,6 +63,18 @@ export function setTorusRotationSpeed(speed: number): void {
   rotationState.speed = Math.max(0.1, Math.min(3.0, speed));
 }
 
+/**
+ * Get the current torus rotation state
+ * @returns Current rotation state
+ */
+export function getTorusRotationState() {
+  return {
+    speed: rotationState.speed,
+    active: rotationState.active,
+    startTime: rotationState.startTime
+  };
+}
+
 // Cache for torus rotation quaternions
 const rotationCache = new Map<string, THREE.Quaternion>();
 

@@ -15,7 +15,6 @@
  */
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Info } from 'lucide-react';
 
 import Meta3DContainer from '../4_context/Meta3DContainer';
 import Meta3DVisualization from '../3_visualization/Meta3DVisualization';
@@ -113,11 +112,7 @@ const Meta3DIntegration: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold text-epii-neon">Bimba-Aligned 3D Visualization</h2>
-      </div>
-
+    <div className="flex flex-col w-full h-full">
       <Meta3DContainer
         nodes={graphData?.nodes || []}
         edges={graphData?.links || []}
@@ -133,20 +128,7 @@ const Meta3DIntegration: React.FC = () => {
         />
       </Meta3DContainer>
 
-      {/* Philosophical Framework Note */}
-      <div className="mt-8 bg-epii-dark/40 neo-glow rounded-lg p-6">
-        <div className="flex items-start gap-3">
-          <Info className="text-epii-neon mt-1 h-5 w-5" />
-          <div>
-            <h3 className="text-lg text-epii-neon mb-2">About the Meta Structure</h3>
-            <p className="text-foreground/70 text-sm">
-              This 3D visualization represents the ontology of isomorphism at the heart of Epi-Logos - where epistemology,
-              form, and function interconnect. The core principles of Anuttara (foundational void), Paramasiva (quaternary logic),
-              Parashakti (vibrational templates), and more are embodied in this dynamic knowledge architecture.
-            </p>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 };

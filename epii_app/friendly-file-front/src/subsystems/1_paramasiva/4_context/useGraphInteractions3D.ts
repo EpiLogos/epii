@@ -48,25 +48,22 @@ export function useGraphInteractions3D(
   // Track the active node ID for internal use
   const activeNodeId = activeNode?.id || null;
 
-  // Track the clicked node ID for toggling highlight
+  // Track the clicked node ID separately from highlighted nodes (like Meta2D does)
   const clickedNodeRef = useRef<string | null>(null);
 
   // Node click handler - now toggles highlighting on single click
   const handleNodeClick = useCallback((node: Node) => {
     if (!node || !node.id) return;
 
-    // Check if this is a click on the same node (for toggling highlight)
-    const isToggle = clickedNodeRef.current === node.id;
+    // Check if this is the same node that was clicked (for toggling)
+    const isToggleClick = clickedNodeRef.current === node.id;
 
-    // If toggling off, clear highlights and reset clicked node
-    if (isToggle) {
-      // Clear highlights
+    // If clicking on the same node again, deselect it
+    if (isToggleClick) {
+      // Clear highlights and clicked node reference
       setHighlightedNodes(new Set());
       setHighlightedLinks(new Set());
       clickedNodeRef.current = null;
-
-      // Don't clear the active node - this allows double-click to still work
-      // while preserving the highlight state
       return;
     }
 
@@ -124,8 +121,8 @@ export function useGraphInteractions3D(
       // Skip if we're already dragging a node
       if (interactionStateRef.current.isDragging) return;
 
-      // If we have an active node, don't change highlights
-      if (activeNodeId) return;
+      // If we have an active node or a clicked node, don't change highlights
+      if (activeNodeId || clickedNodeRef.current) return;
 
       // Store the hovered node for delayed processing
       const isHovering = !!node && !!node.id;
@@ -158,10 +155,10 @@ export function useGraphInteractions3D(
         }, 150); // 150ms delay before activating hover effects
       }
 
-      // If no node is hovered, clear highlights
+      // If no node is hovered, clear highlights (but only if they're hover-based, not click-based)
       if (!node || !node.id) {
-        // Only clear if we actually have highlights
-        if (lastHoveredNodeRef.current !== null) {
+        // Only clear if we actually have hover-based highlights and no clicked node
+        if (lastHoveredNodeRef.current !== null && !clickedNodeRef.current) {
           // Use functional updates to avoid capturing stale state
           setHighlightedNodes(new Set());
           setHighlightedLinks(new Set());
@@ -245,7 +242,7 @@ export function useGraphInteractions3D(
     // Clear the highlighted nodes and links in the Meta3DContainer context
     setHighlightedNodes(new Set());
     setHighlightedLinks(new Set());
-    // Reset the clicked node reference
+    // Clear the clicked node reference
     clickedNodeRef.current = null;
   }, [setActiveNode, setHighlightedNodes, setHighlightedLinks]);
 

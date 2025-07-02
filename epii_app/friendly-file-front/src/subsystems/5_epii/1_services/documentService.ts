@@ -81,6 +81,93 @@ const documentServiceImpl = {
   },
 
   /**
+   * Get documents in batches to avoid WebSocket payload size limits
+   * @param collection MongoDB collection name (default: 'Documents')
+   * @param batchSize Number of documents per batch (default: 10 for pratibimba, 50 for others)
+   * @param excludeFields Fields to exclude to reduce payload size
+   * @returns Promise with all documents loaded in batches
+   */
+  getAllDocumentsBatched: async (
+    collection: string = 'Documents',
+    batchSize?: number,
+    excludeFields?: string[]
+  ) => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
+    // Set intelligent batch sizes based on collection type
+    const defaultBatchSize = collection === 'pratibimbaDocuments' ? 10 : 50;
+    const actualBatchSize = batchSize || defaultBatchSize;
+
+    // For pratibimba documents, exclude metadata by default to reduce payload size
+    const defaultExcludeFields = collection === 'pratibimbaDocuments'
+      ? ['metadata', 'versions']
+      : [];
+    const actualExcludeFields = excludeFields || defaultExcludeFields;
+
+    console.log(`🔄 Loading ${collection} documents in batches of ${actualBatchSize}...`);
+
+    const allDocuments: any[] = [];
+    let skip = 0;
+    let hasMore = true;
+
+    try {
+      while (hasMore) {
+        console.log(`📦 Loading batch starting at ${skip}...`);
+
+        const response = await fetch(`${backendUrl}/api/bpmcp/call-tool`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            toolName: 'listDocuments',
+            args: {
+              query: {},
+              limit: actualBatchSize,
+              skip,
+              collection,
+              excludeFields: actualExcludeFields
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to get documents batch: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        let batchDocuments: any[] = [];
+
+        // Extract documents from result
+        if (Array.isArray(result)) {
+          batchDocuments = result;
+        } else if (result && result.documents && Array.isArray(result.documents)) {
+          batchDocuments = result.documents;
+        }
+
+        console.log(`📦 Loaded ${batchDocuments.length} documents in this batch`);
+
+        // Add to all documents
+        allDocuments.push(...batchDocuments);
+
+        // Check if we have more documents
+        hasMore = batchDocuments.length === actualBatchSize;
+        skip += actualBatchSize;
+
+        // Add a small delay between batches to prevent overwhelming the server
+        if (hasMore) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+
+      console.log(`✅ Loaded ${allDocuments.length} documents from ${collection} in ${Math.ceil(skip / actualBatchSize)} batches`);
+      return allDocuments;
+
+    } catch (error) {
+      console.error(`❌ Error loading batched documents from ${collection}:`, error);
+      return allDocuments; // Return what we have so far
+    }
+  },
+
+  /**
    * Create a new document in MongoDB
    * @param document Document data
    * @returns Promise with the created document

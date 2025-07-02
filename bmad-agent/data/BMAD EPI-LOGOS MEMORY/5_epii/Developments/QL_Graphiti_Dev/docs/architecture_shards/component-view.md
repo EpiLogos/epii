@@ -6,7 +6,7 @@ The core of this development lies in the Graphiti MCP service. It will be respon
 
 **Phase 1: Identification (Automated)**
 - The service will periodically or on-demand scan new content from LightRAG and changes in the Neo4j Bimba graph.
-- It will use a combination of NLP techniques (semantic analysis, keyword/pattern matching) and graph analysis to identify clusters of information that strongly suggest a 4-part or 6-part structure.
+- It will use a combination of NLP techniques (semantic analysis, keyword/pattern matching) and graph analysis to identify clusters of information that strongly suggest a QL structure. While the primary focus is on identifying the core 4-part and 6-part variants, the system will also be tuned to recognize patterns indicative of 2, 3, 5, 7, 8, 9, 10, and 12-part knowledge units.
 - **Example Heuristic:** If a document discusses a problem, outlines a series of steps, describes the outcome, and specifies the application context, the service will flag this as a `POTENTIAL` 4-part `QuaternalUnit`.
 - Upon identification, it creates a `QuaternalUnit` node with `status: POTENTIAL` and links to the source evidence.
 
@@ -30,7 +30,7 @@ Core Logic of ContemplateKnowledge :
    - searchLightRAG(query) : To find relevant unstructured text from documents.
    - queryNotion(query) : To access crystallized knowledge and human-curated content.
    - getMongoContext(query) : To retrieve operational data or other relevant records.
-3. Synthesis : The agent analyzes the gathered information, looking for the 4-part or 6-part QL pattern. It identifies the entities for each position.
+3. Synthesis : The agent analyzes the gathered information, looking for the patterns of a QL structure (e.g., 4-part, 6-part, etc.). It identifies the entities for each position.
 4. Grounding & Linking :
    - It calls createQuaternalUnit or updateQuaternalUnit , explicitly grounding the unit in a primary bimbaCoordinate .
    - Crucially, if the synthesis reveals connections to concepts in other coordinates, it identifies the relevant QuaternalUnit in that coordinate and creates a cross_coordinate_link .

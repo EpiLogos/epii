@@ -12,7 +12,7 @@ import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ForceGraph3D from 'react-force-graph-3d';
 import { NodeDetailsPanel } from "../../../shared/components/meta/NodeDetailsPanel";
-import { GraphControls } from "../../../shared/components/meta/GraphControls";
+
 import { Node, Edge } from "../../../shared/components/meta/metaData";
 // Import the useMeta3D hook from the correct Meta3DContainer
 // This ensures we're using the context from the Paramasiva subsystem
@@ -28,6 +28,7 @@ import { RelationVisualizer } from '../../2_parashakti/3_visualization/RelationV
 // It uses a unified approach based on virtual depth for all nodes
 import { useGraphStylingFunctions } from '../../3_mahamaya/2_hooks/useGraphStylingFunctions';
 import { useNodeDetails } from "../../../shared/hooks/bimba/useNodeDetails";
+import { AnimationConsoleTrigger } from "../../2_parashakti/5_integration/AnimationConsoleTrigger";
 import { getAnimationManager } from '../../2_parashakti/1_utils/AnimationManager';
 
 interface Meta3DVisualizationProps {
@@ -272,52 +273,13 @@ export const Meta3DVisualization: React.FC<Meta3DVisualizationProps> = ({
     }
   }, [graphRef, pulsationFactor]);
 
-  // Mark component as mounted and handle cleanup
+  // Mark component as mounted - cleanup handled by forced remounting
   useEffect(() => {
     isMountedRef.current = true;
-
-    // Capture the current graph reference to use in cleanup
-    const currentGraphRef = graphRef.current;
-
-    // Return cleanup function
     return () => {
-      console.log('Meta3DVisualization: Cleaning up resources');
       isMountedRef.current = false;
-
-      // Stop the animation manager
-      const animationManager = getAnimationManager();
-      if (animationManager) {
-        console.log('Meta3DVisualization: Stopping animation manager');
-        animationManager.stop();
-      }
-
-      // Clean up ForceGraph3D resources
-      if (currentGraphRef) {
-        try {
-          console.log('Meta3DVisualization: Cleaning up ForceGraph3D');
-
-          // Stop the physics simulation
-          if (typeof currentGraphRef.d3Force === 'function') {
-            try {
-              const simulation = currentGraphRef.d3Force();
-              if (simulation && typeof simulation.stop === 'function') {
-                simulation.stop();
-              }
-            } catch (error) {
-              console.error('Error stopping physics simulation:', error);
-            }
-          }
-
-          // Reset physics state
-          physicsInitializedRef.current = false;
-          setPhysicsInitialized(false);
-
-        } catch (error) {
-          console.error('Error cleaning up ForceGraph3D:', error);
-        }
-      }
     };
-  }, [graphRef]);
+  }, []);
 
   // Initialize physics when component mounts
   useEffect(() => {
@@ -421,25 +383,21 @@ export const Meta3DVisualization: React.FC<Meta3DVisualizationProps> = ({
 
   return (
     <>
-      {/* Controls */}
-      <GraphControls
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onReset={resetView}
-        viewMode="3D"
-        onViewModeChange={() => navigate('/meta2d')}
-      />
-
       {/* Relation Visualizer - handles all link styling and animations */}
       <RelationVisualizer wireframesCreated={wireframesCreated} />
 
       {/* Graph */}
       {!isLoading && !error && graphData && graphData.nodes.length > 0 && (
-        <ForceGraph3D
+        <div className="relative w-full h-[700px] bg-epii-dark/40 neo-glow rounded-lg overflow-hidden">
+          {/* Animation Console Trigger */}
+          <div className="absolute top-4 right-4 z-10">
+            <AnimationConsoleTrigger page="meta3d" />
+          </div>
+          <ForceGraph3D
           ref={graphRef}
           graphData={graphData}
           width={graphDimensions.width}
-          height={graphDimensions.height}
+          height={700}
           backgroundColor="rgba(0,0,0,0)"
           // Node styling - using the unified styling functions from Mahamaya subsystem
           // These functions apply styling based on virtual depth for all nodes
@@ -500,6 +458,7 @@ export const Meta3DVisualization: React.FC<Meta3DVisualizationProps> = ({
           onNodeHover={handleNodeHover}
           onBackgroundClick={handleBackgroundClick}
         />
+        </div>
       )}
 
       {/* Node details panel */}
@@ -508,7 +467,11 @@ export const Meta3DVisualization: React.FC<Meta3DVisualizationProps> = ({
           <NodeDetailsPanel
             activeNode={{
               ...activeNodeData,
-              details: nodeDetails || null,
+              details: nodeDetails ? {
+                properties: nodeDetails.properties,
+                connections: nodeDetails.connections,
+                notionResolution: nodeDetails.notionResolution
+              } : null,
               connections: Array.from(highlightedNodes).filter(id => id !== activeNodeData.id),
               highlightedLinks: graphData?.links.filter(link => highlightedLinks.has(link.id)) || [],
               isLoading: isLoadingNodeDetails,

@@ -1089,11 +1089,11 @@ export const EpiiProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('🔄 Loading documents from MongoDB...');
 
-      // First load bimba documents
+      // First load bimba documents (normal loading)
       const fetchedBimbaDocuments = await documentService.getAllDocuments('Documents');
 
-      // Then load pratibimba documents
-      const fetchedPratibimbaDocuments = await documentService.getAllDocuments('pratibimbaDocuments');
+      // Then load pratibimba documents using batched loading to avoid WebSocket payload limits
+      const fetchedPratibimbaDocuments = await documentService.getAllDocumentsBatched('pratibimbaDocuments');
 
       // Cache ALL documents at once
       documentCacheService.cacheAllDocuments(fetchedBimbaDocuments, fetchedPratibimbaDocuments);
@@ -1159,8 +1159,8 @@ export const EpiiProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
-      // Then load pratibimba documents
-      const fetchedPratibimbaDocuments = await documentService.getAllDocuments('pratibimbaDocuments');
+      // Then load pratibimba documents using batched loading to avoid WebSocket payload limits
+      const fetchedPratibimbaDocuments = await documentService.getAllDocumentsBatched('pratibimbaDocuments');
 
       // Cache ALL documents at once
       documentCacheService.cacheAllDocuments(fetchedBimbaDocuments, fetchedPratibimbaDocuments);

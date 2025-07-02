@@ -9,7 +9,7 @@ This tool allows the agent or user to initiate the creation of a QL structure, p
 **Schema (`CreateQuaternalUnitSchema`):**
 ```typescript
 z.object({
-  quaternal_type: z.enum(["FOUR_PART", "SIX_PART"]).optional().describe("User-specified QL structure. If omitted, the agent will infer it."),
+  quaternal_type: z.enum(["TWO_PART", "THREE_PART", "FOUR_PART", "FIVE_PART", "SIX_PART", "SEVEN_PART", "EIGHT_PART", "NINE_PART", "TEN_PART", "TWELVE_PART"]).optional().describe("User-specified QL structure. Defaults to FOUR_PART. The 4 and 6-part variants are considered the primary operational units."),
   bimbaCoordinate: z.string().describe("The primary Bimba coordinate to ground the unit."),
   source_references: z.array(z.object({ 
     uuid: z.string(), 

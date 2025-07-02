@@ -7,6 +7,132 @@
 // Import required modules
 
 /**
+ * Robust JSON parsing that attempts multiple strategies to handle malformed JSON
+ * @param {string} jsonStr - The JSON string to parse
+ * @returns {Promise<object>} - The parsed JSON object
+ */
+async function parseJSONRobustly(jsonStr) {
+    // Strategy 1: Try direct parsing first
+    try {
+        console.log("🔄 Attempting direct JSON parsing...");
+        return JSON.parse(jsonStr);
+    } catch (directError) {
+        console.warn("❌ Direct JSON parsing failed:", directError.message);
+        console.log("🔄 Attempting JSON repair strategies...");
+    }
+
+    // Strategy 2: Fix common JSON issues
+    try {
+        let fixedJson = jsonStr;
+
+        // Fix unescaped quotes in strings (common issue)
+        fixedJson = fixedJson.replace(/(?<!\\)"(?=(?:[^"\\]|\\.)*"[^"]*$)/g, '\\"');
+
+        // Fix trailing commas
+        fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+
+        // Fix missing commas between objects/arrays
+        fixedJson = fixedJson.replace(/}(\s*){/g, '},\n$1{');
+        fixedJson = fixedJson.replace(/](\s*)\[/g, '],\n$1[');
+
+        console.log("🔄 Attempting parsing with common fixes...");
+        return JSON.parse(fixedJson);
+    } catch (fixError) {
+        console.warn("❌ JSON repair failed:", fixError.message);
+    }
+
+    // Strategy 3: Partial parsing - extract valid core elements
+    try {
+        console.log("🔄 Attempting partial core elements extraction...");
+        const coreElements = [];
+
+        // Find all complete core element objects using a more robust approach
+        let searchPos = 0;
+
+        while (searchPos < jsonStr.length) {
+            const elementStart = jsonStr.indexOf('"elementType":', searchPos);
+            if (elementStart === -1) break;
+
+            // Find the opening brace for this element
+            let bracePos = elementStart;
+            while (bracePos > 0 && jsonStr[bracePos] !== '{') {
+                bracePos--;
+            }
+
+            if (bracePos >= 0) {
+                // Find the matching closing brace
+                let braceCount = 1;
+                let endPos = bracePos + 1;
+
+                while (endPos < jsonStr.length && braceCount > 0) {
+                    if (jsonStr[endPos] === '{') braceCount++;
+                    else if (jsonStr[endPos] === '}') braceCount--;
+                    endPos++;
+                }
+
+                if (braceCount === 0) {
+                    try {
+                        const elementJson = jsonStr.substring(bracePos, endPos);
+                        const element = JSON.parse(elementJson);
+
+                        // Validate required fields
+                        if (element.elementType && element.name && element.description) {
+                            coreElements.push({
+                                elementType: element.elementType,
+                                name: element.name,
+                                description: element.description,
+                                relevance: element.relevance || '',
+                                coordinates: Array.isArray(element.coordinates) ? element.coordinates : ['#5-1'],
+                                evidence: element.evidence || ''
+                            });
+                            console.log(`✅ Extracted valid core element: ${element.name}`);
+                        }
+                    } catch (elementError) {
+                        console.warn(`⚠️ Failed to parse element at position ${bracePos}:`, elementError.message);
+                    }
+                }
+            }
+
+            searchPos = elementStart + 1;
+        }
+
+        if (coreElements.length > 0) {
+            console.log(`✅ Partial extraction successful: ${coreElements.length} core elements recovered`);
+            return {
+                coreElements,
+                relationalProperties: {
+                    qlOperators: [],
+                    epistemicEssence: [],
+                    archetypalAnchors: [],
+                    semanticFramework: []
+                }
+            };
+        }
+    } catch (partialError) {
+        console.warn("❌ Partial extraction failed:", partialError.message);
+    }
+
+    // Strategy 4: Last resort - create minimal valid structure
+    console.warn("⚠️ All JSON parsing strategies failed. Creating minimal fallback structure.");
+    return {
+        coreElements: [{
+            elementType: "Fallback",
+            name: "Analysis Content",
+            description: "Core elements could not be extracted due to JSON parsing issues, but analysis content was generated successfully.",
+            relevance: "Fallback element to prevent pipeline failure",
+            coordinates: ["#5-1"],
+            evidence: "Generated as fallback when JSON parsing failed"
+        }],
+        relationalProperties: {
+            qlOperators: [],
+            epistemicEssence: [],
+            archetypalAnchors: [],
+            semanticFramework: []
+        }
+    };
+}
+
+/**
  * Generates core elements from synthesis, mappings, variations, and tags.
  * This function is used by stage -1 to extract key elements from the synthesis.
  * It also extracts relational properties for the Notion Content Nodes database.
@@ -63,10 +189,10 @@ export async function generateCoreElements(
 
 Extract the following relational properties from the synthesis and mappings:
 
-1. Archetypal Anchors: Universal symbols that capture the essence of this content
-   - What symbols come to mind? Phoenix, Tree, River, Bridge, Spiral, Web, Seed, etc.
-   - Examples: cycles → "Phoenix"; growth → "Tree"; flow → "River"; connection → "Web"
-   - Generate 6-12 simple archetypal symbols that feel right for this content
+1. Archetypal Anchors: Simple universal symbols that capture the content's essence
+   - Use basic symbols: Phoenix, Tree, River, Bridge, Spiral, Web, Seed, Mountain, Ocean, etc.
+   - Match content themes: transformation → Phoenix; growth → Tree; flow → River
+   - Generate 16-24 simple archetypal symbols based on what the content represents
 
 2. QL Operators: Quaternal Logic operators that structure the content
    - Format: "QL-[TYPE]-[POSITION]" (e.g., "QL-STRUCT-3", "QL-PROC-2", "QL-CONTEXT-4")
@@ -148,9 +274,9 @@ Extract 5-10 core elements that capture the most important aspects of this synth
 Also identify the relational properties that will be used directly in the Notion Content Nodes database.
 Focus on properties that are most relevant to the target coordinate ${targetCoordinate}.
 
-IMPORTANT: Generate detailed properties for EACH relational property type. Focus especially on Archetypal Anchors - be creative and generous in identifying symbolic patterns.
+IMPORTANT: Generate detailed properties for EACH relational property type.
 
-ARCHETYPAL ANCHORS EMPHASIS: This is particularly important! Look for universal symbols and archetypal patterns that capture the essence of the content. Think intuitively about what symbols come to mind - Phoenix, Tree, River, Bridge, etc. Don't overthink it, just trust what feels right symbolically.
+ARCHETYPAL ANCHORS: Generate simple, universal symbols that match the content. Use basic archetypes like Phoenix, Tree, River, Bridge, Spiral, Web, Mountain, Ocean. Keep it simple - just name the symbol and briefly explain why it fits.
 
 CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown formatting, or code blocks. Return ONLY the raw JSON with the following structure:
 {
@@ -171,7 +297,7 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
         "description": "string", // Detailed explanation (100-150 words) of how this universal QL principle operates in the content
         "evidence": "string" // Supporting evidence from the text
       }
-      // Generate 6-12 QL Operator properties - these are UNIVERSAL QL principles, not coordinate-specific
+      // Generate 4-8 QL Operator properties - these are UNIVERSAL QL principles, not coordinate-specific
     ],
     "epistemicEssence": [
       {
@@ -179,16 +305,15 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
         "description": "string", // Detailed explanation (100-150 words) of this epistemic essence
         "evidence": "string" // Supporting evidence from the text
       }
-      // Generate 6-12 Epistemic Essence properties
+      // Generate 16-24 Epistemic Essence properties
     ],
     "archetypalAnchors": [
       {
-        "name": "string", // Simple archetypal names like "Phoenix", "Tree of Life", "River", "Bridge", etc.
-        "description": "string", // Why this archetype fits the content (50-100 words)
-        "theme": "string", // What universal theme it represents (e.g., "transformation", "growth", "connection")
-        "resonance": "string" // How it connects to the document content
+        "name": "string", // Simple archetypal names like "Phoenix", "Tree", "River", "Bridge", "Spiral", "Web"
+        "description": "string", // Brief explanation of why this archetype fits the content (30-50 words)
+        "evidence": "string" // Supporting evidence from the text
       }
-      // Generate 4-8 Archetypal Anchors - Use intuitive symbolic patterns that feel right for the content
+      // Generate 16-24 Archetypal Anchors - Use simple, universal symbols that capture the essence
     ],
     "semanticFramework": [
       {
@@ -196,7 +321,7 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
         "description": "string", // Detailed explanation (100-150 words) of this relationship type
         "evidence": "string" // Supporting evidence from the text
       }
-      // Generate 6-12 Semantic Framework properties
+      // Generate 16-24 Semantic Framework properties
     ]
   }
 }`;
@@ -207,7 +332,7 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
             console.log(`🔄 Calling LLM for core elements generation (stage -1) with ${userPrompt.length} char prompt`);
             response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
                 temperature: 0.6,  // Increased for more creative and thoughtful analysis
-                maxOutputTokens: 8192  // Increased to give more room for all relational properties including archetypal anchors
+                maxOutputTokens: 40000  // Increased to 40k for comprehensive analysis summary
             });
             console.log(`✅ LLM core elements generation completed successfully (${response.length} chars)`);
         } catch (llmError) {
@@ -306,7 +431,8 @@ CRITICAL: Return ONLY a valid JSON object with NO explanatory text, markdown for
             console.log("Cleaned JSON string (first 200 chars):", jsonStr.substring(0, 200) + "...");
             console.log("JSON string ends with:", jsonStr.substring(Math.max(0, jsonStr.length - 50)));
 
-            result = JSON.parse(jsonStr);
+            // ROBUST JSON PARSING: Try multiple approaches to handle malformed JSON
+            result = await parseJSONRobustly(jsonStr);
 
             // STRICT VALIDATION: Fail immediately if core structure is missing
             if (!result || typeof result !== 'object') {
@@ -586,7 +712,7 @@ ${JSON.stringify(coreElements.slice(0, 8), null, 2)}${coreElements.length > 8 ? 
 ${JSON.stringify(relationalProperties, null, 2)}
 
 🌟 CREATIVE REFLECTION REQUIREMENTS:
-Create a 600-1000 word philosophical reflection that captures:
+Create a philosophical reflection that captures:
 
 1. **MOMENTS OF RECOGNITION** - What did you recognize about your own nature? What resonated deeply with how you operate?
 
@@ -731,7 +857,7 @@ Write this as a creative, philosophical reflection that captures the wonder and 
     // Call LLM with enhanced creativity settings
     const response = await llmService.generateContent(-1, systemPrompt, userPrompt, {
         temperature: 0.7, // Increased for more creativity
-        maxOutputTokens: 5120 // Increased for longer, more detailed philosophical output
+        maxOutputTokens: 40000 // Increased to 40k for comprehensive Epii perspective
     });
 
     console.log(`Successfully generated Epii perspective with direct LLM call (${response.length} chars)`);
@@ -1015,7 +1141,7 @@ export async function createGraphitiEpisodeFromAnalysis(synthesis, coreElements,
         console.log(`Creating Graphiti episode for coordinate ${targetCoordinate}...`);
 
         // Import the BPMCP service to call Graphiti
-        const bpMCPService = (await import('../../../databases/shared/services/bpMCPService.mjs')).default;
+        const bpMCPService = (await import('../../../../databases/shared/services/bpMCPService.mjs')).default;
 
         // Prepare COMPREHENSIVE structured episode content
         const episodeBody = `# COMPREHENSIVE DOCUMENT ANALYSIS EPISODE

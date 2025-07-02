@@ -18,7 +18,7 @@ async function getBPMCPService() {
   if (!bpMCPService) {
     try {
       // Import the ES module bpMCPService from the backend
-      const servicePath = path.resolve(__dirname, '../../friendly-file-backend/services/bpMCPService.mjs');
+      const servicePath = path.resolve(__dirname, '../../../friendly-file-backend/databases/bpmcp/bpMCP.service.mjs');
       const bpMCPModule = await import(servicePath);
       bpMCPService = bpMCPModule.default;
       console.log('[UnifiedRAG] BPMCP service loaded successfully');

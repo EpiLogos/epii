@@ -89,8 +89,8 @@ export function useGraphStylingFunctions(
 
     // Apply highlight effect if needed
     if (isHighlighted) {
-      // For highlighted nodes, make them larger with pulsation
-      return baseSize * (1.0 + (pulsationFactor - 1.0) * 0.5);
+      // For highlighted nodes, make them larger with pulsation (increased by 1.5x for better visibility)
+      return baseSize * (1.0 + (pulsationFactor - 1.0) * 0.75);
     } else {
       // For non-highlighted nodes, use the calculated size
       return baseSize;

@@ -62,7 +62,7 @@ class EpiiLLMService {
       apiKey,
       model: process.env.EPII_RELATION_LLM_MODEL || process.env.SYNTHESIS_LLM_MODEL_PAID,
       temperature: 0.2,
-      maxOutputTokens: 4096,
+      maxOutputTokens: 20480, // Increased to handle detailed batch analysis
     });
 
     // Stage -1: Core Element Definition LLM (needs precision and longer output)
@@ -70,7 +70,7 @@ class EpiiLLMService {
       apiKey,
       model: process.env.EPII_ELEMENT_LLM_MODEL || process.env.SYNTHESIS_LLM_MODEL_PAID,
       temperature: 0.1,
-      maxOutputTokens: 8192,  // Increased from 4096 to handle detailed core elements
+      maxOutputTokens: 40000,  // Increased to 40k for comprehensive analysis and relational properties
     });
 
     // Stage -0: Payload Synthesis LLM (needs creativity and integration)
@@ -161,6 +161,15 @@ class EpiiLLMService {
         try {
           let content;
 
+          // Prepare invoke options with dynamic parameters
+          const invokeOptions = {};
+          if (llmOptions.maxOutputTokens) {
+            invokeOptions.maxOutputTokens = llmOptions.maxOutputTokens;
+          }
+          if (llmOptions.temperature !== undefined) {
+            invokeOptions.temperature = llmOptions.temperature;
+          }
+
           if (shouldCache) {
             // Use cached LLM response if applicable
             content = await getCachedLLMResponse(
@@ -169,7 +178,7 @@ class EpiiLLMService {
                 const response = await llm.invoke([
                   ["system", systemPrompt],
                   ["human", prompt]
-                ]);
+                ], invokeOptions);
                 return response.content;
               },
               { ...llmOptions, systemPrompt, temperature: llm.temperature }
@@ -179,7 +188,7 @@ class EpiiLLMService {
             const response = await llm.invoke([
               ["system", systemPrompt],
               ["human", userPrompt]
-            ]);
+            ], invokeOptions);
             content = response.content;
           }
 
@@ -194,6 +203,15 @@ class EpiiLLMService {
       } else {
         // Direct LLM call without tracing
         try {
+          // Prepare invoke options with dynamic parameters
+          const invokeOptions = {};
+          if (llmOptions.maxOutputTokens) {
+            invokeOptions.maxOutputTokens = llmOptions.maxOutputTokens;
+          }
+          if (llmOptions.temperature !== undefined) {
+            invokeOptions.temperature = llmOptions.temperature;
+          }
+
           if (shouldCache) {
             // Use cached LLM response if applicable
             return await getCachedLLMResponse(
@@ -202,7 +220,7 @@ class EpiiLLMService {
                 const response = await llm.invoke([
                   ["system", systemPrompt],
                   ["human", prompt]
-                ]);
+                ], invokeOptions);
                 return response.content;
               },
               { ...llmOptions, systemPrompt, temperature: llm.temperature }
@@ -212,7 +230,7 @@ class EpiiLLMService {
             const response = await llm.invoke([
               ["system", systemPrompt],
               ["human", userPrompt]
-            ]);
+            ], invokeOptions);
             return response.content;
           }
         } catch (error) {

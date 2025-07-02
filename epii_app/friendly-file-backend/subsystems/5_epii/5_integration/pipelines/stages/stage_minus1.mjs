@@ -289,7 +289,7 @@ export async function runStageMinus1(state) {
                 actionableSummaryLength: stageMinus1Output.actionableSummary ? stageMinus1Output.actionableSummary.length : 0,
                 qlOperatorsCount: (coreElementsResult.relationalProperties?.qlOperators || []).length,
                 epistemicEssenceCount: (coreElementsResult.relationalProperties?.epistemicEssence || []).length,
-                archetypeAnchorsCount: (coreElementsResult.relationalProperties?.archetypeAnchors || []).length,
+                archetypalAnchorsCount: (coreElementsResult.relationalProperties?.archetypalAnchors || []).length,
                 semanticFrameworkCount: (coreElementsResult.relationalProperties?.semanticFramework || []).length
             });
         } catch (tracingError) {
@@ -305,7 +305,7 @@ export async function runStageMinus1(state) {
         const relProps = coreElementsResult.relationalProperties || {};
         const qlOperators = relProps.qlOperators || [];
         const epistemicEssence = relProps.epistemicEssence || [];
-        const archetypeAnchors = relProps.archetypeAnchors || [];
+        const archetypeAnchors = relProps.archetypalAnchors || [];
         const semanticFramework = relProps.semanticFramework || [];
 
         console.log(`- QL Operators: ${qlOperators.length} (${qlOperators.map(op => op.name || op).join(', ')})`);

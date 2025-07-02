@@ -517,14 +517,14 @@ export async function generateNotionUpdatePayload(
             relationalProperties = {
                 qlOperators: [],
                 epistemicEssence: [],
-                archetypeAnchors: [],
+                archetypalAnchors: [],
                 semanticFramework: []
             };
         } else {
             // Ensure all required properties exist
             relationalProperties.qlOperators = Array.isArray(relationalProperties.qlOperators) ? relationalProperties.qlOperators : [];
             relationalProperties.epistemicEssence = Array.isArray(relationalProperties.epistemicEssence) ? relationalProperties.epistemicEssence : [];
-            relationalProperties.archetypeAnchors = Array.isArray(relationalProperties.archetypeAnchors) ? relationalProperties.archetypeAnchors : [];
+            relationalProperties.archetypalAnchors = Array.isArray(relationalProperties.archetypalAnchors) ? relationalProperties.archetypalAnchors : [];
             relationalProperties.semanticFramework = Array.isArray(relationalProperties.semanticFramework) ? relationalProperties.semanticFramework : [];
         }
 
@@ -625,7 +625,7 @@ export async function generateNotionUpdatePayload(
         const hasRelationalProperties =
             relationalProperties.qlOperators.length > 0 ||
             relationalProperties.epistemicEssence.length > 0 ||
-            relationalProperties.archetypeAnchors.length > 0 ||
+            relationalProperties.archetypalAnchors.length > 0 ||
             relationalProperties.semanticFramework.length > 0;
 
         if (hasRelationalProperties) {
@@ -648,9 +648,9 @@ export async function generateNotionUpdatePayload(
             }
 
             // Add Archetypal Anchors
-            if (relationalProperties.archetypeAnchors.length > 0) {
+            if (relationalProperties.archetypalAnchors.length > 0) {
                 contentBlocks.push(formatHeadingBlock("⚕️ Archetypal Anchors", 3));
-                relationalProperties.archetypeAnchors.forEach(symbol => {
+                relationalProperties.archetypalAnchors.forEach(symbol => {
                     contentBlocks.push(formatBulletedListItemBlock(symbol));
                 });
             }
@@ -744,7 +744,7 @@ export async function generateNotionUpdatePayload(
         console.log(`Payload contains ${notionUpdatePayload.contentBlocks.length} content blocks`);
 
         if (hasRelationalProperties) {
-            console.log(`Included relational properties: QL Operators (${relationalProperties.qlOperators.length}), Epistemic Essence (${relationalProperties.epistemicEssence.length}), Archetypal Anchors (${relationalProperties.archetypeAnchors.length}), Semantic Framework (${relationalProperties.semanticFramework.length})`);
+            console.log(`Included relational properties: QL Operators (${relationalProperties.qlOperators.length}), Epistemic Essence (${relationalProperties.epistemicEssence.length}), Archetypal Anchors (${relationalProperties.archetypalAnchors.length}), Semantic Framework (${relationalProperties.semanticFramework.length})`);
         }
 
         // Update tracing run if available
@@ -761,7 +761,7 @@ export async function generateNotionUpdatePayload(
                         hasRelationalProperties,
                         numQLOperators: relationalProperties.qlOperators.length,
                         numEpistemicEssence: relationalProperties.epistemicEssence.length,
-                        numArchetypalAnchors: relationalProperties.archetypeAnchors.length,
+                        numArchetypalAnchors: relationalProperties.archetypalAnchors.length,
                         numSemanticFramework: relationalProperties.semanticFramework.length
                     }
                 });

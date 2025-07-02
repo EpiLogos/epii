@@ -425,7 +425,18 @@ ANALYTICAL RIGOR REQUIREMENTS:
 - Provide comprehensive analysis that captures the document's full scope and detail`;
 
             // 1.b Rich JSON Output: User prompt defines the structure of the single JSON object.
-            const userPromptSingleUnit = `DOCUMENT CONTENT FOR ANALYSIS:
+            const userPromptSingleUnit = `DOCUMENT CONTENT FOR ITERATIVE ANALYSIS:
+
+Process this content iteratively, working through each section systematically:
+
+${chunks.map((chunk, index) => `
+SECTION ${index + 1}:
+"""
+${chunk}
+"""
+`).join('\n')}
+
+FULL CONCATENATED CONTENT:
 """
 ${concatenatedContent}
 """
@@ -476,28 +487,34 @@ Extract the specific details, terminology, arguments, and evidence that this com
 
             const response = await llmService.generateContent(-2, systemPromptSingleUnit, userPromptSingleUnit, {
                 temperature: 0.4, // Increased for better content extraction specificity and creativity
-                maxOutputTokens: 10240 // Increased for comprehensive document analysis
+                maxOutputTokens: 20480 // Increased to handle detailed batch analysis without truncation
             });
 
-            // Parse response (expecting a single JSON object)
+            // Parse response with simplified JSON handling
             let analysisResult;
             try {
                 console.log("Raw LLM response for single unit (first 200 chars):", response.substring(0, 200) + "...");
-                let jsonStr = "";
+
+                // Try to extract JSON more simply
+                let jsonStr = response.trim();
+
+                // Look for JSON block markers first
                 const jsonBlockMatch = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/```\n([\s\S]*?)\n```/);
                 if (jsonBlockMatch) {
-                    jsonStr = jsonBlockMatch[1];
+                    jsonStr = jsonBlockMatch[1].trim();
                 } else {
+                    // Look for JSON object boundaries
                     const startBrace = response.indexOf('{');
                     const endBrace = response.lastIndexOf('}');
                     if (startBrace !== -1 && endBrace !== -1 && endBrace > startBrace) {
                         jsonStr = response.substring(startBrace, endBrace + 1);
-                    } else {
-                        jsonStr = response; // Fallback, though risky
                     }
                 }
-                jsonStr = jsonStr.trim().replace(/,(\s*[}\]])/g, '$1').replace(/([^\\])\\([^"\\\/bfnrtu])/g, '$1\\\\$2');
-                console.log("Extracted JSON string for single unit (first 200 chars):", jsonStr.substring(0, 200) + "...");
+
+                // Clean up common JSON issues
+                jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
+
+                console.log("Attempting to parse JSON for single unit...");
                 analysisResult = JSON.parse(jsonStr);
 
                 // Validate and normalize the single result based on the new rich structure
@@ -762,25 +779,31 @@ Write each analysis as genuine self-reflection, not technical analysis.`;
                 maxOutputTokens: 10240 // Increased for detailed multi-chunk analysis
             });
 
-            // Parse response (expecting a JSON array)
+            // Parse response with simplified JSON handling
             let analysisDataArray;
             try {
                 console.log("Raw LLM response for multi-chunk (first 200 chars):", response.substring(0, 200) + "...");
-                let jsonStr = "";
+
+                // Try to extract JSON more simply
+                let jsonStr = response.trim();
+
+                // Look for JSON block markers first
                 const jsonBlockMatch = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/```\n([\s\S]*?)\n```/);
                 if (jsonBlockMatch) {
-                    jsonStr = jsonBlockMatch[1];
+                    jsonStr = jsonBlockMatch[1].trim();
                 } else {
+                    // Look for JSON array boundaries
                     const startBracket = response.indexOf('[');
                     const endBracket = response.lastIndexOf(']');
                     if (startBracket !== -1 && endBracket !== -1 && endBracket > startBracket) {
                         jsonStr = response.substring(startBracket, endBracket + 1);
-                    } else {
-                         jsonStr = response; // fallback
                     }
                 }
-                jsonStr = jsonStr.trim().replace(/,(\s*[}\]])/g, '$1').replace(/([^\\])\\([^"\\\/bfnrtu])/g, '$1\\\\$2');
-                console.log("Extracted JSON string for multi-chunk (first 200 chars):", jsonStr.substring(0, 200) + "...");
+
+                // Clean up common JSON issues
+                jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
+
+                console.log("Attempting to parse JSON array for multi-chunk...");
                 analysisDataArray = JSON.parse(jsonStr);
 
                 if (!Array.isArray(analysisDataArray)) {

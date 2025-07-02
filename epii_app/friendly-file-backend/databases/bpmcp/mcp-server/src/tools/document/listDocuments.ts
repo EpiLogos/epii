@@ -37,12 +37,31 @@ export async function handleListDocuments(dependencies: ToolDependencies, args: 
 
     const collection = mongoDb.collection(collectionName);
 
-    const results = await collection.find(validatedArgs.query || {})
+    // Build projection object to exclude specified fields
+    let projection = {};
+    if (validatedArgs.excludeFields && validatedArgs.excludeFields.length > 0) {
+      projection = validatedArgs.excludeFields.reduce((proj, field) => {
+        proj[field] = 0;
+        return proj;
+      }, {} as Record<string, number>);
+      console.log(`Excluding fields: ${validatedArgs.excludeFields.join(', ')}`);
+    }
+
+    // Removed .sort({ uploadDate: -1 }) to avoid MongoDB 32MB in-memory sort limit
+    // Frontend handles sorting by coordinate which is the desired behavior anyway
+    const query = collection.find(validatedArgs.query || {});
+
+    // Apply projection if specified
+    if (Object.keys(projection).length > 0) {
+      query.project(projection);
+    }
+
+    const results = await query
+      .skip(validatedArgs.skip)
       .limit(validatedArgs.limit)
-      .sort({ uploadDate: -1 })
       .toArray();
 
-    console.log(`Found ${results.length} documents in collection ${collectionName}`);
+    console.log(`Found ${results.length} documents in collection ${collectionName} (skipped ${validatedArgs.skip})`);
 
     // Convert ObjectId to string for serialization
     const serializableResults = results.map(doc => ({

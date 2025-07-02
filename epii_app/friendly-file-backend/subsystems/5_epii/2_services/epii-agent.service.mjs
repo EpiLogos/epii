@@ -1049,7 +1049,7 @@ class EpiiAgentService {
     }
   }
 
-  
+
 
   /**
    * Process a chat message using the synthesis LLM with BPMCP tools
@@ -1084,7 +1084,7 @@ class EpiiAgentService {
           console.log(`🔍 Calling UnifiedRAG for enhanced context with query: "${message.substring(0, 50)}..."`);
 
           // Import the A2A service to call UnifiedRAG
-          const a2aService = (await import('../../friendly-file-back2front/services/a2aSkillsService.js')).default;
+          const a2aService = (await import('../../../friendly-file-back2front/shared/services/a2aSkillsService.js')).default;
 
           const ragResponse = await a2aService.executeUnifiedRAG({
             query: message,

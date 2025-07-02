@@ -277,7 +277,7 @@ class EpiiChatSkill {
       }
 
       // Fallback: create new instance
-      const UnifiedRAGSkill = require('../../shared/services/unifiedRAG');
+      const UnifiedRAGSkill = require('../../../shared/services/unifiedRAG');
       return new UnifiedRAGSkill();
     } catch (error) {
       console.warn('[EpiiChat] Could not get UnifiedRAG skill:', error);

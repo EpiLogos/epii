@@ -78,9 +78,10 @@ export async function handleListDocuments(mongoDb: any, args: any) {
   console.log(`Listing documents from collection: ${collectionName}`);
   console.log(`Query: ${JSON.stringify(validatedArgs.query || {})}`);
 
+  // Removed .sort({ uploadDate: -1 }) to avoid MongoDB 32MB in-memory sort limit
+  // Frontend handles sorting by coordinate which is the desired behavior anyway
   const results = await collection.find(validatedArgs.query || {})
     .limit(validatedArgs.limit)
-    .sort({ uploadDate: -1 })
     .toArray();
 
   console.log(`Found ${results.length} documents in collection ${collectionName}`);
@@ -136,9 +137,10 @@ export async function handleListDocumentsByCoordinate(mongoDb: any, args: any) {
   console.log(`Listing documents by coordinate from collection: ${collectionName}`);
   console.log(`Coordinate: ${validatedArgs.coordinate}`);
 
+  // Removed .sort({ uploadDate: -1 }) to avoid MongoDB 32MB in-memory sort limit
+  // Frontend handles sorting by coordinate which is the desired behavior anyway
   const results = await collection.find({ targetCoordinate: validatedArgs.coordinate })
     .limit(validatedArgs.limit)
-    .sort({ uploadDate: -1 })
     .toArray();
 
   console.log(`Found ${results.length} documents with coordinate ${validatedArgs.coordinate} in collection ${collectionName}`);

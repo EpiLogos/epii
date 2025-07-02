@@ -1,10 +1,10 @@
 # PRD: Quaternal Logic (QL) Alignment for Graphiti Episodic Memory
 
-**Version:** 1.0
+**Version:** 1.1
 
 ## 1. Vision & Goal
 
-To evolve the Graphiti episodic memory system from a repository of simple entities and relations into a sophisticated engine for conceptual synthesis. This will be achieved by enabling Graphiti to identify, model, and refine holistic epistemic structures based on the foundational 4-part and 6-part variants of Quaternal Logic.
+To evolve the Graphiti episodic memory system from a repository of simple entities and relations into a sophisticated engine for conceptual synthesis. This will be achieved by enabling Graphiti to identify, model, and refine holistic epistemic structures based on foundational variants of Quaternal Logic, with a primary focus on the core 4-part and 6-part structures, while also accommodating other significant forms (e.g., 2, 3, 5, 7, 8, 9, 10, and 12-part units).
 
 The primary goal is to create a high-level layer of refined, structured memory (`epistemic wholes`). This will empower the agent to perform deeper reasoning and generate insights by operating on these complete conceptual units, thereby reducing the cognitive load and context-dependency of the `UnifiedRag` process for many interactions.
 
@@ -16,7 +16,7 @@ The current agent memory architecture, while effective at storing and retrieving
 
 This development focuses on empowering the **Graphiti MCP Service** to act as the primary engine for identifying and structuring QL units from the lower-level memory stores (Neo4j Bimba graph, LightRAG document store, Notion, MongoDB).
 
-- **Extend Graphiti Data Model:** Introduce new schemas to represent 4-part and 6-part QL structures as specialized `Community` nodes.
+- **Extend Graphiti Data Model:** Introduce new schemas to represent a spectrum of QL structures (2, 3, 4, 5, 6, 7, 8, 9, 10, 12-part) as specialized `Community` nodes, while maintaining the primacy of the 4/6-fold variants.
 - **Develop New BPMCP Tools:** Create specific tools within the BPMCP's Graphiti toolset to manage the lifecycle of these QL structures.
 - **Implement a `Contemplation` Skill:** Design a core agent skill that orchestrates the dynamic sourcing, synthesis, and refinement of QL units.
 - **Enable Closed-Loop Knowledge Processing:** Institute a logging mechanism to capture emergent insights for future updates to the core Bimba map.
@@ -30,7 +30,7 @@ To align with the existing Graphiti architecture, the `QuaternalUnit` will be im
 **New Node Label:** `QuaternalUnit` (in addition to `Community`)
 
 **`QuaternalUnit` Community Node Properties:**
-- `quaternal_type`: Enum (`FOUR_PART`, `SIX_PART`).
+- `quaternal_type`: Enum (`TWO_PART`, `THREE_PART`, `FOUR_PART`, `FIVE_PART`, `SIX_PART`, `SEVEN_PART`, `EIGHT_PART`, `NINE_PART`, `TEN_PART`, `TWELVE_PART`).
 - `status`: Enum (`POTENTIAL`, `REFINING`, `VALIDATED`).
 - `bimba_coordinate`: String. The primary Bimba coordinate this unit is grounded in.
 - `source_references`: Array of objects, each containing a `uuid` and `source_type` (e.g., `lightrag_doc`, `notion_page`, `neo4j_node`, `mongo_doc`).
@@ -52,7 +52,7 @@ This tool allows the agent or user to initiate the creation of a QL structure, p
 **Schema (`CreateQuaternalUnitSchema`):**
 ```typescript
 z.object({
-  quaternal_type: z.enum(["FOUR_PART", "SIX_PART"]).optional().describe("User-specified QL structure. If omitted, the agent will infer it."),
+  quaternal_type: z.enum(["TWO_PART", "THREE_PART", "FOUR_PART", "FIVE_PART", "SIX_PART", "SEVEN_PART", "EIGHT_PART", "NINE_PART", "TEN_PART", "TWELVE_PART"]).optional().describe("User-specified QL structure. Defaults to FOUR_PART. The 4 and 6-part variants are considered the primary operational units."),
   bimbaCoordinate: z.string().describe("The primary Bimba coordinate to ground the unit."),
   source_references: z.array(z.object({ 
     uuid: z.string(), 

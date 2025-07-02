@@ -9,7 +9,7 @@ import React from 'react';
 import Meta3DIntegration from './Meta3DIntegration';
 import PageTransition from '../../../shared/components/layout/PageTransition';
 import GeometricBackground from '../../../shared/components/ui/GeometricBackground';
-import ModuleNavigation from '../../../shared/components/layout/ModuleNavigation';
+
 import { Info } from 'lucide-react';
 
 const Meta3D: React.FC = () => {
@@ -27,8 +27,7 @@ const Meta3D: React.FC = () => {
               at the heart of Epi-Logos, where epistemology, form, and function interconnect in three dimensions.
             </p>
 
-            {/* Module Navigation */}
-            <ModuleNavigation currentModule="0/1" />
+
           </div>
 
           {/* Meta3D Integration */}

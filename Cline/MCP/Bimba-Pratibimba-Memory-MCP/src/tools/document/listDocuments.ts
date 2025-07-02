@@ -37,9 +37,10 @@ export async function handleListDocuments(dependencies: ToolDependencies, args: 
 
     const collection = mongoDb.collection(collectionName);
 
+    // Removed .sort({ uploadDate: -1 }) to avoid MongoDB 32MB in-memory sort limit
+    // Frontend handles sorting by coordinate which is the desired behavior anyway
     const results = await collection.find(validatedArgs.query || {})
       .limit(validatedArgs.limit)
-      .sort({ uploadDate: -1 })
       .toArray();
 
     console.log(`Found ${results.length} documents in collection ${collectionName}`);

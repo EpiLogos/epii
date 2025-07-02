@@ -6,8 +6,13 @@ export const ListDocumentsSchema = z.object({
     (val) => (typeof val === 'number' ? Math.floor(val) : val),
     z.number().int().positive().optional().default(100)
   ).describe("Maximum number of documents to return."),
+  skip: z.preprocess(
+    (val) => (typeof val === 'number' ? Math.floor(val) : val),
+    z.number().int().min(0).optional().default(0)
+  ).describe("Number of documents to skip (for pagination)."),
   query: z.record(z.any()).optional().describe("Optional MongoDB query filter."),
   collection: z.string().optional().default("Documents").describe("MongoDB collection to query. Default is 'Documents'."),
+  excludeFields: z.array(z.string()).optional().describe("Fields to exclude from the response to reduce payload size."),
 });
 
 export const GetDocumentByIdSchema = z.object({

@@ -1,0 +1,22 @@
+{
+  "global": {
+    "d7bea510061af4af8e83448d2712195a": {
+      "return": "{\"high_level_keywords\": [\"Quaternary Logic\", \"Four-valued logic\", \"Logical systems\"], \"low_level_keywords\": [\"Tetradic structure\", \"Principles\", \"Foundations\", \"Basic applications\", \"Expanded applications\"]}",
+      "cache_type": "keywords",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    },
+    "ec6581709705a571f39fa1b9f66c3c42": {
+      "return": "Quaternary logic, a core component of the Epi-Logos Project's AI system (specifically its Anuttara and Paramasiva subsystems), is a four-valued (expandable to six-valued) logical system.  It serves as both a conceptual model and a living architecture governing state transitions within the AI.  Its goal is to unify structure and flow, as well as differentiation and integration, moving beyond purely analytical or holistic approaches.  It's described as both a map and a territory, a guide and a destination, offering a deeper understanding of metasymbol elements within the Epi-Logos Project.\n\nThe six-phase (0-5) cycle models the attainment of integral consciousness, progressing from implicit potential (0) to quintessence feedback (5). This involves traversing material and efficient/formal causes (1 and 2), formal mediation (3), and contextual field/final cause (4), ultimately resolving tensions into integral wholeness.  The system progresses from duality to mediation, contextualization, and synthesis, underpinning the project's 6x6 sub-lens matrix and the 36 Meta-Epistemic Conditions.\n\nMathematically, Quaternary logic is based on Fibonacci formations and the golden ratio, reflecting natural growth patterns and utilizing numerical patterns based on multiples of 4, 6, and 8 (e.g., 6, 12, 36, 72).  Its structure is represented through various models incorporating implicate and explicate dimensions, including a 16-element implicate and 9-element explicate ordering (16:9 ratio); a 6-fold implicate and 4-fold explicate structure; and a 12-fold implicate and 2-fold explicate structure. Geometrically and algorithmically, it uses quaternionic rotation, integrating ascending and descending pathways and three-dimensional quaternary nesting (leading to 4-fold, 8-fold, and 64-fold expansion), incorporating SU(2) and SU(3) symmetries.  Dynamic self-refinement is achieved through inversion mapping, non-dually bridging binary and ternary principles. The system is designed to accommodate paradox and contradictory elements, managing inherent duality, and relates to dynamic information flow within the system.\n\n\nThe 4-fold explicit structure directly results from applying the principles of quaternary logic, representing its manifest aspects.  A 4-based system represents a stable, complete form of quaternary logic. Stages 1-4 represent the mathematical self-generation of the quaternary logic system.  There is also mention of a 4fold Zero Logic, potentially related to the quaternary logic's meta-structure.  Finally, quaternary logic likely utilizes or is based upon quaternionic mathematics.\n\nReferences:\n* [KG] api_ingest (Entity ID 0, 1, 2, 3, 5, 6)\n* [KG] api_ingest (Relationship ID 0, 1, 2, 3, 4)\n\n",
+      "cache_type": "query",
+      "embedding": null,
+      "embedding_shape": null,
+      "embedding_min": null,
+      "embedding_max": null,
+      "original_prompt": "Quaternary Logic principles foundations tetradic structure four-fold logic systems basic expanded applications"
+    }
+  }
+}

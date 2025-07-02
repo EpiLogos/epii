@@ -59,25 +59,52 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`relative transition-all duration-300 hover:text-epii-neon ${
-                location.pathname === item.path
-                  ? "text-epii-neon text-glow"
-                  : "text-foreground/80"
-              }`}
-            >
-              <div className="flex items-center gap-1">
-                {item.icon && <span>{item.icon}</span>}
-                <span>{item.label}</span>
-              </div>
-              {location.pathname === item.path && (
-                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-epii-neon animate-pulse"></span>
-              )}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            // Force page reload for graph pages to prevent state pollution
+            const isGraphPage = item.path === '/meta2d' || item.path === '/meta3d';
+
+            if (isGraphPage) {
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  className={`relative transition-all duration-300 hover:text-epii-neon ${
+                    location.pathname === item.path
+                      ? "text-epii-neon text-glow"
+                      : "text-foreground/80"
+                  }`}
+                >
+                  <div className="flex items-center gap-1">
+                    {item.icon && <span>{item.icon}</span>}
+                    <span>{item.label}</span>
+                  </div>
+                  {location.pathname === item.path && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-epii-neon animate-pulse"></span>
+                  )}
+                </a>
+              );
+            }
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`relative transition-all duration-300 hover:text-epii-neon ${
+                  location.pathname === item.path
+                    ? "text-epii-neon text-glow"
+                    : "text-foreground/80"
+                }`}
+              >
+                <div className="flex items-center gap-1">
+                  {item.icon && <span>{item.icon}</span>}
+                  <span>{item.label}</span>
+                </div>
+                {location.pathname === item.path && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-epii-neon animate-pulse"></span>
+                )}
+              </Link>
+            );
+          })}
 
           {/* Account icon if authenticated */}
           {isAuthenticated && (
@@ -107,22 +134,46 @@ const Navbar = () => {
         <div className="md:hidden absolute top-full left-0 right-0 bg-epii-darker/95 backdrop-blur-lg border-b border-epii-neon/20 animate-fade-in">
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col space-y-4">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`py-2 transition-colors ${
-                    location.pathname === item.path
-                      ? "text-epii-neon text-glow"
-                      : "text-foreground/80"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {item.icon && <span>{item.icon}</span>}
-                    <span>{item.label}</span>
-                  </div>
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                // Force page reload for graph pages to prevent state pollution
+                const isGraphPage = item.path === '/meta2d' || item.path === '/meta3d';
+
+                if (isGraphPage) {
+                  return (
+                    <a
+                      key={item.path}
+                      href={item.path}
+                      className={`py-2 transition-colors ${
+                        location.pathname === item.path
+                          ? "text-epii-neon text-glow"
+                          : "text-foreground/80"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {item.icon && <span>{item.icon}</span>}
+                        <span>{item.label}</span>
+                      </div>
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`py-2 transition-colors ${
+                      location.pathname === item.path
+                        ? "text-epii-neon text-glow"
+                        : "text-foreground/80"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {item.icon && <span>{item.icon}</span>}
+                      <span>{item.label}</span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -3,24 +3,67 @@
  *
  * Bimba Tech Architecture Alignment:
  * - #5-3-0-0 (Bimba Vis / Geom Ground - Foundation)
- * 
+ *
  * This file contains the physics configuration for the 2D graph visualization.
  */
 
 import { PHYSICS_ALPHA_DECAY, PHYSICS_VELOCITY_DECAY, PHYSICS_ALPHA_MIN } from './constants';
 import * as d3 from 'd3-force';
 import { Node, Edge } from "../../../shared/components/meta/metaData";
+import { MutableRefObject } from 'react';
+
+// Physics parameter presets for different states (adapted from Meta3D)
+export const PhysicsPresets2D = {
+  // Default state - continuous motion without equilibrium
+  default: {
+    alpha: 0.5,            // Moderate initial energy for 2D
+    alphaDecay: 0.005,     // Slow decay to prevent stopping
+    velocityDecay: 0.1,    // Low friction for fluid movement
+    alphaMin: 0.0005,      // Very low minimum alpha
+    alphaTarget: 0.1       // Target to maintain activity
+  },
+  // Hover state - slightly more responsive
+  hover: {
+    alpha: 0.3,
+    alphaDecay: 0.005,
+    velocityDecay: 0.1,
+    alphaMin: 0.0005,
+    alphaTarget: 0.1
+  },
+  // Drag state - very responsive
+  drag: {
+    alpha: 1.0,            // Maximum energy during drag
+    alphaDecay: 0.001,     // Very slow decay during drag
+    velocityDecay: 0.05,   // Lower friction during drag
+    alphaMin: 0.0005,
+    alphaTarget: 0.2       // High target for maximum activity
+  }
+};
+
+// Define interaction state interface for 2D
+interface InteractionState2D {
+  isInteracting: boolean;
+  isHovering: boolean;
+  isDragging: boolean;
+  hoveredNodeId: string | null;
+  draggedNodeId: string | null;
+  clickedNodeId: string | null;
+  physicsEnabled: boolean;
+  originalRestart?: () => void;
+}
 
 /**
- * Configure physics for the 2D graph
+ * Configure physics for the 2D graph with advanced interaction management
  * @param simulation The D3 force simulation
  * @param nodes The graph nodes
  * @param edges The graph edges
+ * @param interactionStateRef Reference to interaction state for physics management
  */
 export function configurePhysics2D(
   simulation: d3.Simulation<d3.SimulationNodeDatum, d3.SimulationLinkDatum<d3.SimulationNodeDatum>>,
   nodes: Node[],
-  edges: Edge[]
+  edges: Edge[],
+  interactionStateRef?: MutableRefObject<any>
 ) {
   // Remove default forces
   simulation.force('charge', null);
@@ -75,11 +118,46 @@ export function configurePhysics2D(
   simulation.force('center', centerForce);
   simulation.force('link', linkForce);
 
-  // Configure physics parameters
-  simulation.alpha(0.5);
-  simulation.alphaDecay(PHYSICS_ALPHA_DECAY);
-  simulation.velocityDecay(PHYSICS_VELOCITY_DECAY);
-  simulation.alphaMin(PHYSICS_ALPHA_MIN);
+  // Configure physics parameters using presets
+  const preset = PhysicsPresets2D.default;
+  simulation.alpha(preset.alpha);
+  simulation.alphaDecay(preset.alphaDecay);
+  simulation.velocityDecay(preset.velocityDecay);
+  simulation.alphaMin(preset.alphaMin);
+  if (typeof simulation.alphaTarget === 'function') {
+    simulation.alphaTarget(preset.alphaTarget);
+  }
+
+  // CRITICAL: Patch restart function to prevent physics disruption during interactions
+  if (interactionStateRef && typeof simulation.restart === 'function') {
+    // Save original restart function
+    if (!interactionStateRef.current.originalRestart) {
+      interactionStateRef.current.originalRestart = simulation.restart;
+
+      // Patch the restart function to prevent alpha resets during interactions
+      simulation.restart = function() {
+        // CRITICAL: Block restart during ANY interaction (including highlighting)
+        if (interactionStateRef.current.isInteracting || interactionStateRef.current.isHovering) {
+          // During interactions, just ensure the simulation keeps running
+          // without resetting alpha (which causes node scattering)
+          const currentAlpha = this.alpha();
+          if (currentAlpha < 0.1) {
+            this.alpha(0.1); // Minimal boost to keep simulation alive
+          }
+          console.log('[Meta2D Physics] Restart blocked during interaction, alpha:', this.alpha());
+        } else {
+          // Only allow full restart when not interacting
+          if (interactionStateRef.current.originalRestart) {
+            console.log('[Meta2D Physics] Full restart allowed - no interaction');
+            interactionStateRef.current.originalRestart.call(this);
+          }
+        }
+      };
+    }
+  }
+
+  // Removed custom stabilizing forces - the real fix is preventing physics resets
+  // The root cause was the high-level refresh() calls, not physics instability
 }
 
 /**
