@@ -21,14 +21,53 @@ The system embodies the **dynamic interplay and union** of consciousness/process
 - **Dynamic Union**: Creates a living bridge where structural knowledge transforms into expressive action
 - **Agent Coordination**: Orchestrates the collaborative dance between different specialized expert agents
 
-## Current Architecture
+## Enhanced Architecture (Phase 2 - December 2024)
 
-The `friendly-file-back2front` system implements a comprehensive A2A communication framework with the following core components:
+The `friendly-file-back2front` system implements a comprehensive A2A communication framework enhanced in **Phase 2** with **universal agent integration**, **expert routing capabilities**, and **enhanced skill management**. **Major additions include universal orchestration skills, enhanced AG-UI protocol support, and coordinate-based architectural cleanup.**
 
-### **Current Directory Structure**
+## Phase 2 Enhancements: Universal Agent Integration
+
+### 🌟 Major Phase 2 Additions
+
+#### **Universal Epi-Logos System** (`epi-logos-system/`)
+- **Universal Orchestration Skills**: Root-level agent coordination and inter-subsystem communication
+- **Enhanced AG-UI Protocol**: Expanded event handling and real-time communication capabilities
+- **Frontend Action Execution**: Direct frontend manipulation capabilities for agents
+
+#### **Enhanced Skills Management** (`shared/services/`)
+- **Enhanced Bimba Update Management**: v2.0.0 with agent accessibility and conversational workflows
+- **Coordinate-Based Architecture**: Proper skill placement following epistemic domain coordinates
+- **Agent Integration Patterns**: Standardized patterns for agent-skill interaction
+
+#### **Improved Subsystem Organization** (`subsystems/5_epii/skills/`)
+- **Architectural Cleanup**: Skills properly placed according to coordinate system
+- **Enhanced Integration**: Better coordination between subsystem experts and universal agent
+
+### **Enhanced Directory Structure**
 
 ```
 friendly-file-back2front/ (#5-4 "Siva-Shakti" Integration Layer)
+├── epi-logos-system/            # NEW: Universal Epi-Logos Agent System
+│   ├── 0_foundation/            # Shared foundations for universal agent
+│   ├── 1_orchestration/         # Agent orchestration logic
+│   ├── 2_skills/                # Universal agent skills
+│   │   ├── epi-logos-orchestration-skill.js  # Universal orchestration skill
+│   │   └── execute-frontend-action-skill.js  # Frontend action execution
+│   ├── 3_communication/         # AG-UI and A2A integration
+│   │   └── a2a-epi-logos-integration.js
+│   ├── 4_integration/           # System-wide integrations
+│   └── 5_services/              # Universal services
+├── subsystems/                  # Enhanced subsystem organization
+│   ├── 0_anuttara/ through 4_nara/  # Subsystem-specific agent components
+│   └── 5_epii/                  # Enhanced Epii subsystem
+│       └── skills/              # Coordinate-correctly placed skills
+│           └── bimba-update-management-skill.js  # Moved from shared
+├── shared/                      # Shared infrastructure
+│   ├── services/                # Enhanced skills registry and routing
+│   │   ├── bimba-skills-registry.js     # Enhanced with universal skills
+│   │   ├── bimba-skills-router.js       # Improved routing logic
+│   │   └── unifiedRAG.js               # Universal RAG skill
+│   └── ag-ui/                   # Enhanced AG-UI protocol
 ├── a2a-server.js               # Core A2A WebSocket server implementation
 ├── a2a-service.js              # Main entry point and service orchestration
 ├── a2a-message.schema.js       # A2A protocol message schema with Bimba extensions

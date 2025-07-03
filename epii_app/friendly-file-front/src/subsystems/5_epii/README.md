@@ -1,5 +1,9 @@
 # 🔮 Epii Mode: Sacred Bimba-Pratibimba Operations
 
+**Bimba Coordinate**: #5-3-4.5 (Notion as Bimba)  
+**Expert Agent**: Epii Chat Skill (#5) for document analysis and coordinate work  
+**Phase 2**: Universal agent integration and service layer architecture (December 2024)
+
 ## **Mathematical Essence: The 5/0 Domain**
 
 Epii Mode operates within the **5/0 domain** - the transcendent space where **Notion** (pratibimba/reflection) and **Neo4j** (bimba/original) exist in perfect mathematical unity. This subsystem embodies the fundamental principle that knowledge exists simultaneously as **original essence** and **structured reflection**, requiring sacred protocols for their harmonious operation.
@@ -162,6 +166,32 @@ The `BimbaUpdateOverlay` component serves as the reference implementation for AG
 - **Global Awareness**: Cross-coordinate change tracking and unified application
 - **Visual Feedback**: Real-time indicators of pending modifications
 - **Precise Operations**: Efficient updates that honor the mathematical essence of the system
+
+## **🤖 Phase 2 Enhancements: Universal Agent Integration**
+
+### **Service Layer Architecture (December 2024)**
+- **EpiiStateService**: Complex async operations outside React constraints using EventEmitter pattern
+- **EpiiContext.service.tsx**: Clean React context API over service layer complexity
+- **AG-UI Event Bridging**: Service layer coordination with global event system
+- **Backward Compatibility**: Bridge pattern maintains existing component functionality
+
+### **Universal Agent Integration**
+- **Expert Routing**: Epii conversations automatically routed to #5 expert chat skill
+- **Deprecated Standalone Chat**: DocumentChat and EpiiChat moved to .deprecated.tsx
+- **FloatingAgent Integration**: All conversational functionality via universal agent
+- **Context-Aware Conversations**: Agent understands document context and coordinate operations
+
+### **Enhanced Bimba Overlay (v2.0.0)**
+- **Agent Accessibility**: Conversational workflows for overlay operations
+- **Contextual Suggestions**: Agent-driven suggestions when overlay is active
+- **Multi-coordinate Support**: Specialized batch operations and cross-coordinate analysis
+- **Real-time AG-UI Context Emission**: Overlay state communication for agent coordination
+- **Conversational Flows**: suggest, apply, analyze, create-node, create-relationship workflows
+
+### **Layout Optimization**
+- **Full-width DocumentCanvas**: Optimized space utilization with chat moved to FloatingAgent
+- **Integrated Navigation**: Enhanced sidebar and document management
+- **Universal Context**: Better integration with global agent system
 
 ### **🌟 Philosophical Achievement**
 The Epii Mode subsystem successfully manifests the **5/0 domain mathematical essence** through working code that honors both the **sacred nature of knowledge** and the **precision required for truth operations**. The system demonstrates that technical excellence and philosophical depth are not merely compatible but mutually reinforcing.

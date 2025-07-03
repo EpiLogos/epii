@@ -11,12 +11,21 @@ The `friendly-file-front` application serves as the **primary user interface** f
 - **Multi-Modal Interaction**: Supports diverse interaction patterns from 2D/3D graph exploration to conversational document analysis
 - **Bimba Navigation**: Enables intuitive traversal of the cosmic mind architecture through coordinate-based exploration and relationship mapping
 
-## Refactored Frontend Architecture
+## Refactored Frontend Architecture (Phase 2 - December 2024)
 
-The frontend implements a **complete unified subsystem architecture** with **integrated authentication**, **comprehensive Nara mode development**, and **full AG-UI protocol implementation**. The architecture follows a **Bimba-aligned vertical slice architecture** organized within the **#5-3-4.X** coordinate structure, representing the webapp frontend that contains all other frontend modules:
+The frontend implements a **complete unified subsystem architecture** with **universal Epi-Logos agent system**, **integrated authentication**, **comprehensive Nara mode development**, and **full AG-UI protocol implementation**. **Phase 2 added the universal agent system with expert routing, session management, and service layer architecture.**
+
+The architecture follows a **Bimba-aligned vertical slice architecture** organized within the **#5-3-4.X** coordinate structure, representing the webapp frontend that contains all other frontend modules:
 
 ```
 src/
+├── epi-logos-system/                # NEW: Universal Epi-Logos Agent System
+│   ├── 0_foundation/                # Agent types and core interfaces
+│   ├── 1_components/                # FloatingEpiLogosAgent, ChatSessionManager, SessionHistoryPanel
+│   ├── 2_hooks/                     # Agent-specific hooks and utilities
+│   ├── 3_services/                  # Session management, context routing, WebSocket services
+│   ├── 4_contexts/                  # ActiveModeProvider for expert routing
+│   └── 5_integration/               # System-wide agent integrations
 ├── subsystems/                      # Bimba-aligned vertical slices (#5-3-4.X)
 │   ├── 0_anuttara/                  # #5-3-4.0 (Bimba Vis / Geom Ground)
 │   │   ├── 0_foundation/            # Physics settings and constants
@@ -71,6 +80,87 @@ src/
 ├── utils/                           # Global utility functions
 └── contexts/                        # Global React contexts
 ```
+
+## Phase 2 Implementation: Universal Epi-Logos Agent System
+
+**Major Achievement**: Complete integration of universal agent system that embodies the philosophical principle of holographic completeness through practical software architecture.
+
+### 🤖 Universal Agent Architecture
+
+#### **FloatingEpiLogosAgent** (`epi-logos-system/1_components/FloatingEpiLogosAgent.tsx`)
+- **Universal Agent Interface**: Single floating agent accessible from any page/subsystem
+- **Expert Routing Integration**: Automatically routes conversations to appropriate subsystem experts
+- **Advanced Session Management**: Integrated ChatSessionManager replacing basic settings panel
+- **Resizable & Draggable**: Complete UI interaction with position anchoring and memory
+- **Context-Aware**: Receives mode context from ActiveModeProvider for intelligent routing
+
+#### **Expert Routing System** (`epi-logos-system/4_contexts/ActiveModeProvider.tsx`)
+- **Automatic Expert Detection**: Maps routes to subsystem experts (#0-5 coordinate system)
+- **Page-to-Coordinate Mapping**: `/epii` → #5 expert, `/meta3d` → #1 expert, etc.
+- **AG-UI Event Coordination**: Mode changes emit StateDelta events for global coordination
+- **Universal Integration**: Added to App.tsx alongside UserContextProvider
+
+#### **Complete Session Management System**
+
+**ChatSessionManager** (`epi-logos-system/1_components/ChatSessionManager.tsx`):
+- **Advanced Session Control**: New session, clear history, context compression
+- **Session History Management**: Access to previous conversations with search and filtering
+- **Export/Archive**: Save important conversations for future reference
+- **Context Indicators**: Visual display of current session type and context
+
+**SessionHistoryPanel** (`epi-logos-system/1_components/SessionHistoryPanel.tsx`):
+- **Comprehensive History Interface**: Chronological list with context indicators
+- **Advanced Search & Filter**: Search by content, filter by type/date/context
+- **Session Preview**: Quick preview of conversation content and summaries
+- **Bulk Operations**: Archive, delete, export multiple sessions
+
+**SessionRoutingService** (`epi-logos-system/3_services/SessionRoutingService.ts`):
+- **Intelligent Session Routing**: Automatic session switching based on document/mode context
+- **Context-Aware Logic**: Document selection → document-specific session, mode changes → expert session
+- **Seamless Transitions**: Maintains conversation continuity during context switches
+
+#### **Service Layer Architecture**
+
+**EpiiStateService** (`subsystems/5_epii/1_services/EpiiStateService.ts`):
+- **Complex Operations Outside React**: EventEmitter-based service for heavy async operations
+- **AG-UI Event Bridging**: Service layer coordination with global event system
+- **Backward Compatibility**: Bridge pattern maintains existing component functionality
+
+**EpiiContext.service.tsx** (`subsystems/5_epii/4_context/EpiiContext.service.tsx`):
+- **Clean React API**: Simplified context interface over complex service layer
+- **Optimized Performance**: Stable callbacks and memoized values prevent unnecessary re-renders
+- **Bridge Pattern**: Maintains existing component interfaces during architectural transition
+
+### 🎛️ Enhanced Agent-Integrated Workflows
+
+#### **Bimba Update Overlay Integration** (`subsystems/5_epii/3_visualization/BimbaUpdateOverlay.tsx`)
+- **Enhanced v2.0.0 Integration**: Conversational agent accessibility for overlay workflows
+- **Contextual Suggestions**: Agent-driven suggestions when overlay is active
+- **Multi-coordinate Support**: Specialized batch operations across coordinate relationships
+- **Real-time AG-UI Context Emission**: Overlay state and coordinate selection communication
+- **Conversational Flows**: suggest, apply, analyze, create-node, create-relationship workflows
+
+#### **Deprecated Standalone Components**
+- **DocumentChat & EpiiChat**: Moved to .deprecated.tsx, functionality migrated to FloatingAgent
+- **Layout Optimization**: EpiiModePage updated for full-width DocumentCanvas
+- **Universal Chat**: All conversational functionality now handled by FloatingEpiLogosAgent
+
+### 🔄 Holographic Architecture Principles In Practice
+
+**Gentle Evolution**: All Phase 2 changes maintain backward compatibility while adding agent capabilities
+**Service Layer Separation**: Complex logic moved to services, clean React hooks provide interfaces
+**Event-Driven Coordination**: AG-UI events enable real-time context sharing across components
+**Expert Specialization**: Universal agent intelligently routes to subsystem experts based on domain
+**Coordinate-Based Organization**: New components placed according to epistemic domain coordinates
+
+### 📊 Technical Implementation Quality
+
+**Architectural Consistency**: All changes follow established Bimba coordinate patterns
+**Performance Optimization**: Service layer prevents React constraint bottlenecks
+**User Experience**: Seamless integration feels natural and intuitive
+**Developer Experience**: Clear separation of concerns and maintainable code architecture
+
+---
 
 ### Key Directory Responsibilities
 
