@@ -10,6 +10,7 @@ import { AnimationConsoleProvider } from "./subsystems/2_parashakti/4_context/An
 import { AnimationConsole } from "./subsystems/2_parashakti/3_visualization/AnimationConsole";
 import { FloatingEpiLogosAgent } from "./epi-logos-system/1_components";
 import { AgentContextProvider } from "./shared/hooks/agent";
+import { ActiveModeProvider } from "./epi-logos-system/4_contexts/ActiveModeProvider";
 
 // Pages
 import Welcome from "./shared/pages/Welcome";
@@ -61,10 +62,12 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <div className="min-h-screen">
-                <Navbar />
-                <AnimatedRoutes />
-              </div>
+              <ActiveModeProvider>
+                <div className="min-h-screen">
+                  <Navbar />
+                  <AnimatedRoutes />
+                </div>
+              </ActiveModeProvider>
               {/* Global Animation Console */}
               <AnimationConsole />
               {/* Global Epi-Logos Agent */}

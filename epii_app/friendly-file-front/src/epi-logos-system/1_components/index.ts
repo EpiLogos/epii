@@ -5,3 +5,4 @@
 
 export { default as FloatingEpiLogosAgent } from './FloatingEpiLogosAgent';
 export type { FloatingEpiLogosAgent as FloatingEpiLogosAgentType } from './FloatingEpiLogosAgent';
+export { ChatSessionManager } from './ChatSessionManager';

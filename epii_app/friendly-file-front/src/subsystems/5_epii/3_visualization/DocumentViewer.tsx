@@ -348,7 +348,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
           </div>
         )}
 
-        {/* No separate selections panel - all selection management is in EpiiChat */}
+        {/* No separate selections panel - all selection management is in FloatingEpiLogosAgent */}
 
         <div onMouseUp={handleReadOnlySelection} className="relative">
           {/* Render selection highlights */}
@@ -445,7 +445,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         </div>
       )}
 
-      {/* No separate selections panel - all selection management is in EpiiChat */}
+      {/* No separate selections panel - all selection management is in FloatingEpiLogosAgent */}
 
       <textarea
         ref={textAreaRef}

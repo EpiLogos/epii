@@ -21,6 +21,8 @@ import { sendWebSocketMessage, subscribeToAGUIEvents, onAGUIEvent } from '../3_s
 import { GenerativeUIRenderer, type GenerativeUIComponent } from '../../shared/components/agent';
 import { useUniversalDocumentState } from '../../subsystems/5_epii/1_hooks/useUniversalDocumentState';
 import documentOperationsService from '../../subsystems/5_epii/1_services/documentOperationsService';
+import { useActiveMode, useCurrentExpert } from '../4_contexts/ActiveModeProvider';
+import { ChatSessionManager } from './ChatSessionManager';
 
 interface FloatingEpiLogosAgentProps {
   initialPosition?: { x: number; y: number };
@@ -49,6 +51,10 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const documentState = useUniversalDocumentState();
   const { currentDocument, currentDocumentId, documents, selections } = documentState;
   
+  // Active mode context for expert routing
+  const activeMode = useActiveMode();
+  const currentExpert = useCurrentExpert();
+  
   // Component state
   const [state, setState] = useState<FloatingAgentState>({
     isVisible: true,
@@ -64,7 +70,6 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [inputMessage, setInputMessage] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   
   // Resize state
   const [isResizing, setIsResizing] = useState(false);
@@ -360,6 +365,15 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           totalDocuments: documents.length,
           currentDocumentId,
           hasActiveDocument: !!currentDocument
+        },
+        // Expert routing context
+        expertRouting: {
+          currentMode: activeMode.currentMode,
+          currentCoordinate: activeMode.currentCoordinate,
+          expertSkillId: activeMode.expertSkillId,
+          capabilities: activeMode.modeCapabilities,
+          modeName: activeMode.modeName,
+          modeDescription: activeMode.modeDescription
         }
       },
       orchestrationStrategy: 'single'
@@ -774,6 +788,75 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [addSystemMessage]);
 
   /**
+   * Switch to different session
+   */
+  const handleSessionChange = useCallback(async (sessionId: string) => {
+    try {
+      const session = await sessionHistoryService.getSession(sessionId);
+      if (session) {
+        setState(prev => ({
+          ...prev,
+          currentSession: session,
+          messageHistory: session.messages || []
+        }));
+        addSystemMessage(`📂 Switched to session ${sessionId.slice(-8)}`);
+      }
+    } catch (error) {
+      console.error('[FloatingAgent] Failed to switch session:', error);
+      addSystemMessage('❌ Failed to switch session');
+    }
+  }, [addSystemMessage]);
+
+  /**
+   * Clear current session messages
+   */
+  const handleClearSession = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      messageHistory: []
+    }));
+    addSystemMessage('🧹 Session cleared. Starting fresh conversation.');
+  }, [addSystemMessage]);
+
+  /**
+   * Export current session
+   */
+  const handleExportSession = useCallback(async (sessionId: string) => {
+    try {
+      const session = await sessionHistoryService.getSession(sessionId);
+      if (session) {
+        const exportData = {
+          sessionId: session.id,
+          timestamp: session.timestamp,
+          messages: session.messages || state.messageHistory,
+          context: session.context,
+          metadata: {
+            exportedAt: new Date().toISOString(),
+            messageCount: session.messages?.length || state.messageHistory.length
+          }
+        };
+
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+          type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `epi-logos-session-${sessionId.slice(-8)}-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        addSystemMessage('💾 Session exported successfully');
+      }
+    } catch (error) {
+      console.error('[FloatingAgent] Failed to export session:', error);
+      addSystemMessage('❌ Failed to export session');
+    }
+  }, [state.messageHistory, addSystemMessage]);
+
+  /**
    * Toggle minimized state
    */
   const toggleMinimized = useCallback(() => {
@@ -920,12 +1003,6 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setShowSettings(!showSettings)}
-            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
-          >
-            <Settings className="w-3 h-3" />
-          </button>
-          <button
             onClick={toggleMinimized}
             className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
           >
@@ -940,29 +1017,15 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         </div>
       </div>
 
-      {/* Settings Panel */}
-      {showSettings && (
-        <div className={`p-3 border-b ${UI_CONFIG.styling.border} ${UI_CONFIG.styling.primary}`}>
-          <div className="flex items-center justify-between text-sm">
-            <span className={UI_CONFIG.styling.accent}>Session: {state.currentSession.id.slice(-8)}</span>
-            <div className="flex gap-2">
-              <button
-                onClick={startNewSession}
-                className={`px-2 py-1 text-xs ${UI_CONFIG.styling.border} border rounded hover:bg-white/10`}
-              >
-                New Session
-              </button>
-              <button
-                onClick={() => contextCompactingService.forceCompactSession(state.currentSession.id)}
-                className={`px-2 py-1 text-xs ${UI_CONFIG.styling.border} border rounded hover:bg-white/10`}
-              >
-                <Archive className="w-3 h-3 inline mr-1" />
-                Compact
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Session Manager */}
+      <ChatSessionManager
+        currentSession={state.currentSession}
+        onSessionChange={handleSessionChange}
+        onNewSession={startNewSession}
+        onClearSession={handleClearSession}
+        onExportSession={handleExportSession}
+        messageCount={state.messageHistory.length}
+      />
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: 'calc(100% - 120px)' }}>
