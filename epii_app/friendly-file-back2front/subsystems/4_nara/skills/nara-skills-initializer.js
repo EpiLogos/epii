@@ -59,7 +59,6 @@ function initializeNaraSkills(naraAgentService, skillsRegistry) {
     agentId: 'nara-agent',
     qlMetadata: {
       qlPosition: 4,
-      contextFrame: '(4.0-4.4/5)',
       qlMode: 'ascending'
     },
     harmonicMetadata: {

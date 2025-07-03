@@ -5,7 +5,7 @@
  */
 
 import universalDocumentState from './universalDocumentState';
-import { emitAGUIEvent } from './webSocketService';
+import { emitAGUIEvent } from '../../../epi-logos-system/3_services/webSocketService';
 import { TextSelection } from '../0_foundation/epiiTypes';
 
 export interface DocumentOperationResult {

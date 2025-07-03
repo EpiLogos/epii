@@ -17,6 +17,7 @@ import DocumentControls from './DocumentControls';
 import AnalysisResultsPanel from './AnalysisResultsPanel';
 import CrystalliseToNotionOverlay from './CrystalliseToNotionOverlay';
 import { sendWebSocketMessage } from '../../../epi-logos-system/3_services/webSocketService';
+import { useEpii } from '../4_context/EpiiContext';
 import {
   // syncTextContentToMetadata, // DEFERRED: Sync feature temporarily disabled
   processPayloadForNotion
@@ -30,10 +31,15 @@ interface DocumentCanvasProps {
 
 const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDeleted, onOpenBimbaUpdate }) => {
   const documentState = useUniversalDocumentState();
+  const { state: epiiState, dispatch } = useEpii();
+  
+  // TEMPORARY BRIDGE: Use EpiiContext state if available, fallback to universalDocumentState
+  // This will be removed in Epic 3 when we fully migrate to service layer
+  const currentDocumentId = epiiState.currentDocumentId || documentState.currentDocumentId;
+  const documents = epiiState.documents.length > 0 ? epiiState.documents : documentState.documents;
+  const currentDocument = documents.find(doc => doc.id === currentDocumentId || doc._id === currentDocumentId) || null;
+  
   const {
-    currentDocumentId,
-    currentDocument,
-    documents,
     error,
     statusMessage,
     isLoading,
@@ -78,10 +84,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
   // Document analysis methods from universal state
   const {
-    createAnalysisSession,
-    updateAnalysisSession,
     setCurrentSession,
-    analysisSessions,
     currentSession
   } = documentState;
   
@@ -401,10 +404,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
   }, [isPratibimba, currentDocument?.metadata?.notionUpdatePayload]);
 
   // Save document when switching to another document or when content changes
-  const previousDocumentIdRef = React.useRef(currentDocumentId);
-  const previousContentRef = React.useRef(documentContent);
-  const previousNameRef = React.useRef(documentName);
-  const contentChangeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Note: previousDocumentIdRef, previousContentRef, previousNameRef, and contentChangeTimeoutRef 
+  // are already declared above
 
   // Auto-save when content changes
   useEffect(() => {
@@ -520,7 +521,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       previousContentRef.current = documentContent;
       previousNameRef.current = documentName;
     }
-  }, [currentDocumentId, dispatch, documentContent, documentName, documents]);
+  }, [currentDocumentId, documentContent, documentName, documents]);
 
   // Create a new empty document
   const createNewDocument = async () => {
@@ -844,10 +845,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       setTimeout(reloadDocuments, 1000);
     } catch (error) {
       console.error('Error sending to Notion:', error);
-      dispatch({
-        type: 'SET_ERROR',
-        payload: `Failed to crystallise to Notion: ${error instanceof Error ? error.message : 'Unknown error'}`
-      });
+      setError(`Failed to crystallise to Notion: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSendingToNotion(false);
     }
@@ -1003,13 +1001,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             collection: collection
           });
 
-          dispatch({
-            type: 'SET_STATUS_MESSAGE',
-            payload: {
-              type: 'success',
-              text: `${isPratibimba ? 'Crystallization' : 'Document'} deleted successfully from database.`
-            }
-          });
+          setStatusMessage(`${isPratibimba ? 'Crystallization' : 'Document'} deleted successfully from database.`);
         } else {
           // Even if the API call failed, we've already removed it from state
           // So we'll show a warning message
@@ -1022,7 +1014,6 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       // Even if there was an error, we've already removed the document from state
       // So we'll show a warning message
       setStatusMessage(`Document removed from view, but there was an error with database deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
     } finally {
       setIsSaving(false);
     }

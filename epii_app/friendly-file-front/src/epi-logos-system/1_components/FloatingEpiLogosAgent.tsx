@@ -3,7 +3,7 @@
  * Universal agent interface that can invoke any subsystem
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { X, Minus, MessageCircle, Send, Settings, Archive, FileText } from 'lucide-react';
 import { 
   AgentMessage, 
@@ -65,6 +65,14 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [inputMessage, setInputMessage] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  
+  // Resize state
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState<'se' | 'sw' | 'ne' | 'nw' | 's' | 'e' | null>(null);
+  const [windowSize, setWindowSize] = useState({
+    width: UI_CONFIG.floatingAgent.minWidth,
+    height: UI_CONFIG.floatingAgent.minHeight
+  });
 
   // Refs
   const agentRef = useRef<HTMLDivElement>(null);
@@ -206,6 +214,83 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [state.currentSession]);
 
   /**
+   * Add system message
+   */
+  const addSystemMessage = useCallback(async (content: string) => {
+    const systemMessage = await sessionHistoryService.addMessageWithPersistence({
+      type: 'system',
+      content,
+      context: {
+        sessionId: state.currentSession.id
+      }
+    });
+
+    setState(prev => ({
+      ...prev,
+      messageHistory: [...prev.messageHistory, systemMessage]
+    }));
+  }, [state.currentSession]);
+
+  /**
+   * Handle local document operations
+   */
+  const handleDocumentOperation = useCallback(async (message: string): Promise<boolean> => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Check for document operation commands
+    if (lowerMessage.includes('create document') || lowerMessage.includes('new document')) {
+      const match = message.match(/create document[s]?\s+["'](.+)["']/) || 
+                   message.match(/new document[s]?\s+["'](.+)["']/);
+      const name = match ? match[1] : 'Untitled Document';
+      
+      const result = await documentOperationsService.createDocument({
+        name,
+        content: '',
+        coordinate: currentDocument?.bimbaCoordinate || '#5'
+      });
+      
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (currentDocument && (lowerMessage.includes('analyze this document') || lowerMessage.includes('analyze current document'))) {
+      const result = await documentOperationsService.startAnalysis({
+        documentId: currentDocument.id,
+        targetCoordinate: currentDocument.targetCoordinate || currentDocument.bimbaCoordinate
+      });
+      
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (currentDocument && (lowerMessage.includes('save document') || lowerMessage.includes('save this document'))) {
+      const result = await documentOperationsService.saveDocument(currentDocument.id);
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (lowerMessage.includes('create crystallization') && currentDocument && selections.length > 0) {
+      const currentDocumentSelections = selections.filter(sel => sel.documentId === currentDocument.id);
+      if (currentDocumentSelections.length > 0) {
+        const selection = currentDocumentSelections[0]; // Use first selection
+        const result = await documentOperationsService.createPratibimba({
+          sourceDocumentId: currentDocument.id,
+          selection: {
+            start: selection.startOffset,
+            end: selection.endOffset,
+            text: selection.text
+          }
+        });
+        
+        addSystemMessage(result.message);
+        return true;
+      }
+    }
+    
+    return false; // Not a document operation
+  }, [currentDocument, selections, addSystemMessage]);
+
+  /**
    * Send message to agent
    */
   const sendMessage = useCallback(async () => {
@@ -309,64 +394,6 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     }
   }, [inputMessage, state.isProcessing, state.currentSession, state.messageHistory, currentDocument, currentDocumentId, documents, selections, handleDocumentOperation]);
 
-  /**
-   * Handle local document operations
-   */
-  const handleDocumentOperation = useCallback(async (message: string): Promise<boolean> => {
-    const lowerMessage = message.toLowerCase();
-    
-    // Check for document operation commands
-    if (lowerMessage.includes('create document') || lowerMessage.includes('new document')) {
-      const match = message.match(/create document[s]?\s+["'](.+)["']/) || 
-                   message.match(/new document[s]?\s+["'](.+)["']/);
-      const name = match ? match[1] : 'Untitled Document';
-      
-      const result = await documentOperationsService.createDocument({
-        name,
-        content: '',
-        coordinate: currentDocument?.bimbaCoordinate || '#5'
-      });
-      
-      addSystemMessage(result.message);
-      return true;
-    }
-    
-    if (currentDocument && (lowerMessage.includes('analyze this document') || lowerMessage.includes('analyze current document'))) {
-      const result = await documentOperationsService.startAnalysis({
-        documentId: currentDocument.id,
-        targetCoordinate: currentDocument.targetCoordinate || currentDocument.bimbaCoordinate
-      });
-      
-      addSystemMessage(result.message);
-      return true;
-    }
-    
-    if (currentDocument && (lowerMessage.includes('save document') || lowerMessage.includes('save this document'))) {
-      const result = await documentOperationsService.saveDocument(currentDocument.id);
-      addSystemMessage(result.message);
-      return true;
-    }
-    
-    if (lowerMessage.includes('create crystallization') && currentDocument && selections.length > 0) {
-      const currentDocumentSelections = selections.filter(sel => sel.documentId === currentDocument.id);
-      if (currentDocumentSelections.length > 0) {
-        const selection = currentDocumentSelections[0]; // Use first selection
-        const result = await documentOperationsService.createPratibimba({
-          sourceDocumentId: currentDocument.id,
-          selection: {
-            start: selection.startOffset,
-            end: selection.endOffset,
-            text: selection.text
-          }
-        });
-        
-        addSystemMessage(result.message);
-        return true;
-      }
-    }
-    
-    return false; // Not a document operation
-  }, [currentDocument, selections, addSystemMessage]);
 
   /**
    * Determine request type from input message
@@ -396,24 +423,6 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     
     return 'orchestrate'; // Default
   };
-
-  /**
-   * Add system message
-   */
-  const addSystemMessage = useCallback(async (content: string) => {
-    const systemMessage = await sessionHistoryService.addMessageWithPersistence({
-      type: 'system',
-      content,
-      context: {
-        sessionId: state.currentSession.id
-      }
-    });
-
-    setState(prev => ({
-      ...prev,
-      messageHistory: [...prev.messageHistory, systemMessage]
-    }));
-  }, [state.currentSession]);
 
   /**
    * Format orchestration response for display
@@ -564,7 +573,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [isDragging, dragOffset, state.isMinimized]);
 
   /**
-   * Handle drag end
+   * Handle drag end with anchoring logic
    */
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -574,7 +583,48 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       agentRef.current.style.cursor = state.isMinimized ? 'pointer' : 'default';
       agentRef.current.style.userSelect = '';
     }
-  }, [state.isMinimized]);
+
+    // Anchoring logic: return to bottom-right if close enough
+    const anchorPos = {
+      x: window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20,
+      y: window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20
+    };
+    
+    const distance = Math.sqrt(
+      Math.pow(state.position.x - anchorPos.x, 2) + 
+      Math.pow(state.position.y - anchorPos.y, 2)
+    );
+    
+    // If within threshold distance, animate back to anchor
+    if (distance < UI_CONFIG.floatingAgent.anchorThreshold) {
+      // Smooth animation back to anchor position
+      const startPos = { ...state.position };
+      const startTime = Date.now();
+      const duration = UI_CONFIG.floatingAgent.anchorAnimationDuration;
+      
+      const animateToAnchor = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        const currentX = startPos.x + (anchorPos.x - startPos.x) * easeOut;
+        const currentY = startPos.y + (anchorPos.y - startPos.y) * easeOut;
+        
+        setState(prev => ({
+          ...prev,
+          position: { x: currentX, y: currentY }
+        }));
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateToAnchor);
+        }
+      };
+      
+      requestAnimationFrame(animateToAnchor);
+    }
+  }, [state.isMinimized, state.position]);
 
   // Set up drag event listeners
   useEffect(() => {
@@ -591,10 +641,10 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 
   // Handle window resize to keep agent in bounds
   useEffect(() => {
-    const handleResize = () => {
+    const handleWindowResize = () => {
       setState(prev => {
-        const maxX = window.innerWidth - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
-        const maxY = window.innerHeight - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minHeight);
+        const maxX = window.innerWidth - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : windowSize.width);
+        const maxY = window.innerHeight - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : windowSize.height);
         
         return {
           ...prev,
@@ -606,9 +656,99 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       });
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
+  }, [windowSize]);
+
+  /**
+   * Handle resize start
+   */
+  const handleResizeStart = useCallback((e: React.MouseEvent, direction: 'se' | 'sw' | 'ne' | 'nw' | 's' | 'e') => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeDirection(direction);
   }, []);
+
+  /**
+   * Handle resize with constrained boundaries
+   */
+  const handleResize = useCallback((e: MouseEvent) => {
+    if (!isResizing || !resizeDirection || state.isMinimized) return;
+
+    const rect = agentRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    let newWidth = windowSize.width;
+    let newHeight = windowSize.height;
+    let newX = state.position.x;
+    let newY = state.position.y;
+
+    // Calculate new dimensions based on resize direction
+    switch (resizeDirection) {
+      case 'se': // Southeast corner
+        newWidth = Math.max(UI_CONFIG.floatingAgent.minWidth, Math.min(UI_CONFIG.floatingAgent.maxWidth, e.clientX - state.position.x));
+        newHeight = Math.max(UI_CONFIG.floatingAgent.minHeight, Math.min(UI_CONFIG.floatingAgent.maxHeight, e.clientY - state.position.y));
+        break;
+      case 'sw': // Southwest corner
+        const newWidthSW = Math.max(UI_CONFIG.floatingAgent.minWidth, Math.min(UI_CONFIG.floatingAgent.maxWidth, state.position.x + windowSize.width - e.clientX));
+        newWidth = newWidthSW;
+        newX = state.position.x + windowSize.width - newWidthSW;
+        newHeight = Math.max(UI_CONFIG.floatingAgent.minHeight, Math.min(UI_CONFIG.floatingAgent.maxHeight, e.clientY - state.position.y));
+        break;
+      case 'ne': // Northeast corner
+        newWidth = Math.max(UI_CONFIG.floatingAgent.minWidth, Math.min(UI_CONFIG.floatingAgent.maxWidth, e.clientX - state.position.x));
+        const newHeightNE = Math.max(UI_CONFIG.floatingAgent.minHeight, Math.min(UI_CONFIG.floatingAgent.maxHeight, state.position.y + windowSize.height - e.clientY));
+        newHeight = newHeightNE;
+        newY = state.position.y + windowSize.height - newHeightNE;
+        break;
+      case 'nw': // Northwest corner
+        const newWidthNW = Math.max(UI_CONFIG.floatingAgent.minWidth, Math.min(UI_CONFIG.floatingAgent.maxWidth, state.position.x + windowSize.width - e.clientX));
+        const newHeightNW = Math.max(UI_CONFIG.floatingAgent.minHeight, Math.min(UI_CONFIG.floatingAgent.maxHeight, state.position.y + windowSize.height - e.clientY));
+        newWidth = newWidthNW;
+        newHeight = newHeightNW;
+        newX = state.position.x + windowSize.width - newWidthNW;
+        newY = state.position.y + windowSize.height - newHeightNW;
+        break;
+      case 's': // South edge
+        newHeight = Math.max(UI_CONFIG.floatingAgent.minHeight, Math.min(UI_CONFIG.floatingAgent.maxHeight, e.clientY - state.position.y));
+        break;
+      case 'e': // East edge
+        newWidth = Math.max(UI_CONFIG.floatingAgent.minWidth, Math.min(UI_CONFIG.floatingAgent.maxWidth, e.clientX - state.position.x));
+        break;
+    }
+
+    // Ensure window stays within viewport
+    newX = Math.max(0, Math.min(newX, window.innerWidth - newWidth));
+    newY = Math.max(0, Math.min(newY, window.innerHeight - newHeight));
+
+    setWindowSize({ width: newWidth, height: newHeight });
+    setState(prev => ({
+      ...prev,
+      position: { x: newX, y: newY }
+    }));
+  }, [isResizing, resizeDirection, windowSize, state.position, state.isMinimized]);
+
+  /**
+   * Handle resize end
+   */
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    setResizeDirection(null);
+  }, []);
+
+  // Set up resize event listeners
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResize);
+      document.addEventListener('mouseup', handleResizeEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [isResizing, handleResize, handleResizeEnd]);
 
   /**
    * Handle key press in input
@@ -654,6 +794,39 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       
       return { ...prev, isMinimized: newMinimized };
     });
+  }, []);
+
+  // Memoized message list for performance
+  const memoizedMessageList = useMemo(() => 
+    state.messageHistory.map((message) => (
+      <div
+        key={message.id}
+        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+      >
+        <div
+          className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
+            message.type === 'user'
+              ? `${UI_CONFIG.styling.accent} bg-blue-600/20 border ${UI_CONFIG.styling.border}`
+              : message.type === 'system'
+              ? 'bg-yellow-600/20 border border-yellow-600/20 text-yellow-100'
+              : `bg-white/5 border ${UI_CONFIG.styling.border} text-gray-100`
+          }`}
+        >
+          {renderMessageContent(message)}
+          {message.metadata && (
+            <div className="text-xs opacity-60 mt-1">
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </div>
+          )}
+        </div>
+      </div>
+    )), 
+    [state.messageHistory]
+  );
+
+  // Optimized input change handler
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value);
   }, []);
 
   if (!state.isVisible) {
@@ -713,8 +886,8 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       style={{
         left: state.position.x,
         top: state.position.y,
-        width: UI_CONFIG.floatingAgent.minWidth,
-        height: UI_CONFIG.floatingAgent.minHeight,
+        width: windowSize.width,
+        height: windowSize.height,
         zIndex: UI_CONFIG.floatingAgent.zIndex,
         minWidth: UI_CONFIG.floatingAgent.minWidth,
         maxWidth: UI_CONFIG.floatingAgent.maxWidth,
@@ -793,29 +966,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: 'calc(100% - 120px)' }}>
-            {state.messageHistory.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
-                    message.type === 'user'
-                      ? `${UI_CONFIG.styling.accent} bg-blue-600/20 border ${UI_CONFIG.styling.border}`
-                      : message.type === 'system'
-                      ? 'bg-yellow-600/20 border border-yellow-600/20 text-yellow-100'
-                      : `bg-white/5 border ${UI_CONFIG.styling.border} text-gray-100`
-                  }`}
-                >
-                  {renderMessageContent(message)}
-                  {message.metadata && (
-                    <div className="text-xs opacity-60 mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+            {memoizedMessageList}
             
             {state.isProcessing && (
               <div className="flex justify-start">
@@ -837,7 +988,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           <textarea
             ref={inputRef}
             value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+            onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Ask me anything across all subsystems..."
             className={`flex-1 px-3 py-2 ${UI_CONFIG.styling.primary} ${UI_CONFIG.styling.border} border rounded text-sm text-white placeholder-gray-400 resize-none`}
@@ -853,6 +1004,45 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Resize Handles */}
+      {!state.isMinimized && (
+        <>
+          {/* Corner handles */}
+          <div
+            className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 'se')}
+            style={{ background: 'linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
+          />
+          <div
+            className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 'sw')}
+            style={{ background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
+          />
+          <div
+            className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 'ne')}
+            style={{ background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
+          />
+          <div
+            className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 'nw')}
+            style={{ background: 'linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
+          />
+          
+          {/* Edge handles */}
+          <div
+            className="absolute bottom-0 left-3 right-3 h-1 cursor-s-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 's')}
+            style={{ background: 'rgba(255,255,255,0.2)' }}
+          />
+          <div
+            className="absolute top-3 bottom-3 right-0 w-1 cursor-e-resize opacity-50 hover:opacity-100"
+            onMouseDown={(e) => handleResizeStart(e, 'e')}
+            style={{ background: 'rgba(255,255,255,0.2)' }}
+          />
+        </>
+      )}
     </div>
   );
 };

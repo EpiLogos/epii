@@ -410,7 +410,6 @@ class EpiiChatSkill {
       },
       qlMetadata: {
         qlPosition: 5,
-        contextFrame: '(0-5)',
         qlMode: 'integral'
       }
     };

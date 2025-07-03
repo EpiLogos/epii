@@ -37,8 +37,7 @@ const epiiAgentCard = {
         type: "object",
         properties: {
           content: { type: "string" },
-          targetCoordinate: { type: "string", nullable: true },
-          contextFrame: { type: "string", nullable: true }
+          targetCoordinate: { type: "string", nullable: true }
         },
         required: ["content"]
       },

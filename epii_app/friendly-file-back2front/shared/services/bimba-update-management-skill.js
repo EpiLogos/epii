@@ -18,7 +18,7 @@ class BimbaUpdateManagementSkill {
     this.description = 'Analyzes documents and suggests Bimba node updates with QL-aware relationships';
     this.bimbaCoordinate = '#5-2';
     this.version = '1.0.0';
-    
+
     // Sub-skills
     this.subSkills = {
       updateApplication: {
@@ -36,13 +36,13 @@ class BimbaUpdateManagementSkill {
    * Execute update application - triggers frontend update mechanisms via AG-UI
    * @param {Object} params - Update application parameters
    * @param {string} params.action - 'apply-suggestions', 'apply-updates', or 'apply-specific'
-   * @param {Array} params.coordinates - Optional: specific coordinates to apply updates for  
+   * @param {Array} params.coordinates - Optional: specific coordinates to apply updates for
    * @param {Object} context - Execution context with AG-UI gateway
    * @returns {Promise<Object>} Result of update application trigger
    */
   async executeUpdateApplication(params, context) {
     console.log('[BimbaUpdateManagement] Executing update application request');
-    
+
     try {
       const result = await this._triggerUpdateApplication({
         action: params.action || 'apply-suggestions',
@@ -53,7 +53,7 @@ class BimbaUpdateManagementSkill {
           threadId: context.threadId || params.threadId
         }
       });
-      
+
       return {
         success: result.success,
         skillId: this.skillId,
@@ -62,7 +62,7 @@ class BimbaUpdateManagementSkill {
         operationType: 'update-application',
         data: result
       };
-      
+
     } catch (error) {
       console.error('[BimbaUpdateManagement] Update application execution failed:', error);
       return {
@@ -124,14 +124,14 @@ class BimbaUpdateManagementSkill {
     }
 
     // Detect multi-coordinate mode
-    const isMultiCoordinateMode = actualParams.multiCoordinateMode || 
-                                 Array.isArray(actualParams.coordinate) || 
+    const isMultiCoordinateMode = actualParams.multiCoordinateMode ||
+                                 Array.isArray(actualParams.coordinate) ||
                                  (actualParams.targetCoordinates && actualParams.targetCoordinates.length > 1);
-    
+
     // Normalize coordinates for processing
     let targetCoordinates;
     if (isMultiCoordinateMode) {
-      targetCoordinates = actualParams.targetCoordinates || 
+      targetCoordinates = actualParams.targetCoordinates ||
                          (Array.isArray(actualParams.coordinate) ? actualParams.coordinate : [actualParams.coordinate]);
     } else {
       targetCoordinates = [actualParams.coordinate];
@@ -267,10 +267,10 @@ class BimbaUpdateManagementSkill {
    */
   async _executeMultiCoordinateAnalysis(actualParams, context, aguiGateway, runId, threadId, logPrefix) {
     console.log(`${logPrefix} Starting multi-coordinate analysis for ${actualParams.targetCoordinates.length} coordinates`);
-    
+
     const isAGUIEnabled = !!(aguiGateway && runId);
     const targetCoordinates = actualParams.targetCoordinates;
-    
+
     if (isAGUIEnabled) {
       aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
         runId,
@@ -297,10 +297,10 @@ class BimbaUpdateManagementSkill {
           philosophicalContext: actualParams.philosophicalContext,
           documentContent: actualParams.documentContent // Pass document content for content allocation
         });
-        
+
         if (nodeCreationResult.created.length > 0) {
           console.log(`${logPrefix} Created ${nodeCreationResult.created.length} hinted coordinate spaces for philosophical exploration`);
-          
+
           if (isAGUIEnabled) {
             aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
               runId,
@@ -318,8 +318,8 @@ class BimbaUpdateManagementSkill {
         }
       } catch (nodeCreationError) {
         console.warn(`${logPrefix} Hinted node creation failed:`, nodeCreationError);
-        nodeCreationResult = { 
-          created: [], 
+        nodeCreationResult = {
+          created: [],
           errors: [{ general: nodeCreationError.message }],
           message: 'Hinted coordinate creation encountered errors'
         };
@@ -328,12 +328,12 @@ class BimbaUpdateManagementSkill {
 
     // Build multi-coordinate analysis prompt
     const multiPrompt = this._buildMultiCoordinateAnalysisPrompt(actualParams);
-    
+
     // Direct LLM analysis for structured results
     console.log(`${logPrefix} Performing direct LLM analysis for multi-coordinate structured results...`);
-    
+
     const { ChatGoogleGenerativeAI } = await import('@langchain/google-genai');
-    
+
     const llm = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
       model: 'gemini-2.0-flash-exp',
@@ -348,7 +348,7 @@ class BimbaUpdateManagementSkill {
 
     // Parse the multi-coordinate response
     const structuredResult = this._parseMultiCoordinateLLMResponse(response, logPrefix, actualParams);
-    
+
     // Emit AG-UI events for each coordinate's suggestions
     if (isAGUIEnabled && structuredResult.multiCoordinateResults) {
       for (const [coordinate, coordinateResult] of Object.entries(structuredResult.multiCoordinateResults)) {
@@ -371,7 +371,7 @@ class BimbaUpdateManagementSkill {
           multiCoordinateMode: true
         });
       }
-      
+
       // Emit summary progress event
       aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
         runId,
@@ -387,7 +387,7 @@ class BimbaUpdateManagementSkill {
         contextFrame: '(0/1/2)'
       });
     }
-    
+
     // Also route through Epi-Logos Agent for conversational presentation (optional)
     const conversationalResult = await this._routeToEpiLogosAgent({
       type: 'multi-coordinate-bimba-analysis',
@@ -444,7 +444,7 @@ class BimbaUpdateManagementSkill {
 
     // Note: In Phase 1, we're using the existing parameter data
     console.log(`${logPrefix} Using provided node data (Phase 1 implementation)`);
-    
+
     // Hinted node creation - create user-specified coordinate spaces for philosophical exploration
     let nodeCreationResult = null;
     if (actualParams.hintedCoordinates && actualParams.hintedCoordinates.length > 0) {
@@ -457,10 +457,10 @@ class BimbaUpdateManagementSkill {
           philosophicalContext: actualParams.philosophicalContext,
           documentContent: actualParams.documentContent // Pass document content for content allocation
         });
-        
+
         if (nodeCreationResult.created.length > 0) {
           console.log(`${logPrefix} Created ${nodeCreationResult.created.length} hinted coordinate spaces for philosophical exploration`);
-          
+
           if (isAGUIEnabled) {
             aguiGateway.emitAGUIEvent(createAGUIEvent(AGUIEventTypes.BIMBA_ANALYSIS_PROGRESS, {
               runId,
@@ -478,14 +478,14 @@ class BimbaUpdateManagementSkill {
         }
       } catch (nodeCreationError) {
         console.warn(`${logPrefix} Hinted node creation failed:`, nodeCreationError);
-        nodeCreationResult = { 
-          created: [], 
+        nodeCreationResult = {
+          created: [],
           errors: [{ general: nodeCreationError.message }],
           message: 'Hinted coordinate creation encountered errors'
         };
       }
     }
-    
+
     // Build the analysis prompt
     const analysisPrompt = this._buildAnalysisPrompt(actualParams);
 
@@ -552,26 +552,26 @@ class BimbaUpdateManagementSkill {
   }
 
   /**
-   * Parse multi-coordinate LLM response 
+   * Parse multi-coordinate LLM response
    */
   _parseMultiCoordinateLLMResponse(response, logPrefix, params) {
     const responseText = response.content || response.text || String(response);
     console.log(`${logPrefix} Parsing multi-coordinate LLM response...`);
-    
+
     try {
       // Extract JSON from response
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }
-      
+
       const parsed = JSON.parse(jsonMatch[0]);
       console.log(`${logPrefix} Successfully parsed multi-coordinate response:`, {
         coordinateCount: Object.keys(parsed.multiCoordinateResults || {}).length,
         crossRelationshipCount: (parsed.crossCoordinateRelationships || []).length,
         hasAnalysisOverview: !!parsed.analysisOverview
       });
-      
+
       return {
         multiCoordinateResults: parsed.multiCoordinateResults || {},
         crossCoordinateRelationships: parsed.crossCoordinateRelationships || [],
@@ -579,10 +579,10 @@ class BimbaUpdateManagementSkill {
         coordinateCount: Object.keys(parsed.multiCoordinateResults || {}).length,
         relationshipCount: (parsed.crossCoordinateRelationships || []).length
       };
-      
+
     } catch (error) {
       console.warn(`${logPrefix} Failed to parse multi-coordinate LLM response:`, error);
-      
+
       // Fallback: create empty structure for all target coordinates
       const fallbackResults = {};
       params.targetCoordinates.forEach(coord => {
@@ -593,7 +593,7 @@ class BimbaUpdateManagementSkill {
           relationshipSuggestions: []
         };
       });
-      
+
       return {
         multiCoordinateResults: fallbackResults,
         crossCoordinateRelationships: [],
@@ -656,7 +656,7 @@ Respond with JSON in this format:
   "crossCoordinateRelationships": [
     {
       "sourceCoordinate": "#X",
-      "targetCoordinate": "#Y", 
+      "targetCoordinate": "#Y",
       "type": "RELATIONSHIP_TYPE",
       "properties": {
         "strength": 0.8,
@@ -686,11 +686,11 @@ Respond with JSON in this format:
    */
   async _routeToEpiLogosAgent(requestData) {
     console.log('[BimbaUpdateManagement] Routing through Epi-Logos Agent → #5 Chat Skill for conversational approval');
-    
+
     try {
       // Step 1: Epi-Logos Agent provides transcendent context and coordination
       const transcendentContext = await this._getEpiLogosTranscendentContext(requestData);
-      
+
       // Step 2: Route through #5 Chat Skill as the foundational conversational identity
       const conversationalResult = await this._routeToEpiiChatSkill({
         ...requestData,
@@ -698,7 +698,7 @@ Respond with JSON in this format:
         workflow: 'multi-coordinate-bimba-analysis',
         conversationalPrompt: this._buildConversationalPrompt(requestData, transcendentContext)
       });
-      
+
       return {
         status: 'conversational_analysis_complete',
         message: 'Multi-coordinate analysis presented through #5 Chat Skill with Epi-Logos transcendent harmony',
@@ -707,7 +707,7 @@ Respond with JSON in this format:
         conversationalPresentation: conversationalResult,
         transcendentContext: transcendentContext
       };
-      
+
     } catch (error) {
       console.error('[BimbaUpdateManagement] Error in agent routing:', error);
       return {
@@ -741,12 +741,12 @@ Respond with JSON in this format:
    */
   async _routeToEpiiChatSkill(enhancedRequestData) {
     console.log('[BimbaUpdateManagement] Delegating to #5 Chat Skill for conversational presentation');
-    
+
     try {
       // Import and instantiate the real EpiiChatSkill
       const EpiiChatSkill = require('../../subsystems/5_epii/skills/epii-chat-skill');
       const epiiChatSkill = new EpiiChatSkill();
-      
+
       // Prepare context for EpiiChatSkill execution
       const chatContext = {
         agentId: 'epii-agent',
@@ -754,10 +754,10 @@ Respond with JSON in this format:
         _epiiAgentService: enhancedRequestData.epiiAgentService, // Pass service if available
         _skillsRegistry: enhancedRequestData.skillsRegistry // Pass skills registry if available
       };
-      
+
       // Build conversational prompt for multi-coordinate analysis
       const conversationalPrompt = this._buildEpiiConversationalPrompt(enhancedRequestData);
-      
+
       // Prepare parameters for EpiiChatSkill
       const chatParams = {
         message: conversationalPrompt,
@@ -775,20 +775,20 @@ Respond with JSON in this format:
           perspectiveDepth: 'profound'
         }
       };
-      
+
       console.log('[BimbaUpdateManagement] Executing EpiiChatSkill with parameters:', {
         messageLength: conversationalPrompt.length,
         coordinates: enhancedRequestData.coordinates,
         hasDocumentContent: !!enhancedRequestData.documentContent,
         multiCoordinateMode: true
       });
-      
+
       // Execute the actual EpiiChatSkill
       const chatResult = await epiiChatSkill.execute(chatParams, chatContext);
-      
+
       if (chatResult.success) {
         console.log('[BimbaUpdateManagement] EpiiChatSkill executed successfully');
-        
+
         return {
           conversationalStyle: 'epii-meta-perspective',
           domainExpertise: 'multi-coordinate-bimba-analysis',
@@ -807,10 +807,10 @@ Respond with JSON in this format:
         console.warn('[BimbaUpdateManagement] EpiiChatSkill execution failed:', chatResult.error);
         throw new Error(`EpiiChatSkill execution failed: ${chatResult.error}`);
       }
-      
+
     } catch (error) {
       console.error('[BimbaUpdateManagement] Error routing to EpiiChatSkill:', error);
-      
+
       // Fallback to placeholder response if real routing fails
       return {
         conversationalStyle: 'epii-meta-perspective',
@@ -1111,64 +1111,64 @@ CRITICAL REQUIREMENTS:
   async _createHintedNodes(params) {
     const logPrefix = '[BimbaUpdateManagement:HintedNodeCreation]';
     console.log(`${logPrefix} Processing user-hinted coordinates for philosophical exploration`);
-    
+
     try {
       // Use user-provided coordinate hints instead of auto-detection
       const hintedCoordinates = params.hintedCoordinates || [];
-      
+
       if (hintedCoordinates.length === 0) {
         console.log(`${logPrefix} No coordinate hints provided by user`);
-        return { 
-          created: [], 
-          skipped: [], 
-          message: 'No coordinate hints provided - proceeding with existing coordinate space' 
+        return {
+          created: [],
+          skipped: [],
+          message: 'No coordinate hints provided - proceeding with existing coordinate space'
         };
       }
-      
+
       console.log(`${logPrefix} User hinted ${hintedCoordinates.length} coordinates for creation:`, hintedCoordinates);
       console.log(`${logPrefix} Philosophical context: ${params.philosophicalContext || 'Not specified'}`);
-      
+
       console.log(`${logPrefix} Checking ${hintedCoordinates.length} hinted coordinates for existence`);
-      
+
       // Check which hinted coordinates already exist using BPMCP
       const existingCoordinatesQuery = `
-        MATCH (n:Bimba) 
-        WHERE n.bimbaCoordinate IN $coordinates 
+        MATCH (n:Bimba)
+        WHERE n.bimbaCoordinate IN $coordinates
         RETURN n.bimbaCoordinate as coordinate
       `;
-      
+
       const bpMCPService = require('../../friendly-file-backend/databases/bpmcp/bpMCP.service.mjs').default;
       const existingResult = await bpMCPService.queryBimbaGraph(existingCoordinatesQuery, {
         coordinates: hintedCoordinates
       });
-      
+
       const existingCoordinates = existingResult.records?.map(record => record.coordinate) || [];
       const coordinatesToCreate = hintedCoordinates.filter(coord => !existingCoordinates.includes(coord));
-      
+
       console.log(`${logPrefix} Found ${coordinatesToCreate.length} new coordinates to create:`, coordinatesToCreate);
-      
+
       if (coordinatesToCreate.length === 0) {
-        return { 
-          created: [], 
-          skipped: existingCoordinates, 
-          message: 'All hinted coordinates already exist in the philosophical space' 
+        return {
+          created: [],
+          skipped: existingCoordinates,
+          message: 'All hinted coordinates already exist in the philosophical space'
         };
       }
-      
+
       // Create hinted coordinate nodes for philosophical exploration
       const createdNodes = [];
       const errors = [];
-      
+
       for (const coordinate of coordinatesToCreate) {
         try {
           console.log(`${logPrefix} Creating node for coordinate: ${coordinate}`);
-          
+
           // Parse coordinate to determine parent relationships
           const coordinateParts = coordinate.replace('#', '').split(/[-\.]/);
-          const parentCoordinate = coordinateParts.length > 1 
+          const parentCoordinate = coordinateParts.length > 1
             ? `#${coordinateParts.slice(0, -1).join('-')}`
             : null;
-          
+
           // Create basic node with foundational properties
           const createNodeQuery = `
             CREATE (n:Bimba {
@@ -1187,10 +1187,10 @@ CRITICAL REQUIREMENTS:
             })
             RETURN n
           `;
-          
+
           // Analyze document content for this specific coordinate
           const coordinateContent = this._extractCoordinateContent(params.documentContent, coordinate);
-          
+
           const nodeProperties = {
             coordinate: coordinate,
             name: `Philosophical exploration space ${coordinate}`,
@@ -1203,12 +1203,12 @@ CRITICAL REQUIREMENTS:
             philosophicalContext: params.philosophicalContext || 'User-initiated exploration',
             allocatedContent: coordinateContent.rawContent || null
           };
-          
+
           const createResult = await bpMCPService.callTool('updateBimbaGraph', {
             query: createNodeQuery,
             params: nodeProperties
           });
-          
+
           // Create parent relationship if applicable
           if (parentCoordinate && createResult.records?.length > 0) {
             const relationshipQuery = `
@@ -1217,7 +1217,7 @@ CRITICAL REQUIREMENTS:
               CREATE (parent)-[:CHILD_OF]->(child)
               RETURN parent, child
             `;
-            
+
             try {
               await bpMCPService.callTool('updateBimbaGraph', {
                 query: relationshipQuery,
@@ -1231,15 +1231,15 @@ CRITICAL REQUIREMENTS:
               console.warn(`${logPrefix} Could not create parent relationship for ${coordinate}:`, relationshipError);
             }
           }
-          
+
           createdNodes.push({
             coordinate: coordinate,
             parentCoordinate: parentCoordinate,
             sourceDocument: params.documentName
           });
-          
+
           console.log(`${logPrefix} Successfully created node: ${coordinate}`);
-          
+
         } catch (nodeError) {
           console.error(`${logPrefix} Error creating node ${coordinate}:`, nodeError);
           errors.push({
@@ -1248,17 +1248,17 @@ CRITICAL REQUIREMENTS:
           });
         }
       }
-      
+
       const result = {
         created: createdNodes,
         errors: errors,
         skipped: existingCoordinates,
         message: `Created ${createdNodes.length} new nodes, ${errors.length} errors, ${existingCoordinates.length} already existed`
       };
-      
+
       console.log(`${logPrefix} Dynamic node creation completed:`, result);
       return result;
-      
+
     } catch (error) {
       console.error(`${logPrefix} Error in dynamic node creation:`, error);
       return {
@@ -1292,13 +1292,13 @@ CRITICAL REQUIREMENTS:
       // Look for explicit coordinate references in the document
       const coordinatePattern = new RegExp(`${coordinate.replace('.', '\\.')}[^\\w]*([^#]*?)(?=#\\d|$)`, 'gi');
       const coordinateMatches = documentContent.match(coordinatePattern) || [];
-      
+
       // Also look for content around coordinate mentions
       const contextPattern = new RegExp(`([^.]{0,200}${coordinate.replace('.', '\\.')}[^.]{0,200})`, 'gi');
       const contextMatches = documentContent.match(contextPattern) || [];
-      
+
       const relevantContent = [...coordinateMatches, ...contextMatches].join(' ').trim();
-      
+
       if (!relevantContent) {
         return {
           qlOperators: null,
@@ -1311,9 +1311,9 @@ CRITICAL REQUIREMENTS:
 
       // Basic content allocation - this could be enhanced with LLM analysis
       const contentLower = relevantContent.toLowerCase();
-      
+
       return {
-        qlOperators: contentLower.includes('logic') || contentLower.includes('operator') 
+        qlOperators: contentLower.includes('logic') || contentLower.includes('operator')
           ? `QL operations derived from document: ${relevantContent.substring(0, 200)}...`
           : null,
         epistemicEssence: contentLower.includes('knowledge') || contentLower.includes('epistemic') || contentLower.includes('knowing')
@@ -1327,7 +1327,7 @@ CRITICAL REQUIREMENTS:
           : null,
         rawContent: relevantContent.substring(0, 500) // Store first 500 chars of relevant content
       };
-      
+
     } catch (error) {
       console.warn('[BimbaUpdateManagement] Error extracting coordinate content:', error);
       return {
@@ -1353,11 +1353,11 @@ CRITICAL REQUIREMENTS:
   async _triggerUpdateApplication(params) {
     const logPrefix = '[BimbaUpdateManagement:UpdateApplication]';
     console.log(`${logPrefix} Triggering update application:`, params.action);
-    
+
     try {
       const { action, coordinates, context } = params;
       const { aguiGateway, runId, threadId } = context || {};
-      
+
       if (!aguiGateway || !runId) {
         console.warn(`${logPrefix} No AG-UI gateway or runId available for update application`);
         return {
@@ -1365,9 +1365,9 @@ CRITICAL REQUIREMENTS:
           message: 'AG-UI gateway not available for update application'
         };
       }
-      
+
       let eventType, eventPayload;
-      
+
       switch (action) {
         case 'apply-suggestions':
           eventType = AGUIEventTypes.BIMBA_APPLY_SUGGESTIONS;
@@ -1379,7 +1379,7 @@ CRITICAL REQUIREMENTS:
             message: 'Agent requesting to apply LLM suggestions to form'
           };
           break;
-          
+
         case 'apply-updates':
           eventType = AGUIEventTypes.BIMBA_APPLY_UPDATES;
           eventPayload = {
@@ -1390,7 +1390,7 @@ CRITICAL REQUIREMENTS:
             message: 'Agent requesting to commit pending changes to backend'
           };
           break;
-          
+
         case 'apply-specific':
           eventType = AGUIEventTypes.BIMBA_APPLY_UPDATES;
           eventPayload = {
@@ -1401,11 +1401,11 @@ CRITICAL REQUIREMENTS:
             message: `Agent requesting to apply updates for specific coordinates: ${coordinates?.join(', ') || 'all'}`
           };
           break;
-          
+
         default:
           throw new Error(`Unknown update application action: ${action}`);
       }
-      
+
       // Emit AG-UI event to frontend
       aguiGateway.emitAGUIEvent(createAGUIEvent(eventType, eventPayload), {
         bimbaCoordinates: coordinates || [],
@@ -1413,9 +1413,9 @@ CRITICAL REQUIREMENTS:
         contextFrame: '(0/1/2)',
         agentInitiated: true
       });
-      
+
       console.log(`${logPrefix} Emitted ${eventType} event for ${coordinates?.length || 'all'} coordinates`);
-      
+
       // Return success immediately - actual application happens in frontend
       return {
         success: true,
@@ -1424,7 +1424,7 @@ CRITICAL REQUIREMENTS:
         message: `Update application event sent to frontend: ${action}`,
         eventType: eventType
       };
-      
+
     } catch (error) {
       console.error(`${logPrefix} Error triggering update application:`, error);
       return {
@@ -1444,34 +1444,34 @@ CRITICAL REQUIREMENTS:
    */
   _buildEpiiConversationalPrompt(enhancedRequestData) {
     const { coordinates, documentContent, documentName, workflow, transcendentContext } = enhancedRequestData;
-    
+
     // Build conversational prompt that leverages EpiiChatSkill's natural language processing
     let prompt = `I need your perspective on a multi-coordinate Bimba analysis for the document "${documentName}". `;
-    
+
     if (coordinates.length === 1) {
       prompt += `Please analyze how this document relates to coordinate ${coordinates[0]} and suggest specific updates to its Bimba node properties.`;
     } else {
       prompt += `This involves ${coordinates.length} coordinates: ${coordinates.join(', ')}. Please provide a unified analysis that considers the relationships between these coordinates.`;
     }
-    
+
     // Add context about the workflow stage
     if (workflow === 'multi-coordinate-selection') {
       prompt += `\n\nThis is part of a multi-coordinate selection workflow where we're exploring how this document content maps across multiple QL coordinates simultaneously.`;
     }
-    
+
     // Add transcendent context if available
     if (transcendentContext && transcendentContext.transcendentPrompt) {
       prompt += `\n\nTranscendent Context: ${transcendentContext.transcendentPrompt}`;
     }
-    
+
     // Add document content context
     if (documentContent) {
-      const contentPreview = documentContent.length > 500 
+      const contentPreview = documentContent.length > 500
         ? documentContent.substring(0, 500) + '...'
         : documentContent;
       prompt += `\n\nDocument Content Preview:\n${contentPreview}`;
     }
-    
+
     // Add specific request for Bimba update suggestions
     prompt += `\n\nPlease provide your analysis with specific suggestions for:
 1. Property updates for the involved Bimba nodes
@@ -1480,14 +1480,14 @@ CRITICAL REQUIREMENTS:
 4. Cross-coordinate synthesis if multiple coordinates are involved
 
 Focus on the four foundational relational properties: qlOperators, epistemicEssence, archetypalAnchors, and semanticFramework.`;
-    
+
     console.log(`[BimbaUpdateManagement] Built conversational prompt for ${coordinates.length} coordinates:`, {
       promptLength: prompt.length,
       coordinates: coordinates,
       hasTranscendentContext: !!transcendentContext?.transcendentPrompt,
       documentName: documentName
     });
-    
+
     return prompt;
   }
 
@@ -1504,7 +1504,6 @@ Focus on the four foundational relational properties: qlOperators, epistemicEsse
       agentId: 'epii-agent',
       qlMetadata: {
         qlPosition: 2,
-        contextFrame: '(0/1/2)',
         qlMode: 'ascending'
       },
       harmonicMetadata: {
@@ -1575,15 +1574,15 @@ Focus on the four foundational relational properties: qlOperators, epistemicEsse
         type: 'object',
         required: ['action'],
         properties: {
-          action: { 
-            type: 'string', 
+          action: {
+            type: 'string',
             enum: ['apply-suggestions', 'apply-updates', 'apply-specific'],
-            description: 'Type of update application to trigger' 
+            description: 'Type of update application to trigger'
           },
-          coordinates: { 
-            type: 'array', 
+          coordinates: {
+            type: 'array',
             items: { type: 'string' },
-            description: 'Optional: specific coordinates to apply updates for' 
+            description: 'Optional: specific coordinates to apply updates for'
           },
           runId: { type: 'string', description: 'AG-UI run ID' },
           threadId: { type: 'string', description: 'AG-UI thread ID' }

@@ -6,8 +6,8 @@
  * eliminating the need for local React Context and providing universal access.
  */
 
-import { emitAGUIEvent, onAGUIEvent, offAGUIEvent } from './webSocketService';
-import documentCacheService from './documentCacheService';
+import { emitAGUIEvent, onAGUIEvent, offAGUIEvent } from '../../../epi-logos-system/3_services/webSocketService';
+import documentCacheService from '../../../shared/services/documentCacheService';
 import documentStateService from './documentStateService';
 
 // Document state types
@@ -179,8 +179,8 @@ class UniversalDocumentStateManager {
    */
   private setupAGUIEventHandlers(): void {
     // Listen for StateDelta events
-    onAGUIEvent('StateDelta', (event: DocumentStateDelta) => {
-      this.handleStateDelta(event);
+    onAGUIEvent('StateDelta', (event: any) => {
+      this.handleStateDelta(event as DocumentStateDelta);
     });
 
     // Listen for document lifecycle events
@@ -243,7 +243,17 @@ class UniversalDocumentStateManager {
    */
   private async loadDocuments(): Promise<UniversalDocument[]> {
     try {
-      const allDocuments = documentCacheService.getAllDocuments();
+      // Get all documents from cache - this returns cached documents only
+      const allDocuments: any[] = [];
+      
+      // Get all documents from byId map
+      const cacheInstance = (documentCacheService as any).cache || { byId: new Map() };
+      if (cacheInstance.byId) {
+        for (const doc of cacheInstance.byId.values()) {
+          allDocuments.push(doc);
+        }
+      }
+      
       return allDocuments.map(doc => this.normalizeDocument(doc));
     } catch (error) {
       console.error('[UniversalDocumentState] Error loading documents:', error);

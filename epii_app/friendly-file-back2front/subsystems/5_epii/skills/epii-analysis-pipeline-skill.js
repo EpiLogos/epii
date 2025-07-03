@@ -44,7 +44,6 @@ class EpiiAnalysisPipelineSkill {
       version: this.version,
       qlMetadata: {
         qlPosition: 0,
-        contextFrame: '(0/1)',
         qlMode: 'ascending'
       },
       harmonicMetadata: {

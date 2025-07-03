@@ -88,35 +88,6 @@ class TaskStateManager {
     return this.task;
   }
 
-  // Determine context frame based on QL stage
-  determineContextFrame() {
-    const qlStage = this.task.status.qlStage;
-    let contextFrame;
-
-    switch (qlStage) {
-      case 0:
-      case 1:
-        contextFrame = '(0/1)'; // Foundation/Identity
-        break;
-      case 2:
-        contextFrame = '(0/1/2)'; // Process/Activation
-        break;
-      case 3:
-        contextFrame = '(0/1/2/3)'; // Pattern/Integration
-        break;
-      case 4:
-        contextFrame = '(4.0-4/5)'; // Application/Context
-        break;
-      case 5:
-        contextFrame = '(5/0)'; // Synthesis/Renewal
-        break;
-      default:
-        contextFrame = '(0-5)'; // Full cycle
-    }
-
-    return this.setContextFrame(contextFrame);
-  }
-
   // Set subsystem path
   setSubsystemPath(subsystemPath) {
     this.task.subsystemPath = subsystemPath;

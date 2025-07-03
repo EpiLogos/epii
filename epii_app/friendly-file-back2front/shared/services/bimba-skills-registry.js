@@ -25,7 +25,6 @@ class BimbaSkillsRegistry {
    * @param {Function} skill.handler Function that implements the skill
    * @param {Object} [skill.qlMetadata] Quaternary Logic metadata
    * @param {number} [skill.qlMetadata.qlPosition] Position in the QL cycle (0-5)
-   * @param {string} [skill.qlMetadata.contextFrame] QL context frame (e.g., '(0/1)', '(0/1/2)')
    * @param {string} [skill.qlMetadata.qlMode] QL mode (e.g., 'ascending', 'descending')
    * @param {Object} [skill.harmonicMetadata] Harmonic metadata for vibrational ontology
    * @returns {Object} The registered skill
@@ -65,7 +64,6 @@ class BimbaSkillsRegistry {
     if (!match) {
       return {
         qlPosition: 0,
-        contextFrame: '(0-5)',
         qlMode: 'ascending'
       };
     }
@@ -73,32 +71,8 @@ class BimbaSkillsRegistry {
     const lastDigit = parseInt(match[match.length - 1], 10);
     const qlPosition = lastDigit % 6; // Ensure it's within the 0-5 range
 
-    // Determine context frame based on QL position
-    let contextFrame;
-    switch (qlPosition) {
-      case 0:
-      case 1:
-        contextFrame = '(0/1)';
-        break;
-      case 2:
-        contextFrame = '(0/1/2)';
-        break;
-      case 3:
-        contextFrame = '(0/1/2/3)';
-        break;
-      case 4:
-        contextFrame = '(4.0-4/5)';
-        break;
-      case 5:
-        contextFrame = '(5/0)';
-        break;
-      default:
-        contextFrame = '(0-5)';
-    }
-
     return {
       qlPosition,
-      contextFrame,
       qlMode: 'ascending'
     };
   }
@@ -151,7 +125,6 @@ class BimbaSkillsRegistry {
    * @param {string} [query.bimbaPrefix] Filter by Bimba coordinate prefix
    * @param {string} [query.textQuery] Filter by text in name or description
    * @param {number} [query.qlPosition] Filter by QL position (0-5)
-   * @param {string} [query.contextFrame] Filter by QL context frame
    * @param {string} [query.qlMode] Filter by QL mode (ascending/descending)
    * @returns {Array} Array of matching skills
    */
@@ -183,13 +156,6 @@ class BimbaSkillsRegistry {
     if (query.qlPosition !== undefined) {
       results = results.filter(skill =>
         skill.qlMetadata && skill.qlMetadata.qlPosition === query.qlPosition
-      );
-    }
-
-    // Filter by QL context frame
-    if (query.contextFrame) {
-      results = results.filter(skill =>
-        skill.qlMetadata && skill.qlMetadata.contextFrame === query.contextFrame
       );
     }
 
@@ -320,15 +286,6 @@ class BimbaSkillsRegistry {
 
     const nestedSkillIds = this.nestedSkills.get(parentSkillId);
     return Array.from(nestedSkillIds).map(id => this.getSkillById(id)).filter(Boolean);
-  }
-
-  /**
-   * Find skills by QL context frame
-   * @param {string} contextFrame The QL context frame (e.g., '(0/1)', '(0/1/2)')
-   * @returns {Array} Array of skills matching the context frame
-   */
-  findSkillsByContextFrame(contextFrame) {
-    return this.findSkills({ contextFrame });
   }
 
   /**

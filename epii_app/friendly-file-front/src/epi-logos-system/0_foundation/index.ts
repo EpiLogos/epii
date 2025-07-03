@@ -45,11 +45,13 @@ export const UI_CONFIG = {
     defaultPosition: { x: window.innerWidth - 80, y: window.innerHeight - 80 }, // Bottom right anchor
     anchorPosition: { x: window.innerWidth - 80, y: window.innerHeight - 80 }, // Default anchor
     minimizedSize: 60, // Circular size when minimized
-    minWidth: 320,
-    maxWidth: 600,
-    minHeight: 400,
-    maxHeight: 800,
-    zIndex: 1000
+    minWidth: 420, // Increased from 320
+    maxWidth: 800, // Increased from 600
+    minHeight: 600, // Increased from 400
+    maxHeight: 900, // Increased from 800
+    zIndex: 1000,
+    anchorThreshold: 100, // Distance from anchor to trigger return
+    anchorAnimationDuration: 300 // ms for smooth return animation
   },
   styling: {
     primary: 'bg-epii-dark',

@@ -18,7 +18,7 @@ class UniversalOrchestrationPipeline {
    */
   async executeDocumentAnalysisPipeline(request) {
     const workflowId = this.generateWorkflowId('document-analysis');
-    
+
     try {
       this.activeWorkflows.set(workflowId, {
         type: 'document-analysis',
@@ -29,7 +29,7 @@ class UniversalOrchestrationPipeline {
 
       // Stage 1: Get current document context from frontend
       const documentContext = await this.frontendContextManager.getFrontendContext(
-        'documentCanvas', 
+        'documentCanvas',
         'document'
       );
 
@@ -55,8 +55,8 @@ class UniversalOrchestrationPipeline {
           {
             type: AgentRequestTypes.ANALYSIS,
             content: request.content,
-            context: { 
-              ...request.context, 
+            context: {
+              ...request.context,
               coordinates: documentContext.selectedCoordinates,
               contextFrame: ContextFrames.COORDINATE
             }
@@ -74,7 +74,6 @@ class UniversalOrchestrationPipeline {
           content: request.content,
           context: {
             ...request.context,
-            contextFrame: ContextFrames.UNIVERSAL,
             userSession: true
           }
         }
@@ -117,7 +116,7 @@ class UniversalOrchestrationPipeline {
    */
   async executeMultiCoordinateAnalysisPipeline(request) {
     const workflowId = this.generateWorkflowId('multi-coordinate');
-    
+
     try {
       this.activeWorkflows.set(workflowId, {
         type: 'multi-coordinate-analysis',
@@ -141,7 +140,7 @@ class UniversalOrchestrationPipeline {
       for (const coordinate of targetCoordinates) {
         // Use BPMCP tools for coordinate-specific analysis instead of delegation
         const coordinateKnowledge = await this.orchestrator.knowledgeBase.queryBimbaGraph(
-          `MATCH (n {bimbaCoordinate: '${coordinate.coordinate}'}) 
+          `MATCH (n {bimbaCoordinate: '${coordinate.coordinate}'})
            OPTIONAL MATCH (n)-[r]-(related)
            RETURN n, collect({rel: r, node: related}) as relationships`,
           { includeRelationships: true }
@@ -149,7 +148,7 @@ class UniversalOrchestrationPipeline {
 
         const semanticAnalysis = await this.orchestrator.knowledgeBase.bimbaKnowing(
           `${coordinate.relevanceHint || ''} ${document.substring(0, 500)}`,
-          { 
+          {
             coordinateFilter: coordinate.coordinate,
             topK: 5,
             threshold: 0.6
@@ -166,9 +165,9 @@ class UniversalOrchestrationPipeline {
 
         coordinateResults.set(coordinate.coordinate, result);
         this.updateWorkflowStage(
-          workflowId, 
-          `coordinate-${coordinate.coordinate}`, 
-          'completed', 
+          workflowId,
+          `coordinate-${coordinate.coordinate}`,
+          'completed',
           result
         );
       }
@@ -217,7 +216,7 @@ class UniversalOrchestrationPipeline {
    */
   async executeKnowledgeSynthesisPipeline(request) {
     const workflowId = this.generateWorkflowId('knowledge-synthesis');
-    
+
     try {
       this.activeWorkflows.set(workflowId, {
         type: 'knowledge-synthesis',
@@ -233,7 +232,7 @@ class UniversalOrchestrationPipeline {
       // Stage 2: Foundational insights using BPMCP query for foundational coordinates
       const foundationalInsights = await this.orchestrator.knowledgeBase.queryBimbaGraph(
         `MATCH (n {bimbaCoordinate: '#0'}) RETURN n LIMIT 1
-         UNION 
+         UNION
          MATCH (n)-[r:FOUNDATIONAL_RELATION]-(m) WHERE n.bimbaCoordinate STARTS WITH '#0' RETURN n, r, m LIMIT 5`,
         { includeRelationships: true }
       );
@@ -243,7 +242,7 @@ class UniversalOrchestrationPipeline {
       // Stage 3: Structural analysis using BPMCP knowing for structural patterns
       const structuralAnalysis = await this.orchestrator.knowledgeBase.bimbaKnowing(
         `quaternal logic structural patterns ${request.query}`,
-        { 
+        {
           coordinateFilter: '#1',
           topK: 8,
           threshold: 0.7
@@ -299,13 +298,13 @@ class UniversalOrchestrationPipeline {
       for (let j = i + 1; j < coordinates.length; j++) {
         const coord1 = coordinates[i];
         const coord2 = coordinates[j];
-        
+
         // Analyze relationship between coord1 and coord2 based on their results
         const relationship = await this.analyzeCoordinatePair(
           coord1, coordinateResults.get(coord1),
           coord2, coordinateResults.get(coord2)
         );
-        
+
         relationships.push(relationship);
       }
     }
@@ -329,7 +328,7 @@ class UniversalOrchestrationPipeline {
       individualSuggestions: Object.fromEntries(
         Array.from(coordinateResults.entries()).map(([coord, result]) => [
           coord,
-          { 
+          {
             updates: [`Update suggestion for ${coord} based on document analysis`],
             confidence: 0.8
           }

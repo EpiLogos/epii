@@ -3,8 +3,8 @@
  * Bimba Coordinate: #5-1-1
  */
 
-import documentCacheService, { CachedDocument } from './documentCacheService';
-import { sendWebSocketMessage } from './webSocketService';
+import documentCacheService, { CachedDocument } from '../../../shared/services/documentCacheService';
+import { sendWebSocketMessage } from '../../../epi-logos-system/3_services/webSocketService';
 
 /**
  * AG-UI Event Emission Helper for DocumentService

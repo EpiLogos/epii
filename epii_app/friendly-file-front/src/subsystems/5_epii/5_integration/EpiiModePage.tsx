@@ -13,6 +13,7 @@ import EpiiSidebar from '../3_visualization/EpiiSidebar';
 import BimbaUpdateOverlay from '../3_visualization/BimbaUpdateOverlay';
 import { useUniversalDocumentState } from '../1_hooks/useUniversalDocumentState';
 import { BimbaCoordinate, Document as BimbaDocument, useBimbaCoordinates } from '../2_hooks/useBimbaCoordinates';
+import { EpiiProvider } from '../4_context/EpiiContext';
 
 // Define interface for the overall payload
 interface NotionUpdatePayload {
@@ -257,7 +258,9 @@ const EpiiModeContent: React.FC = () => {
 
 const EpiiModePage: React.FC = () => {
   return (
-    <EpiiModeContent />
+    <EpiiProvider>
+      <EpiiModeContent />
+    </EpiiProvider>
   );
 };
 

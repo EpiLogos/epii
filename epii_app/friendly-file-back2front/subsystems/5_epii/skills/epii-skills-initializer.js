@@ -50,7 +50,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
     agentId: 'epii-agent',
     qlMetadata: {
       qlPosition: 0,
-      contextFrame: '(0/1)',
       qlMode: 'ascending'
     },
     harmonicMetadata: {
@@ -118,7 +117,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
     agentId: 'epii-agent',
     qlMetadata: {
       qlPosition: 1,
-      contextFrame: '(0/1)',
       qlMode: 'ascending'
     },
     harmonicMetadata: {
@@ -195,7 +193,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
     agentId: 'epii-agent',
     qlMetadata: {
       qlPosition: 2,
-      contextFrame: '(0/1/2)',
       qlMode: 'ascending'
     },
     harmonicMetadata: {
@@ -211,7 +208,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
         mode: 'architecture-analysis',
         qlMetadata: {
           qlPosition: 2,
-          contextFrame: '(0/1/2)',
           qlMode: 'ascending'
         }
       });
@@ -227,7 +223,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
     agentId: 'epii-agent',
     qlMetadata: {
       qlPosition: 3,
-      contextFrame: '(0/1/2/3)',
       qlMode: 'ascending'
     },
     harmonicMetadata: {
@@ -243,7 +238,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
         mode: 'visualization',
         qlMetadata: {
           qlPosition: 3,
-          contextFrame: '(0/1/2/3)',
           qlMode: 'ascending'
         }
       });
@@ -332,7 +326,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
           mode: 'logos-movement',
           qlMetadata: {
             qlPosition: 5,
-            contextFrame: '(5/0)',
             qlMode: 'ascending'
           },
           notionContentData: notionResults,
@@ -381,7 +374,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
       agentId: 'epii-agent',
       qlMetadata: {
         qlPosition: 0,
-        contextFrame: '(0/1)',
         qlMode: 'descending'
       },
       harmonicMetadata: {
@@ -417,7 +409,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
         agentId: 'epii-agent',
         qlMetadata: {
           qlPosition: 0,
-          contextFrame: '(0/1)',
           qlMode: 'ascending'
         },
         handler: async (content, context) => {
@@ -436,7 +427,6 @@ function initializeEpiiSkills(epiiAgentService, skillsRegistry, options = {}) {
         agentId: 'epii-agent',
         qlMetadata: {
           qlPosition: 1,
-          contextFrame: '(0/1)',
           qlMode: 'ascending'
         },
         handler: async (content, context) => {

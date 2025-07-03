@@ -507,26 +507,142 @@
 
 ### Sub-Tasks:
 
-*   **[Frontend] Task 3.1: Refactor the Document Canvas**
-    *   **Description:** Completely remove the local `EpiiContext` and `useEpiiAnalysis` hooks. The Document Canvas must be refactored to derive all of its state from the global `webSocketService`.
-    *   **Details:** All state changes (`activeDocument`, `selectedNodes`, `graphLayout`, `analysisResults`, `uiFlags`) will be received as `StateDelta` AG-UI events from the backend. The component will become a "dumb" view that simply renders the state provided by the global service.
-    *   **PRD Ref:** 3.3.1
+*   **[Frontend] Task 3.0: Audit and Restore Missing EpiiContext State Management**
+    *   **Description:** Identify and restore any EpiiContext-level state management functionality that was removed during the initial development transition before the current state management plan emerged.
+    *   **Details:** Audit the current DocumentCanvas, EpiiSidebar, and related components to identify missing state management that existed in the original EpiiContext, and restore critical functionality that may have been lost during the hasty transition to universal state management.
 
     **CODEBASE CONTEXT:**
-    *   **Target Component:** `epii_app/friendly-file-front/src/subsystems/5_epii/3_visualization/DocumentCanvas.tsx`
-    *   **Current Dependencies to Remove:**
-        - `useEpii` hook import (line 13) from `../4_context/EpiiContext`
-        - `useDocumentAnalysis` hook import (line 14) from `../2_hooks/useEpiiDocument`
-        - Local state management throughout component
-    *   **EpiiContext to Deprecate:** `epii_app/friendly-file-front/src/subsystems/5_epii/4_context/EpiiContext.tsx` (entire file)
-    *   **useEpiiAnalysis to Deprecate:** `epii_app/friendly-file-front/src/subsystems/5_epii/2_hooks/useEpiiAnalysis.ts` (entire file)
-    *   **State Migration:**
-        - Replace local state with AG-UI event subscriptions via webSocketService
-        - Add StateDelta event handlers for: activeDocument, selectedNodes, graphLayout, analysisResults, uiFlags
-        - Use existing AG-UI patterns from BimbaUpdateOverlay (lines 1680-2860)
-    *   **WebSocket Integration:** Connect to existing webSocketService (line 19 import)
-    *   **Event Types:** Define new StateDelta event types in AG-UI schema
-    *   **Backward Compatibility:** Maintain existing component interface while changing internal implementation
+    *   **Audit Targets:**
+        - Document state management (creation, updates, deletion, coordinate assignment)
+        - Selection state management (text selections, persistence, coordinate awareness)
+        - Analysis session management (session creation, results tracking, history)
+        - Chat message state (if not fully migrated to Floating Agent)
+        - UI state coordination (loading states, error handling, status messages)
+    *   **Current Implementation Gaps:** 
+        - DocumentCanvas may be missing coordinated state management between operations
+        - Selection persistence across document switches may be incomplete
+        - Analysis session continuity may be broken
+        - Error state handling may be fragmented
+    *   **Files to Audit:**
+        - `epii_app/friendly-file-front/src/subsystems/5_epii/4_context/EpiiContext.tsx` (current state)
+        - `epii_app/friendly-file-front/src/subsystems/5_epii/3_visualization/DocumentCanvas.tsx` (missing dependencies)
+        - `epii_app/friendly-file-front/src/subsystems/5_epii/1_hooks/useUniversalDocumentState.ts` (incomplete migration)
+    *   **Restoration Strategy:**
+        - Identify missing state coordination that causes current functionality gaps
+        - Restore critical state management temporarily in current EpiiContext
+        - Document restored functionality for proper service layer migration in Task 3.1
+        - Ensure DocumentCanvas and related components have complete, working state before architectural transformation
+
+*   **[Frontend] Task 3.0.5: Fix Critical Floating Agent UI Issues**
+    *   **Description:** Address immediate usability issues with the FloatingEpiLogosAgent to make it functional for development and testing.
+    *   **Details:** Fix the laggy interactions, unresponsive chat input, inadequate window sizing, and lack of resize capability that prevent proper agent usage.
+
+    **CODEBASE CONTEXT:**
+    *   **Target Component:** `epii_app/friendly-file-front/src/epi-logos-system/1_components/FloatingEpiLogosAgent.tsx`
+    *   **Critical Issues to Fix:**
+        - **Laggy/Unresponsive Interactions**: Likely caused by excessive re-renders or blocking operations in React hooks
+        - **Non-functional Chat Input**: Text input field not accepting user input or not triggering send operations
+        - **Window Too Small**: Default size insufficient for meaningful conversations
+        - **Non-resizable Window**: Users cannot adjust window size for their workflow needs
+    *   **UI/UX Improvements:**
+        ```typescript
+        // Enhanced window sizing and resize capability
+        const [windowSize, setWindowSize] = useState({ width: 400, height: 600 }); // Larger default
+        const [isResizable, setIsResizable] = useState(true);
+        
+        // Input responsiveness fixes
+        const handleInputChange = useCallback((value: string) => {
+          setInputMessage(value);
+        }, []); // Stable callback reference
+        
+        // Performance optimizations
+        const memoizedMessageList = useMemo(() => 
+          messageHistory.map(msg => <Message key={msg.id} {...msg} />), 
+          [messageHistory]
+        );
+        ```
+    *   **Technical Fixes:**
+        - **Input Field**: Ensure proper onChange handlers and state updates
+        - **Window Resize**: Add drag handles and resize functionality
+        - **Performance**: Memoize expensive operations and optimize re-render cycles
+        - **Responsive Design**: Ensure window works on different screen sizes
+        - **Z-Index Management**: Proper layering with other UI elements
+    *   **Testing Requirements:**
+        - Chat input accepts text and sends messages
+        - Window can be resized by dragging corners/edges
+        - Interactions are responsive without lag
+        - Window size persists across sessions
+        - Agent responses display properly in conversation
+
+*   **[Frontend] Task 3.1: Transform EpiiContext into Service-Layer State Management Pattern**
+    *   **Description:** Transform the existing EpiiContext into a service-layer based state management pattern that bridges global AG-UI events with clean React context hooks. This creates a template for holographic subsystem state management that can be extended to other subsystems.
+    *   **Details:** Create an EpiiStateService that handles complex async operations and event coordination outside React's dependency system, while providing a clean, predictable API through a simplified useEpii hook. This maintains subsystem completeness while enabling global coordination.
+    *   **PRD Ref:** 3.3.1
+
+    **ARCHITECTURAL CONTEXT:**
+    *   **State Management Hierarchy:**
+        ```
+        Global AG-UI Events (epi-logos-system level) - Cross-subsystem coordination
+            ↓
+        EpiiStateService (subsystem service layer) - Complete subsystem autonomy
+            ↓
+        useEpii Hook (simplified React API) - Clean component interface
+            ↓
+        React Components (DocumentCanvas, etc.) - Pure rendering logic
+        ```
+    *   **Directory Structure Alignment:**
+        - **Global Coordination:** `epi-logos-system/` directory for universal agent and cross-subsystem state management
+        - **Subsystem Completeness:** `subsystems/5_epii/` directory maintains complete internal state management via service layer
+        - **Holographic Scaling:** Same pattern applies to `subsystems/4_nara/`, `subsystems/1_paramasiva/`, etc.
+    *   **Holographic Design Principle:** Each subsystem maintains complete internal state management while exposing universal AG-UI interfaces for cross-subsystem coordination
+    *   **Service Layer Benefits:** 
+        - Eliminates React dependency complexity and temporal dead zone errors
+        - Enables complex async coordination outside React's constraint system
+        - Provides stable, testable APIs independent of React lifecycles
+        - Supports state machine integration for sophisticated state transitions
+
+    **CODEBASE CONTEXT:**
+    *   **New Service Layer:** `epii_app/friendly-file-front/src/subsystems/5_epii/1_services/EpiiStateService.ts` (NEW FILE)
+    *   **Transform EpiiContext:** `epii_app/friendly-file-front/src/subsystems/5_epii/4_context/EpiiContext.tsx` (REFACTOR - simplify to clean API over service)
+    *   **Target Components:** DocumentCanvas, EpiiSidebar, BimbaUpdateOverlay (update to use simplified context)
+    *   **Service Architecture:**
+        ```typescript
+        class EpiiStateService {
+          private state: EpiiState;
+          private eventEmitter: EventEmitter;
+          
+          // Handles complex async operations outside React
+          async handleDocumentOperation(operation: DocumentOperation): Promise<void>;
+          
+          // Bridges AG-UI events to React state
+          handleAGUIEvent(event: AGUIEvent): void;
+          
+          // Provides clean state access for React hooks
+          getState(): EpiiState;
+          subscribe(listener: (state: EpiiState) => void): () => void;
+        }
+        ```
+    *   **Simplified Context Hook:**
+        ```typescript
+        const useEpii = () => {
+          // Clean, predictable API over EpiiStateService
+          // No complex interdependencies or temporal issues
+          // Stable reference patterns for React components
+        }
+        ```
+    *   **AG-UI Bridge Integration:** Service handles webSocketService events and translates to clean React state updates
+    *   **State Machine Support:** Service can internally use state machines for complex state transitions
+    *   **Global Coordination:** Service exposes AG-UI events for Floating Agent coordination while maintaining subsystem autonomy
+    *   **Template Pattern:** This architecture becomes the template for Nara, Paramasiva, and other subsystem state management
+
+    **IMPLEMENTATION STRATEGY:**
+    *   **Phase 0:** Audit and restore any EpiiContext state management that was removed during initial development (see Task 3.0)
+    *   **Phase 1:** Extract complex logic from EpiiContext into EpiiStateService
+    *   **Phase 2:** Simplify useEpii hook to clean API over service
+    *   **Phase 3:** Update components to use simplified context API
+    *   **Phase 4:** Add AG-UI event bridging for global coordination
+    *   **Phase 5:** Document pattern for extension to other subsystems
+    *   **Backward Compatibility:** Maintain existing component interfaces while improving internal architecture
 
 *   **[Frontend] Task 3.2: Deprecate Standalone Chat Components**
     *   **Description:** Remove the existing, isolated "Document Chat" functionality.

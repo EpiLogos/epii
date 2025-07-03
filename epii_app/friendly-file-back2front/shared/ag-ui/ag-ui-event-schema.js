@@ -48,7 +48,7 @@ const AGUIEventTypes = {
   BIMBA_UPDATE_SUGGESTIONS: 'BimbaUpdateSuggestions',
   BIMBA_CONTEXT_UPDATE: 'BimbaContextUpdate',
   QL_STAGE_TRANSITION: 'QLStageTransition',
-  
+
   // Agent-Triggered Update Application Events
   BIMBA_APPLY_SUGGESTIONS: 'BimbaApplySuggestions',
   BIMBA_APPLY_UPDATES: 'BimbaApplyUpdates',
@@ -374,7 +374,6 @@ const createAGUIEvent = (type, payload = {}, bimbaMetadata = {}) => {
       ...payload.metadata,
       bimbaCoordinates: bimbaMetadata.bimbaCoordinates || [],
       qlStage: bimbaMetadata.qlStage,
-      contextFrame: bimbaMetadata.contextFrame,
       subsystemPath: bimbaMetadata.subsystemPath,
       timestamp: new Date().toISOString(),
       ...bimbaMetadata

@@ -9,8 +9,8 @@
  * 4. Eliminates need for manual page refreshes
  */
 
-import { onAGUIEvent, offAGUIEvent } from './webSocketService';
-import documentCacheService from './documentCacheService';
+import { onAGUIEvent, offAGUIEvent } from '../../../epi-logos-system/3_services/webSocketService';
+import documentCacheService from '../../../shared/services/documentCacheService';
 
 // Types for AG-UI document events
 interface DocumentCreatedEvent {

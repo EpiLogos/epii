@@ -19,7 +19,6 @@ class BimbaSkillsRouter {
    * @param {string} [request.content] Content of the request
    * @param {Object} [request.context] Additional context for the request
    * @param {number} [request.qlPosition] Position in the QL cycle (0-5)
-   * @param {string} [request.contextFrame] QL context frame (e.g., '(0/1)', '(0/1/2)')
    * @param {string} [request.qlMode] QL mode (e.g., 'ascending', 'descending')
    * @returns {Promise<Object>} The result of the skill execution
    */
@@ -58,21 +57,7 @@ class BimbaSkillsRouter {
         throw new Error(`No skill found for QL position: ${request.qlPosition}`);
       }
     }
-    // If context frame is provided, find a skill matching that frame
-    else if (request.contextFrame) {
-      const skills = this.skillsRegistry.findSkillsByContextFrame(request.contextFrame);
-      if (skills.length > 0) {
-        // If multiple skills match, use content to determine the best match
-        if (skills.length > 1 && request.content) {
-          skill = await this.determineSkillFromContentAndContextFrame(request.content, request.contextFrame, request.context);
-        } else {
-          skill = skills[0];
-        }
-      }
-      if (!skill) {
-        throw new Error(`No skill found for context frame: ${request.contextFrame}`);
-      }
-    }
+
     // Otherwise, determine the skill based on content
     else if (request.content) {
       skill = await this.determineSkillFromContent(request.content, request.context);
@@ -81,10 +66,10 @@ class BimbaSkillsRouter {
       }
     }
     else {
-      throw new Error(`Request must include skillId, bimbaCoordinate, qlPosition, contextFrame, or content`);
+      throw new Error(`Request must include skillId, bimbaCoordinate, qlPosition, or content`);
     }
 
-    console.log(`Selected skill: ${skill.name} (${skill.bimbaCoordinate}), QL Position: ${skill.qlMetadata?.qlPosition}, Context Frame: ${skill.qlMetadata?.contextFrame}`);
+    console.log(`Selected skill: ${skill.name} (${skill.bimbaCoordinate}), QL Position: ${skill.qlMetadata?.qlPosition}`);
 
     // Check if this skill has a double-covered counterpart
     const relatedSkills = this.skillsRegistry.getRelatedSkills(skill.id, 'double_covered');
@@ -210,16 +195,6 @@ class BimbaSkillsRouter {
         if (skills.length > 0) {
           return skills[0];
         }
-      }
-    }
-
-    // Check for context frame mentions
-    const contextFrameMatch = contentLower.match(/\b(context frame|frame|context)\s*\(([^)]+)\)/);
-    if (contextFrameMatch) {
-      const frame = `(${contextFrameMatch[2]})`;
-      const skills = this.skillsRegistry.findSkillsByContextFrame(frame);
-      if (skills.length > 0) {
-        return skills[0];
       }
     }
 
@@ -353,15 +328,15 @@ class BimbaSkillsRouter {
   }
 
   /**
-   * Determine the appropriate skill based on content and context frame
+   * Determine the appropriate skill based on content and QL position
    * @param {string} content The content to analyze
-   * @param {string} contextFrame The QL context frame
+   * @param {number} qlPosition The QL position
    * @param {Object} context Additional context
    * @returns {Promise<Object>} The selected skill
    */
-  async determineSkillFromContentAndContextFrame(content, contextFrame, context) {
-    // Get all skills matching the context frame
-    const skills = this.skillsRegistry.findSkillsByContextFrame(contextFrame);
+  async determineSkillFromContentAndQLPosition(content, qlPosition, context) {
+    // Get all skills matching the QL position
+    const skills = this.skillsRegistry.findSkillsByQLPosition(qlPosition);
     if (skills.length === 0) {
       return null;
     }
@@ -380,16 +355,6 @@ class BimbaSkillsRouter {
       const coordinate = bimbaMatch[0];
       const skill = skills.find(s => s.bimbaCoordinate === coordinate);
       if (skill) return skill;
-    }
-
-    // Check for QL position mentions
-    const qlPositionMatch = contentLower.match(/\b(position|stage|phase|ql position|ql stage|ql phase)\s*(\d)\b/);
-    if (qlPositionMatch) {
-      const position = parseInt(qlPositionMatch[2], 10);
-      if (position >= 0 && position <= 5) {
-        const skill = skills.find(s => s.qlMetadata && s.qlMetadata.qlPosition === position);
-        if (skill) return skill;
-      }
     }
 
     // Check for keywords related to different skills

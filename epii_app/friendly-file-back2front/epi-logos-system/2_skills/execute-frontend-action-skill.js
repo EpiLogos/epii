@@ -30,6 +30,7 @@ class ExecuteFrontendActionSkill {
       name: 'Execute Frontend Action',
       description: 'Execute actions on frontend components through AG-UI events',
       bimbaCoordinate: this.bimbaCoordinate,
+      agentId: 'epi-logos-agent',
       category: 'frontend-interaction',
       version: '1.0.0',
       
