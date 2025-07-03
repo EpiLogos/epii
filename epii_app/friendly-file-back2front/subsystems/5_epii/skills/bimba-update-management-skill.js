@@ -7,17 +7,18 @@
 
 // Load environment variables from the backend .env file
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../friendly-file-backend/.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../../../friendly-file-backend/.env') });
 
-const { AGUIEventTypes, createAGUIEvent } = require('../ag-ui/ag-ui-event-schema');
+const { AGUIEventTypes, createAGUIEvent } = require('../../../shared/ag-ui/ag-ui-event-schema');
 
 class BimbaUpdateManagementSkill {
   constructor() {
     this.skillId = 'bimba-update-management';
     this.name = 'Bimba Update Management';
-    this.description = 'Analyzes documents and suggests Bimba node updates with QL-aware relationships';
+    this.description = 'Analyzes documents and suggests Bimba node updates with QL-aware relationships. Now agent-accessible for conversational workflow.';
     this.bimbaCoordinate = '#5-2';
-    this.version = '1.0.0';
+    this.version = '2.0.0';
+    this.agentId = 'epii-agent'; // Make available to Epi-Logos Agent
 
     // Sub-skills
     this.subSkills = {
@@ -28,8 +29,34 @@ class BimbaUpdateManagementSkill {
         bimbaCoordinate: '#5-2-0',
         parentSkill: '#5-2',
         version: '1.0.0'
+      },
+      contextualSuggestion: {
+        skillId: 'bimba-contextual-suggestion',
+        name: 'Contextual Bimba Suggestions',
+        description: 'Agent-driven contextual suggestions when BimbaUpdateOverlay is open',
+        bimbaCoordinate: '#5-2-1',
+        parentSkill: '#5-2',
+        version: '1.0.0'
+      },
+      conversationalUpdate: {
+        skillId: 'bimba-conversational-update',
+        name: 'Conversational Bimba Updates',
+        description: 'Handle agent-initiated conversational update flows',
+        bimbaCoordinate: '#5-2-2',
+        parentSkill: '#5-2',
+        version: '1.0.0'
       }
     };
+
+    // Context tracking for agent integration
+    this.contextualCapabilities = [
+      'document-analysis',
+      'property-updates', 
+      'relationship-suggestions',
+      'node-creation',
+      'multi-node-updates',
+      'coordinate-navigation'
+    ];
   }
 
   /**
@@ -1489,6 +1516,447 @@ Focus on the four foundational relational properties: qlOperators, epistemicEsse
     });
 
     return prompt;
+  }
+
+  /**
+   * Execute contextual suggestions when BimbaUpdateOverlay is open
+   * Agent-driven contextual analysis and suggestions
+   */
+  async executeContextualSuggestion(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:ContextualSuggestion]';
+    console.log(`${logPrefix} Processing contextual suggestion request`);
+
+    try {
+      // Check if BimbaUpdateOverlay is open in frontend context
+      const frontendContext = context.frontendContext || context.expertRouting;
+      const isOverlayOpen = frontendContext?.capabilities?.includes('bimba-updates') || 
+                           frontendContext?.activeComponent === 'BimbaUpdateOverlay';
+
+      if (!isOverlayOpen) {
+        return {
+          success: true,
+          message: "I can help with Bimba updates! Open the Bimba Update Overlay from the sidebar to enable contextual suggestions for coordinate analysis, property updates, and relationship management.",
+          skillId: this.subSkills.contextualSuggestion.skillId,
+          contextualAvailable: false
+        };
+      }
+
+      // Get current overlay context
+      const selectedCoordinate = params.selectedCoordinate || context.selectedCoordinate;
+      const availableDocuments = params.availableDocuments || context.availableDocuments || [];
+
+      if (!selectedCoordinate) {
+        return {
+          success: true,
+          message: "I see the Bimba Update Overlay is open! Select a coordinate from the tree to get contextual suggestions for document analysis, property updates, and relationship management.",
+          skillId: this.subSkills.contextualSuggestion.skillId,
+          availableActions: [
+            'coordinate-selection',
+            'document-upload',
+            'tree-navigation'
+          ]
+        };
+      }
+
+      // Provide contextual suggestions based on current state
+      const suggestions = this._generateContextualSuggestions(selectedCoordinate, availableDocuments, context);
+
+      return {
+        success: true,
+        message: suggestions.message,
+        skillId: this.subSkills.contextualSuggestion.skillId,
+        contextualData: {
+          selectedCoordinate,
+          documentCount: availableDocuments.length,
+          suggestedActions: suggestions.actions,
+          analysisCapabilities: this.contextualCapabilities
+        }
+      };
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        error: error.message,
+        skillId: this.subSkills.contextualSuggestion.skillId
+      };
+    }
+  }
+
+  /**
+   * Execute conversational update flows
+   * Handle agent-initiated conversational Bimba updates
+   */
+  async executeConversationalUpdate(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:ConversationalUpdate]';
+    console.log(`${logPrefix} Processing conversational update request`);
+
+    try {
+      const updateType = params.updateType || 'suggest';
+      const selectedCoordinate = params.selectedCoordinate || context.selectedCoordinate;
+
+      switch (updateType) {
+        case 'suggest':
+          return this._handleSuggestUpdate(params, context);
+        case 'apply':
+          return this._handleApplyUpdate(params, context);
+        case 'analyze':
+          return this._handleAnalyzeForUpdate(params, context);
+        case 'create-node':
+          return this._handleCreateNode(params, context);
+        case 'create-relationship':
+          return this._handleCreateRelationship(params, context);
+        default:
+          return {
+            success: false,
+            error: `Unknown update type: ${updateType}`,
+            skillId: this.subSkills.conversationalUpdate.skillId
+          };
+      }
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        error: error.message,
+        skillId: this.subSkills.conversationalUpdate.skillId
+      };
+    }
+  }
+
+  /**
+   * Generate contextual suggestions based on current overlay state
+   * @private
+   */
+  _generateContextualSuggestions(selectedCoordinate, availableDocuments, context) {
+    // Check if this is multi-coordinate mode
+    const isMultiMode = context.multiNodeMode || (context.selectedCoordinates && context.selectedCoordinates.length > 1);
+    
+    if (isMultiMode) {
+      return this._generateMultiCoordinateSuggestions(context.selectedCoordinates || [], context);
+    }
+
+    let message = `I see you've selected coordinate **${selectedCoordinate}**. `;
+    let actions = [];
+
+    if (availableDocuments.length === 0) {
+      message += "No documents are currently available for this coordinate. I can help you:\n\n";
+      message += "• **Upload a document** for analysis and suggestions\n";
+      message += "• **Create new properties** for this coordinate\n";
+      message += "• **Add relationships** to other coordinates\n";
+      message += "• **Create a new child node** under this coordinate";
+      
+      actions = ['upload-document', 'create-properties', 'add-relationships', 'create-child-node'];
+    } else {
+      message += `I found **${availableDocuments.length}** document(s) for this coordinate. I can help you:\n\n`;
+      message += "• **Analyze documents** for property and relationship suggestions\n";
+      message += "• **Update node properties** based on document content\n";
+      message += "• **Suggest new relationships** to related coordinates\n";
+      message += "• **Apply multi-coordinate updates** across related nodes";
+
+      actions = ['analyze-documents', 'update-properties', 'suggest-relationships', 'multi-coordinate-updates'];
+    }
+
+    return { message, actions };
+  }
+
+  /**
+   * Generate suggestions for multi-coordinate selection
+   * @private
+   */
+  _generateMultiCoordinateSuggestions(selectedCoordinates, context) {
+    let message = `I see you've selected **${selectedCoordinates.length}** coordinates: ${selectedCoordinates.join(', ')}. `;
+    message += "With multiple coordinates selected, I can help you:\n\n";
+    
+    message += "• **Analyze relationships** between the selected coordinates\n";
+    message += "• **Suggest cross-coordinate connections** based on content similarity\n";
+    message += "• **Apply batch updates** with consistent properties across coordinates\n";
+    message += "• **Compare coordinate structures** and identify patterns\n";
+    message += "• **Create inter-coordinate relationships** for better knowledge integration\n";
+    message += "• **Generate unified analysis** across all selected coordinates";
+
+    const actions = [
+      'analyze-coordinate-relationships',
+      'suggest-cross-connections',
+      'apply-batch-updates', 
+      'compare-structures',
+      'create-inter-relationships',
+      'unified-multi-analysis'
+    ];
+
+    return { message, actions };
+  }
+
+  /**
+   * Handle suggest update conversational flow
+   * @private
+   */
+  async _handleSuggestUpdate(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:SuggestUpdate]';
+    
+    try {
+      // Route to existing analysis functionality but present conversationally
+      const analysisParams = {
+        coordinate: params.selectedCoordinate,
+        documentContent: params.documentContent,
+        documentType: params.documentType,
+        nodeProperties: params.currentProperties || {},
+        relationships: params.currentRelationships || []
+      };
+
+      // Execute the main skill analysis
+      const analysisResult = await this.execute(analysisParams, context);
+
+      if (analysisResult.success) {
+        let conversationalMessage = `Based on my analysis of coordinate **${params.selectedCoordinate}**:\n\n`;
+        
+        const suggestions = analysisResult.data;
+        if (suggestions.propertyUpdates && Object.keys(suggestions.propertyUpdates).length > 0) {
+          conversationalMessage += "**Property Updates:**\n";
+          Object.entries(suggestions.propertyUpdates).forEach(([key, value]) => {
+            conversationalMessage += `• **${key}**: ${value}\n`;
+          });
+          conversationalMessage += "\n";
+        }
+
+        if (suggestions.relationshipSuggestions && suggestions.relationshipSuggestions.length > 0) {
+          conversationalMessage += "**Relationship Suggestions:**\n";
+          suggestions.relationshipSuggestions.forEach(rel => {
+            conversationalMessage += `• **${rel.action}** ${rel.type} relationship to **${rel.targetCoordinate}**\n`;
+            conversationalMessage += `  *${rel.reasoning}*\n`;
+          });
+          conversationalMessage += "\n";
+        }
+
+        conversationalMessage += "Would you like me to **apply these suggestions** or would you prefer to **review and modify** them first?";
+
+        return {
+          success: true,
+          message: conversationalMessage,
+          skillId: this.subSkills.conversationalUpdate.skillId,
+          suggestions: suggestions,
+          nextActions: ['apply-suggestions', 'review-modifications', 'suggest-alternatives']
+        };
+      } else {
+        return {
+          success: false,
+          message: `I encountered an issue analyzing coordinate ${params.selectedCoordinate}: ${analysisResult.error}`,
+          skillId: this.subSkills.conversationalUpdate.skillId
+        };
+      }
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        message: `Sorry, I encountered an error while analyzing the coordinate: ${error.message}`,
+        skillId: this.subSkills.conversationalUpdate.skillId
+      };
+    }
+  }
+
+  /**
+   * Handle apply update conversational flow
+   * @private
+   */
+  async _handleApplyUpdate(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:ApplyUpdate]';
+    
+    try {
+      const applyParams = {
+        action: params.specificUpdates ? 'apply-specific' : 'apply-suggestions',
+        coordinates: params.coordinates || [params.selectedCoordinate],
+        specificUpdates: params.specificUpdates
+      };
+
+      // Execute the update application
+      const applyResult = await this.executeUpdateApplication(applyParams, context);
+
+      if (applyResult.success) {
+        let message = `✅ Successfully applied updates for coordinate **${params.selectedCoordinate || params.coordinates?.join(', ')}**!\n\n`;
+        message += "The changes have been sent to the frontend via AG-UI events. ";
+        message += "You should see the updates reflected in the Bimba Update Overlay.";
+
+        return {
+          success: true,
+          message,
+          skillId: this.subSkills.conversationalUpdate.skillId,
+          appliedUpdates: applyResult
+        };
+      } else {
+        return {
+          success: false,
+          message: `❌ Failed to apply updates: ${applyResult.error}`,
+          skillId: this.subSkills.conversationalUpdate.skillId
+        };
+      }
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        message: `Sorry, I encountered an error while applying updates: ${error.message}`,
+        skillId: this.subSkills.conversationalUpdate.skillId
+      };
+    }
+  }
+
+  /**
+   * Handle analyze for update conversational flow
+   * @private
+   */
+  async _handleAnalyzeForUpdate(params, context) {
+    // For analysis, we can route to the main execute method but present results conversationally
+    return this._handleSuggestUpdate(params, context);
+  }
+
+  /**
+   * Handle create node conversational flow
+   * @private
+   */
+  async _handleCreateNode(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:CreateNode]';
+    
+    try {
+      let message = `I can help you create a new node! `;
+      
+      if (params.parentCoordinate) {
+        message += `Based on parent coordinate **${params.parentCoordinate}**, I suggest:\n\n`;
+        message += `• **Coordinate**: ${params.parentCoordinate}-X (where X is the next available number)\n`;
+        message += `• **Node Type**: ${this._suggestNodeType(params.parentCoordinate)}\n`;
+        message += `• **Initial Properties**: Based on the parent's QL context\n\n`;
+        message += "Would you like me to **create this node** with these suggestions, or would you prefer to **specify custom properties**?";
+      } else {
+        message += "To create a new node, I need:\n\n";
+        message += "• **Parent coordinate** (where to create the new node)\n";
+        message += "• **Node properties** (optional - I can suggest based on context)\n";
+        message += "• **Relationship type** to parent (optional - defaults to CHILD_OF)\n\n";
+        message += "Please specify the parent coordinate and I'll help you create the new node!";
+      }
+
+      return {
+        success: true,
+        message,
+        skillId: this.subSkills.conversationalUpdate.skillId,
+        nextActions: params.parentCoordinate ? 
+          ['create-with-suggestions', 'specify-custom-properties'] : 
+          ['specify-parent-coordinate']
+      };
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        message: `Sorry, I encountered an error while preparing node creation: ${error.message}`,
+        skillId: this.subSkills.conversationalUpdate.skillId
+      };
+    }
+  }
+
+  /**
+   * Handle create relationship conversational flow
+   * @private
+   */
+  async _handleCreateRelationship(params, context) {
+    const logPrefix = '[BimbaUpdateManagement:CreateRelationship]';
+    
+    try {
+      let message = `I can help you create a new relationship! `;
+      
+      if (params.sourceCoordinate && params.targetCoordinate) {
+        message += `You want to connect:\n\n`;
+        message += `• **Source**: ${params.sourceCoordinate}\n`;
+        message += `• **Target**: ${params.targetCoordinate}\n\n`;
+        
+        const suggestedType = this._suggestRelationshipType(params.sourceCoordinate, params.targetCoordinate);
+        message += `Based on the coordinate patterns, I suggest a **${suggestedType}** relationship.\n\n`;
+        message += "Would you like me to **create this relationship** or would you prefer a **different relationship type**?";
+      } else {
+        message += "To create a relationship, I need:\n\n";
+        message += "• **Source coordinate** (starting point)\n";
+        message += "• **Target coordinate** (ending point)\n";
+        message += "• **Relationship type** (optional - I can suggest based on coordinates)\n\n";
+        message += "Please specify the source and target coordinates!";
+      }
+
+      return {
+        success: true,
+        message,
+        skillId: this.subSkills.conversationalUpdate.skillId,
+        nextActions: (params.sourceCoordinate && params.targetCoordinate) ? 
+          ['create-suggested-relationship', 'specify-custom-type'] : 
+          ['specify-coordinates']
+      };
+
+    } catch (error) {
+      console.error(`${logPrefix} Error:`, error);
+      return {
+        success: false,
+        message: `Sorry, I encountered an error while preparing relationship creation: ${error.message}`,
+        skillId: this.subSkills.conversationalUpdate.skillId
+      };
+    }
+  }
+
+  /**
+   * Suggest node type based on parent coordinate
+   * @private
+   */
+  _suggestNodeType(parentCoordinate) {
+    const depth = parentCoordinate.split('-').length;
+    const baseCoordinate = parentCoordinate.split('-')[0];
+    
+    if (depth <= 2) {
+      return 'Conceptual Node';
+    } else if (depth <= 4) {
+      return 'Detailed Node';
+    } else {
+      return 'Specific Implementation Node';
+    }
+  }
+
+  /**
+   * Suggest relationship type based on coordinate patterns
+   * @private
+   */
+  _suggestRelationshipType(sourceCoordinate, targetCoordinate) {
+    // Check if it's a parent-child relationship
+    if (targetCoordinate.startsWith(sourceCoordinate + '-')) {
+      return 'CHILD_OF';
+    }
+    if (sourceCoordinate.startsWith(targetCoordinate + '-')) {
+      return 'PARENT_OF';
+    }
+    
+    // Check if they're siblings (same parent)
+    const sourceParent = sourceCoordinate.substring(0, sourceCoordinate.lastIndexOf('-'));
+    const targetParent = targetCoordinate.substring(0, targetCoordinate.lastIndexOf('-'));
+    if (sourceParent === targetParent) {
+      return 'SIBLING_OF';
+    }
+    
+    // Check QL relationships
+    const sourceQL = this._getQLPosition(sourceCoordinate);
+    const targetQL = this._getQLPosition(targetCoordinate);
+    
+    if (Math.abs(sourceQL - targetQL) === 1) {
+      return 'QL_ADJACENT';
+    }
+    if ((sourceQL + targetQL) % 6 === 0) {
+      return 'QL_COMPLEMENTARY';
+    }
+    
+    // Default to RELATED_TO
+    return 'RELATED_TO';
+  }
+
+  /**
+   * Get QL position from coordinate
+   * @private
+   */
+  _getQLPosition(coordinate) {
+    const baseCoordinate = coordinate.split('-')[0];
+    return parseInt(baseCoordinate.replace('#', '')) || 0;
   }
 
   /**

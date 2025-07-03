@@ -304,7 +304,7 @@ let registryInstance = null;
 // Auto-register core skills
 const UnifiedRAGSkill = require('./unifiedRAG');
 const EpiiChatSkill = require('../../subsystems/5_epii/skills/epii-chat-skill');
-const BimbaUpdateManagementSkill = require('./bimba-update-management-skill');
+const BimbaUpdateManagementSkill = require('../../subsystems/5_epii/skills/bimba-update-management-skill');
 const EpiLogosOrchestrationSkill = require('../../epi-logos-system/2_skills/epi-logos-orchestration-skill');
 const ExecuteFrontendActionSkill = require('../../epi-logos-system/2_skills/execute-frontend-action-skill');
 

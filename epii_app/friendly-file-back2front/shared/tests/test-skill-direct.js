@@ -3,7 +3,7 @@
  * Tests the skill directly without going through the A2A server
  */
 
-const BimbaUpdateManagementSkill = require('./skills/bimba-update-management-skill');
+const BimbaUpdateManagementSkill = require('../../subsystems/5_epii/skills/bimba-update-management-skill');
 
 async function testSkillDirect() {
   console.log('🧪 Testing Bimba Update Management Skill Directly\n');

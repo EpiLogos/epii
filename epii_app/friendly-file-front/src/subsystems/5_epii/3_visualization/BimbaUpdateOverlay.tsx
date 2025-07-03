@@ -23,7 +23,8 @@ import webSocketService, {
   subscribeToAGUIEvents,
   onAGUIEvent,
   offAGUIEvent,
-  executeSkillWithAGUI
+  executeSkillWithAGUI,
+  emitAGUIEvent
 } from '../../../epi-logos-system/3_services/webSocketService';
 
 interface BimbaNode {
@@ -242,6 +243,89 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       setSelectedCoordinate(initialCoordinate);
     }
   }, [isOpen, initialCoordinate, selectedCoordinate]);
+
+  // Emit AG-UI context when overlay opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      // Emit overlay opened event
+      emitAGUIEvent('StateDelta', {
+        type: 'bimba-overlay-opened',
+        subsystem: 'epii',
+        activeComponent: 'BimbaUpdateOverlay',
+        capabilities: [
+          'bimba-updates',
+          'document-analysis',
+          'property-updates',
+          'relationship-suggestions',
+          'node-creation',
+          'multi-node-updates'
+        ],
+        selectedCoordinate,
+        availableDocuments: coordinateDocuments.length,
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log('[BimbaUpdateOverlay] Emitted overlay opened context for agent');
+    } else {
+      // Emit overlay closed event
+      emitAGUIEvent('StateDelta', {
+        type: 'bimba-overlay-closed',
+        subsystem: 'epii',
+        activeComponent: null,
+        capabilities: [],
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log('[BimbaUpdateOverlay] Emitted overlay closed context for agent');
+    }
+  }, [isOpen, selectedCoordinate, coordinateDocuments.length]);
+
+  // Emit AG-UI context when coordinate selection changes (single or multi-node)
+  useEffect(() => {
+    if (isOpen && (selectedCoordinate || selectedCoordinates.size > 0)) {
+      emitAGUIEvent('StateDelta', {
+        type: selectedCoordinates.size > 0 ? 'bimba-multi-coordinates-selected' : 'bimba-coordinate-selected',
+        subsystem: 'epii',
+        activeComponent: 'BimbaUpdateOverlay',
+        selectedCoordinate,
+        selectedCoordinates: Array.from(selectedCoordinates),
+        multiNodeMode: selectedCoordinates.size > 0,
+        coordinateContext: {
+          singleCoordinate: selectedCoordinate,
+          multiCoordinates: Array.from(selectedCoordinates),
+          coordinateCount: selectedCoordinates.size > 0 ? selectedCoordinates.size : (selectedCoordinate ? 1 : 0),
+          documentsAvailable: coordinateDocuments.length,
+          nodeData: nodeData ? {
+            hasProperties: Object.keys(nodeData.properties || {}).length > 0,
+            hasRelationships: (nodeData.relationships || []).length > 0,
+            labels: nodeData.labels || []
+          } : null,
+          pendingChanges: pendingChanges.size > 0,
+          globalChangeCount
+        },
+        availableActions: selectedCoordinates.size > 0 ? [
+          'analyze-multi-coordinates',
+          'suggest-multi-updates',
+          'apply-batch-updates',
+          'create-cross-relationships',
+          'coordinate-comparison'
+        ] : [
+          'analyze-documents',
+          'suggest-updates',
+          'create-properties',
+          'create-relationships',
+          'create-child-node'
+        ],
+        timestamp: new Date().toISOString()
+      });
+      
+      if (selectedCoordinates.size > 0) {
+        console.log(`[BimbaUpdateOverlay] Emitted multi-coordinate selection context: ${Array.from(selectedCoordinates).join(', ')}`);
+      } else {
+        console.log(`[BimbaUpdateOverlay] Emitted coordinate selection context: ${selectedCoordinate}`);
+      }
+    }
+  }, [selectedCoordinate, selectedCoordinates, coordinateDocuments.length, nodeData, pendingChanges.size, globalChangeCount, isOpen]);
 
   // Setup AG-UI event handlers when overlay opens
   useEffect(() => {
