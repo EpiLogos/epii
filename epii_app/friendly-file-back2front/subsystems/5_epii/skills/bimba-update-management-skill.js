@@ -247,7 +247,12 @@ class BimbaUpdateManagementSkill {
         };
       }
 
+      // Determine document type for enhanced processing
+      const documentType = this._determineDocumentType(actualParams);
+      actualParams.documentType = documentType; // Ensure it's set for downstream processing
+      
       console.log(`${logPrefix} Parameters validated, proceeding with ${isMultiCoordinateMode ? 'multi-coordinate' : 'single-coordinate'} analysis`);
+      console.log(`${logPrefix} Document type: ${documentType} (${documentType === 'pratibimba' ? 'structured analysis' : 'raw content analysis'})`);
 
       // Check if AG-UI gateway is available for progress reporting
       const aguiGateway = context?.aguiGateway;
@@ -640,16 +645,51 @@ class BimbaUpdateManagementSkill {
    */
   _buildMultiCoordinateAnalysisPrompt(params) {
     const coordinates = params.targetCoordinates;
+    // Determine document type - pratibimba docs have documentType property, others are bimba
+    const documentType = params.documentType === 'pratibimba' ? 'pratibimba' : 'bimba';
+    const isStructuredDocument = documentType === 'pratibimba';
+    
+    let documentAnalysisSection = '';
+    let taskEnhancement = '';
+    
+    if (isStructuredDocument) {
+      documentAnalysisSection = `
+DOCUMENT ANALYSIS (STRUCTURED PRATIBIMBA):
+- Document Type: ${documentType} (crystallised analysis - structured JSON ready for Notion)
+- Document Name: ${params.documentName}
+- Content Structure: This is a pratibimba document containing pre-analyzed, structured content with:
+  * Notion relational properties (epistemic essence, archetypal anchors, etc.)
+  * Analysis summarization and core themes
+  * Extracted, structured analyses ready for direct mapping
+- Content: ${params.documentContent}`;
+      
+      taskEnhancement = `
+
+**PRATIBIMBA ENHANCEMENT FOR MULTI-COORDINATE ANALYSIS:**
+Since this is a structured pratibimba document, leverage the pre-analyzed content to:
+- Create sophisticated cross-coordinate relationship mappings
+- Identify deeper conceptual connections between coordinates
+- Generate more comprehensive multi-node suggestions
+- Map structured themes directly to coordinate-specific properties
+- Focus heavily on cross-coordinate synthesis and relationship creation`;
+    } else {
+      documentAnalysisSection = `
+DOCUMENT ANALYSIS (RAW BIMBA):
+- Document Type: ${documentType} (un-analysed raw content)
+- Document Name: ${params.documentName}
+- Content: ${params.documentContent}`;
+      
+      taskEnhancement = `
+
+**BIMBA ANALYSIS FOR MULTI-COORDINATE:**
+Since this is raw content, perform comprehensive analysis to extract coordinate-relevant insights from unstructured material.`;
+    }
+    
     return `As the Epii agent specializing in Multi-Coordinate Bimba Analysis, analyze this document and suggest relevance-aware updates for multiple Bimba coordinates simultaneously.
 
-TARGET COORDINATES: ${coordinates.join(', ')}
+TARGET COORDINATES: ${coordinates.join(', ')}${documentAnalysisSection}${taskEnhancement}
 
-DOCUMENT ANALYSIS:
-- Document Type: ${params.documentType}
-- Document Name: ${params.documentName}
-- Content: ${params.documentContent}
-
-TASK: Perform relevance-aware analysis for each coordinate, identifying which aspects of the document are most relevant to each specific coordinate, and generate tailored property updates and relationship suggestions.
+TASK: Perform relevance-aware analysis for each coordinate, identifying which aspects of the document are most relevant to each specific coordinate, and generate tailored property updates and relationship suggestions.${isStructuredDocument ? ' Given the structured nature of this pratibimba document, emphasize sophisticated cross-coordinate relationship mapping and comprehensive multi-node suggestions.' : ''}
 
 For each coordinate, analyze:
 1. **Relevance Score** (0.0-1.0): How relevant is this document to this specific coordinate?
@@ -878,19 +918,41 @@ Present this analysis through your Epii conversational identity while acknowledg
    * @returns {string} Formatted prompt
    */
   _buildAnalysisPrompt(params) {
+    // Determine document type - pratibimba docs have documentType property, others are bimba
+    const documentType = params.documentType === 'pratibimba' ? 'pratibimba' : 'bimba';
+    const isStructuredDocument = documentType === 'pratibimba';
+    
+    let documentAnalysisSection = '';
+    if (isStructuredDocument) {
+      documentAnalysisSection = `
+DOCUMENT ANALYSIS (STRUCTURED PRATIBIMBA):
+- Document Type: ${documentType} (crystallised analysis - structured JSON ready for Notion)
+- Document Name: ${params.documentName}
+- Content Structure: This is a pratibimba document containing pre-analyzed, structured content with:
+  * Notion relational properties (epistemic essence, archetypal anchors, etc.)
+  * Analysis summarization and core themes
+  * Extracted, structured analyses ready for direct mapping
+- Content: ${params.documentContent}
+
+APPROACH FOR PRATIBIMBA: Focus on direct mapping of structured content to update suggestions. The document contains pre-analyzed material that can be efficiently transferred to Bimba node properties. Emphasize cross-coordinate relations and multi-node suggestions given the structured nature.`;
+    } else {
+      documentAnalysisSection = `
+DOCUMENT ANALYSIS (RAW BIMBA):
+- Document Type: ${documentType} (un-analysed raw content)
+- Document Name: ${params.documentName}
+- Content: ${params.documentContent}
+
+APPROACH FOR BIMBA: Perform full analysis of raw content to extract insights. This requires comprehensive processing to identify QL patterns, epistemic structures, and archetypal resonances from unstructured material.`;
+    }
+    
     return `As the Epii agent specializing in Bimba Update Management, analyze this document and suggest specific updates for the Bimba node at coordinate ${params.coordinate}.
 
 CURRENT BIMBA NODE:
 - Coordinate: ${params.coordinate}
 - Properties: ${JSON.stringify(params.nodeProperties, null, 2)}
-- Current Relationships: ${JSON.stringify(params.relationships, null, 2)}
+- Current Relationships: ${JSON.stringify(params.relationships, null, 2)}${documentAnalysisSection}
 
-DOCUMENT ANALYSIS:
-- Document Type: ${params.documentType}
-- Document Name: ${params.documentName}
-- Content: ${params.documentContent}
-
-TASK: Generate foundational property updates for this Bimba node based on the document content, strictly prioritizing the four core relational properties from the Notion crystallisation framework.
+TASK: Generate foundational property updates for this Bimba node based on the document content, strictly prioritizing the four core relational properties from the Notion crystallisation framework.${isStructuredDocument ? '\n\n**PRATIBIMBA ENHANCEMENT**: Given the structured nature of this document, provide enhanced focus on cross-coordinate relationships and multi-node suggestions. The pre-analyzed content enables more sophisticated relationship mapping.' : ''}
 
 **🎯 FOUNDATIONAL PRIORITY: The Four Core Relational Properties**
 
@@ -1957,6 +2019,31 @@ Focus on the four foundational relational properties: qlOperators, epistemicEsse
   _getQLPosition(coordinate) {
     const baseCoordinate = coordinate.split('-')[0];
     return parseInt(baseCoordinate.replace('#', '')) || 0;
+  }
+
+  /**
+   * Determine document type for enhanced processing
+   * Pratibimba docs have documentType='pratibimba', others are bimba by elimination
+   * @param {Object} params - Document parameters
+   * @returns {string} Document type ('bimba' or 'pratibimba')
+   * @private
+   */
+  _determineDocumentType(params) {
+    const logPrefix = '[BimbaUpdateManagement:DocumentType]';
+    
+    // Pratibimba documents explicitly have documentType set to 'pratibimba'
+    if (params.documentType === 'pratibimba') {
+      console.log(`${logPrefix} Detected PRATIBIMBA document: ${params.documentName}`);
+      console.log(`${logPrefix} → Structured analysis ready for direct mapping`);
+      console.log(`${logPrefix} → Enhanced cross-coordinate relations available`);
+      return 'pratibimba';
+    }
+    
+    // All other documents are bimba by elimination logic
+    console.log(`${logPrefix} Detected BIMBA document: ${params.documentName || 'unnamed'}`);
+    console.log(`${logPrefix} → Raw content requiring full analysis`);
+    console.log(`${logPrefix} → Standard processing approach`);
+    return 'bimba';
   }
 
   /**
