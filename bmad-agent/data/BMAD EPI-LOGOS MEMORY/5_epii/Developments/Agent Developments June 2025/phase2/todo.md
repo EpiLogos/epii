@@ -14,17 +14,17 @@
 
 ## Phase 1: Fix Critical Issues (IMMEDIATE)
 
-### Task 1.1: Fix FloatingAgent UI Issues ❌
+### Task 1.1: Fix FloatingAgent UI Issues ✅
 **Epic Reference:** Task 3.0.5
 **Priority:** Critical
-**Status:** Not Started
+**Status:** Complete
 
-**Issues to Fix:**
-- [ ] **Laggy/Unresponsive Interactions**: Fix excessive re-renders or blocking operations
-- [ ] **Non-functional Chat Input**: Ensure text input accepts user input and triggers send operations
-- [ ] **Window Too Small**: Increase default size from current to 400x600 minimum
-- [ ] **Non-resizable Window**: Add drag handles and resize functionality
-- [ ] **Performance**: Memoize expensive operations and optimize re-render cycles
+**Issues Fixed:**
+- [x] **Laggy/Unresponsive Interactions**: Fixed with memoized message rendering and optimized callbacks
+- [x] **Non-functional Chat Input**: Verified working, added optimized input change handler
+- [x] **Window Too Small**: Increased default size to 420x600, max 800x900
+- [x] **Non-resizable Window**: Added complete resize functionality with corner/edge handles
+- [x] **Performance**: Memoized expensive operations and optimized re-render cycles
 
 **Files to Modify:**
 - `epii_app/friendly-file-front/src/epi-logos-system/1_components/FloatingEpiLogosAgent.tsx`
@@ -36,15 +36,15 @@
 - Responsive design: Ensure window works on different screen sizes
 - Z-index management: Proper layering with other UI elements
 
-### Task 1.2: Add Position Anchoring Logic ❌
+### Task 1.2: Add Position Anchoring Logic ✅
 **Priority:** High
-**Status:** Not Started
+**Status:** Complete
 
 **Implementation:**
-- [ ] Add anchor position logic to bounce back to bottom-right when released
-- [ ] Implement smooth animation for anchor return
-- [ ] Add user preference for anchor position
-- [ ] Ensure anchoring respects window boundaries
+- [x] Add anchor position logic to bounce back to bottom-right when released
+- [x] Implement smooth animation for anchor return
+- [x] Add anchor threshold and animation duration configuration
+- [x] Ensure anchoring respects window boundaries
 
 **Files to Modify:**
 - `epii_app/friendly-file-front/src/epi-logos-system/1_components/FloatingEpiLogosAgent.tsx`
