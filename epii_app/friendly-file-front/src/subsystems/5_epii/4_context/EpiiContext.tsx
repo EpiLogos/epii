@@ -1142,7 +1142,7 @@ export const EpiiProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Import documentService and documentCacheService
       const [moduleService, moduleCacheService] = await Promise.all([
         import('../1_services/documentService'),
-        import('../1_services/documentCacheService')
+        import('../../../shared/services/documentCacheService')
       ]);
 
       const documentService = moduleService.default;

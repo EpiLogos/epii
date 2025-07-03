@@ -19,6 +19,7 @@ import nodeDetailsRoutes from './databases/api/routes/nodeDetails.routes.mjs'; /
 import epiiAgentRoutes from './subsystems/5_epii/5_integration/routes/epii-agent.routes.mjs'; // Import Epii Agent routes
 import documentsRoutes from './databases/api/routes/documents.routes.mjs'; // Import Documents routes
 import bpmcpRoutes from './databases/api/routes/bpmcp.routes.mjs'; // Import BPMCP routes
+import conversationsRoutes from './databases/api/routes/conversations.routes.mjs'; // Import Conversations routes
 import userRoutes from './subsystems/4_nara/5_integration/routes/user.routes.mjs'; // Import User routes
 import analysisRoutes from './subsystems/5_epii/5_integration/routes/analysis.routes.mjs'; // Import Analysis routes
 import { mahamayaRoutes, initializeRoutes } from './subsystems/4_nara/5_integration/routes/mahamaya-routes.mjs'; // Import Nara Mahamaya routes
@@ -65,6 +66,7 @@ async function startServer() {
   app.use('/api/epii-agent', epiiAgentRoutes); // Mount Epii Agent routes under /api/epii-agent
   app.use('/api/documents', documentsRoutes); // Mount Documents routes under /api/documents
   app.use('/api/bpmcp', bpmcpRoutes); // Mount BPMCP routes under /api/bpmcp
+  app.use('/api/conversations', conversationsRoutes); // Mount Conversations routes under /api/conversations
   app.use('/api/users', userRoutes); // Mount User routes under /api/users
   app.use('/api/analysis', analysisRoutes); // Mount Analysis routes under /api/analysis
   app.use('/api', mahamayaRoutes); // Mount Nara Mahamaya routes under /api

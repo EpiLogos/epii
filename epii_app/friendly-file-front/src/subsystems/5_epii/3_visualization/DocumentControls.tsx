@@ -8,7 +8,7 @@ import { Play, Loader2, Sparkles, ChevronDown, ChevronUp, FileText, ExternalLink
 import { AnalysisResults } from '../0_foundation/epiiTypes';
 import { formatBimbaCoordinate } from "../1_services/utils/epiiFormatters";
 import { isValidBimbaCoordinate } from "../1_services/utils/epiiHelpers";
-import { onAGUIEvent, offAGUIEvent } from '../1_services/webSocketService';
+import { onAGUIEvent, offAGUIEvent } from '../../../epi-logos-system/3_services/webSocketService';
 
 interface DocumentControlsProps {
   onStartAnalysis: (targetCoordinate: string) => void;

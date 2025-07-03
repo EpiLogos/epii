@@ -18,7 +18,7 @@ export * from './2_hooks/useEpiiAnalysis';
 // Visualization
 export { default as DocumentCanvas } from './3_visualization/DocumentCanvas';
 export { default as DocumentViewer } from './3_visualization/DocumentViewer';
-export { default as DocumentChat } from './3_visualization/DocumentChat';
+// DocumentChat deprecated - functionality moved to FloatingEpiLogosAgent
 export { default as DocumentControls } from './3_visualization/DocumentControls';
 export { default as AnalysisVisualizer } from './3_visualization/AnalysisVisualizer';
 

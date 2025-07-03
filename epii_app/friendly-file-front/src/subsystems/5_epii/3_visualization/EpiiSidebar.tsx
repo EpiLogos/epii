@@ -9,7 +9,7 @@ import { useBimbaCoordinates, BimbaCoordinate, Document } from '../2_hooks/useBi
 import { useEpii } from '../4_context/EpiiContext';
 import { useDocumentUpload } from '../2_hooks/useEpiiDocument';
 import CoordinateItem from './RecursiveCoordinateTree';
-import { standardizeDocumentContent } from '../1_services/documentCacheService';
+import { standardizeDocumentContent } from '../../../shared/services/documentCacheService';
 
 interface EpiiSidebarProps {
   onSelectDocument?: (document: Document) => void;
@@ -31,7 +31,7 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
   useEffect(() => {
     const setupAGUIEventHandlers = async () => {
       try {
-        const { onAGUIEvent, offAGUIEvent } = await import('../1_services/webSocketService');
+        const { onAGUIEvent, offAGUIEvent } = await import('../../../epi-logos-system/3_services/webSocketService');
 
         // Handler for document created events
         const handleDocumentCreated = (event: any) => {
@@ -310,7 +310,7 @@ const EpiiSidebar: React.FC<EpiiSidebarProps> = ({
       const isPratibimba = document.documentType === 'pratibimba';
 
       // Import document cache service
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
 
       // First check if the document is already in the state with textContent
       const existingDoc = state.documents.find(doc => doc.id === document.id && doc.textContent);

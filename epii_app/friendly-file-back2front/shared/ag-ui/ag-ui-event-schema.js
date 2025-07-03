@@ -48,6 +48,11 @@ const AGUIEventTypes = {
   BIMBA_UPDATE_SUGGESTIONS: 'BimbaUpdateSuggestions',
   BIMBA_CONTEXT_UPDATE: 'BimbaContextUpdate',
   QL_STAGE_TRANSITION: 'QLStageTransition',
+  
+  // Agent-Triggered Update Application Events
+  BIMBA_APPLY_SUGGESTIONS: 'BimbaApplySuggestions',
+  BIMBA_APPLY_UPDATES: 'BimbaApplyUpdates',
+  BIMBA_UPDATE_APPLICATION_STATUS: 'BimbaUpdateApplicationStatus',
   COORDINATE_CHANGE: 'CoordinateChange',
 
   // Document State Management Events

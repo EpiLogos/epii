@@ -7,12 +7,11 @@ import React, { useState } from 'react';
 import PageTransition from "../../../shared/components/layout/PageTransition";
 import GeometricBackground from "../../../shared/components/ui/GeometricBackground";
 import { Button } from "../../../shared/components/ui/button";
-import { CheckCircle, AlertTriangle, Info, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import DocumentCanvas from '../3_visualization/DocumentCanvas';
 import EpiiSidebar from '../3_visualization/EpiiSidebar';
-import EpiiChat from '../3_visualization/EpiiChat';
 import BimbaUpdateOverlay from '../3_visualization/BimbaUpdateOverlay';
-import { EpiiProvider, useEpii } from '../4_context/EpiiContext';
+import { useUniversalDocumentState } from '../1_hooks/useUniversalDocumentState';
 import { BimbaCoordinate, Document as BimbaDocument, useBimbaCoordinates } from '../2_hooks/useBimbaCoordinates';
 
 // Define interface for the overall payload
@@ -32,8 +31,9 @@ interface NotionUpdatePayload {
 }
 
 const EpiiModeContent: React.FC = () => {
-  const { state } = useEpii();
-  const { statusMessage } = state;
+  // Document state from universal state management
+  const { documents, currentDocumentId, isLoading } = useUniversalDocumentState();
+  
   const [selectedCoordinate, setSelectedCoordinate] = useState<BimbaCoordinate | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [bimbaUpdateOpen, setBimbaUpdateOpen] = useState<boolean>(false);
@@ -43,7 +43,7 @@ const EpiiModeContent: React.FC = () => {
   const { coordinates, getRelatedCoordinates, refreshCoordinateDocuments } = useBimbaCoordinates();
 
   // Get current document
-  const currentDocument = state.documents.find(doc => doc.id === state.currentDocumentId);
+  const currentDocument = documents.find(doc => doc.id === currentDocumentId);
 
   // Metadata for display
   const metadata = {
@@ -53,7 +53,7 @@ const EpiiModeContent: React.FC = () => {
   };
 
   // State values
-  const isAnalyzing = state.isLoading;
+  const isAnalyzing = isLoading;
   const lastUpdateTimestamps = {
     notion: currentDocument?.lastModified || new Date(),
     bimba: new Date()
@@ -169,34 +169,8 @@ const EpiiModeContent: React.FC = () => {
             {/* Main Content Area (Combined Chat + Canvas) */}
             <div className="flex-grow flex bg-epii-dark/40 neo-glow rounded-lg overflow-hidden w-full"> {/* Match Chat.tsx styling */}
 
-              {/* Left Pane: Chat Interaction */}
-              <div className="w-1/3 flex flex-col border-r border-gray-600 p-4"> {/* Adjusted border color */}
-                <div className="flex justify-end mb-4">
-                  <h2 className="text-xl font-semibold text-epii-neon">Epii Analysis</h2> {/* Moved to right side */}
-                </div>
-
-                {/* Status Message Display */}
-                {statusMessage && (
-                  <div className={`mb-3 p-2 rounded text-sm flex items-center gap-2 ${
-                    statusMessage.type === 'success' ? 'bg-green-900/50 text-green-300' :
-                    statusMessage.type === 'error' ? 'bg-red-900/50 text-red-300' :
-                    'bg-blue-900/50 text-blue-300'
-                  }`}>
-                    {statusMessage.type === 'success' && <CheckCircle size={16} />}
-                    {statusMessage.type === 'error' && <AlertTriangle size={16} />}
-                    {statusMessage.type === 'info' && <Info size={16} />}
-                    <span>{statusMessage.text}</span>
-                  </div>
-                )}
-
-                {/* Epii Chat Component */}
-                <EpiiChat
-                  userId="admin"
-                />
-              </div>
-
-              {/* Right Pane: Document Canvas */}
-              <div className="w-2/3 flex flex-col p-4">
+              {/* Full Width: Document Canvas - Chat functionality now handled by FloatingAgent */}
+              <div className="w-full flex flex-col p-6"> {/* Increased padding since we have more space */}
                 {/* Metadata Display - Compact with scrollbar */}
                 <div className="mb-2 p-2 border border-gray-600 rounded bg-gray-800/50 text-gray-300 text-sm max-h-24 overflow-y-auto">
                   <div className="flex items-center justify-between">
@@ -283,9 +257,7 @@ const EpiiModeContent: React.FC = () => {
 
 const EpiiModePage: React.FC = () => {
   return (
-    <EpiiProvider>
-      <EpiiModeContent />
-    </EpiiProvider>
+    <EpiiModeContent />
   );
 };
 

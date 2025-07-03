@@ -228,15 +228,9 @@
     *   **Analysis State:** EpiiContext.tsx analysis sessions and results management
     *   **Pipeline Integration:** Existing epii-analysis-pipeline skill integration
     *   **Migration Strategy:**
-        - Route analysis requests through Epi-Logos Agent instead of direct pipeline calls
+        - Route analysis requests through Epi-Logos Agent on top of direct pipeline calls through frontend button
         - Preserve analysis session management with agent context
         - Maintain analysis result display and interaction patterns
-        - Enhance analysis with agent's multi-source knowledge integration
-    *   **Agent Enhancement:**
-        - Multi-document analysis with cross-reference capabilities
-        - Enhanced context from agent's knowledge base
-        - Improved result synthesis with QL-aware processing
-        - Session continuity across document switches
 
 ---
 

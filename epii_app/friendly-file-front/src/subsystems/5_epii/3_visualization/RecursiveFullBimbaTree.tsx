@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { ChevronRight, ChevronDown, FileText, Folder, Settings, Circle } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Folder, Settings, Circle, CheckCircle, Square } from 'lucide-react';
 
 interface GraphNode {
   id: string;
@@ -41,6 +41,11 @@ interface RecursiveFullBimbaTreeProps {
   selectedNodeId?: string;
   rootNodeId?: string;
   coordinateChanges?: Map<string, any>; // Change counts per coordinate
+  // Multi-selection support
+  multiSelectMode?: boolean;
+  selectedCoordinates?: Set<string>;
+  onCoordinateToggle?: (coordinate: string, selected: boolean) => void;
+  maxSelections?: number;
 }
 
 interface TreeNode {
@@ -56,7 +61,11 @@ const RecursiveFullBimbaTree: React.FC<RecursiveFullBimbaTreeProps> = ({
   onNodeSelect,
   selectedNodeId,
   rootNodeId,
-  coordinateChanges
+  coordinateChanges,
+  multiSelectMode = false,
+  selectedCoordinates = new Set(),
+  onCoordinateToggle,
+  maxSelections
 }) => {
 
   // Build tree structure using coordinate-based hierarchy (like RecursiveCoordinateTree)
@@ -303,6 +312,9 @@ const RecursiveFullBimbaTree: React.FC<RecursiveFullBimbaTreeProps> = ({
     const isExpanded = expandedNodes[node.id];
     const isSelected = selectedNodeId === node.id;
     const hasBimbaCoord = !!node.bimbaCoordinate;
+    const isCoordinateSelected = node.bimbaCoordinate && selectedCoordinates.has(node.bimbaCoordinate);
+    const canSelectMore = !maxSelections || selectedCoordinates.size < maxSelections;
+    const canToggleSelection = hasBimbaCoord && multiSelectMode && (canSelectMore || isCoordinateSelected);
 
     // Get change count for this coordinate
     const changeCount = node.bimbaCoordinate && coordinateChanges
@@ -333,12 +345,22 @@ const RecursiveFullBimbaTree: React.FC<RecursiveFullBimbaTreeProps> = ({
       <Circle size={14} className="text-gray-400 fill-current" />
     );
 
+    // Handle coordinate selection toggle
+    const handleCoordinateToggle = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (node.bimbaCoordinate && onCoordinateToggle && canToggleSelection) {
+        onCoordinateToggle(node.bimbaCoordinate, !isCoordinateSelected);
+      }
+    };
+
     return (
       <div key={node.id} className="select-none">
         <div
           className={`flex items-center py-1 px-2 rounded cursor-pointer transition-colors duration-150 ${
             isSelected
               ? 'bg-epii-neon/20 text-epii-neon'
+              : isCoordinateSelected && multiSelectMode
+              ? 'bg-epii-neon/10 text-epii-neon border border-epii-neon/30'
               : 'hover:bg-epii-dark/50 text-gray-300 hover:text-white'
           }`}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -361,6 +383,32 @@ const RecursiveFullBimbaTree: React.FC<RecursiveFullBimbaTreeProps> = ({
           )}
 
           {!hasChildren && <div className="w-4 mr-1" />}
+
+          {/* Multi-select checkbox for coordinate nodes */}
+          {multiSelectMode && hasBimbaCoord && (
+            <button
+              onClick={handleCoordinateToggle}
+              disabled={!canToggleSelection}
+              className={`mr-2 p-0.5 rounded transition-colors ${
+                canToggleSelection 
+                  ? 'hover:bg-epii-dark/50 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              title={
+                isCoordinateSelected 
+                  ? 'Remove from multi-coordinate analysis'
+                  : maxSelections && selectedCoordinates.size >= maxSelections
+                    ? `Maximum ${maxSelections} coordinates allowed`
+                    : 'Include in multi-coordinate analysis'
+              }
+            >
+              {isCoordinateSelected ? (
+                <CheckCircle size={14} className="text-epii-neon" />
+              ) : (
+                <Square size={14} className="text-gray-400" />
+              )}
+            </button>
+          )}
 
           {/* Change count indicator */}
           {changeCount > 0 && (

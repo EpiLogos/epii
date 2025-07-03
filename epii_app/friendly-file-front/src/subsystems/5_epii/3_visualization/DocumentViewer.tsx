@@ -9,7 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { getLanguageForSyntaxHighlighting } from "../1_services/utils/epiiHelpers";
 import { debounce } from "../1_services/utils/debounce";
 import { Search, Sparkles, Save } from 'lucide-react';
-import { useEpii } from '../4_context/EpiiContext';
+import { useUniversalDocumentState } from '../1_hooks/useUniversalDocumentState';
 import { TextSelection } from '../0_foundation/epiiTypes';
 
 interface DocumentViewerProps {
@@ -31,8 +31,9 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   readOnly = false,
   isPratibimba = false
 }) => {
-  // Get state and dispatch from EpiiContext
-  const { state, dispatch } = useEpii();
+  // Get state from universal document state
+  const documentState = useUniversalDocumentState();
+  const { currentDocument, currentDocumentId, documents, selections, currentSelection, addSelection, updateSelection, setCurrentSelection, setStatusMessage } = documentState;
 
   const [editorContent, setEditorContent] = useState(content);
   const [language, setLanguage] = useState('text');
@@ -42,14 +43,14 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
 
   // Use all selections, not just document-specific ones
   // This ensures selections persist across document switches
-  const documentSelections = state.selections;
+  const documentSelections = selections;
 
   // Only log selection state in development and when it changes
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`DocumentViewer: ${state.selections.length} selections, document ID: ${state.currentDocumentId || 'none'}`);
+      console.log(`DocumentViewer: ${selections.length} selections, document ID: ${currentDocumentId || 'none'}`);
     }
-  }, [state.selections.length, state.currentDocumentId]);
+  }, [selections.length, currentDocumentId]);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const highlighterRef = useRef<HTMLDivElement>(null);
@@ -73,11 +74,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setSelection(null);
       setShowSelectionMenu(false);
 
-      // Also clear in context
-      dispatch({
-        type: 'SET_SELECTION',
-        payload: null
-      });
+      // Also clear in universal state
+      setCurrentSelection(null);
     };
 
     // Add event listener for selection clearing
@@ -86,7 +84,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     return () => {
       document.removeEventListener('clearSelection', handleSelectionClear as EventListener);
     };
-  }, [dispatch]);
+  }, [setCurrentSelection]);
 
   // We don't clear selection when document changes
   // This allows selections to persist when switching documents
@@ -107,7 +105,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
 
   // Create a debounced version of the text selection handler
   const handleTextAreaSelectionImpl = useCallback(() => {
-    if (!textAreaRef.current || !state.currentDocumentId) return;
+    if (!textAreaRef.current || !currentDocumentId) return;
 
     const textarea = textAreaRef.current;
     const start = textarea.selectionStart;
@@ -120,12 +118,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       const cursorPosition = getCursorPosition(textarea, end);
 
       // Get the current document to access its bimbaCoordinate
-      const currentDoc = state.documents.find(doc => doc.id === state.currentDocumentId);
+      const currentDoc = documents.find(doc => doc.id === currentDocumentId);
 
       // Create the new selection object with enhanced properties
       const newSelection: TextSelection = {
         id: `sel-${Date.now()}`,
-        documentId: state.currentDocumentId,
+        documentId: currentDocumentId,
         start,
         end,
         text: selectedText,
@@ -139,11 +137,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setSelectionPosition(cursorPosition);
       setShowSelectionMenu(true);
 
-      // Update the EpiiContext with the current selection
-      dispatch({
-        type: 'SET_SELECTION',
-        payload: newSelection
-      });
+      // Update the universal state with the current selection
+      setCurrentSelection(newSelection);
 
       // Notify parent component if needed
       if (onSelectionChange) {
@@ -152,7 +147,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     }
     // We don't clear the selection when clicking elsewhere
     // This allows the selection to persist when clicking on the chat
-  }, [state.currentDocumentId, state.documents, isPratibimba, dispatch, onSelectionChange]);
+  }, [currentDocumentId, documents, isPratibimba, setCurrentSelection, onSelectionChange]);
 
   // Apply debounce to the implementation
   const handleTextAreaSelection = useMemo(() =>
@@ -163,7 +158,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   // Create a debounced version of the read-only selection handler
   const handleReadOnlySelectionImpl = useCallback(() => {
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed || !highlighterRef.current || !state.currentDocumentId) return;
+    if (!selection || selection.isCollapsed || !highlighterRef.current || !currentDocumentId) return;
 
     const range = selection.getRangeAt(0);
     const selectedText = selection.toString();
@@ -185,12 +180,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         };
 
         // Get the current document to access its bimbaCoordinate
-        const currentDoc = state.documents.find(doc => doc.id === state.currentDocumentId);
+        const currentDoc = documents.find(doc => doc.id === currentDocumentId);
 
         // Create the new selection object with enhanced properties
         const newSelection: TextSelection = {
           id: `sel-${Date.now()}`,
-          documentId: state.currentDocumentId,
+          documentId: currentDocumentId,
           start,
           end,
           text: selectedText,
@@ -204,11 +199,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         setSelectionPosition(position);
         setShowSelectionMenu(true);
 
-        // Update the EpiiContext with the current selection
-        dispatch({
-          type: 'SET_SELECTION',
-          payload: newSelection
-        });
+        // Update the universal state with the current selection
+        setCurrentSelection(newSelection);
 
         // Notify parent component if needed
         if (onSelectionChange) {
@@ -218,7 +210,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     }
     // We don't clear the selection when clicking elsewhere
     // This allows the selection to persist when clicking on the chat
-  }, [state.currentDocumentId, state.documents, content, isPratibimba, dispatch, onSelectionChange]);
+  }, [currentDocument, content, isPratibimba, setCurrentSelection, onSelectionChange]);
 
   // Apply debounce to the implementation
   const handleReadOnlySelection = useMemo(() =>
@@ -269,7 +261,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       console.log('Saving selection:', selection);
 
       // Get the current document to access its bimbaCoordinate
-      const currentDoc = state.documents.find(doc => doc.id === state.currentDocumentId);
+      const currentDoc = documents.find(doc => doc.id === currentDocumentId);
 
       // Create an enhanced selection with all necessary metadata
       const enhancedSelection = {
@@ -285,10 +277,14 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         console.log('DocumentViewer: Saving and clearing selection in one step');
       }
 
-      // Use the new batched action
-      dispatch({
-        type: 'SAVE_AND_CLEAR_SELECTION',
-        payload: enhancedSelection
+      // Save selection and clear from UI
+      addSelection({
+        documentId: currentDocument?.id || '',
+        text: enhancedSelection.text,
+        startOffset: enhancedSelection.start,
+        endOffset: enhancedSelection.end,
+        coordinate: enhancedSelection.bimbaCoordinate,
+        notes: enhancedSelection.notes
       });
 
       // Update local state
@@ -296,13 +292,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setShowSelectionMenu(false);
 
       // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: 'Selection saved'
-        }
-      });
+      setStatusMessage('Selection saved');
     } else {
       // Call the parent handler for analyze or crystallize actions
       if (onSelectionAction) {
@@ -377,12 +367,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
           ))}
 
           {/* Render current selection highlight */}
-          {state.currentSelection && state.currentSelection.documentId === state.currentDocumentId && (
+          {currentSelection && currentSelection.documentId === currentDocumentId && (
             <div
               className="absolute bg-epii-neon/30 border border-epii-neon/50 rounded-sm z-0 pointer-events-none"
               style={{
                 // This is a simplified approach - in a real app, you'd need more sophisticated positioning
-                top: `${Math.floor(state.currentSelection.start / content.length * 100)}%`,
+                top: `${Math.floor(currentSelection.start / content.length * 100)}%`,
                 left: '0',
                 width: '100%',
                 height: '24px',

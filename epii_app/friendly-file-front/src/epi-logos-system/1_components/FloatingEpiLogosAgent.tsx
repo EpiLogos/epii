@@ -1,0 +1,860 @@
+/**
+ * Floating Epi-Logos Agent Component
+ * Universal agent interface that can invoke any subsystem
+ */
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Minus, MessageCircle, Send, Settings, Archive, FileText } from 'lucide-react';
+import { 
+  AgentMessage, 
+  AgentSession, 
+  OrchestrationRequest,
+  OrchestrationResponse,
+  FloatingAgentState,
+  OrchestrationStates,
+  UI_CONFIG,
+  EPI_LOGOS_AGENT_ID 
+} from '../0_foundation';
+import { sessionHistoryService } from '../3_services/SessionHistoryService';
+import { contextCompactingService } from '../3_services/ContextCompactingService';
+import { sendWebSocketMessage, subscribeToAGUIEvents, onAGUIEvent } from '../3_services/webSocketService';
+import { GenerativeUIRenderer, type GenerativeUIComponent } from '../../shared/components/agent';
+import { useUniversalDocumentState } from '../../subsystems/5_epii/1_hooks/useUniversalDocumentState';
+import documentOperationsService from '../../subsystems/5_epii/1_services/documentOperationsService';
+
+interface FloatingEpiLogosAgentProps {
+  initialPosition?: { x: number; y: number };
+  onClose?: () => void;
+}
+
+// Calculate default position based on current window size
+const getDefaultPosition = () => {
+  if (typeof window !== 'undefined') {
+    return {
+      x: window.innerWidth - 80,
+      y: window.innerHeight - 80
+    };
+  }
+  return { x: 20, y: 20 };
+};
+
+export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
+  initialPosition,
+  onClose
+}) => {
+  // Calculate position with fallbacks
+  const defaultPos = initialPosition || getDefaultPosition();
+  
+  // Document context awareness
+  const documentState = useUniversalDocumentState();
+  const { currentDocument, currentDocumentId, documents, selections } = documentState;
+  
+  // Component state
+  const [state, setState] = useState<FloatingAgentState>({
+    isVisible: true,
+    isMinimized: true, // Start minimized as circular bubble
+    position: defaultPos,
+    currentSession: sessionHistoryService.getCurrentSession() || sessionHistoryService.startNewSession(),
+    messageHistory: [],
+    isProcessing: false,
+    orchestrationState: OrchestrationStates.IDLE
+  });
+
+  // UI state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [inputMessage, setInputMessage] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Refs
+  const agentRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Initialize component
+  useEffect(() => {
+    initializeAgent();
+    setupEventListeners();
+    
+    return () => {
+      cleanupEventListeners();
+    };
+  }, []);
+
+  // Load message history when session changes
+  useEffect(() => {
+    if (state.currentSession) {
+      const messages = sessionHistoryService.getCurrentSessionMessages();
+      setState(prev => ({ ...prev, messageHistory: messages }));
+    }
+  }, [state.currentSession]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [state.messageHistory]);
+
+  /**
+   * Initialize agent and connect to backend
+   */
+  const initializeAgent = useCallback(() => {
+    console.log('[FloatingEpiLogosAgent] Initializing universal agent...');
+    
+    // Set up MongoDB integration with user ID
+    sessionHistoryService.setUserId('default-user'); // TODO: Replace with actual auth user ID
+    
+    // Subscribe to AG-UI events for orchestration responses
+    subscribeToAGUIEvents('orchestration:response');
+    subscribeToAGUIEvents('agent:message');
+    subscribeToAGUIEvents('agent:state');
+    
+    // Add welcome message if no session exists
+    if (state.messageHistory.length === 0) {
+      addSystemMessage('🌀 Epi-Logos Agent activated. I can assist you across all subsystems with document analysis, coordinate work, knowledge synthesis, and more.');
+    }
+  }, [state.messageHistory.length]);
+
+  /**
+   * Set up event listeners
+   */
+  const setupEventListeners = useCallback(() => {
+    // Listen for AG-UI orchestration responses
+    onAGUIEvent('orchestration:response', handleOrchestrationResponse);
+    onAGUIEvent('agent:message', handleAgentMessage);
+    onAGUIEvent('agent:state', handleAgentStateUpdate);
+    
+    // Listen for context compacting events
+    window.addEventListener('epi-logos:context-compacting-completed', handleContextCompactingCompleted);
+  }, []);
+
+  /**
+   * Clean up event listeners
+   */
+  const cleanupEventListeners = useCallback(() => {
+    window.removeEventListener('epi-logos:context-compacting-completed', handleContextCompactingCompleted);
+  }, []);
+
+  /**
+   * Handle orchestration responses from backend
+   */
+  const handleOrchestrationResponse = useCallback(async (event: any) => {
+    const response: OrchestrationResponse = event.payload;
+    
+    setState(prev => ({
+      ...prev,
+      isProcessing: false,
+      orchestrationState: OrchestrationStates.IDLE
+    }));
+
+    // Add agent response message with MongoDB persistence
+    const responseMessage = await sessionHistoryService.addMessageWithPersistence({
+      type: 'agent',
+      content: formatOrchestrationResponse(response),
+      context: {
+        sessionId: state.currentSession.id,
+        orchestrationResponse: response
+      },
+      metadata: response.metadata
+    });
+
+    setState(prev => ({
+      ...prev,
+      messageHistory: [...prev.messageHistory, responseMessage]
+    }));
+  }, [state.currentSession]);
+
+  /**
+   * Handle direct agent messages
+   */
+  const handleAgentMessage = useCallback(async (event: any) => {
+    const message = await sessionHistoryService.addMessageWithPersistence({
+      type: 'agent',
+      content: event.payload.content,
+      context: event.payload.context,
+      metadata: event.payload.metadata
+    });
+
+    setState(prev => ({
+      ...prev,
+      messageHistory: [...prev.messageHistory, message]
+    }));
+  }, []);
+
+  /**
+   * Handle agent state updates
+   */
+  const handleAgentStateUpdate = useCallback((event: any) => {
+    const { orchestrationState } = event.payload;
+    
+    setState(prev => ({
+      ...prev,
+      orchestrationState: orchestrationState || OrchestrationStates.IDLE
+    }));
+  }, []);
+
+  /**
+   * Handle context compacting completion
+   */
+  const handleContextCompactingCompleted = useCallback((event: any) => {
+    const { sessionId, result } = event.detail;
+    
+    if (sessionId === state.currentSession.id) {
+      addSystemMessage(`📋 Context compacted: ${result.originalMessageCount} → ${result.compactedMessageCount} messages (${(result.compressionRatio * 100).toFixed(1)}% compression)`);
+    }
+  }, [state.currentSession]);
+
+  /**
+   * Send message to agent
+   */
+  const sendMessage = useCallback(async () => {
+    if (!inputMessage.trim() || state.isProcessing) {
+      return;
+    }
+
+    const userMessage = await sessionHistoryService.addMessageWithPersistence({
+      type: 'user',
+      content: inputMessage.trim(),
+      context: {
+        sessionId: state.currentSession.id,
+        componentId: 'floatingAgent'
+      }
+    });
+
+    // Update UI with user message
+    setState(prev => ({
+      ...prev,
+      messageHistory: [...prev.messageHistory, userMessage],
+      isProcessing: true,
+      orchestrationState: OrchestrationStates.ANALYZING
+    }));
+
+    // Clear input
+    setInputMessage('');
+
+    // Check if this is a local document operation
+    const requestType = determineRequestType(inputMessage);
+    if (requestType === 'document_operation') {
+      const handled = await handleDocumentOperation(inputMessage);
+      if (handled) {
+        setState(prev => ({
+          ...prev,
+          isProcessing: false,
+          orchestrationState: OrchestrationStates.IDLE
+        }));
+        return;
+      }
+    }
+
+    // Prepare document context for the agent
+    const documentContext = currentDocument ? {
+      documentId: currentDocument.id,
+      documentName: currentDocument.name,
+      documentType: currentDocument.documentType,
+      bimbaCoordinate: currentDocument.bimbaCoordinate,
+      targetCoordinate: currentDocument.targetCoordinate,
+      analysisStatus: currentDocument.analysisStatus,
+      contentLength: currentDocument.textContent?.length || 0,
+      hasSelections: selections.filter(sel => sel.documentId === currentDocument.id).length > 0,
+      selectionsCount: selections.filter(sel => sel.documentId === currentDocument.id).length
+    } : null;
+
+    // Send orchestration request to backend
+    const orchestrationRequest: OrchestrationRequest = {
+      type: determineRequestType(inputMessage),
+      content: inputMessage.trim(),
+      context: {
+        sessionId: state.currentSession.id,
+        messageHistory: state.messageHistory.slice(-10), // Recent context
+        frontendComponent: 'floatingAgent',
+        // Include document context for document-aware conversations
+        documentContext,
+        // Include global document state summary
+        globalDocumentState: {
+          totalDocuments: documents.length,
+          currentDocumentId,
+          hasActiveDocument: !!currentDocument
+        }
+      },
+      orchestrationStrategy: 'single'
+    };
+
+    try {
+      // Send via WebSocket to A2A layer
+      const success = sendWebSocketMessage({
+        type: 'orchestration:request',
+        agentId: EPI_LOGOS_AGENT_ID,
+        payload: orchestrationRequest
+      });
+
+      if (!success) {
+        setState(prev => ({
+          ...prev,
+          isProcessing: false,
+          orchestrationState: OrchestrationStates.IDLE
+        }));
+        
+        addSystemMessage('⚠️ Failed to send message. Please check your connection.');
+      }
+    } catch (error) {
+      console.error('[FloatingEpiLogosAgent] Failed to send orchestration request:', error);
+      setState(prev => ({
+        ...prev,
+        isProcessing: false,
+        orchestrationState: OrchestrationStates.IDLE
+      }));
+      
+      addSystemMessage('⚠️ Error sending message. Please try again.');
+    }
+  }, [inputMessage, state.isProcessing, state.currentSession, state.messageHistory, currentDocument, currentDocumentId, documents, selections, handleDocumentOperation]);
+
+  /**
+   * Handle local document operations
+   */
+  const handleDocumentOperation = useCallback(async (message: string): Promise<boolean> => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Check for document operation commands
+    if (lowerMessage.includes('create document') || lowerMessage.includes('new document')) {
+      const match = message.match(/create document[s]?\s+["'](.+)["']/) || 
+                   message.match(/new document[s]?\s+["'](.+)["']/);
+      const name = match ? match[1] : 'Untitled Document';
+      
+      const result = await documentOperationsService.createDocument({
+        name,
+        content: '',
+        coordinate: currentDocument?.bimbaCoordinate || '#5'
+      });
+      
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (currentDocument && (lowerMessage.includes('analyze this document') || lowerMessage.includes('analyze current document'))) {
+      const result = await documentOperationsService.startAnalysis({
+        documentId: currentDocument.id,
+        targetCoordinate: currentDocument.targetCoordinate || currentDocument.bimbaCoordinate
+      });
+      
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (currentDocument && (lowerMessage.includes('save document') || lowerMessage.includes('save this document'))) {
+      const result = await documentOperationsService.saveDocument(currentDocument.id);
+      addSystemMessage(result.message);
+      return true;
+    }
+    
+    if (lowerMessage.includes('create crystallization') && currentDocument && selections.length > 0) {
+      const currentDocumentSelections = selections.filter(sel => sel.documentId === currentDocument.id);
+      if (currentDocumentSelections.length > 0) {
+        const selection = currentDocumentSelections[0]; // Use first selection
+        const result = await documentOperationsService.createPratibimba({
+          sourceDocumentId: currentDocument.id,
+          selection: {
+            start: selection.startOffset,
+            end: selection.endOffset,
+            text: selection.text
+          }
+        });
+        
+        addSystemMessage(result.message);
+        return true;
+      }
+    }
+    
+    return false; // Not a document operation
+  }, [currentDocument, selections, addSystemMessage]);
+
+  /**
+   * Determine request type from input message
+   */
+  const determineRequestType = (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Document operations
+    if (lowerMessage.includes('create document') || lowerMessage.includes('new document') ||
+        lowerMessage.includes('save document') || lowerMessage.includes('analyze this document') ||
+        lowerMessage.includes('create crystallization')) {
+      return 'document_operation';
+    }
+    
+    if (lowerMessage.includes('analyze') || lowerMessage.includes('analysis')) {
+      return 'analyze';
+    }
+    if (lowerMessage.includes('synthesize') || lowerMessage.includes('synthesis')) {
+      return 'synthesize';
+    }
+    if (lowerMessage.includes('coordinate') || lowerMessage.includes('multi')) {
+      return 'coordinate';
+    }
+    if (lowerMessage.includes('reflect') || lowerMessage.includes('reflection')) {
+      return 'reflect';
+    }
+    
+    return 'orchestrate'; // Default
+  };
+
+  /**
+   * Add system message
+   */
+  const addSystemMessage = useCallback(async (content: string) => {
+    const systemMessage = await sessionHistoryService.addMessageWithPersistence({
+      type: 'system',
+      content,
+      context: {
+        sessionId: state.currentSession.id
+      }
+    });
+
+    setState(prev => ({
+      ...prev,
+      messageHistory: [...prev.messageHistory, systemMessage]
+    }));
+  }, [state.currentSession]);
+
+  /**
+   * Format orchestration response for display
+   */
+  const formatOrchestrationResponse = (response: OrchestrationResponse): string => {
+    if (!response.success) {
+      return `❌ **Error**: ${response.error || 'Unknown orchestration error'}`;
+    }
+
+    const { metadata } = response;
+    let content = '';
+
+    // Add orchestration type header
+    content += `🔄 **${metadata.orchestrationType.replace('-', ' ').toUpperCase()}**\n\n`;
+
+    // Add result content
+    if (typeof response.result === 'string') {
+      content += response.result;
+    } else if (response.result?.synthesis) {
+      content += response.result.synthesis;
+    } else if (response.result?.content) {
+      content += response.result.content;
+    } else {
+      content += JSON.stringify(response.result, null, 2);
+    }
+
+    // Add metadata footer
+    content += `\n\n---\n*Processed in ${metadata.processingTime}ms`;
+    if (metadata.subsystemsInvolved?.length > 0) {
+      content += ` • Subsystems: ${metadata.subsystemsInvolved.join(', ')}`;
+    }
+    content += '*';
+
+    return content;
+  };
+
+  /**
+   * Check if message contains generative UI
+   */
+  const hasGenerativeUI = (message: AgentMessage): boolean => {
+    return !!(message.context?.generativeUI || message.metadata?.generativeUI);
+  };
+
+  /**
+   * Extract generative UI components from message
+   */
+  const extractGenerativeUI = (message: AgentMessage): GenerativeUIComponent[] => {
+    const generativeUI = message.context?.generativeUI || message.metadata?.generativeUI;
+    
+    if (!generativeUI) {
+      return [];
+    }
+
+    // Handle single component
+    if (!Array.isArray(generativeUI)) {
+      return [generativeUI];
+    }
+
+    // Handle array of components
+    return generativeUI;
+  };
+
+  /**
+   * Render message content with generative UI support
+   */
+  const renderMessageContent = (message: AgentMessage): React.ReactNode => {
+    const hasGenUI = hasGenerativeUI(message);
+    
+    if (hasGenUI) {
+      const components = extractGenerativeUI(message);
+      
+      return (
+        <div className="space-y-3">
+          {/* Regular text content */}
+          {message.content && (
+            <div className="whitespace-pre-wrap">{message.content}</div>
+          )}
+          
+          {/* Generative UI components */}
+          {components.map((component, index) => (
+            <GenerativeUIRenderer
+              key={`${message.id}-${index}`}
+              componentSpec={component}
+              onSuccess={(componentName) => {
+                console.log(`[FloatingAgent] Rendered ${componentName} successfully`);
+              }}
+              onError={(error, spec) => {
+                console.error(`[FloatingAgent] Failed to render ${spec.componentName}:`, error);
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // Regular text content
+    return <div className="whitespace-pre-wrap">{message.content}</div>;
+  };
+
+  /**
+   * Handle drag start
+   */
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    // Prevent default to avoid text selection
+    e.preventDefault();
+    
+    if ((e.target as HTMLElement).closest('.drag-handle') || state.isMinimized) {
+      setIsDragging(true);
+      const rect = agentRef.current?.getBoundingClientRect();
+      if (rect) {
+        setDragOffset({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        });
+      }
+      
+      // Add some visual feedback
+      if (agentRef.current) {
+        agentRef.current.style.cursor = 'grabbing';
+        agentRef.current.style.userSelect = 'none';
+      }
+    }
+  }, [state.isMinimized]);
+
+  /**
+   * Handle drag with requestAnimationFrame for smoothness
+   */
+  const handleDrag = useCallback((e: MouseEvent) => {
+    if (isDragging && agentRef.current) {
+      // Use requestAnimationFrame for smooth updates
+      requestAnimationFrame(() => {
+        const newX = e.clientX - dragOffset.x;
+        const newY = e.clientY - dragOffset.y;
+        
+        // Constrain to viewport bounds
+        const maxX = window.innerWidth - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
+        const maxY = window.innerHeight - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
+        
+        const constrainedX = Math.max(0, Math.min(newX, maxX));
+        const constrainedY = Math.max(0, Math.min(newY, maxY));
+        
+        setState(prev => ({
+          ...prev,
+          position: { x: constrainedX, y: constrainedY }
+        }));
+      });
+    }
+  }, [isDragging, dragOffset, state.isMinimized]);
+
+  /**
+   * Handle drag end
+   */
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+    
+    // Reset cursor
+    if (agentRef.current) {
+      agentRef.current.style.cursor = state.isMinimized ? 'pointer' : 'default';
+      agentRef.current.style.userSelect = '';
+    }
+  }, [state.isMinimized]);
+
+  // Set up drag event listeners
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleDrag);
+      document.addEventListener('mouseup', handleDragEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleDrag);
+        document.removeEventListener('mouseup', handleDragEnd);
+      };
+    }
+  }, [isDragging, handleDrag, handleDragEnd]);
+
+  // Handle window resize to keep agent in bounds
+  useEffect(() => {
+    const handleResize = () => {
+      setState(prev => {
+        const maxX = window.innerWidth - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
+        const maxY = window.innerHeight - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minHeight);
+        
+        return {
+          ...prev,
+          position: {
+            x: Math.max(0, Math.min(prev.position.x, maxX)),
+            y: Math.max(0, Math.min(prev.position.y, maxY))
+          }
+        };
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  /**
+   * Handle key press in input
+   */
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }, [sendMessage]);
+
+  /**
+   * Start new session
+   */
+  const startNewSession = useCallback(async () => {
+    const newSession = await sessionHistoryService.startNewSessionWithPersistence();
+    setState(prev => ({
+      ...prev,
+      currentSession: newSession,
+      messageHistory: []
+    }));
+    addSystemMessage('🆕 New session started. How can I help you?');
+  }, [addSystemMessage]);
+
+  /**
+   * Toggle minimized state
+   */
+  const toggleMinimized = useCallback(() => {
+    setState(prev => {
+      const newMinimized = !prev.isMinimized;
+      
+      // If expanding from minimized, position to show full UI properly
+      if (!newMinimized && prev.isMinimized) {
+        const newX = Math.min(prev.position.x, window.innerWidth - UI_CONFIG.floatingAgent.minWidth);
+        const newY = Math.min(prev.position.y, window.innerHeight - UI_CONFIG.floatingAgent.minHeight);
+        
+        return { 
+          ...prev, 
+          isMinimized: newMinimized,
+          position: { x: newX, y: newY }
+        };
+      }
+      
+      return { ...prev, isMinimized: newMinimized };
+    });
+  }, []);
+
+  if (!state.isVisible) {
+    return null;
+  }
+
+  // Render minimized circular bubble
+  if (state.isMinimized) {
+    return (
+      <div
+        ref={agentRef}
+        className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer`}
+        style={{
+          left: state.position.x,
+          top: state.position.y,
+          width: UI_CONFIG.floatingAgent.minimizedSize,
+          height: UI_CONFIG.floatingAgent.minimizedSize,
+          borderRadius: '50%',
+          zIndex: UI_CONFIG.floatingAgent.zIndex,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        onMouseDown={handleDragStart}
+        onClick={(e) => {
+          if (!isDragging) {
+            toggleMinimized();
+          }
+        }}
+        title="Epi-Logos Agent - Click to expand"
+      >
+        <div className="relative">
+          <MessageCircle 
+            className={`w-6 h-6 ${UI_CONFIG.styling.accent} ${state.isProcessing ? 'animate-pulse' : ''}`} 
+          />
+          {state.orchestrationState !== OrchestrationStates.IDLE && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+          )}
+          {state.messageHistory.length > 0 && (
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-full"></div>
+          )}
+          {currentDocument && (
+            <div className="absolute -top-1 -left-1 w-3 h-3 bg-green-400 rounded-full border border-white/20" title={`Document-aware: ${currentDocument.name}`}></div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render expanded agent interface
+  return (
+    <div
+      ref={agentRef}
+      className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border rounded-lg shadow-2xl transition-all duration-300 ${
+        isDragging ? 'cursor-grabbing scale-105' : 'cursor-default'
+      }`}
+      style={{
+        left: state.position.x,
+        top: state.position.y,
+        width: UI_CONFIG.floatingAgent.minWidth,
+        height: UI_CONFIG.floatingAgent.minHeight,
+        zIndex: UI_CONFIG.floatingAgent.zIndex,
+        minWidth: UI_CONFIG.floatingAgent.minWidth,
+        maxWidth: UI_CONFIG.floatingAgent.maxWidth,
+        minHeight: UI_CONFIG.floatingAgent.minHeight,
+        maxHeight: UI_CONFIG.floatingAgent.maxHeight
+      }}
+      onMouseDown={handleDragStart}
+    >
+      {/* Header */}
+      <div className={`drag-handle flex items-center justify-between p-3 ${UI_CONFIG.styling.primary} border-b ${UI_CONFIG.styling.border} cursor-grab ${isDragging ? 'cursor-grabbing' : ''}`}>
+        <div className="flex items-center gap-2">
+          <MessageCircle className={`w-4 h-4 ${UI_CONFIG.styling.accent}`} />
+          <span className={`text-sm font-medium ${UI_CONFIG.styling.accent}`}>
+            Epi-Logos Agent
+          </span>
+          {currentDocument && (
+            <div className="flex items-center gap-1">
+              <FileText className="w-3 h-3 text-green-400" />
+              <span className="text-xs text-green-400" title={`Document-aware: ${currentDocument.name}`}>
+                {currentDocument.name.length > 12 ? currentDocument.name.slice(0, 12) + '...' : currentDocument.name}
+              </span>
+            </div>
+          )}
+          {state.orchestrationState !== OrchestrationStates.IDLE && (
+            <span className="text-xs text-yellow-400">
+              {state.orchestrationState}...
+            </span>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
+          >
+            <Settings className="w-3 h-3" />
+          </button>
+          <button
+            onClick={toggleMinimized}
+            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
+          >
+            <Minus className="w-3 h-3" />
+          </button>
+          <button
+            onClick={onClose}
+            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <div className={`p-3 border-b ${UI_CONFIG.styling.border} ${UI_CONFIG.styling.primary}`}>
+          <div className="flex items-center justify-between text-sm">
+            <span className={UI_CONFIG.styling.accent}>Session: {state.currentSession.id.slice(-8)}</span>
+            <div className="flex gap-2">
+              <button
+                onClick={startNewSession}
+                className={`px-2 py-1 text-xs ${UI_CONFIG.styling.border} border rounded hover:bg-white/10`}
+              >
+                New Session
+              </button>
+              <button
+                onClick={() => contextCompactingService.forceCompactSession(state.currentSession.id)}
+                className={`px-2 py-1 text-xs ${UI_CONFIG.styling.border} border rounded hover:bg-white/10`}
+              >
+                <Archive className="w-3 h-3 inline mr-1" />
+                Compact
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: 'calc(100% - 120px)' }}>
+            {state.messageHistory.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
+                    message.type === 'user'
+                      ? `${UI_CONFIG.styling.accent} bg-blue-600/20 border ${UI_CONFIG.styling.border}`
+                      : message.type === 'system'
+                      ? 'bg-yellow-600/20 border border-yellow-600/20 text-yellow-100'
+                      : `bg-white/5 border ${UI_CONFIG.styling.border} text-gray-100`
+                  }`}
+                >
+                  {renderMessageContent(message)}
+                  {message.metadata && (
+                    <div className="text-xs opacity-60 mt-1">
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            
+            {state.isProcessing && (
+              <div className="flex justify-start">
+                <div className={`bg-white/5 border ${UI_CONFIG.styling.border} px-3 py-2 rounded-lg text-sm text-gray-100`}>
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin w-3 h-3 border border-white/30 border-t-white rounded-full"></div>
+                    Processing...
+                  </div>
+                </div>
+              </div>
+            )}
+            
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className={`p-3 border-t ${UI_CONFIG.styling.border}`}>
+        <div className="flex gap-2">
+          <textarea
+            ref={inputRef}
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me anything across all subsystems..."
+            className={`flex-1 px-3 py-2 ${UI_CONFIG.styling.primary} ${UI_CONFIG.styling.border} border rounded text-sm text-white placeholder-gray-400 resize-none`}
+            rows={1}
+            disabled={state.isProcessing}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!inputMessage.trim() || state.isProcessing}
+            className={`px-3 py-2 ${UI_CONFIG.styling.accent} ${UI_CONFIG.styling.border} border rounded hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FloatingEpiLogosAgent;

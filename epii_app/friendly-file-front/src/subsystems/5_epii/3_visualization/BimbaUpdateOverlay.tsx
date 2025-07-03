@@ -24,7 +24,7 @@ import webSocketService, {
   onAGUIEvent,
   offAGUIEvent,
   executeSkillWithAGUI
-} from '../1_services/webSocketService';
+} from '../../../epi-logos-system/3_services/webSocketService';
 
 interface BimbaNode {
   coordinate: string;
@@ -122,6 +122,13 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   // Create node modal state
   const [showCreateNodeModal, setShowCreateNodeModal] = useState(false);
 
+  // Multi-coordinate analysis state
+  const [multiCoordinateMode, setMultiCoordinateMode] = useState(false);
+  const [selectedCoordinates, setSelectedCoordinates] = useState<Set<string>>(new Set());
+  const [multiCoordinateAnalysisResults, setMultiCoordinateAnalysisResults] = useState<Map<string, any>>(new Map());
+  const [isMultiCoordinateAnalyzing, setIsMultiCoordinateAnalyzing] = useState(false);
+  const maxMultiCoordinateSelections = 7; // Configurable limit (parent + full 0-5 internal structure)
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get coordinates for the tree
@@ -138,6 +145,94 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       ...prev,
       [nodeId]: !prev[nodeId]
     }));
+  };
+
+  // Multi-coordinate mode handlers
+  const handleCoordinateToggle = (coordinate: string, selected: boolean) => {
+    setSelectedCoordinates(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(coordinate);
+      } else {
+        newSet.delete(coordinate);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleMultiCoordinateMode = () => {
+    setMultiCoordinateMode(prev => {
+      const newMode = !prev;
+      if (!newMode) {
+        // When turning off multi-mode, clear selections
+        setSelectedCoordinates(new Set());
+        setMultiCoordinateAnalysisResults(new Map());
+      }
+      return newMode;
+    });
+  };
+
+  const startMultiCoordinateAnalysis = async () => {
+    if (selectedCoordinates.size === 0 || !selectedFile?.file) {
+      console.warn('No coordinates selected or no file provided for multi-coordinate analysis');
+      return;
+    }
+
+    setIsMultiCoordinateAnalyzing(true);
+    setSuggestionError(null);
+    
+    try {
+      console.log('🔄 Starting multi-coordinate analysis for coordinates:', Array.from(selectedCoordinates));
+      
+      // Read file content
+      const fileContent = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = (e) => reject(e);
+        reader.readAsText(selectedFile.file!);
+      });
+
+      // Generate run and thread IDs for AG-UI tracking
+      const runId = `run_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const threadId = `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      setCurrentRunId(runId);
+      setCurrentThreadId(threadId);
+
+      console.log('🚀 Executing multi-coordinate Bimba Update Management skill via AG-UI');
+
+      // Call the enhanced Bimba Update Management skill with multi-coordinate parameters
+      const result = await executeSkillWithAGUI(
+        'bimba-update-management',
+        {
+          multiCoordinateMode: true,
+          targetCoordinates: Array.from(selectedCoordinates),
+          documentContent: fileContent,
+          documentType: selectedFile.documentType || 'bimba',
+          documentName: selectedFile.name,
+          nodeProperties: {},
+          relationships: [],
+          requestType: 'multi-coordinate-bimba-analysis'
+        },
+        {
+          runId,
+          threadId,
+          enableAGUI: true
+        }
+      );
+
+      console.log('✅ Multi-coordinate skill execution initiated:', result);
+      console.log(`🎯 Analysis started for ${selectedCoordinates.size} coordinates via Epi-Logos Agent delegation`);
+
+      // Results will be handled by AG-UI event handlers
+      // The Epi-Logos Agent will provide conversational presentation and approval workflow
+
+    } catch (error) {
+      console.error('Multi-coordinate analysis failed:', error);
+      setSuggestionError(error instanceof Error ? error.message : 'Failed to start multi-coordinate analysis');
+    } finally {
+      setIsMultiCoordinateAnalyzing(false);
+    }
   };
 
   // Auto-select initial coordinate when overlay opens (only if provided as string)
@@ -177,14 +272,21 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       const suggestions = {
         propertyUpdates: event.propertyUpdates || {},
         relationshipSuggestions: event.relationshipSuggestions || [],
+        crossCoordinateRelationships: event.crossCoordinateRelationships || [],
+        relevanceScore: event.relevanceScore,
+        keyAspects: event.keyAspects || [],
         reasoning: event.reasoning || 'Analysis completed via AG-UI',
         qlAlignment: event.qlAlignment || 'QL aligned',
-        targetCoordinate: event.targetCoordinate || selectedCoordinate
+        targetCoordinate: event.targetCoordinate || selectedCoordinate,
+        multiCoordinateMode: event.multiCoordinateMode || false
       };
 
       console.log('✨ Processed suggestions for form application:', {
         propertyCount: Object.keys(suggestions.propertyUpdates).length,
         relationshipCount: suggestions.relationshipSuggestions.length,
+        crossCoordinateRelationshipCount: suggestions.crossCoordinateRelationships.length,
+        relevanceScore: suggestions.relevanceScore,
+        multiCoordinateMode: suggestions.multiCoordinateMode,
         targetCoordinate: suggestions.targetCoordinate
       });
 
@@ -196,6 +298,11 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       // Detailed relationship suggestions logging
       if (suggestions.relationshipSuggestions.length > 0) {
         console.log('🔗 Relationship suggestions to apply:', suggestions.relationshipSuggestions);
+      }
+      
+      // Cross-coordinate relationships logging
+      if (suggestions.crossCoordinateRelationships.length > 0) {
+        console.log('🌐 Cross-coordinate relationships suggested:', suggestions.crossCoordinateRelationships);
       }
 
       // Set suggestions first
@@ -427,7 +534,7 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
     setIsLoadingDocuments(true);
     try {
       // Import document cache service
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
 
       console.log(`📋 Document cache service loaded, checking for documents...`);
 
@@ -961,6 +1068,92 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
       console.log('🔗 No relationship suggestions to apply');
     }
 
+    // Apply cross-coordinate relationship suggestions
+    if (suggestions.crossCoordinateRelationships && suggestions.crossCoordinateRelationships.length > 0) {
+      console.log('🌐 Processing cross-coordinate relationship suggestions:', suggestions.crossCoordinateRelationships);
+
+      // Add cross-coordinate relationships to the current coordinate's relationship suggestions
+      const crossCoordRelationships = suggestions.crossCoordinateRelationships
+        .filter((rel: any) => {
+          // Include relationships where current coordinate is the source or target
+          const isSource = rel.sourceCoordinate === selectedCoordinate;
+          const isTarget = rel.targetCoordinate === selectedCoordinate;
+          console.log(`🔍 Cross-coordinate relationship: ${rel.sourceCoordinate} → ${rel.targetCoordinate}, current: ${selectedCoordinate}, include: ${isSource || isTarget}`);
+          return isSource || isTarget;
+        })
+        .map((rel: any, index: number) => {
+          // If current coordinate is the source, create an outgoing relationship
+          // If current coordinate is the target, create an incoming relationship reference
+          const isSource = rel.sourceCoordinate === selectedCoordinate;
+          const mappedRel = {
+            action: 'create',
+            type: rel.type,
+            targetCoordinate: isSource ? rel.targetCoordinate : rel.sourceCoordinate,
+            properties: {
+              ...rel.properties,
+              crossCoordinateRelationship: true,
+              reasoning: rel.reasoning || 'Cross-coordinate relationship from multi-coordinate analysis',
+              bidirectional: rel.bidirectional || false,
+              originalSource: rel.sourceCoordinate,
+              originalTarget: rel.targetCoordinate
+            },
+            suggestionId: `cross_coord_rel_${Date.now()}_${index}`,
+            crossCoordinate: true
+          };
+          console.log(`🔄 Mapped cross-coordinate relationship:`, mappedRel);
+          return mappedRel;
+        });
+
+      if (crossCoordRelationships.length > 0) {
+        console.log(`🌐 Adding ${crossCoordRelationships.length} cross-coordinate relationships`);
+
+        // Update relationships state
+        setEditedRelationships(prev => {
+          const updated = [...prev, ...crossCoordRelationships];
+          console.log(`🌐 Updated relationships count with cross-coordinate: ${updated.length}`);
+          return updated;
+        });
+
+        // Track cross-coordinate relationship changes in pending changes
+        setPendingChanges(prevChanges => {
+          const newChanges = new Map(prevChanges);
+
+          crossCoordRelationships.forEach((rel, index) => {
+            const changeKey = `rel_cross_coord_${rel.suggestionId}`;
+            newChanges.set(changeKey, {
+              action: 'create',
+              type: rel.type,
+              targetCoordinate: rel.targetCoordinate,
+              properties: rel.properties,
+              source: 'cross_coordinate_analysis',
+              crossCoordinate: true
+            });
+            console.log(`📊 Added cross-coordinate relationship change: ${changeKey}`);
+          });
+
+          console.log('📊 Updated pending changes with cross-coordinate relationships:', Array.from(newChanges.entries()));
+
+          // Update hasUnsavedChanges
+          setHasUnsavedChanges(newChanges.size > 0);
+
+          // Save to cache immediately
+          saveChangesToCache(selectedCoordinate, newChanges);
+
+          // Update global change count
+          setTimeout(() => {
+            const globalChanges = collectAllChanges();
+            const totalChanges = Array.from(globalChanges.values()).reduce((total, changes) => total + Object.keys(changes).length, 0);
+            setGlobalChangeCount(totalChanges);
+            console.log(`🔢 Updated global change count with cross-coordinate relationships: ${totalChanges}`);
+          }, 0);
+
+          return newChanges;
+        });
+      }
+    } else {
+      console.log('🌐 No cross-coordinate relationship suggestions to apply');
+    }
+
     console.log('✅ applySuggestionsToForm completed using existing change tracking patterns');
   };
 
@@ -977,7 +1170,7 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
   const loadExistingDocumentContent = async (docId: string): Promise<string> => {
     try {
       // First try to get from cache
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
       const cachedDoc = documentCacheService.getDocumentById(docId);
 
       if (cachedDoc && (cachedDoc.content || cachedDoc.textContent)) {
@@ -1721,7 +1914,44 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
           <div className="w-1/3 bg-epii-darker rounded-lg p-4 overflow-y-auto flex flex-col">
             {/* Wrapped existing content to allow flex-grow and push button down */}
             <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-epii-neon mb-4">Select Coordinate</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-epii-neon">Select Coordinate</h3>
+                <button
+                  onClick={toggleMultiCoordinateMode}
+                  className={`px-3 py-1 text-xs rounded-md border transition-colors ${
+                    multiCoordinateMode
+                      ? 'bg-epii-neon text-epii-darker border-epii-neon'
+                      : 'bg-transparent text-epii-neon border-epii-neon hover:bg-epii-neon/10'
+                  }`}
+                  title={multiCoordinateMode ? 'Switch to single coordinate mode' : 'Enable multi-coordinate analysis'}
+                >
+                  Multi ({selectedCoordinates.size})
+                </button>
+              </div>
+
+              {multiCoordinateMode && (
+                <div className="mb-3 p-2 bg-epii-dark/50 rounded border border-epii-neon/30">
+                  <div className="text-xs text-epii-neon mb-1">Multi-Coordinate Analysis</div>
+                  <div className="text-xs text-gray-400">
+                    Select up to {maxMultiCoordinateSelections} coordinates for simultaneous analysis.
+                    {selectedCoordinates.size > 0 && (
+                      <span className="text-epii-neon"> {selectedCoordinates.size} selected</span>
+                    )}
+                  </div>
+                  {selectedCoordinates.size > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {Array.from(selectedCoordinates).map(coord => (
+                        <span
+                          key={coord}
+                          className="px-2 py-1 text-xs bg-epii-neon/20 text-epii-neon rounded border border-epii-neon/50"
+                        >
+                          {coord}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {isLoadingGraph && (
               <div className="text-gray-400 text-sm">Loading graph data...</div>
@@ -1739,6 +1969,10 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                 onNodeSelect={handleNodeSelect}
                 selectedNodeId={fullGraphData.nodes.find(n => n.bimbaCoordinate === selectedCoordinate)?.id}
                 coordinateChanges={collectAllChanges()}
+                multiSelectMode={multiCoordinateMode}
+                selectedCoordinates={selectedCoordinates}
+                onCoordinateToggle={handleCoordinateToggle}
+                maxSelections={maxMultiCoordinateSelections}
               />
             )}
 
@@ -2510,16 +2744,24 @@ const BimbaUpdateOverlay: React.FC<BimbaUpdateOverlayProps> = ({
                             </Button>
 
                             <Button
-                              onClick={generateLLMSuggestions}
-                              disabled={!selectedFile || isGeneratingSuggestions}
+                              onClick={multiCoordinateMode ? startMultiCoordinateAnalysis : generateLLMSuggestions}
+                              disabled={
+                                !selectedFile || 
+                                isGeneratingSuggestions || 
+                                isMultiCoordinateAnalyzing ||
+                                (multiCoordinateMode && selectedCoordinates.size === 0)
+                              }
                               className="bg-epii-neon text-epii-darker hover:bg-epii-neon/90"
                             >
-                              {isGeneratingSuggestions ? (
+                              {(isGeneratingSuggestions || isMultiCoordinateAnalyzing) ? (
                                 <div className="animate-spin mr-2 h-4 w-4 border-2 border-epii-darker border-t-transparent rounded-full" />
                               ) : (
                                 <Sparkles size={16} className="mr-2" />
                               )}
-                              Generate Suggestions
+                              {multiCoordinateMode 
+                                ? `Analyze ${selectedCoordinates.size} Coordinates`
+                                : 'Generate Suggestions'
+                              }
                             </Button>
                           </div>
 

@@ -348,6 +348,8 @@ let registryInstance = null;
 const UnifiedRAGSkill = require('./unifiedRAG');
 const EpiiChatSkill = require('../../subsystems/5_epii/skills/epii-chat-skill');
 const BimbaUpdateManagementSkill = require('./bimba-update-management-skill');
+const EpiLogosOrchestrationSkill = require('../../epi-logos-system/2_skills/epi-logos-orchestration-skill');
+const ExecuteFrontendActionSkill = require('../../epi-logos-system/2_skills/execute-frontend-action-skill');
 
 async function getRegistryInstance() {
   if (!registryInstance) {
@@ -358,6 +360,20 @@ async function getRegistryInstance() {
     registryInstance.registerSkill({
       ...unifiedRAGSkill.getSkillMetadata(),
       handler: unifiedRAGSkill.execute.bind(unifiedRAGSkill)
+    });
+
+    // Register the Epi-Logos Universal Orchestration skill at root coordinate #
+    const epiLogosOrchestrationSkill = new EpiLogosOrchestrationSkill();
+    registryInstance.registerSkill({
+      ...epiLogosOrchestrationSkill.getSkillMetadata(),
+      handler: epiLogosOrchestrationSkill.execute.bind(epiLogosOrchestrationSkill)
+    });
+
+    // Register the Execute Frontend Action skill at root coordinate #
+    const executeFrontendActionSkill = new ExecuteFrontendActionSkill();
+    registryInstance.registerSkill({
+      ...executeFrontendActionSkill.getSkillMetadata(),
+      handler: executeFrontendActionSkill.execute.bind(executeFrontendActionSkill)
     });
 
     // Register the Epii Chat skill at coordinate #5
@@ -387,7 +403,7 @@ async function getRegistryInstance() {
       console.error('[BimbaSkillsRegistry] Failed to register Epii Analysis Pipeline skill:', error);
     }
 
-    console.log('[BimbaSkillsRegistry] Core skills registered (UnifiedRAG at #, EpiiChat at #5, BimbaUpdate at #5-2, AnalysisPipeline at #5-0)');
+    console.log('[BimbaSkillsRegistry] Core skills registered (UnifiedRAG at #, EpiLogosOrchestration at #, ExecuteFrontendAction at #, EpiiChat at #5, BimbaUpdate at #5-2, AnalysisPipeline at #5-0)');
   }
   return registryInstance;
 }

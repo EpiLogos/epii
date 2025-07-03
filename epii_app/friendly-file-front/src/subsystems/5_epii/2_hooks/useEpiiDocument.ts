@@ -9,7 +9,7 @@ import { Document } from '../0_foundation/epiiTypes';
 import { v4 as uuidv4 } from 'uuid';
 import { getLanguageForSyntaxHighlighting } from "../1_services/utils/epiiHelpers";
 import { useGraphData } from '../../0_anuttara/2_hooks/useGraphData';
-import '../1_services/webSocketService'; // Import to ensure WebSocket connection is established
+import '../../../epi-logos-system/3_services/webSocketService'; // Import to ensure WebSocket connection is established
 
 /**
  * Hook for managing document uploads
@@ -303,7 +303,7 @@ export const useDocumentAnalysis = () => {
     // Import webSocketService and register event handler
     const setupEventHandler = async () => {
       try {
-        const { onAGUIEvent, offAGUIEvent } = await import('../1_services/webSocketService');
+        const { onAGUIEvent, offAGUIEvent } = await import('../../../epi-logos-system/3_services/webSocketService');
 
         // Register the event handler
         onAGUIEvent('DocumentAnalysisCompleted', handleAnalysisCompleted);
@@ -523,7 +523,7 @@ export const useDocumentAnalysis = () => {
       console.log(`🎯 Target Coordinate: ${targetCoordinate}`);
 
       // Import the executeSkillWithAGUI function
-      const { executeSkillWithAGUI } = await import('../1_services/webSocketService');
+      const { executeSkillWithAGUI } = await import('../../../epi-logos-system/3_services/webSocketService');
 
       // Execute skill using centralized WebSocket service with AG-UI support
       // Pass complete document metadata AND graphData through AG-UI protocol
@@ -788,7 +788,7 @@ export const useDocumentAnalysis = () => {
       console.log('Crystallization successful:', data);
 
       // Import document cache service to clear analysis results
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
       documentCacheService.clearAnalysisResults(currentDocumentId);
       console.log(`Cleared analysis results from cached document ${currentDocumentId}`);
 

@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useGraphData } from '../../0_anuttara/2_hooks/useGraphData';
 import { useQuery } from '@tanstack/react-query';
-import documentCacheService from '../1_services/documentCacheService';
+import documentCacheService from '../../../shared/services/documentCacheService';
 
 // Define types for Bimba coordinates and related documents
 export interface BimbaCoordinate {
@@ -153,7 +153,7 @@ export function useBimbaCoordinates(isDocumentsLoading?: boolean) {
       }
 
       // Import document cache service
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
 
       // Get documents from cache ONLY - no MongoDB fallback
       const cachedBimbaDocuments = documentCacheService.getDocumentsByCoordinate(coordinate, 'Documents');
@@ -320,7 +320,7 @@ export function useBimbaCoordinates(isDocumentsLoading?: boolean) {
 
     try {
       // Import document cache service
-      const documentCacheService = (await import('../1_services/documentCacheService')).default;
+      const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
 
       // Remove from state first
       setDocumentsByCoordinate(prev => {

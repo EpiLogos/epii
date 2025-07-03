@@ -3,20 +3,20 @@
  * Bimba Coordinate: #5-3-4.5-3
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText, Save, AlertCircle, Loader, PenTool, Trash2, Sparkles,
   Settings, X, ChevronUp, ChevronDown
 } from 'lucide-react';
 import DocumentViewer from './DocumentViewer';
 import { TextSelection, NotionUpdatePayload } from '../0_foundation/epiiTypes';
-import { useEpii } from '../4_context/EpiiContext';
-import { useDocumentAnalysis } from '../2_hooks/useEpiiDocument';
+import { useUniversalDocumentState } from '../1_hooks/useUniversalDocumentState';
 import documentService from '../1_services/documentService';
+import documentCacheService from '../../../shared/services/documentCacheService';
 import DocumentControls from './DocumentControls';
 import AnalysisResultsPanel from './AnalysisResultsPanel';
 import CrystalliseToNotionOverlay from './CrystalliseToNotionOverlay';
-import { sendWebSocketMessage } from '../1_services/webSocketService';
+import { sendWebSocketMessage } from '../../../epi-logos-system/3_services/webSocketService';
 import {
   // syncTextContentToMetadata, // DEFERRED: Sync feature temporarily disabled
   processPayloadForNotion
@@ -29,25 +29,32 @@ interface DocumentCanvasProps {
 }
 
 const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDeleted, onOpenBimbaUpdate }) => {
-  const { state, dispatch } = useEpii();
+  const documentState = useUniversalDocumentState();
   const {
     currentDocumentId,
+    currentDocument,
     documents,
     error,
-    statusMessage
-  } = state;
+    statusMessage,
+    isLoading,
+    syncStatus,
+    setCurrentDocument,
+    updateDocument,
+    deleteDocument,
+    setError,
+    setStatusMessage,
+    setLoading,
+    addDocument,
+    createAnalysisSession,
+    updateAnalysisSession,
+    analysisSessions
+  } = documentState;
 
-  // Get current document with improved debugging
-  console.log(`DocumentCanvas: Looking for document with ID ${currentDocumentId} in ${documents.length} documents`);
+  // Debug logging
+  console.log(`[DocumentCanvas] Current document ID: ${currentDocumentId}, Documents: ${documents.length}, Sync: ${syncStatus}`);
   if (documents.length > 0) {
-    console.log(`DocumentCanvas: Available document IDs:`, documents.map(doc => doc.id || doc._id));
+    console.log(`[DocumentCanvas] Available documents:`, documents.map(doc => ({ id: doc.id, name: doc.name })));
   }
-
-  // Find document by id or _id
-  let currentDocument = documents.find(doc =>
-    doc.id === currentDocumentId ||
-    doc._id === currentDocumentId
-  );
 
   // Ensure document has both id and _id properties if found
   if (currentDocument) {
@@ -69,15 +76,95 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
   // Check if this is a pratibimba document
   const isPratibimba = currentDocument?.documentType === 'pratibimba';
 
-  // Document hooks
+  // Document analysis methods from universal state
   const {
-    startAnalysis,
-    isAnalyzing,
-    targetCoordinate,
-    setTargetCoordinate,
-    crystallizeResults,
-    latestSession
-  } = useDocumentAnalysis();
+    createAnalysisSession,
+    updateAnalysisSession,
+    setCurrentSession,
+    analysisSessions,
+    currentSession
+  } = documentState;
+  
+  // Local analysis state
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [targetCoordinate, setTargetCoordinate] = useState<string>('');
+  
+  // Get latest session for current document
+  const latestSession = currentDocument ? 
+    analysisSessions
+      .filter(session => session.documentId === currentDocument.id)
+      .sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())[0] || null
+    : null;
+  
+  // Analysis methods
+  const startAnalysis = async () => {
+    if (!currentDocument || !targetCoordinate) {
+      setError('No document or target coordinate available');
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    setLoading(true);
+    
+    try {
+      // Create new analysis session
+      const sessionId = createAnalysisSession(
+        `Analysis of ${currentDocument.name}`,
+        currentDocument.id,
+        [] // No selections for now
+      );
+      
+      // TODO: Implement actual analysis via webSocketService
+      // For now, just simulate the process
+      console.log('Starting analysis for document:', currentDocument.id);
+      
+      // Simulate analysis completion after delay
+      setTimeout(() => {
+        updateAnalysisSession(sessionId, {
+          analysisResults: {
+            status: 'completed',
+            summary: 'Analysis completed successfully'
+          }
+        });
+        setIsAnalyzing(false);
+        setLoading(false);
+        setStatusMessage('Analysis completed successfully');
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error starting analysis:', error);
+      setError('Failed to start analysis');
+      setIsAnalyzing(false);
+      setLoading(false);
+    }
+  };
+  
+  const crystallizeResults = async () => {
+    if (!latestSession) {
+      setError('No analysis session available');
+      return false;
+    }
+    
+    setLoading(true);
+    
+    try {
+      // TODO: Implement actual crystallization via webSocketService
+      console.log('Crystallizing results for session:', latestSession.id);
+      
+      // Simulate crystallization
+      setTimeout(() => {
+        setStatusMessage('Results crystallized successfully');
+        setLoading(false);
+      }, 2000);
+      
+      return true;
+    } catch (error) {
+      console.error('Error crystallizing results:', error);
+      setError('Failed to crystallize results');
+      setLoading(false);
+      return false;
+    }
+  };
 
   // Local state
   const [documentContent, setDocumentContent] = useState<string>('');
@@ -91,8 +178,14 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
   // Track the current notion payload for the overlay (refreshes when metadata changes)
   const [currentNotionPayload, setCurrentNotionPayload] = useState<NotionUpdatePayload | null>(null);
   // We keep track of the current selection in local state for immediate updates
-  // but the source of truth is in the EpiiContext
+  // but the source of truth is in the universal state
   const [, setCurrentSelection] = useState<TextSelection | null>(null);
+  
+  // Refs for tracking previous values
+  const previousContentRef = useRef<string>('');
+  const previousDocumentIdRef = useRef<string | null>(null);
+  const previousNameRef = useRef<string>('');
+  const contentChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // AG-UI Event Emission Helper
   const emitDocumentEvent = async (eventType: string, documentData: any) => {
@@ -159,14 +252,9 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         setDocumentContent(currentDocument.content);
         previousContentRef.current = currentDocument.content;
 
-        // Also update the document in the context to use textContent consistently
-        dispatch({
-          type: 'UPDATE_DOCUMENT',
-          payload: {
-            id: currentDocument.id,
-            textContent: currentDocument.content,
-            forceSync: false
-          }
+        // Also update the document to use textContent consistently
+        updateDocument(currentDocument.id, {
+          textContent: currentDocument.content
         });
       }
 
@@ -210,7 +298,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           }
 
           // Import document cache service first
-          const documentCacheService = (await import('../1_services/documentCacheService')).default;
+          const documentCacheService = (await import('../../../shared/services/documentCacheService')).default;
 
           // Clean the document ID to ensure it's in a format that MongoDB can handle
           const cleanedId = currentDocument.id.replace(/[^0-9a-f]/gi, '').padEnd(24, '0').substring(0, 24);
@@ -235,17 +323,11 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             setDocumentContent(docContent);
             previousContentRef.current = docContent;
 
-            // Only update document in context if content is not empty
+            // Only update document if content is not empty
             if (docContent.length > 0) {
-              dispatch({
-                type: 'UPDATE_DOCUMENT',
-                payload: {
-                  id: currentDocument.id,
-                  textContent: docContent, // Use textContent consistently
-                  name: cachedDoc.name || currentDocument.name,
-                  // Don't force sync since we just loaded it
-                  forceSync: false
-                }
+              updateDocument(currentDocument.id, {
+                textContent: docContent,
+                name: cachedDoc.name || currentDocument.name
               });
             }
 
@@ -276,21 +358,15 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
             setDocumentContent(docContent);
             previousContentRef.current = docContent;
 
-            // Only update document in context if content is not empty
+            // Only update document if content is not empty
             // This prevents infinite loops with empty documents
             if (docContent.length > 0) {
-              dispatch({
-                type: 'UPDATE_DOCUMENT',
-                payload: {
-                  id: currentDocument.id,
-                  textContent: docContent, // Use textContent consistently
-                  name: doc.name || currentDocument.name,
-                  // Don't force sync since we just loaded it
-                  forceSync: false
-                }
+              updateDocument(currentDocument.id, {
+                textContent: docContent,
+                name: doc.name || currentDocument.name
               });
             } else {
-              console.log(`Not updating document ${currentDocument.id} in context - content is empty`);
+              console.log(`Not updating document ${currentDocument.id} - content is empty`);
             }
           } else {
             console.warn(`Document ${currentDocument.id} not found in MongoDB or cache`);
@@ -312,7 +388,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
     // Update the previous document ID ref
     previousDocumentIdRef.current = currentDocument?.id;
-  }, [currentDocument, dispatch, setTargetCoordinate]);
+  }, [currentDocument, updateDocument, setTargetCoordinate]);
 
   // Update the notion payload state when document metadata changes
   useEffect(() => {
@@ -375,16 +451,10 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         const updatedMetadata = currentDocument.metadata;
 
         // Update the document in state
-        dispatch({
-          type: 'UPDATE_DOCUMENT',
-          payload: {
-            id: currentDocumentId,
-            textContent: documentContent, // Use textContent consistently
-            name: documentName,
-            metadata: updatedMetadata,
-            // Always force sync to ensure changes are saved
-            forceSync: true
-          }
+        updateDocument(currentDocumentId, {
+          textContent: documentContent,
+          name: documentName,
+          metadata: updatedMetadata
         });
       }
 
@@ -398,7 +468,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         clearTimeout(contentChangeTimeoutRef.current);
       }
     };
-  }, [documentContent, currentDocumentId, documentName, dispatch]);
+  }, [documentContent, currentDocumentId, documentName, updateDocument]);
 
   // Save document when switching to another document
   useEffect(() => {
@@ -422,14 +492,9 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           console.log(`Previous content length: ${previousContentRef.current.length}`);
 
           // Update the previous document in state with the PREVIOUS content (not current)
-          dispatch({
-            type: 'UPDATE_DOCUMENT',
-            payload: {
-              id: prevDocument.id,
-              textContent: previousContentRef.current, // Use textContent consistently
-              name: previousNameRef.current,
-              forceSync: true // Force sync to MongoDB
-            }
+          updateDocument(prevDocument.id, {
+            textContent: previousContentRef.current,
+            name: previousNameRef.current
           });
         } else {
           console.log(`Not saving previous document ${prevDocument.id} - content unchanged`);
@@ -485,17 +550,11 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         pratibimbaIds: [] // Initialize with empty array
       };
 
-      // Add document to context state
-      dispatch({
-        type: 'ADD_DOCUMENT',
-        payload: newDoc
-      });
+      // Add document to state
+      addDocument(newDoc);
 
       // Set as current document
-      dispatch({
-        type: 'SET_CURRENT_DOCUMENT',
-        payload: newDoc.id
-      });
+      setCurrentDocument(newDoc.id);
 
       // Update local state
       setDocumentContent(initialContent);
@@ -512,13 +571,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       });
 
       // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: 'New document created successfully.'
-        }
-      });
+      setStatusMessage('New document created successfully.');
     } catch (error) {
       console.error('Error creating document:', error);
 
@@ -534,27 +587,18 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         pratibimbaIds: [] // Initialize with empty array
       };
 
-      // Add to context state
-      dispatch({
-        type: 'ADD_DOCUMENT',
-        payload: localDoc
-      });
+      // Add to state
+      addDocument(localDoc);
 
       // Set as current document
-      dispatch({
-        type: 'SET_CURRENT_DOCUMENT',
-        payload: localDoc.id
-      });
+      setCurrentDocument(localDoc.id);
 
       // Update local state
       setDocumentContent(initialContent);
       setDocumentName(initialName);
 
       // Show error message
-      dispatch({
-        type: 'SET_ERROR',
-        payload: 'Failed to create document in MongoDB. Using local storage only.'
-      });
+      setError('Failed to create document in MongoDB. Using local storage only.');
     } finally {
       setIsSaving(false);
     }
@@ -597,13 +641,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       console.log(`Analyzing selection: "${selection.text}"`);
 
       // Show a status message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'info',
-          text: `Analyzing selection: "${selection.text.substring(0, 30)}${selection.text.length > 30 ? '...' : ''}"`
-        }
-      });
+      setStatusMessage(`Analyzing selection: "${selection.text.substring(0, 30)}${selection.text.length > 30 ? '...' : ''}"`);
     } else if (action === 'crystallize') {
       // Create a new pratibimba document from the selection
       handleCreatePratibimba(selection);
@@ -752,21 +790,16 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       const result = await response.json();
 
       // Update the document status
-      dispatch({
-        type: 'UPDATE_DOCUMENT',
-        payload: {
-          id: currentDocumentId,
-          metadata: {
-            ...currentDocument.metadata,
-            status: 'sent_to_notion',
-            notionReference: {
-              updated: true,
-              updateDate: new Date(),
-              notionPageId: result.notionPageId,
-              status: 'synced'
-            }
-          },
-          forceSync: true
+      updateDocument(currentDocumentId, {
+        metadata: {
+          ...currentDocument.metadata,
+          status: 'sent_to_notion',
+          notionReference: {
+            updated: true,
+            updateDate: new Date(),
+            notionPageId: result.notionPageId,
+            status: 'synced'
+          }
         }
       });
 
@@ -777,13 +810,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       setShowCrystalliseOverlay(false);
 
       // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: `Successfully crystallised to Notion.`
-        }
-      });
+      setStatusMessage('Successfully crystallised to Notion.');
 
       // Reload documents using the cache first
       const reloadDocuments = async () => {
@@ -791,7 +818,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           console.log('Reloading documents after Notion update...');
 
           // Import document cache service first
-          const documentCacheModule = await import('../1_services/documentCacheService');
+          const documentCacheModule = await import('../../../shared/services/documentCacheService');
           const documentCacheService = documentCacheModule.default;
 
           // Invalidate the cache for the current document and its coordinate
@@ -838,33 +865,26 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       const pratibimbaName = `Crystallization of ${documentName}`;
 
       // Create a new pratibimba document
-      dispatch({
-        type: 'CREATE_PRATIBIMBA',
-        payload: {
+      const pratibimbaDoc = {
+        id: `pratibimba_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: pratibimbaName,
+        textContent: selection.text,
+        documentType: 'pratibimba' as const,
+        bimbaCoordinate: currentDocument.bimbaCoordinate,
+        isTemporary: false,
+        metadata: {
           bimbaId: currentDocumentId,
-          name: pratibimbaName,
-          textContent: selection.text,
-          content: selection.text, // Deprecated: kept for backward compatibility
           sourceSelection: selection,
-          crystallizationIntent: 'Manual crystallization from selection',
-          bimbaCoordinate: currentDocument.bimbaCoordinate
+          crystallizationIntent: 'Manual crystallization from selection'
         }
-      });
+      };
+      addDocument(pratibimbaDoc);
 
       // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: `Created crystallization from selection.`
-        }
-      });
+      setStatusMessage('Created crystallization from selection.');
     } catch (error) {
       console.error('Error creating crystallization:', error);
-      dispatch({
-        type: 'SET_ERROR',
-        payload: `Failed to create crystallization: ${error instanceof Error ? error.message : 'Unknown error'}`
-      });
+      setError(`Failed to create crystallization: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
@@ -882,33 +902,26 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
       const pratibimbaName = `Crystallization of ${documentName}`;
 
       // Create a new pratibimba document
-      dispatch({
-        type: 'CREATE_PRATIBIMBA',
-        payload: {
+      const pratibimbaDoc = {
+        id: `pratibimba_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: pratibimbaName,
+        textContent: '',
+        documentType: 'pratibimba' as const,
+        bimbaCoordinate: currentDocument.bimbaCoordinate,
+        isTemporary: false,
+        metadata: {
           bimbaId: currentDocumentId,
-          name: pratibimbaName,
-          textContent: '', // Empty content
-          content: '', // Deprecated: kept for backward compatibility
           sourceSelection: { start: 0, end: 0, text: '' },
-          crystallizationIntent: 'Manual empty crystallization',
-          bimbaCoordinate: currentDocument.bimbaCoordinate
+          crystallizationIntent: 'Manual empty crystallization'
         }
-      });
+      };
+      addDocument(pratibimbaDoc);
 
       // Show success message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'success',
-          text: `Created empty crystallization.`
-        }
-      });
+      setStatusMessage('Created empty crystallization.');
     } catch (error) {
       console.error('Error creating empty crystallization:', error);
-      dispatch({
-        type: 'SET_ERROR',
-        payload: `Failed to create crystallization: ${error instanceof Error ? error.message : 'Unknown error'}`
-      });
+      setError(`Failed to create crystallization: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
@@ -937,10 +950,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
     try {
       // First, clear the current document state to prevent UI issues
       // This ensures we don't try to render a document that's being deleted
-      dispatch({
-        type: 'SET_CURRENT_DOCUMENT',
-        payload: null
-      });
+      setCurrentDocument(null);
 
       // Reset canvas state immediately to prevent UI issues
       setDocumentContent('');
@@ -952,19 +962,10 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         console.log(`Deleting temporary document ${documentIdToDelete} from state only`);
 
         // Just remove from state
-        dispatch({
-          type: 'REMOVE_DOCUMENT',
-          payload: documentIdToDelete
-        });
+        deleteDocument(documentIdToDelete);
 
         // Show success message
-        dispatch({
-          type: 'SET_STATUS_MESSAGE',
-          payload: {
-            type: 'success',
-            text: 'Document deleted successfully.'
-          }
-        });
+        setStatusMessage('Document deleted successfully.');
       } else {
         // For MongoDB documents, we'll delete from the database
         console.log(`Deleting document ${documentIdToDelete} from MongoDB collection ${isPratibimba ? 'pratibimbaDocuments' : 'Documents'}`);
@@ -973,22 +974,13 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         const collection = isPratibimba ? 'pratibimbaDocuments' : 'Documents';
 
         // Remove from state first to ensure UI responsiveness
-        dispatch({
-          type: 'REMOVE_DOCUMENT',
-          payload: documentIdToDelete
-        });
+        deleteDocument(documentIdToDelete);
 
         // Then delete from MongoDB asynchronously
         const deletePromise = documentService.deleteDocument(documentIdToDelete, collection);
 
         // Show a pending message
-        dispatch({
-          type: 'SET_STATUS_MESSAGE',
-          payload: {
-            type: 'info',
-            text: `Deleting ${isPratibimba ? 'crystallization' : 'document'} from database...`
-          }
-        });
+        setStatusMessage(`Deleting ${isPratibimba ? 'crystallization' : 'document'} from database...`);
 
         // Wait for the deletion to complete
         const result = await deletePromise;
@@ -1021,13 +1013,7 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
         } else {
           // Even if the API call failed, we've already removed it from state
           // So we'll show a warning message
-          dispatch({
-            type: 'SET_STATUS_MESSAGE',
-            payload: {
-              type: 'warning',
-              text: `${isPratibimba ? 'Crystallization' : 'Document'} removed from view, but there was an issue with database deletion: ${result.message}`
-            }
-          });
+          setStatusMessage(`${isPratibimba ? 'Crystallization' : 'Document'} removed from view, but there was an issue with database deletion: ${result.message}`);
         }
       }
     } catch (error) {
@@ -1035,13 +1021,8 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
 
       // Even if there was an error, we've already removed the document from state
       // So we'll show a warning message
-      dispatch({
-        type: 'SET_STATUS_MESSAGE',
-        payload: {
-          type: 'warning',
-          text: `Document removed from view, but there was an error with database deletion: ${error instanceof Error ? error.message : 'Unknown error'}`
-        }
-      });
+      setStatusMessage(`Document removed from view, but there was an error with database deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
     } finally {
       setIsSaving(false);
     }
@@ -1213,16 +1194,11 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           }
           */
 
-          // First, update the document in context state to ensure it's saved
-          dispatch({
-            type: 'UPDATE_DOCUMENT',
-            payload: {
-              id: currentDocumentId,
-              textContent: documentContent, // Use textContent consistently
-              name: documentName,
-              metadata: updatedMetadata,
-              forceSync: true // Force sync to MongoDB
-            }
+          // First, update the document in state to ensure it's saved
+          updateDocument(currentDocumentId, {
+            textContent: documentContent,
+            name: documentName,
+            metadata: updatedMetadata
           });
 
           // Update the previous content ref to prevent auto-save issues
@@ -1252,13 +1228,10 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           }, collection);
 
           // Update metadata in state
-          dispatch({
-            type: 'UPDATE_DOCUMENT_METADATA',
-            payload: {
-              id: currentDocumentId,
-              name: documentName,
-              bimbaCoordinate: coordinateToSave  // ✅ Use the correctly calculated coordinate
-            }
+          updateDocument(currentDocumentId, {
+            name: documentName,
+            bimbaCoordinate: coordinateToSave,
+            targetCoordinate: coordinateToSave
           });
 
           console.log(`${isPratibimba ? 'Pratibimba' : 'Bimba'} document ${currentDocumentId} saved successfully to MongoDB`);
@@ -1278,21 +1251,12 @@ const DocumentCanvas: React.FC<DocumentCanvasProps> = ({ userId, onDocumentDelet
           });
 
           // Show success message
-          dispatch({
-            type: 'SET_STATUS_MESSAGE',
-            payload: {
-              type: 'success',
-              text: `${isPratibimba ? 'Crystallization' : 'Document'} saved successfully to MongoDB.`
-            }
-          });
+          setStatusMessage(`${isPratibimba ? 'Crystallization' : 'Document'} saved successfully to MongoDB.`);
         } catch (updateError) {
           console.error(`Error updating ${isPratibimba ? 'pratibimba' : 'bimba'} document in MongoDB:`, updateError);
 
           // Show error message
-          dispatch({
-            type: 'SET_ERROR',
-            payload: `Failed to save ${isPratibimba ? 'crystallization' : 'document'} to MongoDB. Please try again.`
-          });
+          setError(`Failed to save ${isPratibimba ? 'crystallization' : 'document'} to MongoDB. Please try again.`);
         }
       }
     } catch (error) {

@@ -8,6 +8,8 @@ import { AnimatePresence } from "framer-motion";
 import { UserContextProvider } from "./subsystems/4_nara/4_context/UserContextProvider";
 import { AnimationConsoleProvider } from "./subsystems/2_parashakti/4_context/AnimationConsoleContext";
 import { AnimationConsole } from "./subsystems/2_parashakti/3_visualization/AnimationConsole";
+import { FloatingEpiLogosAgent } from "./epi-logos-system/1_components";
+import { AgentContextProvider } from "./shared/hooks/agent";
 
 // Pages
 import Welcome from "./shared/pages/Welcome";
@@ -53,20 +55,24 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <UserContextProvider>
-        <AnimationConsoleProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen">
-              <Navbar />
-              <AnimatedRoutes />
-            </div>
-            {/* Global Animation Console */}
-            <AnimationConsole />
-          </BrowserRouter>
-        </AnimationConsoleProvider>
-      </UserContextProvider>
+      <AgentContextProvider>
+        <UserContextProvider>
+          <AnimationConsoleProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className="min-h-screen">
+                <Navbar />
+                <AnimatedRoutes />
+              </div>
+              {/* Global Animation Console */}
+              <AnimationConsole />
+              {/* Global Epi-Logos Agent */}
+              <FloatingEpiLogosAgent />
+            </BrowserRouter>
+          </AnimationConsoleProvider>
+        </UserContextProvider>
+      </AgentContextProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

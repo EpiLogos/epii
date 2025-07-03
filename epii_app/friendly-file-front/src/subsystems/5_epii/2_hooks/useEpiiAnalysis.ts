@@ -79,7 +79,7 @@ export const useDocumentAnalysis = () => {
       });
 
       // Call A2A service to execute epii-analysis-pipeline skill with AG-UI support
-      const { executeSkillWithAGUI } = await import('../1_services/webSocketService');
+      const { executeSkillWithAGUI } = await import('../../../epi-logos-system/3_services/webSocketService');
 
       // Generate AG-UI run identifiers
       const runId = `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
