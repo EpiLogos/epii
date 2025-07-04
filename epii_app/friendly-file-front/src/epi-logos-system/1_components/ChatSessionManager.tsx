@@ -30,6 +30,7 @@ interface ChatSessionManagerProps {
   onNewSession: () => void;
   onClearSession: () => void;
   onExportSession: (sessionId: string) => void;
+  onDeleteSession: (sessionId: string) => void;
   messageCount: number;
   className?: string;
 }
@@ -50,6 +51,7 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
   onNewSession,
   onClearSession,
   onExportSession,
+  onDeleteSession,
   messageCount,
   className = ''
 }) => {
@@ -187,6 +189,16 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
     }
   };
 
+  const handleDeleteSession = useCallback(async (sessionId: string) => {
+    try {
+      await onDeleteSession(sessionId);
+      // Refresh session history after deletion
+      loadSessionHistory();
+    } catch (error) {
+      console.error('[ChatSessionManager] Failed to delete session:', error);
+    }
+  }, [onDeleteSession, loadSessionHistory]);
+
   // Determine if compression should be suggested
   const shouldSuggestCompression = messageCount > 50;
 
@@ -284,15 +296,17 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
               {sessionHistory.map((session) => (
                 <div
                   key={session.id}
-                  onClick={() => handleSessionSelect(session.id)}
-                  className={`p-2 rounded cursor-pointer transition-colors ${
+                  className={`p-2 rounded transition-colors ${
                     session.id === currentSession.id
                       ? 'bg-epii-neon/20 border border-epii-neon/40'
                       : 'hover:bg-epii-neon/10'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 min-w-0 flex-1">
+                    <div 
+                      className="flex items-center space-x-2 min-w-0 flex-1 cursor-pointer"
+                      onClick={() => handleSessionSelect(session.id)}
+                    >
                       <span className="text-sm">{getSessionTypeIcon(session.sessionType)}</span>
                       <div className="min-w-0 flex-1">
                         <div className="text-xs text-gray-200 truncate">
@@ -312,6 +326,19 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
                       )}
                       <Clock size={10} />
                       <span>{session.timestamp.toLocaleDateString()}</span>
+                      {/* Delete button - only show for non-current sessions */}
+                      {session.id !== currentSession.id && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent session selection
+                            handleDeleteSession(session.id);
+                          }}
+                          className="p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300"
+                          title="Delete session"
+                        >
+                          <Trash2 size={10} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

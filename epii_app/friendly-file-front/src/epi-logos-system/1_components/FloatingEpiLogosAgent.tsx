@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { X, Minus, MessageCircle, Send, Settings, Archive, FileText } from 'lucide-react';
+import { Minus, MessageCircle, Send, Settings, Archive, FileText } from 'lucide-react';
 import { 
   AgentMessage, 
   AgentSession, 
@@ -907,6 +907,23 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [state.messageHistory, addSystemMessage]);
 
   /**
+   * Delete session
+   */
+  const handleDeleteSession = useCallback(async (sessionId: string) => {
+    try {
+      const success = await sessionHistoryService.deleteSession(sessionId);
+      if (success) {
+        addSystemMessage(`🗑️ Session deleted successfully`);
+      } else {
+        addSystemMessage('❌ Cannot delete current active session');
+      }
+    } catch (error) {
+      console.error('[FloatingAgent] Failed to delete session:', error);
+      addSystemMessage('❌ Failed to delete session');
+    }
+  }, [addSystemMessage]);
+
+  /**
    * Toggle minimized state with smart positioning
    */
   const toggleMinimized = useCallback(() => {
@@ -1133,14 +1150,9 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           <button
             onClick={toggleMinimized}
             className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
+            title="Minimize"
           >
             <Minus className="w-3 h-3" />
-          </button>
-          <button
-            onClick={onClose}
-            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
-          >
-            <X className="w-3 h-3" />
           </button>
         </div>
       </div>
@@ -1152,6 +1164,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         onNewSession={startNewSession}
         onClearSession={handleClearSession}
         onExportSession={handleExportSession}
+        onDeleteSession={handleDeleteSession}
         messageCount={state.messageHistory.length}
       />
 
