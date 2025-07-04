@@ -14,7 +14,7 @@ import {
   Trash2, 
   Archive, 
   Download, 
-  Compress,
+  Minimize2,
   Clock,
   MessageCircle,
   ChevronDown,
@@ -250,7 +250,7 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
               }`}
               title={showConfirmCompress ? 'Click to confirm compression' : 'Compress long conversation'}
             >
-              <Compress size={14} />
+              <Minimize2 size={14} />
             </button>
           )}
 
@@ -306,7 +306,7 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
                     <div className="flex items-center space-x-2 text-xs text-gray-400">
                       <span>{session.messageCount}m</span>
                       {session.isCompressed && (
-                        <Compress size={10} className="text-yellow-400" />
+                        <Minimize2 size={10} className="text-yellow-400" />
                       )}
                       <Clock size={10} />
                       <span>{session.timestamp.toLocaleDateString()}</span>

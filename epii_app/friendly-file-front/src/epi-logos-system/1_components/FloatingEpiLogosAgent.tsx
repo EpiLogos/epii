@@ -69,6 +69,11 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   // UI state
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  
+  // Performance optimization: Use refs for drag position tracking
+  const dragPositionRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  
   const [inputMessage, setInputMessage] = useState('');
   
   // Resize state
@@ -84,14 +89,19 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initialize component
+  // Initialize component only once
+  const hasInitialized = useRef(false);
+  
   useEffect(() => {
-    initializeAgent();
-    setupEventListeners();
-    
-    return () => {
-      cleanupEventListeners();
-    };
+    if (!hasInitialized.current) {
+      initializeAgent();
+      setupEventListeners();
+      hasInitialized.current = true;
+      
+      return () => {
+        cleanupEventListeners();
+      };
+    }
   }, []);
 
   // Load message history when session changes
@@ -102,12 +112,35 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     }
   }, [state.currentSession]);
 
+  // Add welcome message for new sessions only
+  useEffect(() => {
+    if (state.currentSession && state.messageHistory.length === 0 && hasInitialized.current) {
+      // Check if this is truly a new session with no messages
+      const sessionMessages = sessionHistoryService.getCurrentSessionMessages();
+      if (sessionMessages.length === 0) {
+        addSystemMessage('🌀 Epi-Logos Agent activated. I can assist you across all subsystems with document analysis, coordinate work, knowledge synthesis, and more.');
+      }
+    }
+  }, [state.currentSession, state.messageHistory.length, addSystemMessage]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [state.messageHistory]);
+
+  // Focus management for input responsiveness
+  useEffect(() => {
+    if (!state.isMinimized && inputRef.current && !state.isProcessing) {
+      // Focus input when expanded and not processing
+      const timeoutId = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [state.isMinimized, state.isProcessing]);
 
   /**
    * Initialize agent and connect to backend
@@ -122,12 +155,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     subscribeToAGUIEvents('orchestration:response');
     subscribeToAGUIEvents('agent:message');
     subscribeToAGUIEvents('agent:state');
-    
-    // Add welcome message if no session exists
-    if (state.messageHistory.length === 0) {
-      addSystemMessage('🌀 Epi-Logos Agent activated. I can assist you across all subsystems with document analysis, coordinate work, knowledge synthesis, and more.');
-    }
-  }, [state.messageHistory.length]);
+  }, []);
 
   /**
    * Set up event listeners
@@ -545,12 +573,17 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     
     if ((e.target as HTMLElement).closest('.drag-handle') || state.isMinimized) {
       setIsDragging(true);
+      isDraggingRef.current = true;
+      
       const rect = agentRef.current?.getBoundingClientRect();
       if (rect) {
         setDragOffset({
           x: e.clientX - rect.left,
           y: e.clientY - rect.top
         });
+        
+        // Initialize drag position ref
+        dragPositionRef.current = { x: rect.left, y: rect.top };
       }
       
       // Add some visual feedback
@@ -562,41 +595,48 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [state.isMinimized]);
 
   /**
-   * Handle drag with requestAnimationFrame for smoothness
+   * Handle drag with optimized performance using refs
    */
   const handleDrag = useCallback((e: MouseEvent) => {
-    if (isDragging && agentRef.current) {
-      // Use requestAnimationFrame for smooth updates
-      requestAnimationFrame(() => {
-        const newX = e.clientX - dragOffset.x;
-        const newY = e.clientY - dragOffset.y;
-        
-        // Constrain to viewport bounds
-        const maxX = window.innerWidth - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
-        const maxY = window.innerHeight - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
-        
-        const constrainedX = Math.max(0, Math.min(newX, maxX));
-        const constrainedY = Math.max(0, Math.min(newY, maxY));
-        
-        setState(prev => ({
-          ...prev,
-          position: { x: constrainedX, y: constrainedY }
-        }));
-      });
-    }
-  }, [isDragging, dragOffset, state.isMinimized]);
+    if (!isDraggingRef.current || !agentRef.current) return;
+    
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    // Constrain to viewport bounds
+    const maxX = window.innerWidth - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
+    const maxY = window.innerHeight - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
+    
+    const constrainedX = Math.max(0, Math.min(newX, maxX));
+    const constrainedY = Math.max(0, Math.min(newY, maxY));
+    
+    // Update position immediately via direct style manipulation for smoothness
+    agentRef.current.style.left = `${constrainedX}px`;
+    agentRef.current.style.top = `${constrainedY}px`;
+    
+    // Store position in ref for final state update
+    dragPositionRef.current = { x: constrainedX, y: constrainedY };
+  }, [dragOffset.x, dragOffset.y, state.isMinimized]);
 
   /**
    * Handle drag end with anchoring logic
    */
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
+    isDraggingRef.current = false;
     
     // Reset cursor
     if (agentRef.current) {
       agentRef.current.style.cursor = state.isMinimized ? 'pointer' : 'default';
       agentRef.current.style.userSelect = '';
     }
+
+    // Update state with final position from ref
+    const finalPosition = dragPositionRef.current;
+    setState(prev => ({
+      ...prev,
+      position: finalPosition
+    }));
 
     // Anchoring logic: return to bottom-right if close enough
     const anchorPos = {
@@ -605,14 +645,14 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     };
     
     const distance = Math.sqrt(
-      Math.pow(state.position.x - anchorPos.x, 2) + 
-      Math.pow(state.position.y - anchorPos.y, 2)
+      Math.pow(finalPosition.x - anchorPos.x, 2) + 
+      Math.pow(finalPosition.y - anchorPos.y, 2)
     );
     
     // If within threshold distance, animate back to anchor
     if (distance < UI_CONFIG.floatingAgent.anchorThreshold) {
       // Smooth animation back to anchor position
-      const startPos = { ...state.position };
+      const startPos = { ...finalPosition };
       const startTime = Date.now();
       const duration = UI_CONFIG.floatingAgent.anchorAnimationDuration;
       
@@ -626,19 +666,25 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         const currentX = startPos.x + (anchorPos.x - startPos.x) * easeOut;
         const currentY = startPos.y + (anchorPos.y - startPos.y) * easeOut;
         
-        setState(prev => ({
-          ...prev,
-          position: { x: currentX, y: currentY }
-        }));
+        if (agentRef.current) {
+          agentRef.current.style.left = `${currentX}px`;
+          agentRef.current.style.top = `${currentY}px`;
+        }
         
         if (progress < 1) {
           requestAnimationFrame(animateToAnchor);
+        } else {
+          // Final state update
+          setState(prev => ({
+            ...prev,
+            position: { x: currentX, y: currentY }
+          }));
         }
       };
       
       requestAnimationFrame(animateToAnchor);
     }
-  }, [state.isMinimized, state.position]);
+  }, [state.isMinimized]);
 
   // Set up drag event listeners
   useEffect(() => {
@@ -857,16 +903,47 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, [state.messageHistory, addSystemMessage]);
 
   /**
-   * Toggle minimized state
+   * Toggle minimized state with smart positioning
    */
   const toggleMinimized = useCallback(() => {
     setState(prev => {
       const newMinimized = !prev.isMinimized;
       
-      // If expanding from minimized, position to show full UI properly
+      // If expanding from minimized, implement smart positioning
       if (!newMinimized && prev.isMinimized) {
-        const newX = Math.min(prev.position.x, window.innerWidth - UI_CONFIG.floatingAgent.minWidth);
-        const newY = Math.min(prev.position.y, window.innerHeight - UI_CONFIG.floatingAgent.minHeight);
+        const bubbleX = prev.position.x;
+        const bubbleY = prev.position.y;
+        const modalWidth = windowSize.width;
+        const modalHeight = windowSize.height;
+        
+        // Detect position relative to screen quadrants
+        const isRightSide = bubbleX > window.innerWidth / 2;
+        const isBottomSide = bubbleY > window.innerHeight / 2;
+        
+        let newX = bubbleX;
+        let newY = bubbleY;
+        
+        // Smart horizontal positioning
+        if (isRightSide) {
+          // If on right side, open leftward
+          newX = Math.max(0, bubbleX - modalWidth + UI_CONFIG.floatingAgent.minimizedSize);
+        } else {
+          // If on left side, open rightward (default behavior)
+          newX = Math.min(bubbleX, window.innerWidth - modalWidth);
+        }
+        
+        // Smart vertical positioning
+        if (isBottomSide) {
+          // If on bottom side, open upward
+          newY = Math.max(0, bubbleY - modalHeight + UI_CONFIG.floatingAgent.minimizedSize);
+        } else {
+          // If on top side, open downward (default behavior)
+          newY = Math.min(bubbleY, window.innerHeight - modalHeight);
+        }
+        
+        // Ensure the modal stays within viewport bounds
+        newX = Math.max(0, Math.min(newX, window.innerWidth - modalWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - modalHeight));
         
         return { 
           ...prev, 
@@ -875,9 +952,56 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         };
       }
       
+      // If minimizing, animate back to anchor position
+      if (newMinimized && !prev.isMinimized) {
+        const anchorPos = {
+          x: window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20,
+          y: window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20
+        };
+        
+        // Start animation to anchor position
+        const startPos = { ...prev.position };
+        const startTime = Date.now();
+        const duration = UI_CONFIG.floatingAgent.anchorAnimationDuration;
+        
+        const animateToAnchor = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // Easing function for smooth animation
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          
+          const currentX = startPos.x + (anchorPos.x - startPos.x) * easeOut;
+          const currentY = startPos.y + (anchorPos.y - startPos.y) * easeOut;
+          
+          if (agentRef.current) {
+            agentRef.current.style.left = `${currentX}px`;
+            agentRef.current.style.top = `${currentY}px`;
+          }
+          
+          if (progress < 1) {
+            requestAnimationFrame(animateToAnchor);
+          } else {
+            // Final state update
+            setState(current => ({
+              ...current,
+              position: { x: currentX, y: currentY }
+            }));
+          }
+        };
+        
+        requestAnimationFrame(animateToAnchor);
+        
+        return { 
+          ...prev, 
+          isMinimized: newMinimized,
+          // Don't update position immediately, let animation handle it
+        };
+      }
+      
       return { ...prev, isMinimized: newMinimized };
     });
-  }, []);
+  }, [windowSize.width, windowSize.height]);
 
   // Memoized message list for performance
   const memoizedMessageList = useMemo(() => 
@@ -921,7 +1045,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     return (
       <div
         ref={agentRef}
-        className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer`}
+        className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border shadow-2xl transition-all duration-300 hover:shadow-xl hover:border-opacity-40 cursor-pointer`}
         style={{
           left: state.position.x,
           top: state.position.y,
@@ -1053,10 +1177,10 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             value={inputMessage}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me anything across all subsystems..."
-            className={`flex-1 px-3 py-2 ${UI_CONFIG.styling.primary} ${UI_CONFIG.styling.border} border rounded text-sm text-white placeholder-gray-400 resize-none`}
+            placeholder={state.isProcessing ? "Processing... (you can type while I work)" : "Ask me anything across all subsystems..."}
+            className={`flex-1 px-3 py-2 ${UI_CONFIG.styling.primary} ${UI_CONFIG.styling.border} border rounded text-sm text-white placeholder-gray-400 resize-none ${state.isProcessing ? 'border-yellow-400/30' : ''}`}
             rows={1}
-            disabled={state.isProcessing}
+            disabled={false}
           />
           <button
             onClick={sendMessage}

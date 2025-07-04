@@ -67,11 +67,11 @@ const App = () => (
                   <Navbar />
                   <AnimatedRoutes />
                 </div>
+                {/* Global Animation Console */}
+                <AnimationConsole />
+                {/* Global Epi-Logos Agent */}
+                <FloatingEpiLogosAgent />
               </ActiveModeProvider>
-              {/* Global Animation Console */}
-              <AnimationConsole />
-              {/* Global Epi-Logos Agent */}
-              <FloatingEpiLogosAgent />
             </BrowserRouter>
           </AnimationConsoleProvider>
         </UserContextProvider>
