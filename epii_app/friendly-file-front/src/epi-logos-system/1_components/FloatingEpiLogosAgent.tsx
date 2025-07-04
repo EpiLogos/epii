@@ -112,16 +112,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     }
   }, [state.currentSession]);
 
-  // Add welcome message for new sessions only
-  useEffect(() => {
-    if (state.currentSession && state.messageHistory.length === 0 && hasInitialized.current) {
-      // Check if this is truly a new session with no messages
-      const sessionMessages = sessionHistoryService.getCurrentSessionMessages();
-      if (sessionMessages.length === 0) {
-        addSystemMessage('🌀 Epi-Logos Agent activated. I can assist you across all subsystems with document analysis, coordinate work, knowledge synthesis, and more.');
-      }
-    }
-  }, [state.currentSession, state.messageHistory.length, addSystemMessage]);
+  // Note: Welcome message useEffect moved after function declarations to avoid hoisting issues
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -263,6 +254,17 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       messageHistory: [...prev.messageHistory, systemMessage]
     }));
   }, [state.currentSession]);
+
+  // Add welcome message for new sessions only (placed after addSystemMessage declaration)
+  useEffect(() => {
+    if (state.currentSession && state.messageHistory.length === 0 && hasInitialized.current) {
+      // Check if this is truly a new session with no messages
+      const sessionMessages = sessionHistoryService.getCurrentSessionMessages();
+      if (sessionMessages.length === 0) {
+        addSystemMessage('🌀 Epi-Logos Agent activated. I can assist you across all subsystems with document analysis, coordinate work, knowledge synthesis, and more.');
+      }
+    }
+  }, [state.currentSession, state.messageHistory.length, addSystemMessage]);
 
   /**
    * Handle local document operations
