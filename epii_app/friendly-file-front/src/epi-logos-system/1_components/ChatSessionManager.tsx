@@ -72,16 +72,18 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
       const historyItems: SessionHistoryItem[] = sessions.map(session => ({
         id: session.id,
         title: generateSessionTitle(session),
-        timestamp: new Date(session.timestamp),
+        timestamp: new Date(session.startTime),
         messageCount: session.messageCount || 0,
         sessionType: determineSessionType(session),
         contextIndicator: session.context?.documentId || session.context?.coordinate,
-        isCompressed: session.isCompressed || false
+        isCompressed: false // AgentSession doesn't have isCompressed, defaulting to false
       }));
 
       setSessionHistory(historyItems);
     } catch (error) {
       console.error('[ChatSessionManager] Failed to load session history:', error);
+      // Set empty array on error to prevent UI issues
+      setSessionHistory([]);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +101,7 @@ export const ChatSessionManager: React.FC<ChatSessionManagerProps> = ({
     }
     
     // Generate from first message or timestamp
-    const date = new Date(session.timestamp);
+    const date = new Date(session.startTime || session.timestamp);
     return `Session ${date.toLocaleDateString()} ${date.toLocaleTimeString([], { 
       hour: '2-digit', 
       minute: '2-digit' 

@@ -73,6 +73,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   // Performance optimization: Use refs for drag position tracking
   const dragPositionRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
   
   const [inputMessage, setInputMessage] = useState('');
   
@@ -579,10 +580,11 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       
       const rect = agentRef.current?.getBoundingClientRect();
       if (rect) {
-        setDragOffset({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        });
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+        
+        setDragOffset({ x: offsetX, y: offsetY });
+        dragOffsetRef.current = { x: offsetX, y: offsetY };
         
         // Initialize drag position ref
         dragPositionRef.current = { x: rect.left, y: rect.top };
@@ -602,8 +604,8 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const handleDrag = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current || !agentRef.current) return;
     
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
+    const newX = e.clientX - dragOffsetRef.current.x;
+    const newY = e.clientY - dragOffsetRef.current.y;
     
     // Constrain to viewport bounds
     const maxX = window.innerWidth - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
@@ -618,7 +620,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     
     // Store position in ref for final state update
     dragPositionRef.current = { x: constrainedX, y: constrainedY };
-  }, [dragOffset.x, dragOffset.y, state.isMinimized]);
+  }, [state.isMinimized]);
 
   /**
    * Handle drag end with anchoring logic
@@ -918,29 +920,29 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         const modalWidth = windowSize.width;
         const modalHeight = windowSize.height;
         
-        // Detect position relative to screen quadrants
-        const isRightSide = bubbleX > window.innerWidth / 2;
-        const isBottomSide = bubbleY > window.innerHeight / 2;
+        // Detect position relative to screen quadrants (more conservative thresholds)
+        const isRightSide = bubbleX > window.innerWidth * 0.6;
+        const isBottomSide = bubbleY > window.innerHeight * 0.6;
         
         let newX = bubbleX;
         let newY = bubbleY;
         
         // Smart horizontal positioning
         if (isRightSide) {
-          // If on right side, open leftward
-          newX = Math.max(0, bubbleX - modalWidth + UI_CONFIG.floatingAgent.minimizedSize);
+          // If on right side, open leftward - align right edges with buffer
+          newX = Math.max(10, bubbleX + UI_CONFIG.floatingAgent.minimizedSize - modalWidth - 10);
         } else {
           // If on left side, open rightward (default behavior)
-          newX = Math.min(bubbleX, window.innerWidth - modalWidth);
+          newX = Math.min(bubbleX, window.innerWidth - modalWidth - 10);
         }
         
         // Smart vertical positioning
         if (isBottomSide) {
-          // If on bottom side, open upward
-          newY = Math.max(0, bubbleY - modalHeight + UI_CONFIG.floatingAgent.minimizedSize);
+          // If on bottom side, open upward - align bottom edges with buffer
+          newY = Math.max(10, bubbleY + UI_CONFIG.floatingAgent.minimizedSize - modalHeight - 10);
         } else {
           // If on top side, open downward (default behavior)
-          newY = Math.min(bubbleY, window.innerHeight - modalHeight);
+          newY = Math.min(bubbleY, window.innerHeight - modalHeight - 10);
         }
         
         // Ensure the modal stays within viewport bounds
