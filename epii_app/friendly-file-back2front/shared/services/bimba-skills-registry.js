@@ -296,6 +296,64 @@ class BimbaSkillsRegistry {
   findSkillsByQLPosition(qlPosition) {
     return this.findSkills({ qlPosition });
   }
+
+  /**
+   * Get all available agents that have registered skills
+   * @returns {Array} Array of agent IDs that have skills registered
+   */
+  getAvailableAgents() {
+    return Array.from(this.agentSkills.keys());
+  }
+
+  /**
+   * Get all available skills
+   * @returns {Array} Array of all registered skills
+   */
+  getAvailableSkills() {
+    return Array.from(this.skills.values());
+  }
+
+  /**
+   * Get skills for a specific agent
+   * @param {string} agentId The agent ID
+   * @returns {Array} Array of skills for the specified agent
+   */
+  getSkillsByAgent(agentId) {
+    if (!this.agentSkills.has(agentId)) {
+      return [];
+    }
+    
+    const skillIds = this.agentSkills.get(agentId);
+    return Array.from(skillIds).map(id => this.getSkillById(id)).filter(Boolean);
+  }
+
+  /**
+   * Get available chat skills (skills with 'chat' in the ID)
+   * @returns {Array} Array of chat skills
+   */
+  getAvailableChatSkills() {
+    return this.getAvailableSkills().filter(skill => 
+      skill.id.includes('chat') || skill.name.toLowerCase().includes('chat')
+    );
+  }
+
+  /**
+   * Check if a specific skill exists
+   * @param {string} skillId The skill ID to check
+   * @returns {boolean} True if skill exists, false otherwise
+   */
+  hasSkill(skillId) {
+    return this.skills.has(skillId);
+  }
+
+  /**
+   * Check if a specific agent has any skills registered
+   * @param {string} agentId The agent ID to check
+   * @returns {boolean} True if agent has skills, false otherwise
+   */
+  hasAgent(agentId) {
+    return this.agentSkills.has(agentId) && this.agentSkills.get(agentId).size > 0;
+  }
 }
 
 // Create singleton instance
@@ -367,4 +425,5 @@ async function getRegistryInstance() {
 
 // Export both the class and the singleton instance
 module.exports = BimbaSkillsRegistry;
+module.exports.getRegistryInstance = getRegistryInstance;
 module.exports.getInstance = getRegistryInstance;

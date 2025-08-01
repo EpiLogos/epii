@@ -4,7 +4,7 @@ import { z } from "zod";
 export const GraphitiEpisodeType = z.enum(["text", "json", "message"]);
 
 // QL-aligned enums for coordinate-aware operations
-export const QLVariant = z.enum(["0/1", "2/3", "4/6", "7/8/9", "10/12", "16/24"]);
+export const QLVariant = z.enum(["0/1", "2/3", "4/6", "7/8/9/10", "11/12", "16/18/24"]);
 export const QLContextFrame = z.enum(["0000", "0/1", "0/1/2", "0/1/2/3", "4.0-4/5", "5/0"]);
 
 // Add Graphiti Episode Schema with Bimba coordinate integration

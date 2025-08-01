@@ -584,6 +584,120 @@ class SessionHistoryService {
 
     return true;
   }
+
+  /**
+   * Get recent sessions for history display
+   */
+  async getRecentSessions(limit: number = 10): Promise<AgentSession[]> {
+    try {
+      // Try to get from MongoDB first
+      const mongoSessions = await this.getConversationsFromMongoDB(limit);
+      if (mongoSessions.length > 0) {
+        return mongoSessions.map(entry => this.convertSessionEntryToAgentSession(entry));
+      }
+
+      // Fallback to local storage
+      const allSessions = this.getAllSessions();
+      return allSessions
+        .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+        .slice(0, limit)
+        .map(entry => this.convertSessionEntryToAgentSession(entry));
+    } catch (error) {
+      console.error('[SessionHistoryService] Failed to get recent sessions:', error);
+      
+      // Final fallback to local storage only
+      const allSessions = this.getAllSessions();
+      return allSessions
+        .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+        .slice(0, limit)
+        .map(entry => this.convertSessionEntryToAgentSession(entry));
+    }
+  }
+
+  /**
+   * Get specific session by ID
+   */
+  async getSession(sessionId: string): Promise<AgentSession | null> {
+    try {
+      // Try MongoDB first
+      const loaded = await this.loadSessionFromMongoDB(sessionId);
+      if (loaded && this.currentSession && this.currentSession.id === sessionId) {
+        return this.currentSession;
+      }
+
+      // Fallback to local storage
+      const allSessions = this.getAllSessions();
+      const sessionEntry = allSessions.find(s => s.sessionId === sessionId);
+      return sessionEntry ? this.convertSessionEntryToAgentSession(sessionEntry) : null;
+    } catch (error) {
+      console.error('[SessionHistoryService] Failed to get session:', error);
+      
+      // Fallback to local storage only
+      const allSessions = this.getAllSessions();
+      const sessionEntry = allSessions.find(s => s.sessionId === sessionId);
+      return sessionEntry ? this.convertSessionEntryToAgentSession(sessionEntry) : null;
+    }
+  }
+
+  /**
+   * Delete a session by ID
+   */
+  async deleteSession(sessionId: string): Promise<boolean> {
+    try {
+      // Don't allow deleting the current active session
+      if (this.currentSession && this.currentSession.id === sessionId) {
+        console.warn('[SessionHistoryService] Cannot delete current active session');
+        return false;
+      }
+
+      // Remove from local storage
+      const allSessions = this.getAllSessions();
+      const filteredSessions = allSessions.filter(s => s.sessionId !== sessionId);
+      this.sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredSessions));
+
+      // Remove from message history map
+      this.messageHistory.delete(sessionId);
+
+      // Try to delete from MongoDB (non-blocking)
+      try {
+        const response = await fetch(`${this.BACKEND_BASE_URL}/api/conversations/${sessionId}?userId=${this.currentUserId}`, {
+          method: 'DELETE'
+        });
+        
+        if (!response.ok && response.status !== 404) {
+          console.warn('[SessionHistoryService] Failed to delete from MongoDB:', response.statusText);
+        }
+      } catch (mongoError) {
+        console.warn('[SessionHistoryService] MongoDB delete failed:', mongoError);
+      }
+
+      console.log(`[SessionHistoryService] Session deleted: ${sessionId}`);
+      return true;
+    } catch (error) {
+      console.error('[SessionHistoryService] Failed to delete session:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Convert SessionHistoryEntry to AgentSession format
+   */
+  private convertSessionEntryToAgentSession(entry: SessionHistoryEntry): AgentSession {
+    return {
+      id: entry.sessionId,
+      startTime: entry.startTime,
+      lastActivity: entry.endTime || new Date(),
+      messageCount: entry.messages.length,
+      context: entry.context,
+      preferences: {
+        maxMessagesInMemory: AGENT_CONFIG.maxMessagesInMemory,
+        contextCompactingThreshold: AGENT_CONFIG.contextCompactingThreshold,
+        preferredOrchestrationStrategy: AGENT_CONFIG.defaultOrchestrationStrategy,
+        enabledSubsystems: AGENT_CONFIG.enabledSubsystems as any[]
+      },
+      messages: entry.messages // Include messages for compatibility
+    };
+  }
 }
 
 // Singleton instance

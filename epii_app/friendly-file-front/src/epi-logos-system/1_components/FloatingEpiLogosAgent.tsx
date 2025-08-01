@@ -68,7 +68,6 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 
   // UI state
   const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   
   // Performance optimization: Use refs for drag position tracking
   const dragPositionRef = useRef({ x: 0, y: 0 });
@@ -411,11 +410,18 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     };
 
     try {
-      // Send via WebSocket to A2A layer
+      // Send via WebSocket to A2A layer using the expected A2A format
       const success = sendWebSocketMessage({
-        type: 'orchestration:request',
-        agentId: EPI_LOGOS_AGENT_ID,
-        payload: orchestrationRequest
+        type: 'skill-execution',
+        skillId: orchestrationRequest.expertSkillId,
+        parameters: {
+          message: inputMessage,
+          context: orchestrationRequest.context,
+          coordinate: orchestrationRequest.context.currentCoordinate,
+          aguiRunId: orchestrationRequest.context.sessionId
+        },
+        context: orchestrationRequest.context,
+        id: `skill_${Date.now()}`
       });
 
       if (!success) {
@@ -574,7 +580,11 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     // Prevent default to avoid text selection
     e.preventDefault();
     
-    if ((e.target as HTMLElement).closest('.drag-handle') || state.isMinimized) {
+    // Check if minimized using DOM state instead of React state
+    const currentIsMinimized = agentRef.current?.classList.contains('minimized') || 
+                              (agentRef.current?.offsetWidth || 0) <= UI_CONFIG.floatingAgent.minimizedSize;
+    
+    if ((e.target as HTMLElement).closest('.drag-handle') || currentIsMinimized) {
       setIsDragging(true);
       isDraggingRef.current = true;
       
@@ -583,7 +593,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         const offsetX = e.clientX - rect.left;
         const offsetY = e.clientY - rect.top;
         
-        setDragOffset({ x: offsetX, y: offsetY });
+        // Only update ref, not state during drag start
         dragOffsetRef.current = { x: offsetX, y: offsetY };
         
         // Initialize drag position ref
@@ -596,7 +606,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         agentRef.current.style.userSelect = 'none';
       }
     }
-  }, [state.isMinimized]);
+  }, []); // Empty dependency array for stable reference
 
   /**
    * Handle drag with optimized performance using refs
@@ -607,9 +617,13 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     const newX = e.clientX - dragOffsetRef.current.x;
     const newY = e.clientY - dragOffsetRef.current.y;
     
+    // Get current minimized state from ref to avoid state dependencies
+    const currentIsMinimized = agentRef.current.classList.contains('minimized') || 
+                              agentRef.current.offsetWidth <= UI_CONFIG.floatingAgent.minimizedSize;
+    
     // Constrain to viewport bounds
-    const maxX = window.innerWidth - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
-    const maxY = window.innerHeight - (state.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
+    const maxX = window.innerWidth - (currentIsMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
+    const maxY = window.innerHeight - (currentIsMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
     
     const constrainedX = Math.max(0, Math.min(newX, maxX));
     const constrainedY = Math.max(0, Math.min(newY, maxY));
@@ -620,7 +634,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     
     // Store position in ref for final state update
     dragPositionRef.current = { x: constrainedX, y: constrainedY };
-  }, [state.isMinimized]);
+  }, []); // Empty dependency array for stable reference
 
   /**
    * Handle drag end with anchoring logic
@@ -631,7 +645,10 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     
     // Reset cursor
     if (agentRef.current) {
-      agentRef.current.style.cursor = state.isMinimized ? 'pointer' : 'default';
+      // Check minimized state from DOM instead of React state
+      const currentIsMinimized = agentRef.current.classList.contains('minimized') || 
+                                agentRef.current.offsetWidth <= UI_CONFIG.floatingAgent.minimizedSize;
+      agentRef.current.style.cursor = currentIsMinimized ? 'pointer' : 'default';
       agentRef.current.style.userSelect = '';
     }
 
@@ -688,7 +705,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       
       requestAnimationFrame(animateToAnchor);
     }
-  }, [state.isMinimized]);
+  }, []); // Empty dependency array for stable reference
 
   // Set up drag event listeners
   useEffect(() => {
@@ -930,41 +947,47 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     setState(prev => {
       const newMinimized = !prev.isMinimized;
       
-      // If expanding from minimized, implement smart positioning
+      // If expanding from minimized, implement boundary-aware smart positioning
       if (!newMinimized && prev.isMinimized) {
         const bubbleX = prev.position.x;
         const bubbleY = prev.position.y;
         const modalWidth = windowSize.width;
         const modalHeight = windowSize.height;
         
-        // Detect position relative to screen quadrants (more conservative thresholds)
-        const isRightSide = bubbleX > window.innerWidth * 0.6;
-        const isBottomSide = bubbleY > window.innerHeight * 0.6;
+        // Check if at anchor position (bottom-right corner)
+        const anchorX = window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20;
+        const anchorY = window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20;
+        const isAtAnchor = Math.abs(bubbleX - anchorX) < 50 && Math.abs(bubbleY - anchorY) < 50;
         
-        let newX = bubbleX;
-        let newY = bubbleY;
+        let newX, newY;
+        const bufferZone = 10;
         
-        // Smart horizontal positioning
-        if (isRightSide) {
-          // If on right side, open leftward - align right edges with buffer
-          newX = Math.max(10, bubbleX + UI_CONFIG.floatingAgent.minimizedSize - modalWidth - 10);
+        if (isAtAnchor) {
+          // At anchor: open up-left to get away from screen edges
+          newX = bubbleX - modalWidth;
+          newY = bubbleY - modalHeight;
         } else {
-          // If on left side, open rightward (default behavior)
-          newX = Math.min(bubbleX, window.innerWidth - modalWidth - 10);
+          // For all other positions: boundary-aware positioning
+          // Try to open right of bubble first
+          if (bubbleX + modalWidth + bufferZone <= window.innerWidth) {
+            newX = bubbleX;
+          } else {
+            // Not enough space on right, open left
+            newX = bubbleX - modalWidth;
+          }
+          
+          // Try to open below bubble first
+          if (bubbleY + modalHeight + bufferZone <= window.innerHeight) {
+            newY = bubbleY;
+          } else {
+            // Not enough space below, open above
+            newY = bubbleY - modalHeight;
+          }
         }
         
-        // Smart vertical positioning
-        if (isBottomSide) {
-          // If on bottom side, open upward - align bottom edges with buffer
-          newY = Math.max(10, bubbleY + UI_CONFIG.floatingAgent.minimizedSize - modalHeight - 10);
-        } else {
-          // If on top side, open downward (default behavior)
-          newY = Math.min(bubbleY, window.innerHeight - modalHeight - 10);
-        }
-        
-        // Ensure the modal stays within viewport bounds
-        newX = Math.max(0, Math.min(newX, window.innerWidth - modalWidth));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - modalHeight));
+        // Final boundary enforcement - ensure modal stays on screen
+        newX = Math.max(bufferZone, Math.min(newX, window.innerWidth - modalWidth - bufferZone));
+        newY = Math.max(bufferZone, Math.min(newY, window.innerHeight - modalHeight - bufferZone));
         
         return { 
           ...prev, 
@@ -1066,12 +1089,14 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     return (
       <div
         ref={agentRef}
-        className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border shadow-2xl transition-all duration-300 hover:shadow-xl hover:border-opacity-40 cursor-pointer`}
+        className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border shadow-2xl cursor-pointer ${isDragging ? 'drag-active' : ''}`}
         style={{
           left: state.position.x,
           top: state.position.y,
           width: UI_CONFIG.floatingAgent.minimizedSize,
           height: UI_CONFIG.floatingAgent.minimizedSize,
+          transform: isDragging ? 'scale(0.98)' : 'scale(1)',
+          willChange: 'transform',
           borderRadius: '50%',
           zIndex: UI_CONFIG.floatingAgent.zIndex,
           display: 'flex',
@@ -1108,11 +1133,11 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   return (
     <div
       ref={agentRef}
-      className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border rounded-lg shadow-2xl transition-all duration-300 ${
-        isDragging ? 'cursor-grabbing scale-105' : 'cursor-default'
-      }`}
+      className={`fixed ${UI_CONFIG.styling.glass} ${UI_CONFIG.styling.border} border rounded-lg shadow-2xl ${isDragging ? 'drag-active cursor-grabbing' : 'cursor-default'}`}
       style={{
         left: state.position.x,
+        transform: isDragging ? 'scale(0.98)' : 'scale(1)',
+        willChange: 'transform',
         top: state.position.y,
         width: windowSize.width,
         height: windowSize.height,
@@ -1149,7 +1174,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={toggleMinimized}
-            className={`p-1 hover:bg-white/10 rounded ${UI_CONFIG.styling.accent}`}
+            className={`p-1 rounded ${UI_CONFIG.styling.accent} ${!isDragging ? 'hover:bg-white/10' : ''}`}
             title="Minimize"
           >
             <Minus className="w-3 h-3" />
@@ -1202,7 +1227,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           <button
             onClick={sendMessage}
             disabled={!inputMessage.trim() || state.isProcessing}
-            className={`px-3 py-2 ${UI_CONFIG.styling.accent} ${UI_CONFIG.styling.border} border rounded hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`px-3 py-2 ${UI_CONFIG.styling.accent} ${UI_CONFIG.styling.border} border rounded ${!isDragging ? 'hover:bg-white/10' : ''} disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <Send className="w-4 h-4" />
           </button>
@@ -1214,34 +1239,34 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         <>
           {/* Corner handles */}
           <div
-            className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 hover:opacity-100"
+            className={`absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 'se')}
             style={{ background: 'linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
           />
           <div
-            className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize opacity-50 hover:opacity-100"
+            className={`absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 'sw')}
             style={{ background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
           />
           <div
-            className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize opacity-50 hover:opacity-100"
+            className={`absolute top-0 right-0 w-3 h-3 cursor-ne-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 'ne')}
             style={{ background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
           />
           <div
-            className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize opacity-50 hover:opacity-100"
+            className={`absolute top-0 left-0 w-3 h-3 cursor-nw-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 'nw')}
             style={{ background: 'linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
           />
           
           {/* Edge handles */}
           <div
-            className="absolute bottom-0 left-3 right-3 h-1 cursor-s-resize opacity-50 hover:opacity-100"
+            className={`absolute bottom-0 left-3 right-3 h-1 cursor-s-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 's')}
             style={{ background: 'rgba(255,255,255,0.2)' }}
           />
           <div
-            className="absolute top-3 bottom-3 right-0 w-1 cursor-e-resize opacity-50 hover:opacity-100"
+            className={`absolute top-3 bottom-3 right-0 w-1 cursor-e-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}
             onMouseDown={(e) => handleResizeStart(e, 'e')}
             style={{ background: 'rgba(255,255,255,0.2)' }}
           />

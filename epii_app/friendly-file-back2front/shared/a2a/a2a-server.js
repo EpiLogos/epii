@@ -100,11 +100,76 @@ async function initializeA2AServer(epiiAgentService, port = 3033) {
   });
 
   // Create HTTP server
-  const server = http.createServer((req, res) => {
+  const server = http.createServer(async (req, res) => {
+    // Enable CORS for frontend requests
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
     // Handle agent card requests
     if (req.url === '/.well-known/agent/epii-agent') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(epiiAgentCard));
+      return;
+    }
+
+    // Handle registry query requests
+    if (req.url === '/api/registry/query' && req.method === 'POST') {
+      let body = '';
+
+      req.on('data', (chunk) => {
+        body += chunk.toString();
+      });
+
+      req.on('end', async () => {
+        try {
+          const request = JSON.parse(body);
+          console.log('[A2A Server] Registry query request:', request);
+
+          if (request.query === 'getRegistrationData') {
+            // Get registry instance and query available data
+            const { getRegistryInstance } = require('../services/bimba-skills-registry');
+            const registry = await getRegistryInstance();
+
+            const registrationData = {
+              availableAgents: registry.getAvailableAgents(),
+              availableSkills: registry.getAvailableSkills(),
+              chatSkills: registry.getAvailableChatSkills()
+            };
+
+            console.log('[A2A Server] Registry data response:', {
+              agents: registrationData.availableAgents.length,
+              skills: registrationData.availableSkills.length,
+              chatSkills: registrationData.chatSkills.length
+            });
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(registrationData));
+            return;
+          }
+
+          // Unknown query type
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            error: 'Unknown query type',
+            supportedQueries: ['getRegistrationData']
+          }));
+        } catch (error) {
+          console.error('[A2A Server] Registry query error:', error);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            error: 'Internal server error',
+            message: error.message
+          }));
+        }
+      });
       return;
     }
 

@@ -23,7 +23,14 @@ class BimbaSkillsRouter {
    * @returns {Promise<Object>} The result of the skill execution
    */
   async routeRequest(request) {
-    console.log(`Routing request: ${JSON.stringify(request)}`);
+    const logPrefix = '[BimbaSkillsRouter:routeRequest]';
+    console.log(`${logPrefix} Starting route request:`, {
+      skillId: request.skillId,
+      bimbaCoordinate: request.bimbaCoordinate,
+      qlPosition: request.qlPosition,
+      hasContent: !!request.content,
+      contentPreview: request.content ? request.content.substring(0, 50) + '...' : 'none'
+    });
 
     // Find the appropriate skill
     let skill = null;
@@ -69,7 +76,13 @@ class BimbaSkillsRouter {
       throw new Error(`Request must include skillId, bimbaCoordinate, qlPosition, or content`);
     }
 
-    console.log(`Selected skill: ${skill.name} (${skill.bimbaCoordinate}), QL Position: ${skill.qlMetadata?.qlPosition}`);
+    console.log(`${logPrefix} Selected skill:`, {
+      name: skill.name,
+      id: skill.id,
+      bimbaCoordinate: skill.bimbaCoordinate,
+      qlPosition: skill.qlMetadata?.qlPosition,
+      qlMode: skill.qlMetadata?.qlMode
+    });
 
     // Check if this skill has a double-covered counterpart
     const relatedSkills = this.skillsRegistry.getRelatedSkills(skill.id, 'double_covered');
