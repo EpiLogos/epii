@@ -2,8 +2,8 @@
 
 ## File Location
 **Path**: `epii_app/friendly-file-backend/databases/bpmcp/mcp-server/src/tools/bimba/queryBimbaGraph.ts`
-**Bimba Coordinate**: `[TO BE ASSIGNED]`
-**Last Updated**: `2025-01-30`
+**Bimba Coordinate**: `#5-2-0-16`
+**Last Updated**: `2025-08-02`
 
 ## Purpose & Role
 Query Bimba Graph Tool providing read operations for the Neo4j Bimba graph database through MCP (Model Context Protocol). Handles complex Cypher queries with coordinate detection, caching optimization, and comprehensive result processing. Serves as the primary read interface for Bimba coordinate system exploration within the BPMCP server architecture with sophisticated query analysis, performance optimization, and intelligent caching strategies.
@@ -158,3 +158,15 @@ No explicit test files referenced, but includes comprehensive error handling and
 - **Caching Optimization**: Coordinate-based caching for improved performance
 - **Logging Integration**: Comprehensive logging for debugging and monitoring
 - **BPMCP Alignment**: Properly aligned with Bimba Process Management and Coordination Protocol architecture
+
+## Change Log
+### 2025-08-02: Standardized Query Format Implementation
+**Issue Resolved**: LLM tool awareness gap - agents lacked guidance on proper coordinate-based query formatting for optimal bimba graph exploration.
+
+**Changes Applied**:
+- Enhanced tool description with standardized query format: `MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#coordinate' RETURN {nodes: collect(n), relationships: []} as graphData`
+- Added APOC integration guidance for embedding property removal using `apoc.map.removeKeys(properties(node), ['embedding'])`
+- Implemented coordinate syntax guide for single nodes, branch exploration, and full subsystem queries
+- Updated both TypeScript source and JavaScript build files for immediate runtime effect
+
+**Impact**: LLMs now receive comprehensive query format guidance as part of tool context, ensuring consistent coordinate-based exploration patterns and optimal result structuring.

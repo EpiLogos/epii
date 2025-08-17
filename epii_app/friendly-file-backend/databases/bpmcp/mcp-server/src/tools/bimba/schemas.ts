@@ -44,7 +44,13 @@ export const GenerateBimbaEmbeddingsSchema = z.object({
 });
 
 export const QueryBimbaGraphSchema = z.object({
-  query: z.string().optional().describe("Cypher query to execute against the Neo4j Bimba graph. Required if specificCoordinate is not provided."),
+  query: z.string().optional().describe(`Cypher query to execute against the Neo4j Bimba graph. Required if specificCoordinate is not provided.
+
+RECOMMENDED FORMAT: Use coordinate-based queries with STARTS WITH for branch exploration:
+"MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#2-5' RETURN {nodes: collect(n), relationships: []} as graphData"
+
+For embedding removal, use APOC:
+"MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#2-5' RETURN {nodes: [node in collect(n) | apoc.map.removeKeys(properties(node), ['embedding'])], relationships: []} as graphData"`),
   params: z.record(z.any()).optional().describe("Optional parameters for the Cypher query."),
   specificCoordinate: z.string().optional().describe("Optional Bimba coordinate to fetch a specific node's properties (e.g., '#5-2')."),
 });

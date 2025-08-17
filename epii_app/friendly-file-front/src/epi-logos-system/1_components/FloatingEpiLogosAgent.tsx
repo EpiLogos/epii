@@ -5,19 +5,19 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Minus, MessageCircle, Send, Settings, Archive, FileText } from 'lucide-react';
-import { 
-  AgentMessage, 
-  AgentSession, 
+import {
+  AgentMessage,
+  AgentSession,
   OrchestrationRequest,
   OrchestrationResponse,
   FloatingAgentState,
   OrchestrationStates,
   UI_CONFIG,
-  EPI_LOGOS_AGENT_ID 
+  EPI_LOGOS_AGENT_ID
 } from '../0_foundation';
 import { sessionHistoryService } from '../3_services/SessionHistoryService';
 import { contextCompactingService } from '../3_services/ContextCompactingService';
-import { sendWebSocketMessage, subscribeToAGUIEvents, onAGUIEvent } from '../3_services/webSocketService';
+import { sendWebSocketMessage, subscribeToAGUIEvents, onAGUIEvent, executeSkillWithAGUI } from '../3_services/webSocketService';
 import { GenerativeUIRenderer, type GenerativeUIComponent } from '../../shared/components/agent';
 import { useUniversalDocumentState } from '../../subsystems/5_epii/1_hooks/useUniversalDocumentState';
 import documentOperationsService from '../../subsystems/5_epii/1_services/documentOperationsService';
@@ -46,15 +46,15 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 }) => {
   // Calculate position with fallbacks
   const defaultPos = initialPosition || getDefaultPosition();
-  
+
   // Document context awareness
   const documentState = useUniversalDocumentState();
   const { currentDocument, currentDocumentId, documents, selections } = documentState;
-  
+
   // Active mode context for expert routing
   const activeMode = useActiveMode();
   const currentExpert = useCurrentExpert();
-  
+
   // Component state
   const [state, setState] = useState<FloatingAgentState>({
     isVisible: true,
@@ -68,14 +68,14 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 
   // UI state
   const [isDragging, setIsDragging] = useState(false);
-  
+
   // Performance optimization: Use refs for drag position tracking
   const dragPositionRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
-  
+
   const [inputMessage, setInputMessage] = useState('');
-  
+
   // Resize state
   const [isResizing, setIsResizing] = useState(false);
   const [resizeDirection, setResizeDirection] = useState<'se' | 'sw' | 'ne' | 'nw' | 's' | 'e' | null>(null);
@@ -91,13 +91,13 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
 
   // Initialize component only once
   const hasInitialized = useRef(false);
-  
+
   useEffect(() => {
     if (!hasInitialized.current) {
       initializeAgent();
       setupEventListeners();
       hasInitialized.current = true;
-      
+
       return () => {
         cleanupEventListeners();
       };
@@ -128,7 +128,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       const timeoutId = setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [state.isMinimized, state.isProcessing]);
@@ -138,25 +138,27 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const initializeAgent = useCallback(() => {
     console.log('[FloatingEpiLogosAgent] Initializing universal agent...');
-    
+
     // Set up MongoDB integration with user ID
     sessionHistoryService.setUserId('default-user'); // TODO: Replace with actual auth user ID
-    
-    // Subscribe to AG-UI events for orchestration responses
-    subscribeToAGUIEvents('orchestration:response');
-    subscribeToAGUIEvents('agent:message');
-    subscribeToAGUIEvents('agent:state');
+
+    // Subscribe to standard AG-UI events
+    subscribeToAGUIEvents('RunStarted');
+    subscribeToAGUIEvents('RunFinished');
+    subscribeToAGUIEvents('RunError');
+    subscribeToAGUIEvents('TextMessageContent');
   }, []);
 
   /**
    * Set up event listeners
    */
   const setupEventListeners = useCallback(() => {
-    // Listen for AG-UI orchestration responses
-    onAGUIEvent('orchestration:response', handleOrchestrationResponse);
-    onAGUIEvent('agent:message', handleAgentMessage);
-    onAGUIEvent('agent:state', handleAgentStateUpdate);
-    
+    // Listen for standard AG-UI events
+    onAGUIEvent('RunStarted', handleRunStarted);
+    onAGUIEvent('RunFinished', handleRunFinished);
+    onAGUIEvent('RunError', handleRunError);
+    onAGUIEvent('TextMessageContent', handleTextMessageContent);
+
     // Listen for context compacting events
     window.addEventListener('epi-logos:context-compacting-completed', handleContextCompactingCompleted);
   }, []);
@@ -169,61 +171,48 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   }, []);
 
   /**
-   * Handle orchestration responses from backend
+   * Handle RunStarted events (AG-UI standard)
    */
-  const handleOrchestrationResponse = useCallback(async (event: any) => {
-    const response: OrchestrationResponse = event.payload;
-    
+  const handleRunStarted = useCallback((event: any) => {
+    console.log('[FloatingAgent] Run started:', event.runId);
+    setState(prev => ({
+      ...prev,
+      isProcessing: true,
+      orchestrationState: OrchestrationStates.ANALYZING
+    }));
+  }, []);
+
+  /**
+   * Handle RunFinished events (AG-UI standard)
+   */
+  const handleRunFinished = useCallback(async (event: any) => {
+    console.log('[FloatingAgent] Run finished:', event.runId);
     setState(prev => ({
       ...prev,
       isProcessing: false,
       orchestrationState: OrchestrationStates.IDLE
     }));
-
-    // Add agent response message with MongoDB persistence
-    const responseMessage = await sessionHistoryService.addMessageWithPersistence({
-      type: 'agent',
-      content: formatOrchestrationResponse(response),
-      context: {
-        sessionId: state.currentSession.id,
-        orchestrationResponse: response
-      },
-      metadata: response.metadata
-    });
-
-    setState(prev => ({
-      ...prev,
-      messageHistory: [...prev.messageHistory, responseMessage]
-    }));
-  }, [state.currentSession]);
-
-  /**
-   * Handle direct agent messages
-   */
-  const handleAgentMessage = useCallback(async (event: any) => {
-    const message = await sessionHistoryService.addMessageWithPersistence({
-      type: 'agent',
-      content: event.payload.content,
-      context: event.payload.context,
-      metadata: event.payload.metadata
-    });
-
-    setState(prev => ({
-      ...prev,
-      messageHistory: [...prev.messageHistory, message]
-    }));
   }, []);
 
   /**
-   * Handle agent state updates
+   * Handle RunError events (AG-UI standard)
    */
-  const handleAgentStateUpdate = useCallback((event: any) => {
-    const { orchestrationState } = event.payload;
-    
+  const handleRunError = useCallback((event: any) => {
+    console.error('[FloatingAgent] Run error:', event);
     setState(prev => ({
       ...prev,
-      orchestrationState: orchestrationState || OrchestrationStates.IDLE
+      isProcessing: false,
+      orchestrationState: OrchestrationStates.IDLE
     }));
+    addSystemMessage(`❌ Error: ${event.message || 'Unknown error occurred'}`);
+  }, []);
+
+  /**
+   * Handle TextMessageContent for streaming (AG-UI standard)
+   */
+  const handleTextMessageContent = useCallback((event: any) => {
+    console.log('[FloatingAgent] Streaming content:', event.delta);
+    // Handle streaming text content if needed
   }, []);
 
   /**
@@ -231,7 +220,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const handleContextCompactingCompleted = useCallback((event: any) => {
     const { sessionId, result } = event.detail;
-    
+
     if (sessionId === state.currentSession.id) {
       addSystemMessage(`📋 Context compacted: ${result.originalMessageCount} → ${result.compactedMessageCount} messages (${(result.compressionRatio * 100).toFixed(1)}% compression)`);
     }
@@ -271,39 +260,39 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const handleDocumentOperation = useCallback(async (message: string): Promise<boolean> => {
     const lowerMessage = message.toLowerCase();
-    
+
     // Check for document operation commands
     if (lowerMessage.includes('create document') || lowerMessage.includes('new document')) {
-      const match = message.match(/create document[s]?\s+["'](.+)["']/) || 
+      const match = message.match(/create document[s]?\s+["'](.+)["']/) ||
                    message.match(/new document[s]?\s+["'](.+)["']/);
       const name = match ? match[1] : 'Untitled Document';
-      
+
       const result = await documentOperationsService.createDocument({
         name,
         content: '',
         coordinate: currentDocument?.bimbaCoordinate || '#5'
       });
-      
+
       addSystemMessage(result.message);
       return true;
     }
-    
+
     if (currentDocument && (lowerMessage.includes('analyze this document') || lowerMessage.includes('analyze current document'))) {
       const result = await documentOperationsService.startAnalysis({
         documentId: currentDocument.id,
         targetCoordinate: currentDocument.targetCoordinate || currentDocument.bimbaCoordinate
       });
-      
+
       addSystemMessage(result.message);
       return true;
     }
-    
+
     if (currentDocument && (lowerMessage.includes('save document') || lowerMessage.includes('save this document'))) {
       const result = await documentOperationsService.saveDocument(currentDocument.id);
       addSystemMessage(result.message);
       return true;
     }
-    
+
     if (lowerMessage.includes('create crystallization') && currentDocument && selections.length > 0) {
       const currentDocumentSelections = selections.filter(sel => sel.documentId === currentDocument.id);
       if (currentDocumentSelections.length > 0) {
@@ -316,12 +305,12 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             text: selection.text
           }
         });
-        
+
         addSystemMessage(result.message);
         return true;
       }
     }
-    
+
     return false; // Not a document operation
   }, [currentDocument, selections, addSystemMessage]);
 
@@ -410,38 +399,59 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     };
 
     try {
-      // Send via WebSocket to A2A layer using the expected A2A format
-      const success = sendWebSocketMessage({
-        type: 'skill-execution',
-        skillId: orchestrationRequest.expertSkillId,
-        parameters: {
+      // Use proper AG-UI skill execution
+      const result = await executeSkillWithAGUI(
+        orchestrationRequest.expertSkillId,
+        {
           message: inputMessage,
           context: orchestrationRequest.context,
           coordinate: orchestrationRequest.context.currentCoordinate,
           aguiRunId: orchestrationRequest.context.sessionId
         },
-        context: orchestrationRequest.context,
-        id: `skill_${Date.now()}`
-      });
+        orchestrationRequest.context,
+        {
+          runId: orchestrationRequest.context.sessionId,
+          threadId: `thread_${orchestrationRequest.context.sessionId}`,
+          enableAGUI: true
+        }
+      );
 
-      if (!success) {
+      // Process the result
+      if (result?.success && result?.data?.message) {
+        const responseMessage = await sessionHistoryService.addMessageWithPersistence({
+          type: 'agent',
+          content: result.data.message,
+          context: {
+            sessionId: state.currentSession.id,
+            bimbaCoordinates: result.data.context?.bimbaCoordinates || []
+          },
+          metadata: result.data.metadata || {}
+        });
+
+        setState(prev => ({
+          ...prev,
+          messageHistory: [...prev.messageHistory, responseMessage],
+          isProcessing: false,
+          orchestrationState: OrchestrationStates.IDLE
+        }));
+      } else {
         setState(prev => ({
           ...prev,
           isProcessing: false,
           orchestrationState: OrchestrationStates.IDLE
         }));
-        
-        addSystemMessage('⚠️ Failed to send message. Please check your connection.');
+        addSystemMessage('⚠️ No response received from agent.');
       }
+
     } catch (error) {
-      console.error('[FloatingEpiLogosAgent] Failed to send orchestration request:', error);
+      console.error('[FloatingEpiLogosAgent] Skill execution failed:', error);
       setState(prev => ({
         ...prev,
         isProcessing: false,
         orchestrationState: OrchestrationStates.IDLE
       }));
-      
-      addSystemMessage('⚠️ Error sending message. Please try again.');
+
+      addSystemMessage(`⚠️ Failed to process message: ${error.message}`);
     }
   }, [inputMessage, state.isProcessing, state.currentSession, state.messageHistory, currentDocument, currentDocumentId, documents, selections, handleDocumentOperation]);
 
@@ -451,14 +461,14 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const determineRequestType = (message: string) => {
     const lowerMessage = message.toLowerCase();
-    
+
     // Document operations
     if (lowerMessage.includes('create document') || lowerMessage.includes('new document') ||
         lowerMessage.includes('save document') || lowerMessage.includes('analyze this document') ||
         lowerMessage.includes('create crystallization')) {
       return 'document_operation';
     }
-    
+
     if (lowerMessage.includes('analyze') || lowerMessage.includes('analysis')) {
       return 'analyze';
     }
@@ -471,7 +481,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     if (lowerMessage.includes('reflect') || lowerMessage.includes('reflection')) {
       return 'reflect';
     }
-    
+
     return 'orchestrate'; // Default
   };
 
@@ -522,7 +532,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const extractGenerativeUI = (message: AgentMessage): GenerativeUIComponent[] => {
     const generativeUI = message.context?.generativeUI || message.metadata?.generativeUI;
-    
+
     if (!generativeUI) {
       return [];
     }
@@ -541,17 +551,17 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const renderMessageContent = (message: AgentMessage): React.ReactNode => {
     const hasGenUI = hasGenerativeUI(message);
-    
+
     if (hasGenUI) {
       const components = extractGenerativeUI(message);
-      
+
       return (
         <div className="space-y-3">
           {/* Regular text content */}
           {message.content && (
             <div className="whitespace-pre-wrap">{message.content}</div>
           )}
-          
+
           {/* Generative UI components */}
           {components.map((component, index) => (
             <GenerativeUIRenderer
@@ -579,27 +589,27 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     // Prevent default to avoid text selection
     e.preventDefault();
-    
+
     // Check if minimized using DOM state instead of React state
-    const currentIsMinimized = agentRef.current?.classList.contains('minimized') || 
+    const currentIsMinimized = agentRef.current?.classList.contains('minimized') ||
                               (agentRef.current?.offsetWidth || 0) <= UI_CONFIG.floatingAgent.minimizedSize;
-    
+
     if ((e.target as HTMLElement).closest('.drag-handle') || currentIsMinimized) {
       setIsDragging(true);
       isDraggingRef.current = true;
-      
+
       const rect = agentRef.current?.getBoundingClientRect();
       if (rect) {
         const offsetX = e.clientX - rect.left;
         const offsetY = e.clientY - rect.top;
-        
+
         // Only update ref, not state during drag start
         dragOffsetRef.current = { x: offsetX, y: offsetY };
-        
+
         // Initialize drag position ref
         dragPositionRef.current = { x: rect.left, y: rect.top };
       }
-      
+
       // Add some visual feedback
       if (agentRef.current) {
         agentRef.current.style.cursor = 'grabbing';
@@ -613,25 +623,25 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
    */
   const handleDrag = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current || !agentRef.current) return;
-    
+
     const newX = e.clientX - dragOffsetRef.current.x;
     const newY = e.clientY - dragOffsetRef.current.y;
-    
+
     // Get current minimized state from ref to avoid state dependencies
-    const currentIsMinimized = agentRef.current.classList.contains('minimized') || 
+    const currentIsMinimized = agentRef.current.classList.contains('minimized') ||
                               agentRef.current.offsetWidth <= UI_CONFIG.floatingAgent.minimizedSize;
-    
+
     // Constrain to viewport bounds
     const maxX = window.innerWidth - (currentIsMinimized ? UI_CONFIG.floatingAgent.minimizedSize : UI_CONFIG.floatingAgent.minWidth);
     const maxY = window.innerHeight - (currentIsMinimized ? UI_CONFIG.floatingAgent.minimizedSize : 60);
-    
+
     const constrainedX = Math.max(0, Math.min(newX, maxX));
     const constrainedY = Math.max(0, Math.min(newY, maxY));
-    
+
     // Update position immediately via direct style manipulation for smoothness
     agentRef.current.style.left = `${constrainedX}px`;
     agentRef.current.style.top = `${constrainedY}px`;
-    
+
     // Store position in ref for final state update
     dragPositionRef.current = { x: constrainedX, y: constrainedY };
   }, []); // Empty dependency array for stable reference
@@ -642,11 +652,11 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     isDraggingRef.current = false;
-    
+
     // Reset cursor
     if (agentRef.current) {
       // Check minimized state from DOM instead of React state
-      const currentIsMinimized = agentRef.current.classList.contains('minimized') || 
+      const currentIsMinimized = agentRef.current.classList.contains('minimized') ||
                                 agentRef.current.offsetWidth <= UI_CONFIG.floatingAgent.minimizedSize;
       agentRef.current.style.cursor = currentIsMinimized ? 'pointer' : 'default';
       agentRef.current.style.userSelect = '';
@@ -664,34 +674,34 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       x: window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20,
       y: window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20
     };
-    
+
     const distance = Math.sqrt(
-      Math.pow(finalPosition.x - anchorPos.x, 2) + 
+      Math.pow(finalPosition.x - anchorPos.x, 2) +
       Math.pow(finalPosition.y - anchorPos.y, 2)
     );
-    
+
     // If within threshold distance, animate back to anchor
     if (distance < UI_CONFIG.floatingAgent.anchorThreshold) {
       // Smooth animation back to anchor position
       const startPos = { ...finalPosition };
       const startTime = Date.now();
       const duration = UI_CONFIG.floatingAgent.anchorAnimationDuration;
-      
+
       const animateToAnchor = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Easing function for smooth animation
         const easeOut = 1 - Math.pow(1 - progress, 3);
-        
+
         const currentX = startPos.x + (anchorPos.x - startPos.x) * easeOut;
         const currentY = startPos.y + (anchorPos.y - startPos.y) * easeOut;
-        
+
         if (agentRef.current) {
           agentRef.current.style.left = `${currentX}px`;
           agentRef.current.style.top = `${currentY}px`;
         }
-        
+
         if (progress < 1) {
           requestAnimationFrame(animateToAnchor);
         } else {
@@ -702,7 +712,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           }));
         }
       };
-      
+
       requestAnimationFrame(animateToAnchor);
     }
   }, []); // Empty dependency array for stable reference
@@ -712,7 +722,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     if (isDragging) {
       document.addEventListener('mousemove', handleDrag);
       document.addEventListener('mouseup', handleDragEnd);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleDrag);
         document.removeEventListener('mouseup', handleDragEnd);
@@ -726,7 +736,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       setState(prev => {
         const maxX = window.innerWidth - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : windowSize.width);
         const maxY = window.innerHeight - (prev.isMinimized ? UI_CONFIG.floatingAgent.minimizedSize : windowSize.height);
-        
+
         return {
           ...prev,
           position: {
@@ -823,7 +833,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
     if (isResizing) {
       document.addEventListener('mousemove', handleResize);
       document.addEventListener('mouseup', handleResizeEnd);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleResize);
         document.removeEventListener('mouseup', handleResizeEnd);
@@ -903,8 +913,8 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           }
         };
 
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-          type: 'application/json' 
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+          type: 'application/json'
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -946,22 +956,22 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
   const toggleMinimized = useCallback(() => {
     setState(prev => {
       const newMinimized = !prev.isMinimized;
-      
+
       // If expanding from minimized, implement boundary-aware smart positioning
       if (!newMinimized && prev.isMinimized) {
         const bubbleX = prev.position.x;
         const bubbleY = prev.position.y;
         const modalWidth = windowSize.width;
         const modalHeight = windowSize.height;
-        
+
         // Check if at anchor position (bottom-right corner)
         const anchorX = window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20;
         const anchorY = window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20;
         const isAtAnchor = Math.abs(bubbleX - anchorX) < 50 && Math.abs(bubbleY - anchorY) < 50;
-        
+
         let newX, newY;
         const bufferZone = 10;
-        
+
         if (isAtAnchor) {
           // At anchor: open up-left to get away from screen edges
           newX = bubbleX - modalWidth;
@@ -975,7 +985,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             // Not enough space on right, open left
             newX = bubbleX - modalWidth;
           }
-          
+
           // Try to open below bubble first
           if (bubbleY + modalHeight + bufferZone <= window.innerHeight) {
             newY = bubbleY;
@@ -984,45 +994,45 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             newY = bubbleY - modalHeight;
           }
         }
-        
+
         // Final boundary enforcement - ensure modal stays on screen
         newX = Math.max(bufferZone, Math.min(newX, window.innerWidth - modalWidth - bufferZone));
         newY = Math.max(bufferZone, Math.min(newY, window.innerHeight - modalHeight - bufferZone));
-        
-        return { 
-          ...prev, 
+
+        return {
+          ...prev,
           isMinimized: newMinimized,
           position: { x: newX, y: newY }
         };
       }
-      
+
       // If minimizing, animate back to anchor position
       if (newMinimized && !prev.isMinimized) {
         const anchorPos = {
           x: window.innerWidth - UI_CONFIG.floatingAgent.minimizedSize - 20,
           y: window.innerHeight - UI_CONFIG.floatingAgent.minimizedSize - 20
         };
-        
+
         // Start animation to anchor position
         const startPos = { ...prev.position };
         const startTime = Date.now();
         const duration = UI_CONFIG.floatingAgent.anchorAnimationDuration;
-        
+
         const animateToAnchor = () => {
           const elapsed = Date.now() - startTime;
           const progress = Math.min(elapsed / duration, 1);
-          
+
           // Easing function for smooth animation
           const easeOut = 1 - Math.pow(1 - progress, 3);
-          
+
           const currentX = startPos.x + (anchorPos.x - startPos.x) * easeOut;
           const currentY = startPos.y + (anchorPos.y - startPos.y) * easeOut;
-          
+
           if (agentRef.current) {
             agentRef.current.style.left = `${currentX}px`;
             agentRef.current.style.top = `${currentY}px`;
           }
-          
+
           if (progress < 1) {
             requestAnimationFrame(animateToAnchor);
           } else {
@@ -1033,22 +1043,22 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             }));
           }
         };
-        
+
         requestAnimationFrame(animateToAnchor);
-        
-        return { 
-          ...prev, 
+
+        return {
+          ...prev,
           isMinimized: newMinimized,
           // Don't update position immediately, let animation handle it
         };
       }
-      
+
       return { ...prev, isMinimized: newMinimized };
     });
   }, [windowSize.width, windowSize.height]);
 
   // Memoized message list for performance
-  const memoizedMessageList = useMemo(() => 
+  const memoizedMessageList = useMemo(() =>
     state.messageHistory.map((message) => (
       <div
         key={message.id}
@@ -1071,7 +1081,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
           )}
         </div>
       </div>
-    )), 
+    )),
     [state.messageHistory]
   );
 
@@ -1112,8 +1122,8 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
         title="Epi-Logos Agent - Click to expand"
       >
         <div className="relative">
-          <MessageCircle 
-            className={`w-6 h-6 ${UI_CONFIG.styling.accent} ${state.isProcessing ? 'animate-pulse' : ''}`} 
+          <MessageCircle
+            className={`w-6 h-6 ${UI_CONFIG.styling.accent} ${state.isProcessing ? 'animate-pulse' : ''}`}
           />
           {state.orchestrationState !== OrchestrationStates.IDLE && (
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
@@ -1170,7 +1180,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center gap-1">
           <button
             onClick={toggleMinimized}
@@ -1196,7 +1206,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: 'calc(100% - 120px)' }}>
             {memoizedMessageList}
-            
+
             {state.isProcessing && (
               <div className="flex justify-start">
                 <div className={`bg-white/5 border ${UI_CONFIG.styling.border} px-3 py-2 rounded-lg text-sm text-gray-100`}>
@@ -1207,7 +1217,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
                 </div>
               </div>
             )}
-            
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -1258,7 +1268,7 @@ export const FloatingEpiLogosAgent: React.FC<FloatingEpiLogosAgentProps> = ({
             onMouseDown={(e) => handleResizeStart(e, 'nw')}
             style={{ background: 'linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.3) 70%, transparent 70%)' }}
           />
-          
+
           {/* Edge handles */}
           <div
             className={`absolute bottom-0 left-3 right-3 h-1 cursor-s-resize opacity-50 ${!isDragging ? 'hover:opacity-100' : ''}`}

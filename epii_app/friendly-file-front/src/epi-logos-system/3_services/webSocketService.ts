@@ -79,26 +79,26 @@ const aguiEventHandlers = new Map<string, AGUIEventHandler[]>();
 const STANDARD_AGUI_EVENTS = {
   // Lifecycle Events (5 types)
   RUN_STARTED: 'RunStarted',
-  RUN_FINISHED: 'RunFinished', 
+  RUN_FINISHED: 'RunFinished',
   RUN_ERROR: 'RunError',
   STEP_STARTED: 'StepStarted',
   STEP_FINISHED: 'StepFinished',
-  
+
   // Text Message Events (3 types)
   TEXT_MESSAGE_START: 'TextMessageStart',
-  TEXT_MESSAGE_CONTENT: 'TextMessageContent', 
+  TEXT_MESSAGE_CONTENT: 'TextMessageContent',
   TEXT_MESSAGE_END: 'TextMessageEnd',
-  
+
   // Tool Call Events (3 types)
   TOOL_CALL_START: 'ToolCallStart',
   TOOL_CALL_ARGS: 'ToolCallArgs',
   TOOL_CALL_END: 'ToolCallEnd',
-  
+
   // State Management Events (3 types)
   STATE_SNAPSHOT: 'StateSnapshot',
   STATE_DELTA: 'StateDelta',
   MESSAGES_SNAPSHOT: 'MessagesSnapshot',
-  
+
   // Special Events (2 types)
   RAW: 'Raw',
   CUSTOM: 'Custom'
@@ -200,8 +200,11 @@ const handleWebSocketMessage = (data: WebSocketMessage): void => {
   } else {
     console.log('❌ Not identified as AG-UI event. Type:', data.type);
     console.log('🔍 Available AG-UI event types:', [
-      'BimbaUpdateSuggestions', 'BimbaAnalysisProgress', 'BimbaContextUpdate',
-      'RunStarted', 'RunFinished', 'RunError', 'StepStarted', 'StepFinished'
+      'RunStarted', 'RunFinished', 'RunError', 'StepStarted', 'StepFinished',
+      'TextMessageStart', 'TextMessageContent', 'TextMessageEnd',
+      'ToolCallStart', 'ToolCallArgs', 'ToolCallEnd',
+      'StateSnapshot', 'StateDelta', 'MessagesSnapshot',
+      'BimbaUpdateSuggestions', 'BimbaAnalysisProgress', 'BimbaContextUpdate'
     ]);
   }
 
@@ -245,17 +248,17 @@ const handleWebSocketMessage = (data: WebSocketMessage): void => {
 const isAGUIEvent = (data: WebSocketMessage): boolean => {
   // Standard 16 AG-UI event types
   const standardTypes = Object.values(STANDARD_AGUI_EVENTS);
-  
+
   // Bimba-specific custom events
   const bimbaCustomTypes = [
     'BimbaUpdateSuggestions',
-    'BimbaAnalysisProgress', 
+    'BimbaAnalysisProgress',
     'BimbaContextUpdate',
     'BimbaNodeAnalysisRequest',
     'QLStageTransition',
     'CoordinateChange'
   ];
-  
+
   // Document lifecycle AG-UI events
   const documentTypes = [
     'DocumentCreated',
@@ -271,12 +274,9 @@ const isAGUIEvent = (data: WebSocketMessage): boolean => {
     'CoordinateDocumentsUpdated',
     'DocumentStateRefresh'
   ];
-  
+
   // Agent communication events
   const agentTypes = [
-    'orchestration:response',
-    'agent:message',
-    'agent:state',
     'frontend:getContext',
     'frontend:contextResponse',
     'frontend:invokeAction'
@@ -297,11 +297,11 @@ const handleAGUIEvent = (event: AGUIEvent): void => {
     case 'frontend:getContext':
       handleFrontendContextRequest(event as any);
       return;
-      
+
     case 'frontend:contextResponse':
       handleFrontendContextResponse(event as any);
       return;
-      
+
     case 'frontend:invokeAction':
       handleFrontendActionRequest(event as any);
       return;
@@ -372,35 +372,35 @@ const handleDocumentCacheUpdate = (event: DocumentCacheUpdateEvent): void => {
  */
 const handleFrontendContextRequest = async (request: FrontendContextRequest): Promise<void> => {
   console.log(`🔍 Handling frontend context request:`, request);
-  
+
   const { requestId, payload } = request;
   const { componentId, contextType = 'fullState' } = payload;
-  
+
   try {
     let contextData: any = {};
-    
+
     // Gather context based on requested type
     switch (contextType) {
       case 'fullState':
         contextData = await getFrontendFullState(componentId);
         break;
-        
+
       case 'currentDocument':
         contextData = await getCurrentDocumentContext();
         break;
-        
+
       case 'selectedText':
         contextData = await getSelectedTextContext();
         break;
-        
+
       case 'userProfile':
         contextData = await getUserProfileContext();
         break;
-        
+
       default:
         throw new Error(`Unknown context type: ${contextType}`);
     }
-    
+
     // Send response back to agent
     const response: FrontendContextResponse = {
       type: 'frontend:contextResponse',
@@ -408,20 +408,20 @@ const handleFrontendContextRequest = async (request: FrontendContextRequest): Pr
       success: true,
       data: contextData
     };
-    
+
     sendWebSocketMessage(response);
     console.log(`✅ Frontend context response sent for request ${requestId}`);
-    
+
   } catch (error) {
     console.error(`❌ Error handling frontend context request ${requestId}:`, error);
-    
+
     const errorResponse: FrontendContextResponse = {
       type: 'frontend:contextResponse',
       requestId,
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
-    
+
     sendWebSocketMessage(errorResponse);
   }
 };
@@ -431,17 +431,17 @@ const handleFrontendContextRequest = async (request: FrontendContextRequest): Pr
  */
 const handleFrontendContextResponse = (response: FrontendContextResponse): void => {
   console.log(`📥 Received frontend context response:`, response);
-  
+
   const pendingRequest = pendingContextRequests.get(response.requestId);
   if (!pendingRequest) {
     console.warn(`No pending context request found for ID: ${response.requestId}`);
     return;
   }
-  
+
   // Clear timeout
   clearTimeout(pendingRequest.timeout);
   pendingContextRequests.delete(response.requestId);
-  
+
   // Resolve or reject the promise
   if (response.success) {
     pendingRequest.resolve(response.data);
@@ -455,20 +455,20 @@ const handleFrontendContextResponse = (response: FrontendContextResponse): void 
  */
 const handleFrontendActionRequest = async (request: FrontendActionRequest): Promise<void> => {
   console.log(`⚡ Handling frontend action request:`, request);
-  
+
   const { requestId, payload } = request;
   const { actionId, parameters, targetComponent } = payload;
-  
+
   try {
     // Look up action in registry
     const actionHandler = frontendActionRegistry.get(actionId);
     if (!actionHandler) {
       throw new Error(`Unknown frontend action: ${actionId}`);
     }
-    
+
     // Execute action with parameters
     const result = await actionHandler(parameters);
-    
+
     // Send success response back to agent (fire-and-forget style)
     const response = {
       type: 'frontend:actionResponse',
@@ -476,20 +476,20 @@ const handleFrontendActionRequest = async (request: FrontendActionRequest): Prom
       success: true,
       result
     };
-    
+
     sendWebSocketMessage(response);
     console.log(`✅ Frontend action ${actionId} executed successfully`);
-    
+
   } catch (error) {
     console.error(`❌ Error executing frontend action ${actionId}:`, error);
-    
+
     const errorResponse = {
       type: 'frontend:actionResponse',
       requestId,
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
-    
+
     sendWebSocketMessage(errorResponse);
   }
 };
@@ -676,7 +676,7 @@ const getFrontendFullState = async (componentId?: string): Promise<any> => {
     documentCache: documentCacheService.getAllDocuments(),
     selectedText: window.getSelection()?.toString() || null
   };
-  
+
   // Add component-specific state if componentId provided
   if (componentId) {
     // This would be extended with actual component state gathering
@@ -685,7 +685,7 @@ const getFrontendFullState = async (componentId?: string): Promise<any> => {
       // Additional component state would be gathered here
     };
   }
-  
+
   return state;
 };
 
@@ -733,20 +733,20 @@ export const requestFrontendContext = (
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     const requestId = `context_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Set up timeout
     const timeoutHandle = setTimeout(() => {
       pendingContextRequests.delete(requestId);
       reject(new Error('Frontend context request timeout'));
     }, timeout);
-    
+
     // Store pending request
     pendingContextRequests.set(requestId, {
       resolve,
       reject,
       timeout: timeoutHandle
     });
-    
+
     // Send context request
     const request: FrontendContextRequest = {
       type: 'frontend:getContext',
@@ -757,7 +757,7 @@ export const requestFrontendContext = (
         timestamp: new Date().toISOString()
       }
     };
-    
+
     if (!sendWebSocketMessage(request)) {
       clearTimeout(timeoutHandle);
       pendingContextRequests.delete(requestId);
@@ -802,7 +802,7 @@ export const emitAGUIEvent = (
     metadata,
     ...payload
   };
-  
+
   console.log(`📡 Emitting AG-UI event: ${event.type}`, event);
   return sendWebSocketMessage(event);
 };
@@ -831,7 +831,7 @@ const webSocketService = {
   initializeWebSocket,
   sendWebSocketMessage,
   isWebSocketConnected,
-  
+
   // AG-UI event handling
   subscribeToAGUIEvents,
   unsubscribeFromAGUIEvents,
@@ -840,7 +840,7 @@ const webSocketService = {
   executeSkillWithAGUI,
   emitAGUIEvent,
   getStandardAGUIEvents,
-  
+
   // Frontend context and action management
   requestFrontendContext,
   registerFrontendAction,

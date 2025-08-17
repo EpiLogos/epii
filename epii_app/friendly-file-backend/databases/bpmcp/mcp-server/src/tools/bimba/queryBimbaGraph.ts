@@ -8,7 +8,30 @@ import { handleError } from "../../utils/error.js";
 // Tool definition
 export const queryBimbaGraphTool: Tool = {
   name: "queryBimbaGraph",
-  description: "Execute a Cypher query against the Neo4j Bimba graph.",
+  description: `Execute a Cypher query against the Neo4j Bimba graph.
+
+RECOMMENDED STANDARD FORMAT for coordinate branch exploration:
+{
+  "query": "MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#2-5' RETURN {nodes: collect(n), relationships: []} as graphData"
+}
+
+This format efficiently retrieves all nodes beneath a coordinate branch and structures results optimally for LLM consumption.
+
+APOC INTEGRATION for embedding removal:
+{
+  "query": "MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#2-5' RETURN {nodes: [node in collect(n) | apoc.map.removeKeys(properties(node), ['embedding'])], relationships: []} as graphData"
+}
+
+BEST PRACTICES:
+- Use 'STARTS WITH' for coordinate hierarchy traversal
+- Return results as 'graphData' object with 'nodes' and 'relationships' arrays
+- Use APOC procedures (apoc.map.removeKeys) to exclude embedding properties
+- This tool automatically filters embeddings from results when not using APOC
+
+COORDINATE SYNTAX GUIDE:
+- Single node: '#2-5'
+- Branch exploration: '#2-5' with STARTS WITH
+- Full subsystem: '#2' with STARTS WITH`,
   inputSchema: zodToJsonSchema(QueryBimbaGraphSchema),
 };
 
@@ -81,7 +104,7 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
       properties: processNodeProperties(rec.get("properties")),
       relationshipType: rec.get("relationshipType"),
     }));
-    
+
     // 4. Fetch Siblings (distinct)
     const siblingResult = await dbSession.run(
       "MATCH (p)-[]->(n {bimbaCoordinate: $coord}) WITH p, n " + // Added 'n' to WITH to use in WHERE
@@ -151,7 +174,7 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
       console.log(`${logPrefix} Executing general Cypher query: ${validatedArgs.query}`);
       const cypherQuery = validatedArgs.query;
       const queryParams = validatedArgs.params;
-      
+
       // This specific try...catch is for errors during the general query execution
       try {
         const result = await session.run(cypherQuery, queryParams || {});
@@ -205,7 +228,7 @@ export async function handleQueryBimbaGraph(dependencies: ToolDependencies, args
   } catch (error: any) { // Outer catch for errors like arg parsing, session creation, or errors bubbled up
     console.error(`${logPrefix} Tool execution error:`, error);
     // Pass the original error to handleError if it's already an McpError or needs specific formatting
-    throw handleError(error, "queryBimbaGraph"); 
+    throw handleError(error, "queryBimbaGraph");
   } finally { // Outer finally to ensure session is always closed if created
     if (session) {
       try {

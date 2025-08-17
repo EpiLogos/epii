@@ -587,6 +587,12 @@ async function initializeA2AServer(epiiAgentService, port = 3033) {
             }));
           }
         } else {
+          // Handle AG-UI events coming back from gateway (prevent event loop)
+          if (data.type && Object.values(AGUIEventTypes).includes(data.type)) {
+            console.log(`[A2A Server] Received AG-UI event: ${data.type} (ignoring to prevent loop)`);
+            return;
+          }
+
           // Unknown message type
           console.log(`❌ Received unknown message type from ${clientId}`);
           console.log(`🔍 Message analysis: type=${data.type}, jsonrpc=${data.jsonrpc}, method=${data.method}, performative=${data.performative}`);

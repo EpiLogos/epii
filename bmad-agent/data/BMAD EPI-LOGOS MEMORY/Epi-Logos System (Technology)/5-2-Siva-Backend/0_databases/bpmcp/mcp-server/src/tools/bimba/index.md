@@ -2,7 +2,7 @@
 
 ## File Location
 **Path**: `epii_app/friendly-file-backend/databases/bpmcp/mcp-server/src/tools/bimba/index.ts`
-**Bimba Coordinate**: `[TO BE ASSIGNED]`
+**Bimba Coordinate**: `#5-2-0-21`
 **Last Updated**: `[TO BE UPDATED]`
 
 ## Purpose & Role

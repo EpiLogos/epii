@@ -159,6 +159,56 @@ epii_app/
 - **Integration Points**: How schemas connect across system components
 - **QL Integration**: Quaternary Logic properties and their significance
 
+## Change Logging Protocol
+
+### Purpose
+Maintain precise, minimal but meaningful change logs in BMAD documentation files to track system evolution and provide context for future development.
+
+### When to Add Change Logs
+- **Significant Functional Changes**: Tool enhancements, API modifications, schema updates
+- **Issue Resolutions**: Bug fixes, performance improvements, integration problems solved
+- **Architecture Updates**: Structural changes, new integrations, protocol modifications
+- **Not Required For**: Minor documentation updates, typo fixes, formatting changes
+
+### Change Log Format
+Add a "Change Log" section at the end of BMAD documentation files:
+
+```markdown
+## Change Log
+### YYYY-MM-DD: [Brief Change Title]
+**Issue Resolved**: [Concise description of the problem that was addressed]
+
+**Changes Applied**:
+- [Specific change 1 with technical details]
+- [Specific change 2 with technical details]
+- [Additional changes as needed]
+
+**Impact**: [Brief description of the practical benefit or improvement achieved]
+```
+
+### Change Log Guidelines
+1. **Precise**: State exact issue and solution clearly
+2. **Minimal**: Concise entries without unnecessary detail
+3. **Meaningful**: Capture significance and business value
+4. **Timestamped**: Use YYYY-MM-DD format for clear chronology
+5. **Impact-focused**: Explain practical benefits achieved
+6. **Technical Specificity**: Include relevant code patterns, formats, or configurations
+
+### Example Implementation
+```markdown
+## Change Log
+### 2025-08-02: Standardized Query Format Implementation
+**Issue Resolved**: LLM tool awareness gap - agents lacked guidance on proper coordinate-based query formatting for optimal bimba graph exploration.
+
+**Changes Applied**:
+- Enhanced tool description with standardized query format: `MATCH (n) WHERE n.bimbaCoordinate STARTS WITH '#coordinate' RETURN {nodes: collect(n), relationships: []} as graphData`
+- Added APOC integration guidance for embedding property removal using `apoc.map.removeKeys(properties(node), ['embedding'])`
+- Implemented coordinate syntax guide for single nodes, branch exploration, and full subsystem queries
+- Updated both TypeScript source and JavaScript build files for immediate runtime effect
+
+**Impact**: LLMs now receive comprehensive query format guidance as part of tool context, ensuring consistent coordinate-based exploration patterns and optimal result structuring.
+```
+
 ## Continuation Protocol
 
 ### For Any LLM Picking Up This Task

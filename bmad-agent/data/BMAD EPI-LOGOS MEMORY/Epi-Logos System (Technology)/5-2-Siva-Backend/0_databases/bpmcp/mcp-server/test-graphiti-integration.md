@@ -3,45 +3,88 @@
 ## File Location
 **Path**: `epii_app/friendly-file-backend/databases/bpmcp/mcp-server/test-graphiti-integration.js`
 **Bimba Coordinate**: `[TO BE ASSIGNED]`
-**Last Updated**: `[TO BE UPDATED]`
+**Last Updated**: `2025-01-30`
 
 ## Purpose & Role
-[Description of what this file does and its role in the system]
+Graphiti Integration Test Script providing comprehensive testing and validation of Graphiti temporal knowledge graph integration with BPMCP MCP server communication. Handles Graphiti integration testing, MCP client communication, temporal knowledge graph validation, and comprehensive integration workflow coordination. Serves as the primary integration testing utility enabling Graphiti functionality validation, MCP communication testing, and advanced temporal knowledge graph integration verification.
 
 ## System Integration
 ### Imports
-- [List of key imports with brief descriptions]
+- **GraphitiClient**: Graphiti client for temporal knowledge graph operations and MCP communication
+- **Node.js Runtime**: Node.js runtime environment for script execution and testing coordination
 
 ### Exports
-- [List of key exports with brief descriptions]
+- **Integration Test Script**: Standalone integration test script for Graphiti functionality validation and MCP communication testing
+- **Testing Functions**: Comprehensive testing functions with Graphiti integration validation and MCP communication verification
 
 ### Dependencies
-- [List of files/services this depends on]
+- **Graphiti Server**: Graphiti temporal knowledge graph server providing knowledge management capabilities
+- **BPMCP MCP Server**: BPMCP MCP server providing tool integration and execution environment
+- **GraphitiClient**: Graphiti client providing temporal knowledge graph operations and communication
 
 ### Dependents
-- [List of files/services that depend on this]
+- **Integration Testing**: Integration testing workflows requiring Graphiti functionality validation and MCP communication testing
+- **Quality Assurance**: QA processes utilizing integration test script for Graphiti verification and validation
+- **Development Workflow**: Development processes requiring Graphiti integration testing and validation
+- **Temporal Knowledge Graph Operations**: Knowledge graph operations requiring Graphiti integration validation
 
 ## Key Functions/Components
-### [Function/Component Name] (Lines X-Y)
-**Purpose**: [Brief description]
-**Parameters**: [If applicable]
-**Returns**: [If applicable]
-**Notes**: [Any important implementation details, bugs, or quirks]
+### testGraphitiIntegration Function (Lines 12-124)
+**Purpose**: Main integration testing function for Graphiti temporal knowledge graph with comprehensive MCP communication validation
+**Parameters**: Graphiti client configuration and testing parameters for integration validation
+**Returns**: Integration test results with Graphiti functionality validation and MCP communication status
+**Notes**: 124 lines implementing comprehensive integration test script with temporal knowledge graph validation and MCP communication testing
+
+### Graphiti Client Initialization (Lines 16-19)
+**Purpose**: Initializes Graphiti client with base URL configuration for temporal knowledge graph operations
+**Parameters**: Graphiti base URL and client configuration for server communication
+**Returns**: Configured Graphiti client for temporal knowledge graph operations and testing
+**Notes**: Advanced client initialization with comprehensive configuration and connection management
+
+### Server Status Testing (Lines 23-30)
+**Purpose**: Tests Graphiti server status with comprehensive validation and error handling
+**Parameters**: Server status validation parameters and connection testing configuration
+**Returns**: Server status results with validation confirmation and error reporting
+**Notes**: Comprehensive server status testing ensuring Graphiti server availability and functionality
+
+### Integration Testing Workflow (Lines 32-80)
+**Purpose**: Comprehensive integration testing workflow with Graphiti functionality validation and MCP communication testing
+**Parameters**: Integration testing parameters with functionality validation and communication testing
+**Returns**: Integration testing results with comprehensive validation status and performance assessment
+**Notes**: Advanced integration testing with comprehensive Graphiti functionality and MCP communication validation
+
+### Error Handling and Reporting (Lines 81-124)
+**Purpose**: Handles integration testing errors with comprehensive error processing and detailed reporting
+**Parameters**: Error handling context and testing coordination for error management and reporting
+**Returns**: Error handling with detailed error reporting and integration testing status
+**Notes**: Comprehensive error handling ensuring robust integration testing coverage and detailed error analysis
 
 ## Data Flow
-[Description of how data flows through this file]
+1. **Test Initialization**: Script startup → Graphiti client initialization → Server configuration → Integration preparation
+2. **Server Status Testing**: Server connection → Status validation → Availability confirmation → Status reporting
+3. **Integration Testing**: Functionality testing → MCP communication validation → Integration verification → Results assessment
+4. **Validation Processing**: Test results → Validation analysis → Performance assessment → Status confirmation
+5. **Error Handling**: Error detection → Error processing → Error reporting → Test completion
 
 ## Configuration
-[Any configuration options, environment variables, or settings]
-
-## Known Issues
-[List any bugs, TODOs, or problematic areas]
+**Graphiti Configuration**: GRAPHITI_BASE_URL (default: http://127.0.0.1:8000) for server connection
+**Integration Testing**: Comprehensive integration testing with functionality validation and MCP communication testing
+**Client Configuration**: GraphitiClient configuration with base URL and connection management
 
 ## Testing
-[Information about tests, if any]
+Integration test script provides comprehensive Graphiti temporal knowledge graph validation with MCP communication testing
 
 ## Related Files
-[List of closely related files with brief descriptions of relationships]
+**GraphitiClient**: Graphiti client providing temporal knowledge graph operations and MCP communication
+**Graphiti Server**: Temporal knowledge graph server providing knowledge management capabilities
+**BPMCP MCP Server**: MCP server providing tool integration and execution environment
 
 ## Development Notes
-[Any important notes for future development]
+- **Integration Testing Excellence**: Comprehensive integration test script enabling consistent Graphiti functionality validation and MCP communication testing
+- **Temporal Knowledge Graph Integration**: Advanced temporal knowledge graph integration with comprehensive validation and testing
+- **MCP Communication Testing**: Sophisticated MCP communication testing with comprehensive validation and error handling
+- **Server Status Validation**: Comprehensive server status testing ensuring Graphiti server availability and functionality
+- **Error Handling Resilience**: Advanced error handling ensuring integration testing coverage and detailed error analysis
+- **Development Support**: Clear testing boundaries and comprehensive integration validation management
+- **Quality Assurance**: Scalable integration test script suitable for production Graphiti validation and QA processes
+- **BPMCP Alignment**: Integration test script alignment with sophisticated Bimba coordinate system and temporal knowledge graph support

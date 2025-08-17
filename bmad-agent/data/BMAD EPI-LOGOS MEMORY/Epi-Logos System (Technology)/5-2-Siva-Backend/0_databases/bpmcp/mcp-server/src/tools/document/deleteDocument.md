@@ -2,7 +2,7 @@
 
 ## File Location
 **Path**: `epii_app/friendly-file-backend/databases/bpmcp/mcp-server/src/tools/document/deleteDocument.ts`
-**Bimba Coordinate**: `[TO BE ASSIGNED]`
+**Bimba Coordinate**: `#5-2-0-29`
 **Last Updated**: `2025-01-30`
 
 ## Purpose & Role
